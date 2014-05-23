@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>ECT - Thoughts and plans</title>
+</head>
+<body>
+<h1>ECT: Thoughts and Plans</h1>
+Chris Greenhalgh, 2004-09-13 [updated 2004-09-21]<br>
+<h2>Status</h2>
+<ul>
+  <li>Java WebStart-able system</li>
+  <li>Distributed (single LAN Installation)</li>
+  <li>Device proxies for: EZIO, TagIt, ACCORD SmartIts, Motes
+(partial), X10 (in progress), simple Joystick (in progress), Phidgets
+(output only)</li>
+  <li>Audio and video capture and simple processing framework.</li>
+  <li>Dynamo display surface.<br>
+  </li>
+  <li>Hosting/import for Processing applets</li>
+  <li>Computation/behaviour through: simple script, association
+learner, delay-line, counter-timer.</li>
+  <li>Persistence and re-starting</li>
+  <li>Graph-view editor, tree-view editor, configuration save/restore</li>
+  <li>Recording of dataspace, supporting potential replay/review<br>
+  </li>
+</ul>
+<h3>Limitations of current implementation<br>
+</h3>
+<ul>
+  <li>Authoring only using explicit component/line GUIs</li>
+  <ul>
+    <li>Slow and unwieldy for larger systems<br>
+    </li>
+    <li>Visual complexity increases rapidly</li>
+  </ul>
+  <li>No self-discovery/plug-and-play</li>
+  <ul>
+    <li>Explicitly create all components</li>
+    <li>Explicitly identify COM ports for serial devices</li>
+  </ul>
+  <li>Graph-view editor does not cope well with restart/joining a
+running application<br>
+  </li>
+  <li>No composite components or views</li>
+  <li>No fail-over, build-in adaptation, etc.</li>
+  <li>No examples of or particular support for adaptation by components
+(e.g. component creation, selection, re/wiring)</li>
+  <li>No recording of non-dataspace state/events (for replay/review)</li>
+  <li>No support for mobile/ad-hoc style join/leave or federation</li>
+  <li>Partially centralised dataspace implementation</li>
+  <li>No remote diagnostic support</li>
+  <li>No support for auto-instantiation</li>
+  <li>No support for singletons or other re-use of components across
+multiple requests</li>
+  <li>No additional information about properties for framework or
+editors, e.g. input/output, reliable/unreliable, update rate</li>
+  <li>No fan-in policy/framework<br>
+  </li>
+  <li>No service UI story</li>
+  <li>No array type property support</li>
+  <li>Effectively Java-only, with no standard network protocol
+(undocumented and not self-describing/extensible, anyway)<br>
+  </li>
+  <li>Graph editor does not reflect addition/removal of dynamic
+properties for components on the surface <br>
+  </li>
+</ul>
+<h3>Limitations of use/experience</h3>
+<ul>
+  <li>No "real" use</li>
+  <li>No specific success metrics</li>
+  <li>No experimental data/results/analysis<br>
+  </li>
+</ul>
+<h2>Possible Directions/outcomes</h2>
+<ul>
+  <li>Software 'release'/open source, <br>
+  </li>
+  <ul>
+    <li>requires</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>documented, easy to start, immediately useful, supported,
+championed</li>
+    </ul>
+    <li>produces</li>
+    <ul>
+      <li>software output<br>
+      </li>
+    </ul>
+  </ul>
+  <li>Support experience projects,</li>
+  <ul>
+    <li>e.g.</li>
+    <ul>
+      <li>curious home, esp. andy law</li>
+      <li>not-so-curious home</li>
+      <li>chawton</li>
+      <li>?<br>
+      </li>
+    </ul>
+  </ul>
+  <ul>
+    <li>requires <br>
+    </li>
+    <ul>
+      <li>experience project(s) and interested stake-holders</li>
+      <li>potential for technical integration/adoption<br>
+      </li>
+    </ul>
+  </ul>
+  <ul>
+    <ul>
+      <li>documentation, support, <br>
+      </li>
+      <li>composite components, partially configured
+capabilities/assemblies<br>
+      </li>
+      <li>easier interfaces? <br>
+      </li>
+      <li>new components?</li>
+      <li>new capabilities, e.g. federation?</li>
+    </ul>
+    <li>produces</li>
+    <ul>
+      <li>experience projects (easier, faster?) and experience project
+publications</li>
+      <li>supporting use publications?</li>
+    </ul>
+  </ul>
+  <li>Systems research</li>
+  <ul>
+    <li>work areas<br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>federation?</li>
+    </ul>
+    <ul>
+      <li>security??</li>
+    </ul>
+    <ul>
+      <li>architecture?</li>
+    </ul>
+    <ul>
+      <li>discovery?</li>
+    </ul>
+    <ul>
+      <li>adaptation/"autonomic"?</li>
+    </ul>
+    <ul>
+      <li>peer-to-peer?</li>
+    </ul>
+    <li>produces</li>
+    <ul>
+      <li>publications<br>
+      </li>
+    </ul>
+  </ul>
+  <li>Use/usability research</li>
+  <ul>
+    <li>areas<br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>home modelling?</li>
+    </ul>
+    <ul>
+      <li>semantic thingies?</li>
+    </ul>
+    <ul>
+      <li>training/learning?</li>
+    </ul>
+  </ul>
+</ul>
+<h2>Possible Activities</h2>
+<ul>
+  <li>Supporting early adopters with the current system</li>
+  <ul>
+    <li>implies technical perspective, relatively small systems, no
+mobile stuff</li>
+  </ul>
+  <li>Multi-installation support</li>
+  <ul>
+    <li>Mobile users, and/or network installations</li>
+  </ul>
+  <li>Better interface and device management and discovery</li>
+  <ul>
+    <li>singleton components, auto-instantiation, serial-line
+negotiation framework<br>
+    </li>
+  </ul>
+  <li>Easier-to-use models and interfaces</li>
+  <ul>
+    <li>composite components, redistributing assemblies, home maps,
+"semantic" annotations (place, purpose, phenomenon)</li>
+  </ul>
+  <li>More components</li>
+  <ul>
+    <li>More hardware device support, e.g. custom motes, phidget input,
+...</li>
+    <li>More functionality in software components</li>
+  </ul>
+  <li>Adaptation</li>
+  <ul>
+    <li>In components?</li>
+    <li>In the framework and/or tools?</li>
+  </ul>
+  <li>Record and reuse/analysis</li>
+  <ul>
+    <li>Better tool/review support</li>
+    <li>Experimental trials/deployments</li>
+    <li>Analysis (hypotheses and metrics??)</li>
+  </ul>
+  <li>eScience application demonstration</li>
+  <ul>
+    <li>Collaboratory??</li>
+    <li>Other requirements from the above??</li>
+  </ul>
+  <li>System architectures, models, formalisms, etc., etc.???<br>
+  </li>
+</ul>
+<br>
+</body>
+</html>

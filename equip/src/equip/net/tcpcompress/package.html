@@ -1,0 +1,24 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+  <HEAD>
+    <TITLE></TITLE>
+  </HEAD>
+<BODY>
+
+A plug-in to provide compression of communication (currently only
+over TCP} with {@link equip.net.ConnectionSap}.<P>
+
+Requires jzlib 1.0.1 (or above) in <code>CLASSPATH</code> - see <A
+HREF="http://www.jcraft.com/jzlib/">http://www.jcraft.com/jzlib/</A>. 
+There may be a copy of the jar in CVS.<P>
+
+Requires configuration via {@link equip.config.ConfigManager} to have
+been read prior to use, e.g. in your config file:
+
+<PRE>DefaultTcpFilter: equip.net.tcpcompress.JzlibFilterFactory
+DefaultTcpFilterArg: 1
+JzlibDisableNagle: y
+JzlibTCPSendBufSize: 5000
+</PRE>
+
+</BODY></HTML>

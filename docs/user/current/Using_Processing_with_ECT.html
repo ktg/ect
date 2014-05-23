@@ -1,0 +1,191 @@
+<html>
+<head>
+  <title>Scripting components in Processing</title>
+</head>
+<body>
+<h1>Scripting components in Processing</h1>
+
+Created by Chris Greenhalgh 2005-03-01<BR>
+Last update by Stefan Rennick Egglestone 2006-07-07<BR><BR>
+
+<a href="#intro">Introduction</a><BR>
+<a href="#started">Getting Started</a><BR>
+<a href="#method1">Using Processing when the graph editor is started via method 1</a>
+
+<h3><a name="intro">Introduction</h3>
+
+<P>
+<a href="http://processing.org/" target="_blank">Processing</a> is a programming
+language and Integrated Development Environment (IDE) which focusses
+on providing support for artists and graphic designers who 
+want to program images, animation and sound. User of processing
+can use its IDE to develop and test programs, and when finished,
+these programs can be exported as applets for use in web-pages
+and other scenarios.
+</P>
+<P>
+ECT provides support which allows any Processing program
+to be used as a component in the ECT environment. This document
+describes how this can be done. It assumes knowledge of using
+Processing.
+</P>
+
+<h3><a name="started">Getting started</h3>
+
+There are now two ways to use Processing with ECT:
+
+<ul>
+  <li>from within the Processing IDE
+  <li>once a Processing applet has been exported
+</ul>
+
+This document describes both of these methods. If you haven't done
+any Processing programming before, you might like to 
+use the following example program below, which simply
+opens a window and draws a circle in it. The instructions
+will describe how this program can be made available as an 
+ECT component with a property called <i>size</i> that initially
+opens a window and draws a circle of size 20, but which redraws
+this circle when the <i>size</i> property is modified.
+
+<pre>
+public int size = 20;
+
+void setup() 
+  {  
+    size(200, 200);  
+    framerate(30);  
+  }
+
+void draw() 
+  {  
+    background(102);  
+    ellipse(width/2, height/2, size, size);
+  }
+</pre>
+
+<h4>Using Processing from within the IDE</h4>
+
+<ol>
+
+<li>
+  Start up the ECT graph editor by using 
+  <a href="ECT_Webstart_Getting_Started.html#method2">method 2</a>,
+  as described in the 
+  <a href="ECT_Webstart_Getting_Started.html">Getting Started</a> guide.
+</li>
+<li>Start up the Processing IDE, and copy the example program into it
+<li>Add the following files to the sketch (using the <tt>Sketch->Add File</tt> menu option)
+  <ul>
+    <li>ect/java/install/ect-core.jar</li>
+    <li>ect/java/install/common/equip4jcore.jar</li>
+  </ul>
+</li>
+<li>Add the following line to the "setup" method of the example
+that you have pasted into the IDE:
+  <ul>
+    <li>
+      <pre>equip.ect.ProcessingHelper.init(this, "myappletname");</pre>
+    </li>
+  </ul>
+</li>
+<li>add the following line to the "draw" method of the example:
+  <ul>
+    <li>
+      <pre>equip.ect.ProcessingHelper.poll();</pre>
+    </li>
+  </ul>
+</li>
+<li>run the processing sketch (ie using the button that looks
+like the play button on a tape recorder). A window will open
+containing a circle, and a new component will appear in the
+graph editor, with one property called <i>size</i>. Modify 
+this property and the size of the circle will change.
+</ol>
+
+<P>
+It should be noted that only fields labelled as "public" will appear as
+component properties.
+</P>
+
+<h4>Using an exported Processing applet</h4>
+
+<ol>
+  <li>in Processing, export the program to get an applet jar file
+  <li>locate the <tt>runProcessingHandler.bat</tt> file in your
+      ECT <tt>install</tt> directory and run it. This will present
+      you with a file choose, which you should use to select
+      your exported applet jar.
+  <li>click "open". This will cause the generation of an ECT
+      component in the <tt>install/components/runtimeGenerated</tt>
+      directory</li>
+  <li>start up the ECT graph editor using 
+      <a href="ECT_Webstart_Getting_Started.html#method2">method 2</a>
+      as described in the 
+      <a href="ECT_Webstart_Getting_Started.html">Getting Started</a> guide
+  </li>
+  <li>you should now be able to find your component in the Capability
+      Browser, and you should be able to request an instance of it
+</ol>
+
+<P>
+Please note that:
+<ul>
+  <li>public/package fields in the processing applet become ECT
+properties;</li>
+  <li>if you have problems with types (only simple types can be
+exported to ect), or too many unnecessary fields then make the ones you
+don't need private;</li>
+  <li>with versions of processing subsequent to 0070 the
+synchronisation with
+ect only occurs each time draw() is called (which may not be very often
+if using the new-to-later-versions noLoop() option)</li>
+</ul>
+
+<h3><a name="method1">Using Processing when the Graph Editor is started 
+via method 1</h3>
+
+<P>
+Launching the graph editor via 
+<a href="ECT_Webstart_Getting_Started.html#method1">method 1</a> as 
+described in the <a href="ECT_Webstart_Getting_Started.html">Getting Started</a>
+guide introduces some additional complexity when using processing.
+</P>
+
+<ul>
+<li>users can set a password (referred to as an installation secret - 
+see the <a href="ECT_Webstart_User_Guide.html">Using the graph editor</a>
+guide) which can be used to control who can join a particular installation
+<li>users can opt to join an installation running on a remote machine
+</ul>
+
+<P>
+As such, Processing applets that are to be used in this scenario
+have to be modified slightly. You should change the line that you 
+added to the setup method of the applet from:
+
+<pre>equip.ect.ProcessingHelper.init(this, "myappletname");</pre>
+
+to:
+
+<pre>equip.ect.ProcessingHelper.init(this, "myappletname", "equip://SERVERMACHINE:9123", "SHAREDSECRET");
+</pre>
+
+<P>
+replacing SERVERMACHINE with the server machine running your installation
+(you should use <tt>localhost</tt> if this is actually your local machine)
+and replacing SHAREDSECRET with the secret that was defined when your
+installation was started.
+</P>
+
+<P>
+Note that if you have chosen to export an applet from processing, 
+and are using method 1 to start the graph editor, then 
+you should copy the component jar file that was produced by
+running the <tt>runProcessingHandler.bat</tt> file to the
+<tt>webstart/download/java/components</tt> directory before
+starting the graph editor.
+</P>
+
+</body>
+</html>

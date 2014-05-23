@@ -1,0 +1,487 @@
+<html>
+<head>
+<title>ECT overview</title>
+</head>
+
+<body>
+<h1>ECT overview</h1>
+
+Created by Stefan Rennick Egglestone 2005-12-05<BR>
+Last update by Stefan Rennick Egglestone 2006-06-29<BR><BR>
+
+<a href="#introduction">Introduction</a><BR>
+<a href="#ubicomp">What is ubiquitous computing?</a><BR>
+<a href="#motivation">Motivation</a><BR>
+<a href="#concepts">Concepts</a><BR>
+<a href="#gui">Graphical user interfaces</a>
+
+<h3><a name="introduction">Introduction</h3>
+
+ECT is an piece of software which aims to support the rapid deployment of 
+ubiquitous computing
+experiences. This document explains our motiviation for developing
+ECT, introduces some of the concepts that you will need to understand in 
+order to use it, and describes some of the useful features
+that ECT provides.
+
+<h3><a name="ubicomp">What is ubiquitous computing?</h4>
+
+<i>Ubiquitous computing</i> (ubicomp) is a broad field of research, which
+involves investigations into the integration
+of computational devices into the environment. A short
+introduction to ubicomp can be found 
+<a href="http://en.wikipedia.org/wiki/Ubiquitous_computing">here</a>,
+and a longer introduction can be found
+<a href="http://www.ubiq.com/hypertext/weiser/UbiHome.html">here</a>.
+Ubicomp is also sometimes called <i>pervasive computing</i>.
+Installations of ubicomp devices in non-research settings
+(eg in museums, people's homes etc) are sometimes called
+<i>ubiquitous computing experiences</i>.
+
+<h3><a name="motivation">Motivation</h3>
+
+<P>
+The development of ECT has been motivated by previous work 
+involving the construction of ubiquitous computing experiences
+undertaken as part of the 
+<a href="http://www.sics.se/accord/index.html" 
+target="_blank">ACCORD</a> project
+and the 
+<a href="http://www.equator.ac.uk"
+target="_blank">EQUATOR</a> Interdisplinary 
+Research Collaboration (IRC). Work in ACCORD focussed on the
+construction of domestic ubicomp experience, and ongoing work
+in EQUATOR has focussed on themes such as 
+<a href="http://www.equator.ac.uk/index.php/articles/summary/c64/"
+target="_blank">Playing and Learning</a>,
+<a href="http://www.equator.ac.uk/index.php/articles/summary/c62/"
+target="_blank">Citywide Performance</a> and
+<a href="http://www.equator.ac.uk/index.php/articles/summary/c63/"
+target="_blank">Digital Care</a>.
+</p>
+<P>
+Although the ubicomp experiences constructed as part of these 
+activities have been very different, a common theme that
+has emerged from all of them is that the construction
+of experiences is difficult and time-consuming to get right. Some
+common problems that have been encountered include:
+</P>
+
+<ul>
+<li>developing software to control individual ubicomp devices from computers
+can be difficult, due to restrictions on the programming language
+needed to talk to the device, and the type and versions of libraries
+used by this software
+<li>if ubicomp experiences are distributed over a wide area, then
+setting up an infrastructure to allows computers to communicate with
+devices can be difficult and expensive - eg if might rely upon the 
+laying of large amounts of cabling. In many environments where we might
+install ubicomp experiences, such as in the home, then may not 
+even be possible to do this
+<li>designing a software architecture that supports the control of multiple
+distributed devices, which may be connected to multiple computers,
+is also a difficult problem
+</ul>
+
+<P>
+ECT has been developed as a result of the experiences that have
+been gained in solving these particular problems in the activities listed
+above. ECT allows:
+
+<ul>
+<li>users to specify which item of software on a particular computer
+should be used to communicate with a particular device attached to
+that computer
+<li>a chosen item of software on one computer 
+to be controlled from any other computer which is connected over
+a TCP/IP netowrk. Since network connections
+can be wireless, this can solve the problem of having to lay
+large amounts of cabling
+<li>complex behaviours to be specified by a combination of 
+software items intended to control devices and software items which performs
+processing operations - eg logic gates, queues for items of data
+gathered from sensors, scripts which express complex behaviours
+</ul>
+
+<P>
+As such, the ECT package is a combination of 
+
+<ul>
+<li>middleware facilities
+implementing an architecture that supports the construction of ubicomp experiencs
+<li>a set of software items (referred to as <i>components</i>) 
+which can be used to communicate with specific devices, to generate control
+instructions for devices, and to process and display
+data which has been gathered from such devices
+</ul>
+
+ECT is currently provided with over 80 components, which allow it to
+communicate with a wide range of physical devices.
+
+</p>
+
+<h3><a name="concepts">Concepts</h3>
+
+This section introduces some of the concepts necessary
+to understand and use ECT.
+
+<h4>Components</h4>
+
+<P>
+ECT uses the term <i>component</i> to refer to an item of software
+running on a particular computer which can be used to control
+a particular device. For a piece of software to be usable as
+a component in ECT,
+it must conform to certain requirements (although there will be 
+many existing items of software that already conform to these
+requirements and that will therefore be directly usable
+in ECT without modification). ECT is supplied with a large number of
+components to allow interactions with popular ubicomp devices,
+and many of these components are listed in component 
+documentation provided on this web-site (for example,
+ see the <a href="javadoc/categorisedComponents.html">Categorised 
+components list</a>).
+</P>
+
+<P>
+It should be noted that, in addition to the components supplied
+with ECT that can be used to control hardware devices, ECT is
+also supplied with a number of software-only components that
+can be used to perform processing operations. For example,
+<a href="javadoc/componentfiles/equip.ect.components.dynamicbsh.DynamicBeanShell.html">Dynamic BeanShell</a> is a component that allows scripts
+written in the <a href="http://www.beanshell.org">BeanShell</a> 
+language to be used in the ECT environment.
+</p>
+
+<h4>Component properties</h4>
+
+<P>
+All components define named properties, which can be used to 
+control their operation, and as a result the operation
+of any hardware device with which they may commmunicate. 
+For example, the 
+Camera component, which can be used to take a picture using
+a webcam, defines the following properties:
+
+<ul>
+<li>configCaptureDevice
+<li>triggerImageCapture
+<li>imageLocation
+</ul> 
+
+Users control components by providing values to properties.
+In this case, a user who wishes to use this component with 
+a webcam must first locate the ID of the camera
+they wish to use (see the <a href="javadoc/componentfiles/equip.ect.components.camera.Camera.html">Camera component online docs</a> for information about
+how this ID can be determined). This ID must then be provided to 
+the component through its 
+<i>configCaptureDevice</i> property.
+
+On receipt of this ID, 
+the component will attempt to connect to the camera that this specifies.
+After the component has connected, a user must trigger the camera
+to take a picture by providing a value to the
+<i>triggerImageCapture</i> property. This will cause the software
+component to communicate with the camera and request it to 
+record an image. When this has occured, the component will then
+place the URL of this image onto the <i>imageLocation</i>
+property. This URL might then be used by other components
+(for example, the 
+<a href="javadoc/componentfiles/equip.ect.components.simplemediaviewer.SimpleMediaViewer.html">Simple Media Viewer</a> component can be used
+to view the image that can be found at this URL).
+</P>
+
+<P>
+Note that the names of some of the properties on the 
+Camera component are examples of property names that follow
+certain conventions (you will also find these conventions regularly used
+in other ECT components):
+
+<ul>
+<li>properties with names starting with <i>config</i>
+represent configuration information for the component, and normally
+all config properties have to be specified by a user before
+the component is usable
+<li>properties with names starting with <i>trigger</i>
+are used to make the component perform an action. Specifying
+any value to these properties will trigger this action
+</ul>
+</p>
+
+<h4>Containers</h4>
+<p>
+In general a component which communicates with a particular
+device will run on the computer to which the device is attached,
+and may require the installation of various items of driver
+software on that machine for its operation (requirements for 
+driver installation are documented by each component - for an
+example, see the <a href="javadoc/componentfiles/equip.ect.components.phidgets.PhidgetInterfaceKit.html">PhidgetInterfaceKit</a> component). 
+</P>
+<P>
+However, in general, properties defined by a ECT component running on 
+one computer are controllable using ECT from another computer, as
+long as this computer is 
+connected over a network and is also running ECT. To 
+allow components to be controlled in this way, 
+ECT has the concept of a <i>container</i>,
+which is an item of software which runs on a computer, and which
+manages the components running on that machine.
+</p>
+<P>
+A container must be installed onto every machine on which
+components should run. When a container is started up, it will
+<ul>
+<li>locate all components which have been installed on the machine
+<li>examine the properties defined by each component
+<li>advertise the availability of the component to other machines
+on the network
+</ul>
+
+Once other machines on the network have seen a component advert
+(known in ECT as a <i>capability</i>) they can
+
+<ul>
+<li>make a request to the container for an instance of the component
+<li>make a request to the container to modify the values of any
+properties defined by the component
+</ul>
+
+The container is then responsible for manipulating components
+to fulfill these requests.
+
+</P>
+<P>
+Note for developers - ECT is currently supplied with a container
+written in Java, which is capable of hosting components which are
+defined as JavaBeans. Properties of a supplied bean are then
+interpretted by ECT as being properties of the component.
+See ECT Developer documentation for more information.
+</P>
+
+<h4>Specifying complex behaviour</h4>
+
+<P>
+Although components provided with ECT can simplify the process
+of setting up software that can control ubicomp devices, 
+setting up a ubicomp experience is likely to involve much
+more work than just installing ECT on a cluster of machines,
+attaching devices to machines, installing drivers for devices,
+and configuring components that can communicate with these
+devices. Designers are likely to wish to specify 
+much more complex behaviours in theirs systems than can 
+be provided using this process alone. 
+</p>
+
+<P>
+The primary mechanism in ECT for the specification of behaviour
+involves the creation of connections between properties
+on different components. Connections can be established 
+between components, even when they are hosted in containers
+running on different machines. If a connection exists between
+two properties, and if one of these properties is set to a new 
+value, then ECT will propogate this new value to any other 
+connected properties. Note that new values might be supplied
+by either users or by the component to which the property
+belongs.
+</P>
+
+<P>
+A simple example of this connection mechanism might involve
+two components - a 
+<a href="javadoc/componentfiles/equip.ect.components.camera.Camera.html">
+Camera</a>
+component and a 
+<a href="javadoc/componentfiles/equip.ect.components.simplemediaviewer.SimpleMediaViewer.html">
+Simple Media Viewer</a> component. If a connection is created
+between the <i>imageLocation</i> property of the Camera 
+components, and between the <i>browserURL</i> property of 
+a Simple Media Viewer component, then every time the 
+Camera component triggers its attached device to take a picture, 
+the URL where this picture can be found will be placed
+on the <i>imageLocation</i> property, and will get 
+propogated along the connection to the Simple Media Viewer
+<i>browserURL</i> property. This will cause the 
+picture at that URL to appear in a browser window maintained by 
+the Simple Media Viewer component. This browser window can 
+easily be on a different machine to the one to which the 
+camera device is attached.
+</P>
+
+<P>
+Of course, there are limitations to the complexity of behaviour
+that can be specified by this property connection mechanism.
+Adding connections between components representing hardware 
+devices
+ is useful in the creation of
+reactive systems (eg ones in which the principal behaviour of
+the system involves a number of events causing a number of actions).
+However, it is not sufficient to create systems which
+exhibit data processing functionality. In ECT at present, 
+data processing functionality can be added through the 
+addition of software-only components. These are components
+which are still controlled through the modification of property
+values, and which can therefore be connected to components
+representing hardware devices, but which themselves do not
+connect to any hardware device. Instead, they may provide
+useful data storage or processing functionality.
+</p>
+<P>
+ECT is currently provided with a wide range of software-only
+components, which have been developed to add 
+behavioural features to existing installations. Examples of
+software-only components include
+
+<ul>
+<li>email clients - allow emails to be sent and received
+<li>rss clients - can be used to monitor an rss feed
+<li>queuing components - allow items of data to be added to 
+and retrieved from a queue
+<li>data input and output components - provide graphical 
+interfaces to gather and display different types of data
+<li>logic operations - can apply logic functions to 
+boolean data (ie data which only takes the value true or false)
+<li>function operations - can be used to specify functions
+that should be applied to numeric data
+<li>many more ... 
+</ul>
+
+</P>
+
+<h4>Installations</h4>
+
+<P>
+The combination of 
+
+<ul>
+<li>a cluster of machines running ECT
+<li>the instances of components that a user has requested on these machines
+<li>the connections that a user has established between 
+properties on these components
+<li>the state of the system (ie the values that have been placed
+onto component properties)
+</ul>
+
+is referred to within ECT as an <i>installation</i>. An installation
+is just another term for a ubicomp experience that has been created
+using ECT.
+</P>
+<P>
+ECT provides functionality to manage multiple installations. Computers
+running ECT can be involved in multiple installations at once, 
+and users can switch between different installations that have been
+created at different times. This process works as follows:
+
+<ul>
+<li>for a particular installation, one computer in the cluster
+is defined as the <i>installation master</i>. User interface
+functionality on this machine is used to create a new installation,
+to give it a name and to give it a password (referred to as an
+<i>installation secret</i>).
+<li>other machines in the cluster can then join the installation
+by providing this name and secret. These machines are then
+referred to as <i>slaves</i>
+<li>it is likely that user interface functionality on the master
+machine will be used to view components available on other machines
+in the cluster, to request instances of components, to 
+establish connections between them, and to set other property values
+<li>details of any installation built will be stored on the master 
+machine
+<li>at any point, the master machine can be used to shut down
+an installation, which will cause component instances to 
+involved in an installation to be deleted from the machines on 
+which they are running
+<li>the master machine can also opt to re-start any of the installations
+that have previously been stored on it. If this occurs, then
+any components required for the installation will be recreated, any
+connections will be added, and any stored property values will be set
+</ul>
+
+</P>
+
+<P>
+Note that it is of course possible to run ECT on just one computer
+(rather than on all computers in a cluster) and if an installation
+is created on this computer, then this computer will automatically
+be the master computer for the installation.
+</P>
+
+<h3><a name="gui">Graphical user interfaces</a></h3>
+
+<P>
+The first part of this document has described core concepts
+and entities in
+ECT, including <i>components</i>, <i>component properties</i>,
+<i>containers</i>, <i>connections</i> and <i>installations</i>.
+The rest of this documentent briefly introduces the different
+types of graphical user interface (GUI) functionality which are
+provided with ECT to manipulate these entities.
+</P>
+<P>
+Different types of GUI functionality have been provided with ECT
+which are targetted at the needs of different categories of users.
+Types of functionality currently include:
+</P>
+
+<h4>The graph editor and capability browser</h4>
+
+<P>
+The combination of the graph editor and capability browser
+is currently the most commonly used interface 
+to ECT, and as such is also the most
+well-developed and bug-free. This section gives a brief 
+overview of the functionality of this interface - 
+for much more detail, including a number of screenshots of these
+interfaces - follow the <a href="user/current/ECT_Webstart_User_Guide.html">
+Learning to use ECT</a> tutorial.
+</P>
+<P>
+The capability browser is a window that displays 
+views of all components that are available
+in any container which has been attached to 
+a particular ECT installation. It allows users to view 
+any documentation defined by a particular component, 
+request that an instance of a component be created, and
+to request that existing instances of components be deleted.
+</P>
+
+<P>
+Once a component instance has been created through the capability
+browser, it will appear in the graph editor. This allows
+users to view the properties defined by a component, 
+modify any values they may have, and to establish 
+connections between properties. As properties on components change
+(for example, when caused by someone providing an input using
+a hardware device) then these property changes appear on the
+graph editor, and if a user uses the capability browser to delete
+a component instance, it will disappear from the graph editor.
+</P>
+
+<h4>Display editor (experimental)</h4>
+
+The display editor is currently an experimental piece of software,
+which is intended for use by users that are less computer-literate
+than those that may wish to use the graph editor. It 
+has been optimised for use through a touch-screen interface. 
+For a tutorial about using the display editor in 
+combination with the graph editor, read
+<a href="user/current/displaytutorial.html">Using the display editor</a>.
+
+<h4>Physical configuration editor (experimental)</h4>
+
+The physical configuration editor is another experimental piece of
+software. It allows logical statements and inferences to be made
+about a ubicomp system. More information about the display editor
+will appear on this web-site soon.
+
+<h4>Scripter application (experimental)</h4>
+
+This is an application that allows scripts to be developed that 
+can control complex components. As such, scripting is an 
+alternative mechanism for the specification of complex 
+behaviour in a ubicomp system than the construction of graphs. For
+an introduction to using the scripter, please read 
+<a href="user/current/scripter.html"/>Using the scripter</a>
+
+</body>
+</html>
+

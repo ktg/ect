@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT - webstart components index</title>
+</head>
+<body>
+<h1>ECT Webstart Component Index</h1>
+<h2>Index</h2>
+<h3>Testing</h3>
+<ul>
+  <li>TestingBinaryOutput - boolean display widget</li>
+  <li>TestingGaugeOutput - float display widget (range 0.0f-1.0f)&nbsp;</li>
+  <li>TestingPushButtonInput - momentary boolean input widget</li>
+  <li>TestingSliderInput - float input widget (range 0.0f-1.0f)</li>
+  <li>TestingTextFieldInput - string input widget</li>
+  <li>TestingTextFieldOutput - string output widget</li>
+  <li>TestingToggleButtonInput - latching boolean input widget<br>
+  </li>
+</ul>
+<h3>Behaviour</h3>
+<ul>
+  <li><a href="#AssociationLearner">AssociationLearner</a> - learns
+simple input -&gt; output mappings (functions) by example</li>
+  <li><a href="#BeanShell">BeanShell</a> - simple <a
+ href="http://www.beanshell.org/">BeanShell</a> (Java) script component<br>
+  </li>
+</ul>
+<h3>Information I/O</h3>
+<ul>
+  <li>AtomBlogger - posts blog entry when <span
+ style="font-family: monospace;">post</span> property is set to true,
+using atom XML blog API. See setup notes for info on setting up your
+own blog (the default is <a href="http://www.curioushome.blogspot.com">http://www.curioushome.blogspot.com</a>)<br>
+  </li>
+  <li>EmailSender - sends emails! (when the <span
+ style="font-family: monospace;">message</span> input property changes)</li>
+  <li>FileExporter - has a local GUI which allows a user to select a
+local file; copies this to a <span style="font-style: italic;">local</span>
+web-server and publises the URL.</li>
+  <li>DynamoMediaViewer - displays a range of content types - specified
+by URL - using local (Windows) viewer applications (e.g. word,
+powerpoint, HTML, AVI).<br>
+  </li>
+</ul>
+<h3>Physical I/O</h3>
+<ul>
+  <li>AudioCaptureManager - See <a
+ href="http://www.crg.cs.nott.ac.uk/%7Ecmg/Equator/Downloads/docs/ect/javadoc/equip/ect/components/audioframework/common/package-summary.html">javadocs</a>
+for more info. Uses JMF (which must be installed and configured) to
+capture audio and make available to audioframework components via
+AudioCaptureDevice sub-components' <span
+ style="font-family: monospace;">source</span> property to:</li>
+  <ul>
+    <li>AudioProcessor - <span style="font-family: monospace;">sink</span>
+can be connected to another <span style="font-family: monospace;">source</span>.
+Hosts a configurable chain of audio processors. See <span
+ style="font-family: monospace;">configUrl</span> for waveform images. <br>
+    </li>
+    <li>AudioAverage - extension of AudioProcessor which outputs
+average sample value at the end of the chain.</li>
+    <li>AudioSelectValue - extension of AudioProcessor which outpus a
+particular sample value at the end of the chain.<br>
+    </li>
+  </ul>
+</ul>
+<ul>
+  <li>JMFVideoCaptureManager - See <a
+ href="http://www.crg.cs.nott.ac.uk/%7Ecmg/Equator/Downloads/docs/ect/javadoc/equip/ect/components/visionframework/common/package-summary.html">javadocs</a>
+for more info. Uses JMF (which must be installed and configured) to
+capture video frames and make available to videoframework components
+via JMFVideoCaptuerDevice sub-components' <span
+ style="font-family: monospace;">source</span> property to:</li>
+  <ul>
+    <li>SimpleVideoProcessor - <span style="font-family: monospace;">sink</span>
+and optionally <span style="font-family: monospace;">referenceSink</span>
+can be connected to another <span style="font-family: monospace;">source</span>.
+Hosts
+a configurable chain of audio processors. See <span
+ style="font-family: monospace;">configUrl </span>for waveform
+images. <br>
+    </li>
+    <li>VideoFrameAverage - similar to SimpleVideoProcessor buts
+outputs average pixel value of the input image.</li>
+    <li>VideoFrameExporter - then <span style="font-family: monospace;">trigger</span>
+is set (and optionally continuously at a specified rate) captures
+images and exports them as URLs to locally hosted files.</li>
+    <li>ARToolkitGlyphTracker - uses the <a
+ href="http://www.c-lab.de/jartoolkit/">jARToolkit</a> binding for <a
+ href="http://www.hitl.washington.edu/artoolkit/">ARToolkit</a>; each
+component tracks a specified glyph (specified by glyph data file URL)
+in the input image.</li>
+  </ul>
+  <li>Phidgquip factory - creates sub-components to represent Phidgets
+currently connected to this machine and their I/O elements (each servo,
+output, etc.). Currently - due to Java binding limitations - supports
+output only (Servo, digital output), and only one of each kind of board
+per computer.</li>
+  <li>SmartItsFactory - creates sub-components to represent
+ACCORD-programmed SmartIts with standard IO boards currently
+communicating with the SmartIt receiver assumed to be connected to the
+COM1 serial port.<br>
+  </li>
+</ul>
+<h2>Details (partial)<br>
+</h2>
+<h3><a name="AssociationLearner"></a>Association Learner<br>
+</h3>
+<pre>ect.components.associationlearner.AssociationLearner<br></pre>
+<h4>Author/source</h4>
+Chris Greenhalgh, Shahram Izadi (Nottingham)
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Can be trained with a 1D
+mapping between input and output. Training is performed by presenting
+an input to <span style="font-family: monospace;">in</span> and then
+presenting the desired output value to <span
+ style="font-family: monospace;">trainingOut</span>. The output <span
+ style="font-family: monospace;">out</span> will always output the
+mapping (if any) associated with the current input. Where the input is
+a number(Java type) and the output is a number (Java type) then the
+Association Learner will fix a piece-wise linear function to the
+trained associations, i.e. an input between those already seen will
+result in an output interpolated between the trained outputs. When the
+input is a number (Java type) and the output is not then the output
+will be mapping of the trained input that is closest to the current
+input.<br>
+<h4>Input properties</h4>
+<ul>
+  <li style="font-family: monospace;">in: Object<br>
+  </li>
+  <li style="font-family: monospace;">trainingOut: Object</li>
+</ul>
+<h4>Output properties</h4>
+<ul>
+  <li style="font-family: monospace;">out: Object</li>
+</ul>
+<h4>Persistence</h4>
+Implements <span style="font-family: monospace;">ect.Persistable</span>.
+Uses <span style="font-family: monospace;">ect.PersistenceManager</span>
+<span style="font-family: monospace;">persistObject</span> and <span
+ style="font-family: monospace;">loadObject</span> to persist (Java
+Serialize) the bean itself. On load the <span
+ style="font-family: monospace;">trainedInputs</span> (TreeSet) and <span
+ style="font-family: monospace;">associations</span> (Hashtable) are
+restored.<br>
+<h3><a name="BeanShell"></a>BeanShell <br>
+</h3>
+<pre>ect.components.bsh.BeanShell<br>Subcomponent: ect.components.bsh.BeanShellArg<br></pre>
+<h4>Author/source</h4>
+Ted Phelps (Sussex/Lancaster)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Host and execute a single bean
+shell script.Set the "inputNamesString" property to a
+whitespace-separated list of script input arguments; the BeanShell
+component will then create corresponding BeanShellInput sub-components,
+the "value" property of which is linked to the corresponding script
+argumennt. Similarly, set the "outputNamesString" property to create
+BeanShellOutput sub-components. The script is re-executed each time an
+input changes.<br>
+<h4>Persistence</h4>
+Implements <span style="font-family: monospace;">ect.Persistable</span>.
+Uses <span style="font-family: monospace;">ect.PersistenceManager</span>
+<span style="font-family: monospace;">persistObject</span> and <span
+ style="font-family: monospace;">loadObject</span> to persist the lists
+of input and output arguments and the script in a text file.On load
+these are restored. (Could probably use default persistence, but that
+didn't exist at the time.)<br>
+<h2><br>
+</h2>
+</body>
+</html>

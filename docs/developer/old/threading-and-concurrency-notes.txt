@@ -1,0 +1,47 @@
+ECT Threading and Concurrency Notes
+Chris Greenhalgh 2004-07-13
+
+
+EQUIP Dataspace threading
+
+thread calling addEvent
+- if not busy, despatch - calling pattern callbacks sync.
+- if/while not busy, do pending event(s) - calling pattern callbacks sync.
+
+queue push thread, regularly...
+- if not busy, do pending event(s) - calling pattern callbacks sync.
+
+network pull thread(s)
+- calls into addEvent to deliver
+
+any thread doing pattern add/remove
+- marks busy while running, and calls back from that thread.
+
+so...
+- any number of threads can do add/remove pattern (e.g. collect) concurrently, but adding events will be done only when there aren't any, being queued if busy (but add event callbacks can do add/remove pattern). i.e. single writer - multiple reader.
+
+
+ECT patterns of invocation
+
+Container 
+- Directory watcher calls events off multiple internal threads
+- creates components in response to request add events
+- creates sub-components in response to property change events
+- updates property items in response to property change events
+
+property change events 
+- due to set of property from linked property item change
+- due to internal threads
+- due to internal GUI interactions
+
+persistence thread
+
+
+sync with Swing?
+
+
+Property change event -> (Bean2Equip) update property item in DS (using event new value)  -> 
+(Equip2Bean) set property value on any target properties ->? property change event...
+
+=> force property update to be async. => no embedded/cascaded property set.
+=> sync on ContainerManager.class for most/all ops.

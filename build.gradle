@@ -1,0 +1,13 @@
+allprojects {
+    apply plugin: 'idea'
+
+	repositories {
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenLocal();
+    }
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '1.11'
+}

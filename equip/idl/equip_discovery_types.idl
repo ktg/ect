@@ -1,0 +1,277 @@
+/*
+<COPYRIGHT>
+
+Copyright (c) 2004-2005, University of Nottingham
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ - Neither the name of the University of Nottingham
+   nor the names of its contributors may be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</COPYRIGHT>
+
+Created by: Chris Greenhalgh (University of Nottingham)
+Contributors:
+  Chris Greenhalgh (University of Nottingham)
+
+*/
+/*
+
+  File:    equip_discovery_types.idl
+  $Id: equip_discovery_types.idl,v 1.1.1.1 2005/03/08 16:17:18 cgreenhalgh Exp $
+  Created:  05/12/2002
+  Author:  Chris Greenhalgh
+
+  Purpose:
+    More-or-less JINI-like service (URL) discovery facility
+
+  To do:
+
+  Change History:
+  $Log: equip_discovery_types.idl,v $
+  Revision 1.1.1.1  2005/03/08 16:17:18  cgreenhalgh
+  From Nottingham CVS
+
+  Revision 1.2  2005/03/08 14:36:25  cmg
+  added BSD license
+
+  Revision 1.1  2004/07/15 08:12:11  cmg
+  initial copy from Equator/Modules/equip//include
+
+  Revision 1.1  2002/12/06 14:06:15  cmg
+  initial (java-only) version
+
+*/
+
+/*======================================================================*/
+/* includes */
+
+/* for GUID */
+#include "eqDataTypes.idl"
+/* for StringArray */
+#include "equip_data_tuple.idl"
+
+/*======================================================================*/
+/* begin equip namespace */
+
+module equip {
+  /** EQUIP discovery module.
+   *
+   * Home of the EQUIP discovery facility
+   */
+  module discovery {
+
+    /*------------------------------------------------------------*/
+    /* constants */
+
+    /** Discovery protocol version */
+    const long DISCOVERY_VERSION = 1111;
+
+    /** default/open group */
+    const string DISCOVERY_GROUP_DEFAULT = "default";
+
+    /** group wildcard = empty string as in JINI */
+    const string DISCOVERY_GROUP_ANY = "";
+
+    /** default port for multicast messages (JINI is 4160).
+     * Not formally allocated and subject to change.
+     * Announcements use DISCOVERY_PORT+1 (JINI uses 4160).
+     */
+    const unsigned short DISCOVERY_PORT = 4170;
+
+    /** default multicast address for discovery (JINI is 224.0.1.85).
+     * Using a random *SITE-LOCAL* group in the block 239.255.0.0-
+     * 239.255.255.255.
+     * Not formally allocated and subject to change.
+     * Announcement uses DISCOVERY_GROUP+1 (JINI uses 224.0.1.84).
+     */
+    const string DISCOVERY_GROUP = "239.255.1.85";
+
+    /** default multicast TTL for discovery and announcement.
+     * JINI suggests 15 which is approx. same as site local.
+     * For now we stick to 1 as the safest option.
+     * 255 is max.
+     */
+    const short DISCOVERY_TTL = 1;
+    
+    /** default delay range on service startup (JINI is 15s).
+     * Made very short to support inter-cell roaming at this rate 
+     */
+    const long ANNOUNCEMENT_STARTUP_DELAY_S = 2;
+
+    /** default inter-announcement interval (JINI is 120s).
+     * Made very short to support inter-cell roaming at this rate 
+     */
+    const long ANNOUNCEMENT_INTERVAL_S = 5;
+
+    /** default inter-request interval (JINI is undefined).
+     */
+    const long DISCOVERY_INTERVAL_S = 10;
+
+    /** default request repeats (JINI is undefined).
+     * little point having this*request-interval more than 
+     * announcement-interval.
+     *   No retries with very quick announcements!
+     */
+    const long DISCOVERY_ATTEMPTS = 1;
+
+    /** default no. missed announcements to assume expiry.
+     * undefined if this even occurs in JINI -pos. not.
+     * (will be used approximately)
+     */
+    const long ANNOUNCEMENT_EXPIRE_COUNT = 4;
+
+    /*------------------------------------------------------------*/
+    /* message types */
+
+    /** Discovery request is this serialised into a multicast packet.
+     * 
+     * Based in part on JINI multicast discovery request.
+     *
+     * Service Type (extra cf JINI since we are not just looking for
+     * lookup services) has common form 
+     * "<interface-class-name>:<version-identifier>".
+     * 
+     * As in JINI (and SNMP), groups are strings which must match
+     * exactly to identify common communities of action. E.g. to 
+     * support concurrently deployment of different versions of the 
+     * system.
+     */
+    valuetype DiscoveryRequest {
+      /** discovery protocol version - will be encoded before object */
+	/*public long version;*/
+      /** UDP port to send responses to */
+      public unsigned short port;
+      /** type(s) of services solicited */
+      public equip::data::StringArray serviceTypes;
+      /** group(s) of services solicited */
+      public equip::data::StringArray groups;
+      /** service URLs already known */
+      public equip::data::StringArray heard;
+    };
+
+    /** information on a single service.
+     *
+     * See DiscoveryRequest for into on service type and group.
+     */
+    valuetype ServerDiscoveryInfo {
+      /** service type - see DiscoveryRequest */
+      public equip::data::StringArray serviceTypes;
+      /** group - see DiscoveryRequest */
+      public equip::data::StringArray groups;
+      /** server end point URL(s) */
+      public equip::data::StringArray urls;
+    };
+
+    /** array of ServerDiscoveryInfo */
+    typedef sequence<ServerDiscoveryInfo> ServerDiscoveryInfoArray;
+
+    /** Announcement is this serialised into a UDP packet.
+     * 
+     * Unicast announcement = discovery response.
+     * 
+     * Again, based on JINI multicast announcement.     
+     *
+     * See DiscoveryRequest.
+     */
+    valuetype ServerAnnouncement {
+      /** discovery protocol version - will be encoded before object */
+	/*public long version;*/
+      /** server(s) announced */
+      public ServerDiscoveryInfoArray infos;
+      /** expected announcement interval in milliseconds */
+      public long announcementIntervalMillis;
+    };
+
+    /*------------------------------------------------------------*/
+    /* service/helper/agent types */
+
+    valuetype DiscoveryEventListener;
+
+    /** Client support for discovery.
+     */
+    valuetype DiscoveryClientAgent {
+      /** initialiase.
+       *
+       * May do sync calls to listener, e.g. if discovery URLs
+       * are actually server URLs.
+       */ 
+      void start(in DiscoveryEventListener listener,
+		 in equip::data::StringArray serviceTypes,
+		 in equip::data::StringArray groups,
+		 in equip::data::StringArray discoveryUrls);
+      /** initialiase using default discovery and announcement Urls.
+       */
+      void startDefault(in DiscoveryEventListener listener,
+			in equip::data::StringArray serviceTypes,
+			in equip::data::StringArray groups);
+      /** terminate activity.
+       * 
+       * Will NOT generate removal callbacks.
+       */
+      void stop();
+      /** get currently known server URLs 
+       */
+      equip::data::StringArray getKnownServers();
+    };
+
+    /** callback interface for client discovery */
+    valuetype DiscoveryEventListener {
+      /** callback on discovery
+       */
+      void discoveryEvent(in DiscoveryClientAgent agent, in string url);
+      /** callback on loss of previous discovery.
+       * e.g. due to timeout or explicit removal.
+       * Note that the information passed will in general not
+       * be exactly the same object as was passed to discoveryEvent
+       * (the references will not be equal using ==).
+       */
+      void discoveryRemoveEvent(in DiscoveryClientAgent agent, in string url);
+    };
+    
+    /** Server support for discovery.
+     */
+    valuetype DiscoveryServerAgent {
+      /** initialiase.
+       */
+      void start(in ServerDiscoveryInfoArray servers,
+		 in equip::data::StringArray discoveryUrls);
+      /** initialiase using default discovery and announcement Urls.
+       */
+      void startDefault(in ServerDiscoveryInfoArray servers);
+
+      /** terminate activity.
+       */
+      void stop();
+    };
+
+    /*------------------------------------------------------------*/
+    /* end namespace */
+    
+  }; /* module discovery */
+}; /* module equip */
+
+/*======================================================================*/
+/* EOF */    
+    

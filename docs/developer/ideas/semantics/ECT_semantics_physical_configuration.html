@@ -1,0 +1,1100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT "semantics" scenario</title>
+</head>
+<body>
+<h1>ECT "semantics" scenario: Physical Configuration<br>
+</h1>
+Chris Greenhalgh, 2005-07-05 (last updated 2005-07-20)
+<h2>Introduction</h2>
+<p>ECT currently focusses on sharing (views of) the software component
+"layer", comprising distributed components and their properties. The
+relationships between this and the physical environment are not
+explicit and can be hard to discern, or entirely absent from the set of
+digital information captured and made available (e.g. in a replay for
+analysis situation).<br>
+</p>
+<p>This note seeks to suggest a simple, concrete motivating example for
+making explicit and making use of additional information within ECT
+linking this component-and-property view to the physical devices,
+components, settings, etc. in which the system is used. This is
+essentially a continuation of the "sematics"/ontology explorations
+previously started.<br>
+</p>
+<p>This document looks at modelling the physical components and context
+of the system
+to support assembly, configuration and understanding of the components
+and what they connect to.
+</p>
+<h2>Example situation</h2>
+<p>Consider ECT being used in a home (or in the lab's "domestic"
+space)...<br>
+</p>
+<p>The hardware is as follows:<br>
+</p>
+<ul>
+  <li>there is a wireless router with NAT firewall supporting the local
+network, and providing (outgoing) access to the internet;</li>
+  <li>there is a reasonably high-spec PC ("A") "behind the scenes"
+running the installation master process and dataspace, and cacheing log
+files locally, with</li>
+  <ul>
+    <li>a 15" touchscreen connected showing the VGA output<br>
+    </li>
+  </ul>
+  <li>there is a wireless tablet PC ("B") running a graphical interface
+to the installation for configuration and monitoring;</li>
+  <li>there is a medium-spec PC ("C") with wireless networking, with</li>
+  <ul>
+    <li>an EZIO board connected to serial port COM1</li>
+    <ul>
+      <li>with a pressure pad switch connected to digital input 2<br>
+      </li>
+    </ul>
+    <li>a phidget 4-servo controller board connected to one of its USB
+ports</li>
+    <ul>
+      <li>with a servo connected to servo output 1, with a small flag
+attached<br>
+      </li>
+    </ul>
+    <li>a webcam plugged into one of its USB ports</li>
+    <li>a set of speakers plugged into the stereo audio output</li>
+    <li>a USB joystick plugged into one of its USB ports<br>
+    </li>
+  </ul>
+</ul>
+<p>In addition:<br>
+</p>
+<ul>
+  <li>PC A is in a cupboard in the lounge</li>
+  <li>the flatscreen is on the cupboard door in the lounge</li>
+  <li>PC C is behind the sofa<br>
+  </li>
+  <li>The touchpad is under the seat of the sofa in the lounge</li>
+  <li>The joystick is on the arm of the sofa<br>
+  </li>
+  <li>The webcam is also in the lounge, directed towards the sofa from
+above the TV</li>
+  <li>The servo is on above the TV in the lounge</li>
+  <li>The speakers are by the lounge door<br>
+  </li>
+</ul>
+<p>(Currently) The software components specifically for interfacing to
+the above hardware are as follows:</p>
+<ul>
+  <li>EZIO component on C</li>
+  <ul>
+    <li>with configPort property set to "COM1"</li>
+    <li>with a property "d2" which is false when the touch pad is sat
+on/pressed, true otherwise<br>
+    </li>
+  </ul>
+  <li>PhidgetManager component on C</li>
+  <ul>
+    <li>with PhidgetServoBoard subcomponent</li>
+    <ul>
+      <li>[does it have a hardware-specific ID??]</li>
+      <li>with 4 PhidgetServo subcomponents</li>
+      <ul>
+        <li>one with ID 1</li>
+        <li>with property "value" which determines the rotation (range
+0.0-1.0 =&gt; approx. 200 degrees)<br>
+        </li>
+      </ul>
+    </ul>
+  </ul>
+  <li>JMFCaptureManager component on C</li>
+  <ul>
+    <li>with one or more JMFCapture subcomponents</li>
+    <ul>
+      <li>one with id "vfw://0"</li>
+      <li>with property "source" which is a local interface reference
+allowing frame capture</li>
+    </ul>
+  </ul>
+  <li>A JoystickManager component on C</li>
+  <ul>
+    <li>with (at least one) Joystick subcomponent</li>
+    <ul>
+      <li>with properties for x, y, each button (names have no
+relationship to placement, labelling or appearance of buttons)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>[no audio-specific component; processing applets??]</li>
+  <li>[no touchscreen-specific component; message board application??
+processing applets??]</li>
+</ul>
+<h2>Issues</h2>
+<ul>
+  <li>configuration/construction -</li>
+  <ul>
+    <li>what do i need to do to make this (kind of/particular)
+device/sensor work? <br>
+    </li>
+    <li>which component/property corresponds to this particular
+sensor/button/etc?<br>
+    </li>
+  </ul>
+  <li>authoring/modification/redeployment - <br>
+  </li>
+  <ul>
+    <li>what do these things actually "mean" or represent?</li>
+  </ul>
+  <li>debugging - <br>
+  </li>
+  <ul>
+    <li>something doesn't work; how do you determine what, where and
+why, and fix it?</li>
+  </ul>
+  <li>(experience) analysis - <br>
+  </li>
+  <ul>
+    <li>what was it that actually happened? (Physical World &amp;
+system)<br>
+    </li>
+  </ul>
+</ul>
+More generally:<br>
+<ul>
+  <li>Physical-virtual relationships</li>
+  <ul>
+    <li>describing them</li>
+    <li>finding them</li>
+    <ul>
+      <li>e.g. temporal correlation<br>
+      </li>
+    </ul>
+    <li>reasoning about them</li>
+  </ul>
+  <li>of</li>
+  <ul>
+    <li>physical:</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>computers</li>
+      <li>devices/sensors</li>
+      <li>events/actions</li>
+      <li>spaces/rooms</li>
+      <li>people</li>
+    </ul>
+    <li>virtual:</li>
+    <ul>
+      <li>hosts, containers</li>
+      <li>components</li>
+      <li>properties</li>
+      <li>property changes</li>
+      <li>links</li>
+      <li>link changes</li>
+      <li>other URIs...?</li>
+    </ul>
+  </ul>
+</ul>
+<h2>Examples</h2>
+<p>Pressure pad:<br>
+</p>
+<ul>
+  <li>property "d2" (...) is "false" =&gt; "someone is sitting on the
+sofa in the lounge"<br>
+  </li>
+  <li>property "d2" (of component "comp1" in container "cont1" on host
+"host1") reports state of sensor "pressure pad1"</li>
+  <ul>
+    <li>sensor physical type: pressure (contact)<br>
+    </li>
+    <li>sensor location: under seat of sofa, in lounge</li>
+    <li>sensor geometry: flat, 20cm x 60cm x 0.2cm<br>
+    </li>
+    <li>sensor value dimensions: 1<br>
+    </li>
+  </ul>
+  <ul>
+    <li>sensor value type: digital, 1 bit (true/false)</li>
+    <li>sensor physical mapping: <br>
+    </li>
+    <ul>
+      <li>inverse</li>
+    </ul>
+    <ul>
+      <li>physical equivalences: true, &lt;20N; false &gt;20N</li>
+    </ul>
+    <ul>
+      <li>accuracy: 10N</li>
+    </ul>
+    <li>sensor temporal resolution: ~0ms (~infinite)<br>
+    </li>
+    <li>sensor latency: 0ms (~infinitessimal)<br>
+    </li>
+    <li>captured/digitised by "EZIO board 1"</li>
+    <ul>
+      <li>sample rate: 10Hz</li>
+      <li>sample resolution: 1 bit</li>
+      <li>sample accuracy: 100% (noise negligable)<br>
+      </li>
+      <li>sampling latency: 100ms<br>
+      </li>
+    </ul>
+  </ul>
+  <li>sensor "pressure pad 1" (in the lounge, ...) is wired to "EZIO
+board 1" (in the lounge), between connectors "ground" and "d2"<br>
+  </li>
+  <ul>
+    <li>"EZIO board 1" is a type 1 EZIO board (therefore with RS-232
+9-pin serial interface, and 5-15V AC/DC power requirement, 10 digital
+inputs, etc)</li>
+    <li>Therefore "EZIO board 1" must be</li>
+    <ul>
+      <li>provided with suitable power</li>
+      <li>connected via a suitable RS-232 cable to an RS-232 port
+belonging to (or attached to, in the case of a USB-RS-232 convertor, or
+associated with? in the case of a RS-232-Bluetooth convertor) a PC
+which is a member of the installation<br>
+      </li>
+    </ul>
+  </ul>
+  <li>"EZIO board 1" is connected via straight-through RS-232 cable
+(9-pin) to PC "C" serial port "COM1"</li>
+  <ul>
+    <li>therefore interface component <br>
+    </li>
+    <ul>
+      <li>must be of type "EZIO"<br>
+      </li>
+      <li>must run on a container on PC "C"</li>
+      <li>must have "configPort" property set to "COM1"</li>
+      <li>must use standard baud rate and line discipline (bits, stop,
+flow control) for that class of device<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+...<br>
+<ul>
+  <li>(equivalence) class of hardware device</li>
+  <ul>
+    <li>sensor interface / physical interface / sampler<br>
+    </li>
+    <ul>
+      <li>"EZIO board type 1 with RS-232 etc"</li>
+    </ul>
+    <li>software component host</li>
+    <ul>
+      <li>"low-spec PC"<br>
+      </li>
+    </ul>
+  </ul>
+  <li>particular hardware device</li>
+  <ul>
+    <li>"EZIO board 1"</li>
+    <ul>
+      <li>[may be broken; may have unique sampling characteristics,
+e.g. bias; may have particular sensors attached; is in a particular
+place, e.g. exposed to particular risks]</li>
+    </ul>
+    <li>"PC C"</li>
+    <ul>
+      <li>[may also have particular state, e.g. components installed,
+cf other PCs of the same type]<br>
+      </li>
+    </ul>
+  </ul>
+  <li>(equivalence) class of sensor</li>
+  <ul>
+    <li>"maplin pressure pad 20cm x 60xm"</li>
+    <li>"contact pressure sensor"</li>
+    <li>"pressure sensor"</li>
+  </ul>
+  <li>particular sensor</li>
+  <ul>
+    <li>"pressure pad 1"</li>
+    <ul>
+      <li>[particular characteristics; particular deployment -
+location, embedding, supporting elements (e.g. platform)] <br>
+      </li>
+    </ul>
+  </ul>
+  <li>software component class</li>
+  <ul>
+    <li>"EZIO"</li>
+  </ul>
+  <li>particular software component</li>
+  <ul>
+    <li>"EZIO component 1"</li>
+    <ul>
+      <li>[particular host, particular properties/configuration;
+particular (possibly hidden) association with particular hardware
+device(s); particular (possibly hidden) internal state (e.g. memory)]</li>
+    </ul>
+  </ul>
+  <li>particular property</li>
+  <ul>
+    <li>"d1"</li>
+  </ul>
+  <li>particular port</li>
+  <ul>
+    <li>"COM1 on PC C"</li>
+  </ul>
+  <li>(equivalence) class of port</li>
+  <ul>
+    <li>"PC C's ports"</li>
+    <li>"COM port on PC C"</li>
+    <li>"COM port on any PC in the installation"</li>
+  </ul>
+  <li>particular cable/wire</li>
+  <ul>
+    <li>"straight-thru 9-pin RS-232 cable 1"</li>
+    <ul>
+      <li>[may bebroken, has a particular length, etc.] </li>
+    </ul>
+  </ul>
+  <li>particular protocol</li>
+  <ul>
+    <li>"RS-232 8 bit, 1 stop, no parity, 19200 baud, no flow control"<br>
+    </li>
+  </ul>
+  <li>particular connection - physical cable or RF channel/association</li>
+  <ul>
+    <li>"connection from EZIO board 1 to PC C COM1 using straight-thru
+RS-232 cable 1, protocol options..."</li>
+  </ul>
+  <li>particular places</li>
+  <ul>
+    <li>"the lounge"</li>
+    <li>"under the cushion of the sofa in the lounge"</li>
+  </ul>
+  <li>particular "mundane" artefacts</li>
+  <ul>
+    <li>"the sofa in the lounge"</li>
+  </ul>
+</ul>
+Key relationships (like bi-graphs??)...<br>
+<ul>
+  <li>containment</li>
+  <ul>
+    <li>physical</li>
+    <li>digital/logical?</li>
+    <li>subsistence/support<br>
+    </li>
+  </ul>
+  <li>composition</li>
+  <ul>
+    <li>part of<br>
+    </li>
+  </ul>
+  <li>connection / communication<br>
+  </li>
+  <ul>
+    <li>"digital"?? guided?!<br>
+    </li>
+    <ul>
+      <li>wired</li>
+      <ul>
+        <li>voltage/current</li>
+        <li>light e.g. SPDIF<br>
+        </li>
+      </ul>
+    </ul>
+    <ul>
+      <li>wireless</li>
+    </ul>
+    <ul>
+      <ul>
+        <li>optical</li>
+      </ul>
+      <ul>
+        <li>IR<br>
+        </li>
+      </ul>
+      <ul>
+        <li>RF</li>
+      </ul>
+      <ul>
+        <li>U/sonic</li>
+      </ul>
+    </ul>
+  </ul>
+  <li>juxtaposition / <span style="text-decoration: underline;">proximity</span>
+/ <span style="text-decoration: underline;">influence</span> /
+physical forces (weak, strong, gravity,
+EM) / action at a distance / relationship / media- / linkage /
+interaction / perception<br>
+  </li>
+  <ul>
+    <ul>
+      <li>contact</li>
+      <ul>
+        <li>pressure, force, vibration<br>
+        </li>
+        <li>stress<br>
+        </li>
+      </ul>
+      <li>visibility / EM<br>
+      </li>
+      <ul>
+        <li>[unguided; frequency; energy]<br>
+        </li>
+      </ul>
+      <li>audibility</li>
+      <li>voltage/current</li>
+      <ul>
+        <li>unguided?!</li>
+      </ul>
+      <li>diffusion / gas exchange / atom exchange</li>
+    </ul>
+  </ul>
+</ul>
+<h2>Physical configuration management/recording</h2>
+<p>A possible relational database schema for encoding some of the above
+information...<br>
+</p>
+<h3>Schema<br>
+</h3>
+Thing (includes abstract things such as Classes, as well as Physical
+Things such as Devices and Locations)<br>
+<ul>
+  <li>Local ID (PK)</li>
+  <li>Type (e.g. "Device", "Device Class", "Location", ...)<br>
+  </li>
+</ul>
+Thing Identifier (1:n, Thing:Identifier&nbsp; [hopefully!]) [generalise
+to metadata? generalise to things other than devices?]<br>
+<ul>
+  <li>Row ID (PK)<br>
+  </li>
+  <li>Thing ID (FK: Thing.Local ID)</li>
+  <li>Reference Thing ID (FK: Thing.Local ID, nullable) [normally null?
+and/or same as Part of Thing? but e.g. a USB-serial adapter may have
+identifier "COM6" but only when plugged into some particular USB port
+on some particular computer]<br>
+  </li>
+  <li>Type (e.g. "Manufacturer's Serial Number", "ECT Physical ID",
+"Title", "Description") [ontology? i.e. separate identifier type table?]</li>
+  <li>Volatility (e.g. "fixed", "durable configurable", "volatile",
+"transient", "contingent")<br>
+  </li>
+  <li>Value (e.g. "1234") [data type?]<br>
+  </li>
+</ul>
+Physical Thing<br>
+<ul>
+  <li>Thing ID (PK, FK: Thing.Local ID)</li>
+  <li>Part Of Thing (FK: Physical Thing.Thing ID; nullable) [Part-of
+table? here only one super-part]</li>
+  <li>SizeMetres</li>
+  <li>WeightKg</li>
+  <li>Colour</li>
+  <li>Texture</li>
+  <li>[...]<br>
+  </li>
+</ul>
+[Device (is a Physical Thing) [nothing to add at present; remove?]<br>
+<ul>
+  <li>Thing ID (PK, FK: Physical Thing.Local ID)]</li>
+</ul>
+Thing Location (not just Physical Thing? What is a software component?)<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Thing ID (FK: Thing.Local ID)</li>
+  <li>Reference Thing ID (FK: Thing.Local ID)</li>
+  <li>Location relationship (e.g. "in", "on", "offset relative by")</li>
+  <li>Location qualifier (e.g. translation, rotation)</li>
+  <li>[accuracy? probability?]<br>
+  </li>
+</ul>
+Thing Class (n:n, Device:Class)<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Thing ID (FK: Thing.Local ID)</li>
+  <li>Class ID (FK: Class.Thing ID)</li>
+</ul>
+Class (is a Thing)<br>
+<ul>
+  <li>Thing ID (PK, FK: Thing.Local ID)</li>
+  <li>Title</li>
+  <li>Description</li>
+  <li>Type (e.g. "Connector", "Indicator", "Switch", "Actuator",
+"Sensor", "Computer", "Cable") [could be super-Classes]<br>
+  </li>
+</ul>
+Thing Image<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Thing ID (FK: Thing.Local ID)</li>
+  <li>Mime type</li>
+  <li>Image (BLOB) [or file path/url?]</li>
+  <li>Point (nullable) (e.g. "10,10")<br>
+  </li>
+</ul>
+Class Has Part (e.g. (an) 9-pin straight-through M-F RS-232 cable has
+one Male RS-232 9-pin connector and one female 9-pin RS-232 connector)<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Class ID (FK: Class.Thing ID)</li>
+  <li>Part Class ID (FK: Class.Thing ID)</li>
+  <li>Minimum cardinality<br>
+  </li>
+  <li>Maximum cardinality (nullable [=&gt; infinite])</li>
+</ul>
+Class Compatibility<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Subject Class ID (FK: Class.Thing ID)</li>
+  <li>Object Class ID 2 (FK: Class.Thing ID)</li>
+  <li>Compatibility (e.g. "Plugs Into")</li>
+</ul>
+Thing Simple Relationship<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Subject Thing ID (FK: Thing.Thing ID)</li>
+  <li>Object Thing ID (FK: Thing.Thing ID)</li>
+  <li>[Compatibility?] Relationship (e.g. "is plugged into" ["Plugs
+Into"?], "has superclass")</li>
+</ul>
+Terminology<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Term (e.g. "in")</li>
+  <li>Definition</li>
+  <li>Use In Column (nullable [=&gt; any])</li>
+</ul>
+<p>[Thing Behaviour...?]</p>
+<p>Sensor (or Sensor Class) Behaviour</p>
+<ul>
+  <li>Thing ID (PK, FK: Thing.Local ID)<br>
+  </li>
+  <li>Sensor physical type (e.g. "pressure (contact)")<br>
+  </li>
+  <li>Sensor value Dimensions (e.g. "1")<br>
+  </li>
+  <li>Sensor value type (e.g. "digital" / "analogue" cf EZIO)
+[Resistance?]<br>
+  </li>
+  <li>[?sensor physical mapping: <br>
+  </li>
+  <ul>
+    <li>inverse</li>
+  </ul>
+  <ul>
+    <li>physical equivalences: true, &lt;20N; false &gt;20N</li>
+  </ul>
+  <ul>
+    <li>accuracy: 10N]</li>
+  </ul>
+  <li>[?sensor temporal resolution: ~0ms (~infinite)]<br>
+  </li>
+  <li>[?sensor latency: 0ms (~infinitessimal)]</li>
+</ul>
+Thing Annotation (e.g. "purpose: to determine if someone is sitting on
+the sofa")<br>
+<ul>
+  <li>Row ID (PK, autoincrement)</li>
+  <li>Thing ID (FK: Thing.Local ID)</li>
+  <li>Annotation Type (e.g. "purpose", "note", "warning")<br>
+  </li>
+  <li>Annotation</li>
+</ul>
+<h4>SQL (mySQL)<br>
+</h4>
+<pre>create database ect;<br>use ect;<br>create table thing (<br>	localid int not null auto_increment,<br>	thingtype char(30),<br>	primary key (localid)<br>);<br>create table thingidentifier (<br>	rowid int not null auto_increment,<br>	thingid int not null references thing(localid),<br>	referencethingid int references thing(localid),<br>	identifiertype char(30) not null,<br>	volatility enum('fixed', 'durable', 'transient', 'contingent', 'volatile'),<br>	identifier char(200) not null,<br>	primary key (rowid)<br>);<br>create table physicalthing (<br>	thingid int not null references thing(localid),<br>	partofthingid int references thing(localid),<br>	widthmetres float,<br>	heightmetres float,<br>	depthmetres float,<br>	weightkilograms float,<br>	colour char(30),<br>	primary key (thingid)<br>);<br>create table thinglocation (<br>	rowid int not null auto_increment,<br>	thingid int not null references thing(localid),<br>	referencethingid int not null references thing(localid),<br>	locationrelationship char(30) not null,<br>	distancemetres float,<br>	primary key (rowid)<br>);<br>create table thingclass (<br>	rowid int not null auto_increment,<br>	thingid int not null references thing(localid),<br>	classid int not null references class(thingid),<br>	primary key (rowid)<br>);<br>create table class (<br>	thingid int not null references thing(localid),<br>	title char(200),<br>	description char(1000),<br>	primary key (thingid)<br>);<br>create table thingimage (<br>	rowid int not null auto_increment,<br>	thingid int not null references thing(localid),<br>	mimetype char(60),<br>	image mediumblob,<br>	pointx int,<br>	pointy int,<br>	primary key (rowid)<br>);<br>create table classhaspart (<br>	rowid int not null auto_increment,<br>	classid int not null references class(thingid),<br>	partclassid int not null references class(thingid),<br>	mincardinality int not null default 1,<br>	maxcardinality int,<br>	primary key (rowid)<br>);<br>create table classcompatibility (<br>	rowid int not null auto_increment,<br>	subjectclassid int not null references class(thingid),<br>	objectclassid int not null references class(thingid),<br>	compatibility char(60),<br>	primary key (rowid)<br>);<br>create table thingsimplerelationship (<br>	rowid int not null auto_increment,<br>	subjectthingid int not null references thing(thingid),<br>	objectthingid int not null references thing(thingid),<br>	compatibility char(60),<br>	primary key (rowid)<br>);<br>create table terminology (<br>	rowid int not null auto_increment,<br>	term char(60) not null,<br>	definition char(1000),<br>	useincolumn char(30),<br>	primary key (rowid)<br>);<br>create table sensor (<br>	thingid int not null references thing(thingid),<br>	sensorphysicaltype char(60),<br>	sensorvaluedimensions int,<br>	sensorvaluetype enum('digital','analogue'),<br>	primary key (thingid)<br>);<br>create table thingannotation (<br>	rowid int not null auto_increment,<br>	thingid int not null references thing(thingid),<br>	annotationtype char(60) not null,<br>	annotation char(1000) not null,<br>	primary key (rowid)<br>);<br>grant all on ect.* to ect@'127.0.0.1' identified by 'password';<br>flush privileges;<br><br></pre>
+<h4>XML Schema</h4>
+See <a href="ect_physical_configuration.xsd">ect_physical_configuration.xsd</a><br>
+<br>
+<h3>Implementation Ideas</h3>
+Relational Database<br>
+Schema-driven UI?<br>
+<ul>
+  <li>from relational schema?</li>
+  <li>from XML schema?</li>
+</ul>
+<h4>Current implementation</h4>
+<p>see <a
+ href="../src/equip/ect/apps/physicalconfigurationmgr/Main.java">../src/equip/ect/apps/physicalconfigurationmgr/Main.java</a></p>
+<p>Note: current version uses JAXB bindings generated from the XML
+schema, with a little custom complex type/property information
+hand-coded into the application, plus various other bits of
+type-specific code.</p>
+Note: have added "rule" to schema, to allow expression of directly
+inferable things.<br>
+<h2>Reflection</h2>
+<p>I still can't quite seem to work out exactly what to do with it and
+why...<br>
+</p>
+<p>I can see a way to do quite fine-grained internal modelling, e.g.<br>
+</p>
+<ul>
+  <li>Joystick</li>
+  <ul>
+    <li>has</li>
+    <ul>
+      <li>Button 1</li>
+      <ul>
+        <li>is proxied by</li>
+        <ul>
+          <li>[Button 1 data proxy]<br>
+          </li>
+        </ul>
+      </ul>
+      <li>...</li>
+      <li>USB 1.1 type A plug<br>
+      </li>
+      <li>Joystick data proxy</li>
+      <ul>
+        <li>has</li>
+        <ul>
+          <li>Button 1 data proxy</li>
+          <li>...</li>
+        </ul>
+        <li>hosts</li>
+        <ul>
+          <li>[Button 1 data proxy]</li>
+          <li>...<br>
+          </li>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+  <ul>
+    <li>hosts</li>
+    <ul>
+      <li>[Joystick data proxy]</li>
+    </ul>
+    <li>is proxied by</li>
+    <ul>
+      <li>[Joystick data proxy]<br>
+      </li>
+    </ul>
+    <li>connects/hosting</li>
+    <ul>
+      <li>[USB 1.1 type A plug]</li>
+    </ul>
+  </ul>
+  <li>PC</li>
+  <ul>
+    <li>has</li>
+    <ul>
+      <li>USB hardware support</li>
+      <ul>
+        <li>has</li>
+        <ul>
+          <li>USB 1.1 type A socket no. 1</li>
+          <ul>
+            <li>connects/hosting</li>
+            <ul>
+              <li>[USB hardware support]<br>
+              </li>
+            </ul>
+          </ul>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+  <li>rule (plug in =&gt; connects/hosting)</li>
+  <ul>
+    <li>left</li>
+    <ul>
+      <li>a</li>
+      <ul>
+        <li>plugged into</li>
+        <ul>
+          <li>b</li>
+        </ul>
+      </ul>
+    </ul>
+    <li>right</li>
+    <ul>
+      <li>a</li>
+      <ul>
+        <li>connects/hosting</li>
+        <ul>
+          <li>b<br>
+          </li>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+  <li>rule (propagate data proxies etc over connects/hosting)<br>
+  </li>
+  <ul>
+    <li>left<br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>a</li>
+    </ul>
+    <ul>
+      <ul>
+        <li>hosts</li>
+      </ul>
+      <ul>
+        <ul>
+          <li>b</li>
+        </ul>
+      </ul>
+    </ul>
+    <ul>
+      <ul>
+        <ul>
+          <ul>
+            <li>class</li>
+          </ul>
+        </ul>
+        <ul>
+          <ul>
+            <ul>
+              <li>bc<br>
+              </li>
+            </ul>
+          </ul>
+        </ul>
+        <li>connects/hosting</li>
+      </ul>
+      <ul>
+        <ul>
+          <li>c</li>
+        </ul>
+      </ul>
+    </ul>
+    <li>actions</li>
+    <ul>
+      <li>d<br>
+      </li>
+    </ul>
+  </ul>
+  <ul>
+    <ul>
+      <ul>
+        <li>create</li>
+        <ul>
+          <li>individual thing</li>
+        </ul>
+      </ul>
+    </ul>
+    <li>right</li>
+    <ul>
+      <li>d</li>
+      <ul>
+        <li>class</li>
+        <ul>
+          <li>bc</li>
+        </ul>
+      </ul>
+      <li>c</li>
+      <ul>
+        <li>hosts</li>
+        <ul>
+          <li>d</li>
+        </ul>
+      </ul>
+      <li>b<br>
+      </li>
+      <ul>
+        <li>connects/hosting</li>
+        <ul>
+          <li>d</li>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+  <li>rule (propagate is proxied by over connects/hosting)</li>
+  <ul>
+    <li>left<br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>a</li>
+    </ul>
+  </ul>
+  <ul>
+    <ul>
+      <ul>
+        <li>is proxied by</li>
+        <ul>
+          <li>b</li>
+        </ul>
+      </ul>
+      <li>b<br>
+      </li>
+    </ul>
+  </ul>
+  <ul>
+    <ul>
+      <ul>
+        <li>connects/hosting</li>
+      </ul>
+    </ul>
+    <ul>
+      <ul>
+        <ul>
+          <li>c</li>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+  <ul>
+    <li>actions</li>
+  </ul>
+  <ul>
+    <li>right</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>a</li>
+      <ul>
+        <li>is proxied by</li>
+        <ul>
+          <li>c<br>
+          </li>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+</ul>
+<p>Now assert joystick USB plug "is plugged into" PC USB socket and
+joystick and button data proxies will be created in the USB hardware
+support, with "is proxied by" relationships to them from the
+joystick/buttons.<br>
+</p>
+<p>But is this level of detail useful/necessary? Do I need the internal
+detail? C.f.<br>
+</p>
+<ul>
+  <li>Joystick</li>
+  <ul>
+    <li>has</li>
+    <ul>
+      <li>Button 1</li>
+      <li>...</li>
+      <li>USB 1.1 type A plug<br>
+      </li>
+    </ul>
+  </ul>
+  <li>PC</li>
+  <ul>
+    <li>has</li>
+    <ul>
+      <li>USB 1.1 type A socket no. 1</li>
+      <li>...<br>
+      </li>
+    </ul>
+    <li>hosts</li>
+    <ul>
+      <li>Joystick Factory component</li>
+    </ul>
+  </ul>
+  <li>pseudo-rule (joystick factory explicit logic)</li>
+  <ul>
+    <li>left</li>
+    <ul>
+      <li>the Windows joystick API indicates that a joystick is present</li>
+    </ul>
+    <li>action</li>
+    <ul>
+      <li>create Joystick component</li>
+      <li>create Joystick individual (or identify which joystick)</li>
+      <li>identify which USB port it is plugged into (or possible
+hub/extension cable tree)<br>
+      </li>
+    </ul>
+    <li>right<br>
+    </li>
+    <ul>
+      <li>create "is plugged into" relationship between JS USB plug and
+PC/hub USB socket<br>
+      </li>
+      <li>create "is proxied by" relationships from joystick and
+buttons to joystick component and properties</li>
+    </ul>
+  </ul>
+</ul>
+<p>What logic is required for the Joystick factory component?
+Can/should it be in the Joystick factory component, or elsewhere? How
+does it interact with the Physical Configuration model?<br>
+</p>
+<ul>
+  <li>Joystick Factory Component</li>
+  <ul>
+    <li>proxies any number of (connected) joysticks</li>
+    <li>auto-detects them</li>
+    <li>creates individual-specific sub-components<br>
+    </li>
+  </ul>
+  <li>Joystick Component</li>
+  <ul>
+    <li>proxies exactly one joystick</li>
+    <li>has properties each of which proxies a particular button or
+other input</li>
+  </ul>
+</ul>
+<h3>ECT-driven exploration<br>
+</h3>
+Bootstrap info (available in ECT):<br>
+<ul>
+  <li>containers are running on hosts... [current name, IP, local
+installation stuff]</li>
+  <ul>
+    <li>therefore they are computers, with certain minimal
+capabilities, but full details may not be known</li>
+    <ul>
+      <li>=&gt; need to merge things (my explicit creation of a
+particular computer of a particular type and the "abstract" computer
+known to exist from within)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>components are current running: joystick factory, joystick
+instance 1, ...</li>
+  <li>components currently have properties/values: ...</li>
+</ul>
+<p>[Aside: Joystick API can return manufacturer and product
+identifiers, and a product name string, as well as number of buttons,
+axes, and whether POV is supported]<br>
+</p>
+<p>The component may indicate (e.g. via an agreed property) that it is
+proxying a particular item, or instance of a particular class of items
+(e.g. Joystick component, class is Joystick or more specific product
+name), or is capable of proxying for a particular class of items either
+one at once, or many at once. <br>
+</p>
+<p>The capability may indicate (e.g. via some extension
+information/metadata) that instances are capable of proxying for a
+particular class of items either one at once, or many at once (e.g.
+Joystick Factory).<br>
+</p>
+<p>e.g.<br>
+</p>
+<ul>
+  <li>canProxyClasses: String[] - alternatives</li>
+  <li>canProxyFactory: boolean</li>
+  <li>isProxyClasses: String[]&nbsp; - of single instance</li>
+  <li>isProxyIdentifiers: String[] - identifiers of instance</li>
+</ul>
+<p>OK, so hosts, containers, components and properties are now mapped
+to individual things...<br>
+</p>
+<ul>
+  <li>The existence of a JoystickProxy component implies that a
+Joystick is connected to that Computer (Host), e.g.</li>
+  <li>left</li>
+  <ul>
+    <li>proxycomponent</li>
+    <ul>
+      <li>hasProperty:title</li>
+      <ul>
+        <li>"JoystickProxy"</li>
+      </ul>
+    </ul>
+    <ul>
+      <li>hasProperty:partofthingid</li>
+      <ul>
+        <li>container</li>
+      </ul>
+    </ul>
+    <li>container</li>
+    <ul>
+      <li>hasProperty:partofthingid</li>
+      <ul>
+        <li>host</li>
+      </ul>
+    </ul>
+    <li>usbsocket</li>
+    <ul>
+      <li>hasProperty:partofthingid</li>
+      <ul>
+        <li>host</li>
+      </ul>
+    </ul>
+    <ul>
+      <li>hasProperty:thingclassid</li>
+      <ul>
+        <li>"USB master connector"</li>
+      </ul>
+    </ul>
+  </ul>
+  <li>action</li>
+  <ul>
+    <li>ask user which joystick it is</li>
+  </ul>
+  <li>right</li>
+  <ul>
+    <li>joystick</li>
+    <ul>
+      <li>is proxied by</li>
+      <ul>
+        <li>proxycomponent</li>
+      </ul>
+    </ul>
+  </ul>
+</ul>
+Or<br>
+<ul>
+  <li>left</li>
+  <ul>
+    <li>proxycomponent</li>
+    <ul>
+      <li>hasProperty:title</li>
+      <ul>
+        <li>"JoystickProxy"</li>
+      </ul>
+    </ul>
+  </ul>
+  <li>right</li>
+  <ul>
+    <li>proxycomponent</li>
+    <ul>
+      <li>is proxy for instance of class</li>
+      <ul>
+        <li>"Joystick"</li>
+      </ul>
+    </ul>
+  </ul>
+</ul>
+and<br>
+<ul>
+  <li>left</li>
+  <ul>
+    <li>proxycomponent</li>
+    <ul>
+      <li>is proxy for instance of class</li>
+      <ul>
+        <li>deviceclass</li>
+      </ul>
+    </ul>
+  </ul>
+  <li>action</li>
+  <ul>
+    <li>find appropriate instance of class deviceclass</li>
+  </ul>
+  <li>right</li>
+  <ul>
+    <li>instance</li>
+    <ul>
+      <li>is proxied by</li>
+      <ul>
+        <li>proxycomponent</li>
+      </ul>
+    </ul>
+  </ul>
+</ul>
+see <a
+ href="../resources/physicalconfigurations/joystick_component_auto_create.xml">../resources/physicalconfigurations/joystick_component_auto_create.xml</a><br>
+Anyway...<br>
+<ul>
+  <li>either I say I have a joystick, and identify it as the one being
+proxied by the component</li>
+  <li>or the system asserts that there must be a joystick and creates
+it (or at least its superclass)</li>
+</ul>
+So...<br>
+I have added the thing merge, so that the system creates the
+superclass, and I can then merge it into the real thing :-)<br>
+<br>
+<p> </p>
+</body>
+</html>

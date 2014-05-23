@@ -1,0 +1,416 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT semantics scenario: content, significance and interation</title>
+</head>
+<body>
+<h1>ECT "semantics" scenario: content, "significance" and
+interaction&nbsp;</h1>
+Chris Greenhalgh 2005-07-20<br>
+<h2>Introduction</h2>
+<p>This is a sister-document to <a
+ href="ECT_semantics_physical_configuration.html">ECT_semantics_physical_configuration.html</a>.<br>
+</p>
+<p>This document consider the extension of the "raw" information in ECT
+components and properties to support the definitions of content and
+interaction, and in particular explores the notion of "significance"
+and its potential utility/interpretation.<br>
+</p>
+<p>So... I have been doing some work on ECT, and trying to thing of
+suitable demonstration applications, and been struggling mightily to do
+so. This may be because ECT is actually not very useful or appropriate.
+However I prefer to think at the moment that it is because the software
+component/property aspect/view which currently predominates in ECT is
+not a good fit for notions of "application" or "content" (although it
+is useful at its own particuar "level" in the system).<br>
+</p>
+<p>Following from the above-mentioned exploration of modelling and
+making use of&nbsp; information about the physical organisation of the
+system, this note explores a similar extension to more directly model
+"content" and "significance" in and around ECT as it currently stands.
+This is also responding to reflections on other EQUATOR experiences,
+including MacRoom, Augurscope, Unearthing Virtual History, Skipping,
+(my perception of) Chawton, POUTs, ...<br>
+</p>
+<h2>Definitions</h2>
+<p>Some initial definitions/explorations:<br>
+</p>
+<ul>
+  <li>"Significance" is concerned with both </li>
+  <ul>
+    <li>significant (to be taken note of)
+versus insignificant (to be ignored) and <br>
+    </li>
+    <li>signification, i.e. what
+it stands for or represents.<br>
+    </li>
+  </ul>
+  <li>Behaviour is generally about what the system does.</li>
+  <ul>
+    <li>Observed behaviour is what it has been seen (or otherwise
+observed) to do in particular historical situations/occasions</li>
+    <li>Future, specified or programmed behaviour will typically be
+expressed in terms of sets of possible behaviours contingent on the
+activities/behaviours of other aspects of the "total system", including
+users and physical environment.</li>
+    <li>The behaviour (or application) will often be specified (or at
+least initially envisioned) in terms of the "significant" actions of
+users, arrangements of physical artefacts and environment, etc.</li>
+    <ul>
+      <li>This may or may not be refined or recast in terms of system
+elements: sensors, programmed behaviours,&nbsp; actuators, etc. (the
+translation may be tacet/implicit)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>Interaction is about how the system responds to its users</li>
+  <ul>
+    <li>This is a particular view of behaviour which emphasises action
+&amp; response and/or dialog.<br>
+    </li>
+  </ul>
+  <li>Content is about what the users gets (back)</li>
+  <ul>
+    <li>It is probably expressed as particular families of contingency
+and behaviour/response, and may include media elements and other forms
+of information which may be "communicated" to user(s).</li>
+    <li>It may be authored, i.e. crafted by one or more people with
+particular responsibility for this.</li>
+    <li>It probably assumes a particular stereotype of
+behaviour/interaction. This can be embodied in a software "engine" of
+some sort. <br>
+    </li>
+    <li>It is typically (recursively) divisible into smaller parts,
+each of which is typically deemed to be appropriate or applicable only
+in certain circumstances or for certain purposes.&nbsp;</li>
+    <li>Some forms of content are (taking illustrative examples from a
+first-person shooter game :-):</li>
+    <ul>
+      <li>primarily passive, just for presenting to the user (in some
+way), e.g. media assets: geometries, textures, images, text</li>
+      <li>organisational, e.g. initial content (monster, trap, etc.)
+placement maps<br>
+      </li>
+      <li>constraints, for users and/or system elements, e.g.
+reachability maps, physics (could be treated as behaviour??)<br>
+      </li>
+      <li>behaviours, to be enacted by elements of the system, e.g.
+animations (could be treated as passive?!), traps, attacks, unlocking
+remote doors<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+<h2>Notes</h2>
+<ul>
+  <li>The design and construction of the physical elements of the
+system is a key activity in itself, which has a major contribution to
+the sense and "feel" (the significance?!) of the final system.</li>
+  <li>The content/engine disjunction reflects the specialisation of
+skills and roles between "content developers" or "artists" and
+"programmers", which is analogous to the levels of engagement discussed
+with ECT.</li>
+  <ul>
+    <li>We do not yet have a "content developer" level as such, since
+this would be tied to specific components (I guess; or new perspectives
+as being explored here); c.f. scripting.</li>
+  </ul>
+  <li>How general are the stereotypes for interaction/content? Should
+one or more be directly supported by the system? If not, how is this
+perspective added/integrated?<br>
+  </li>
+</ul>
+<h2>Examples of application/behaviour/interaction stereotypes in ubicomp</h2>
+<ul>
+  <li>presentation/filtering of "contextually relevant" information</li>
+  <ul>
+    <li>esp. location-relevant, automatically, on a personal display</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>e.g. touring guide, museum guide</li>
+    </ul>
+    <ul>
+      <li>e.g. interruption management<br>
+      </li>
+    </ul>
+  </ul>
+  <ul>
+    <li>including localised task support</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>e.g. navigation, wayfinding (GPS navigation system)</li>
+    </ul>
+    <ul>
+      <li>e.g. maintainance (photocopier :-), crisis/disaster activities<br>
+      </li>
+    </ul>
+  </ul>
+  <li>capture of local (esp. physical world) information<br>
+  </li>
+  <ul>
+    <li>recording and recall <br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>e.g. prosthetic memory, smart-camera, memories for life,
+contextual reminders</li>
+    </ul>
+    <ul>
+      <li>e.g. surveying, scene-of-crime, site-specific planning</li>
+      <li>e.g. authoring<br>
+      </li>
+    </ul>
+  </ul>
+  <ul>
+    <li>remote monitoring and anomaly detection<br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>e.g. elder-care, health-care, environmental monitoring,
+security (prison or fortress)</li>
+    </ul>
+    <ul>
+      <li>also e.g. "awareness" [less intrusive/oppressive?!]<br>
+      </li>
+    </ul>
+  </ul>
+  <li>device/location-independent interaction</li>
+  <ul>
+    <li>e.g. mobile (software) interfaces and applications, payment?!,
+mobile/distributed access to applications/services/processes, e.g. food
+ordering<br>
+    </li>
+  </ul>
+  <ul>
+    <li>e.g. ensemble/distributed interaction (esp. ad hoc/dynamically
+configured), using nearby interfaces with personal devices, offloading
+personal storage/computation, personal-area networks/convergence</li>
+  </ul>
+  <li>augmented (physical) artefacts and environments<br>
+  </li>
+  <ul>
+    <li>artefacts, e.g. phicons, tagged paper, AR (CYSMN?!), smart-its
+chemical containers</li>
+  </ul>
+  <ul>
+    <li>systems, e.g. tangible interfaces</li>
+    <li>envionrments, e.g. responsive environments, art installations,
+"smart" home<br>
+    </li>
+  </ul>
+  <li>social/collaborative<br>
+  </li>
+  <ul>
+    <li>communication</li>
+    <ul>
+      <li>e.g. telephony<br>
+      </li>
+    </ul>
+    <ul>
+      <li>virtual co-location (and collaboration), e.g. CYSMN,
+TheMacRoom</li>
+    </ul>
+  </ul>
+  <ul>
+    <li>social prosthesis <br>
+    </li>
+    <ul>
+      <li>e.g. p2p "jewelery" for introduction/identification, wireless
+game trading/gift extensions</li>
+      <li>more general brokering?<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+<h2>Examples of "significance" and sensing<br>
+</h2>
+"Significant" action/interaction inferred from sensor readings
+(component property values):<br>
+<ul>
+  <li>Pinger receiver reports pinger ID I (e.g. Ambient Wood,
+Mac-to-street, Chawton)</li>
+  <ul>
+    <li>=&gt; Pinger, hence device (hence person?!) "close to" physical
+location where (a) pinger with ID I deployed (at time T)</li>
+    <ul>
+      <li>=&gt; person (device) "has gone to" physical location(s)
+associated with pinger ID I<br>
+      </li>
+    </ul>
+  </ul>
+  <li>GPS position XYZ (e.g. Unearthing etc.)</li>
+  <ul>
+    <li>=&gt; GPS received, hence device (hence person?!) "roughly at
+lat/long (relative to the earth)" XYZ (at time T)</li>
+    <ul>
+      <li>=&gt; person "has gone to" XYZ</li>
+      <li>=&gt; person "has gone to" significant physical location L
+(position ~XYZ)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>Ultrasonic receiver reports position XYZ (e.g. MacRoom,
+CuriousHome?)</li>
+  <ul>
+    <li>=&gt; Ultrasonic receiver (transmitter) (hence device...) "in
+range of" ("close to"?) (particular) transmitter (receiver) array (at
+time T)<br>
+    </li>
+    <li>=&gt; Ultrasonic receiver (transmitter) (hence device...)
+"roughtly at offset" XYZ relative to the (particular) transmitter
+(receiver) array (at time T)</li>
+    <ul>
+      <li>=&gt; person "is near to" ("is looking at"?!) exhibit E
+(which has location ~XYZ)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>Bluetooth discovery of MAC address M (e.g. not-so-curious home?)</li>
+  <ul>
+    <li>=&gt; Bluetooth radio, (hence device (phone, PDA), hence
+person??...) "close to" physical location where polling bluetooth radio
+deployed (at time T)</li>
+  </ul>
+  <li>RFID reader reports RFID R (e.g. shape castle, skipping)</li>
+  <ul>
+    <li>=&gt; RFID tag having ID R hence (particular) physical artefact
+"close to" physical location of (particular?) aerial of (particular)
+RFID reader</li>
+    <ul>
+      <li>=&gt; physical artefact (having RFID tag R) "has been placed
+on"(?!) physical artefact (housing aerial of RFID reader) (by person
+P??)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>analog input (connected to dial) changes value to V (e.g. audio
+chair, shape virtual radio, group proj. game)</li>
+  <ul>
+    <li>=&gt; someone "manipates" dial to angle A(V)&nbsp;</li>
+    <ul>
+      <li>small delta-V may be taken to be "noise" (electrical,
+mechanical, finger vibration)<br>
+      </li>
+    </ul>
+    <li>=&gt; someone "selects (e.g.) channel" C (angle ~A) for device
+associated with (that) dial.</li>
+    <li>=&gt; A&gt;threshold: someone "opens the door" (group proj.
+game; analog input corresponds to angle of a door handle)<br>
+    </li>
+  </ul>
+  <li>Load cell array report values ABCD (e.g. weight table, skipping)</li>
+  <ul>
+    <li>=&gt; device which integrates those load cells (table) "is
+carrying weight" ("is subject to force") M(ABCD)</li>
+    <li>=&gt; mass (centre of gravity) "roughly at offset" XY(ABCD)
+relative to the (particular) load cells/load sensing surface</li>
+  </ul>
+  <li>digital input (connected to a pressure pad) is true (e.g. audio
+chair)<br>
+  </li>
+  <ul>
+    <li>=&gt; something "is on" the physical artefact on/under which
+the pressure pad is placed</li>
+    <ul>
+      <li>=&gt; (e.g.) someone (?!) "is sitting on" the audio chair</li>
+    </ul>
+  </ul>
+  <li>digital input (connected to a button) becomes true (e.g. shared
+lights)</li>
+  <ul>
+    <li>=&gt; someone "presses" the (particular, e.g. green) button</li>
+    <ul>
+      <li>someone (e.g.) "(wants to) make brighter" the light
+associated with that button<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+<p>Note: many "significant" interactions are not sense-able (either in
+some particular context, or in general), e.g.<br>
+</p>
+<ul>
+  <li>is someone actually "looking at" a particular exhibit (or
+device)? <br>
+  </li>
+  <ul>
+    <li>are the "attending to" or "interested in" that particular
+exhibit?</li>
+    <li>is someone actually "thinking about" something particular<br>
+    </li>
+  </ul>
+  <li>is someone (currently) alone? having a conversation?<br>
+  </li>
+  <li>is the reading in error for some (external) reason (e.g.
+reflections)?</li>
+  <li>is someone lost? or having trouble?</li>
+  <ul>
+    <li>or are they (say) waiting for traffic to pass? or sheltering
+from the rain?<br>
+    </li>
+  </ul>
+  <li>is someone near to some thing/place which is much smaller than
+the positioning system's resolution or accuracy?</li>
+</ul>
+Some "significant" things in relation to application stereotypes:<br>
+<ul>
+  <li style="font-style: italic;">presentation/filtering of
+"contextually relevant" information</li>
+  <ul>
+    <li>where are you</li>
+    <li>what is your (notionally sensable) "context" (e.g. other
+people, history of activities)</li>
+    <li>what are your interests/other non-sensed "context" (e.g.
+appointments, plans)</li>
+    <li>what information is available<br>
+    </li>
+  </ul>
+  <li><span style="font-style: italic;">capture of local (esp. physical
+world) information</span><br>
+  </li>
+  <ul>
+    <li>what is the state of the world/environment</li>
+    <li>what is happening</li>
+    <ul>
+      <li>also inferred activities, people, etc.</li>
+    </ul>
+    <li>is it "normal"<br>
+    </li>
+  </ul>
+  <li style="font-style: italic;">device/location-independent
+interaction</li>
+  <ul>
+    <li>what devices are to hand/nearby</li>
+    <li>what are their capabilities, communications, etc.</li>
+    <li>what applications/services are "in play", with what
+requirements, etc.<br>
+    </li>
+  </ul>
+  <li><span style="font-style: italic;">augmented (physical) artefacts
+and environments</span><br>
+  </li>
+  <ul>
+    <li>which artefact is it<br>
+    </li>
+    <li>what is the user "input"</li>
+    <li>what is happening...<br>
+    </li>
+  </ul>
+  <li style="font-style: italic;">social/collaborative<br>
+  </li>
+  <ul>
+    <li>who/what kind of person do you want to communicate/share with</li>
+    <li>who is nearby - physically/virtually</li>
+  </ul>
+</ul>
+<h2>Thought Experiments (ECT scenarios)</h2>
+<h3>RFID</h3>
+<br>
+</body>
+</html>

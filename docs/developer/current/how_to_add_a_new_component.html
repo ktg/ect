@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Developing new components for ECT</title>
+</head>
+<body>
+<h1>Developing new components for ECT</h1>
+Initial version by Chris Greenhalgh<br>
+Most recent update by Stefan Rennick Egglestone 2005-11-15<br>
+<br>
+<a href="#intro">Introduction</a><BR>
+<a href="#what">What is an ECT component?</a><br>
+<a href="#adding">Developing new components</a><BR>
+
+<h3><a name="intro">Introduction</h3>
+<P>
+This document is a brief introduction to the
+process of adding a new component to ECT, which should not 
+be too difficult if you are a competent
+Java developer. It assumes that you are already familiar with using
+ECT, and that you have experimented with a number of pre-written
+components. 
+</p>
+<P>
+The simplest way to start developing a new component is to obtain
+the source code for ECT, as this includes a number of template
+components that can be extended. Read the 
+</a><a href="ECT_Build_Notes.html">Building ECT</a>
+document for instructions on how do do this. Note that source code
+for a particular ECT release can also be obtained by downloading
+the <b>full</b> ECT archive (rather than the <b>webstart</b>
+archive). 
+</p>
+Knowledge of using Apache Ant is assumed in the rest of this
+document. This document also assumes that
+you are familiar with the JavaBeans concept. If not, you should 
+read up on this. Take a look at Sun's <a
+ href="http://java.sun.com/products/javabeans/index.jsp" target="_blank">Java
+Bean information
+pages </a> and particularly the <a
+ href="http://java.sun.com/developer/onlineTraining/Beans/JBeansAPI/shortcourse.html"
+ target="_blank">JavaBeans tutorial</a>. </p>
+<p>
+<P>
+Once you have worked through this document, you should also read the
+<a href="ECT_Component_Guidelines.html">Component reference</a> for
+more detailed information about component development, and the
+<a href="documenting_components.html">Documentation reference</a>
+for more detailed information about writing documentation for
+components.
+</p>
+<p>
+Finally, the best way to learn how to develop ECT components is to look
+at existing examples, many of which are supplied with ECT. If you have
+any questions about ECT development, please join our mailing list, 
+as we will be happy to help you resolve them. 
+</p>
+
+<h3><a name="what">What is an ECT component?</h3>
+
+<P>
+At its simplest, an ECT component is just a JavaBean, packaged as 
+a JAR. To take a look at some of the beans included with ECT 
+already, take a look in the <tt>webstart/download/java/components</tt>
+directory in your ECT installation - each file you find here
+(eg <tt>template-component.jar</tt> will contain at least one bean,
+and possibly more (eg <tt>template-component.jar</tt> currently
+contains two). If you have any
+pre-written java beans, you should just be able to
+place them into this directory, and they should become available to 
+ECT the next time you start it. So, if you can develop a JavaBean,
+then you can develop an ECT component, and all you need to know
+is how to add such a bean into a particular installation.
+</p>
+
+<P>
+In more detail, you'll notice that components in ECT normally define a 
+number of properties. For example, the <i>template</i> component
+distributed with ECT defines a number of properties called
+<tt>input</tt> and <tt>output</tt>. These are implemented in 
+the source file for the template component
+as pairs of methods
+called <tt>setInput</tt> and <tt>getInput</tt>, and 
+<tt>setOutput</tt> and <tt>getOutput</tt>
+(see file <tt>/src/equip/ect/components/templates/Template.java</tt>)
+. When a user 
+uses the graphical interface to modify property <tt>input</tt>, then
+the ECT system causes the <tt>setInput</tt> method on the
+corresponding component to be called, As well, if ECT ever needs
+to check the value of this property, is calls 
+<tt>getInput</tt> to obtain the current propertly value.
+</p>
+
+<h3><a name="adding">Developing new components</a></h3>
+<P>
+Although it is possible to construct a bean outside of ECT, and
+then to import that bean into ECT, this approach is not recommended.
+For each bean, as well developing a valid class file conforming
+to the JavaBean spec (eg <tt>Template.java</tt>) you would have
+to construct a BeanInfo class (eg <tt>TemplateBeanInfo.java</tt>)
+and a manifest file (eg <tt>manifest.mft</tt>) and package all these
+files into the correct structure inside a JAR. This process is slightly
+tricky, and mistakes can be made which can slow bean development. 
+</p>
+<P>
+As an alternative, the ECT build system provides a number of tools
+to help with the process of constructing a bean. To a first approximation,
+all you have to do is write your bean source file (eg <tt>Template.java</tt>),
+add a new target to the ECT build file (<tt>build.xml</tt>), and if 
+you have set things up properly, ECT will generate a valid bean info,
+package up your bean, and copy it to the correct installation automatically.
+This approach saves a lot of time and errors!
+</p>
+
+The following instructions assume that
+you have checked out module <i>ect</i> into directory
+&lt;ect_home&gt;.
+<ol>
+  <li>Make a new directory for your component under
+<tt>&lt;ect_home&gt;/ect/java/src/equip/ect/components</tt>
+  (eg <tt>&lt;ect_home&gt;/ect/java/src/equip/ect/components/new_component</tt>)
+  
+  <li>copy Template.java into this directory and modify it so that
+      it does what you want it to (hint - you'll need to change the package
+      directive inside this source file, and you might want to change
+      the name of the file and the class defined in it)
+  <li>Modify build.xml so that it contains a target to build your components.
+      You might like to copy the "template" target and modify it, as long
+      as your component does not require any additional classpath 
+      entries. Alternatively, if you component does need additional
+      classpath entries (eg if it depends on another jar, for example)
+      take a look at target "phidgets". Call
+      your new target something like <tt>new_component</tt>
+  <li>to build your component and to install, type the following
+      into a command prompt:<BR><BR>
+      <B>ant new_component</b><BR>
+      <b>ant install</b><BR>
+      <b>ant webstart</b><BR><BR>
+  <li>run ECT, and hopefully your component will have appeared
+</ol>
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>Equip component toolkit state/startup design</title>
+</head>
+<body>
+<h1>EQUIP Component Toolkit state/startup design notes</h1>
+2004-05-17, Chris &amp; James<br>
+<h2>Introduction</h2>
+Persistence is presumed to ultimately file-based. E.g. file
+backup/restore can be used to recover a failed node.<br>
+Several installations (= multi-host single dwelling system, e.g. Tom's
+flat) may exist on a single LAN (e.g. Tom's building-area network, BAN)<br>
+Setting up a new node should be easy using Java WebStart :-)<br>
+<h3>Single Dwelling System</h3>
+A single dwelling system comprises (a) hardware:<br>
+<ul>
+  <li>Some LAN networking provision, e.g. WaveLAN access point</li>
+  <li>Some Internet access, e.g. routed/firewalled ISP connection,
+presumed always on</li>
+  <li>One or more PC-like machines = infrastructure servers. Exactly
+one PC will be designated as the installation master.<br>
+  </li>
+  <li>Misc devices, sensors, etc. plugged into the above PCs</li>
+</ul>
+(b) Software:<br>
+<ul>
+  <li>Exactly one persistent shared dataspace for non-persistent
+coordination (e.g. component adverts, component properties) and
+persistent component-independent configuration (e.g. component
+requests, property link requests). This will run on the installation
+master machine.<br>
+  </li>
+  <li>Zero or more&nbsp; (but zero would be a bit silly) Containers,
+typically one Java Container per machine, and perhaps one C# container
+per machine (or maybe more, depending on which bits are likely to crash
+most often).</li>
+  <li>Each Container has zero or more component capabilities (e.g. Jar
+files containing Java Bean classes)</li>
+  <li>Each Container provides its own persistence for recreating
+components, e.g. consistent use of GUIDs, persistence of component
+internal state (Shahram)</li>
+</ul>
+<h3>Security and Trust</h3>
+Direct physical access to hardware is taken as the base-line for
+security, i.e. at this level you can do whatever you want :-)
+Consequently, all processes on a given host are presumed mutually
+trustworthy.<br>
+Access to the LAN is assumed to provide a minimal degree of security,
+but is not sufficient for granting trust (e.g. see multiple dwellings
+per LAN case, above).<br>
+Security model 1 presumes that out of band distribution of a shared
+secret to a host (PC) incorporates it into that trust domain. E.g.
+copying a shared secret via a USB flash disk from an existing member of
+the particular dwelling to a new host would establish mutual trust.<br>
+<h4>Scenarios:</h4>
+<ul>
+  <li>Tom buys a new infrastructure PC to wire up another room, and is
+easily able to add it to his own installation... :-)</li>
+  <li>Tom and his neighbour, X, both have separate installations. Tom
+should not be able to add nodes to X's installation, or make changes to
+X's configuration, or connect components in X's installation to
+components in his own installation.</li>
+</ul>
+<h3>Additional Requirements</h3>
+For development/testing/etc it should be possible for a single PC to be
+part of different installations. It is not clear whether this would
+only be at different times, or possibly even at the same time :-)<br>
+<h2>Design 1</h2>
+When a machine is re-booted, by inspecting its own filesystem (or other
+local persistence mechanism) it should be able to determine:<br>
+<ul>
+  <li>What (if any) installations it has previously been a member of.</li>
+  <li>The shared secret for such installations<br>
+  </li>
+  <li>Which (if any) installations to re-join/re-start automatically
+(by default).</li>
+  <li>Where it was the installation <span style="font-style: italic;">master
+    </span>machine and consequently ran the dataspace for an
+installation, it will have the persisted state of the DS (checkpoint(s)
+and event log files). <br>
+    <span style="font-weight: bold;">NOTE </span>to configure the use
+of DS persistence in the current implementation requires the
+specification in advance of full dataspace URL including IP address and
+server port number! If this may vary then the configuration must be
+dynamically generated on startup. <br>
+    <span style="font-weight: bold;">NOTE </span>client will
+automatically try to reconnect to a failed dataspace server, but will
+use the ORIGINAL IP address and port number.<br>
+  </li>
+  <li>Where it ran any Container(s) in an installation it will have the
+container-specific persistent state (GUIDs, previous component requests
+and component state(s) and GUIDs).</li>
+</ul>
+What can you do when you start a new machine?<br>
+<ul>
+  <li>Restart a previously mastered installation for which we were
+master. <br>
+Optionally clear out persistent information (other than shared secret)
+from that installation (= hard reset/wipe and restart)<br>
+  </li>
+  <li>Rejoin a previously joined installation of which we were a member
+(and which may or may not still exist or be running!). <br>
+Optionally clear out persistent information (other than shared secret)
+from that installation.<br>
+  </li>
+  <li>Start a new installation with this machine as master<br>
+NOTE generates or remotely obtains new shared secret.<br>
+  </li>
+  <li>Join an installation (somewhere on this network, presumably)
+which we have not previously been a member of.<br>
+NOTE installation's shared secret must be provided securely (e.g. via
+dongle).<br>
+  </li>
+</ul>
+NOTE when (re)starting an installation master the IP and port of
+installation dataspace may have changed and must be made available.<br>
+NOTE when (re)starting a Container the IP and port of the installation
+dataspace may have changed and must be determined.<br>
+<h3>Discovery issues</h3>
+How do you know what installations are available to join?<br>
+<ul>
+  <li>Option 1: you remember that you already created one, and have the
+shared secret.</li>
+  <li>Option 2 (better): there is a network-scoped
+discovery/advertisement process, which lets you find existing
+installations, although an out of band mechanism is still required to
+obtain the shared secret and join them.<br>
+ISSUE: make sure that this is not as insecure as WEP :-)<br>
+NOTE Option 1 should still be available to cover the case where the
+master is currently down/broken/etc.<br>
+  </li>
+</ul>
+How do you know what IP and port the installation's dataspace is
+running on?<br>
+<ul>
+  <li>Option 1 (bad): it is configured when first joined, e.g. with the
+shared secret, and presumed never to change.</li>
+  <li>Option 2 (better): it is discovered from the running installation
+master.<br>
+ISSUE: make sure that someone can't fake being the installation master.</li>
+</ul>
+<h3>Design for use of EQUIP discovery</h3>
+Background:<br>
+<ul>
+  <li>Jini-like announce protocol, mapping group name(s) and type
+name(s) to string(s) (usually URLs).</li>
+  <li>No security.</li>
+</ul>
+Desired outcome (a) installation discovery:<br>
+<ul>
+  <li>Human readable/meaningful installation name so that you can ask
+someone to join it or remember that you made it. e.g. "Tom's flat"</li>
+</ul>
+Desired outcome (b) installation dataspace URL discovery:<br>
+<ul>
+  <li>Exactly one URL (protocol, IP, port) of installation dataspace,
+with confidence that this is the one true master of this installation<br>
+  </li>
+</ul>
+Option 1:<br>
+<ul>
+  <li>group name = Human-readable installation name plus additional
+installation-specific string (not the shared secret :-) which can
+easily be seperated from the human-readable name (e.g. '...#...')<br>
+  </li>
+  <li>Discovered service string = master dataspace URL PLUS digital
+signature testable using shared secret, e.g. derive a key from the
+shared secret (optionally incorporating information from the URL), use
+to encrypt a secure digest of the dataspace URL, concatenate with URL
+in unambiguous parsable form.<br>
+NOTE non-secure version will not be able to distinguish deliberate
+clashes on group name.<br>
+  </li>
+</ul>
+So:<br>
+<ul>
+  <li>Installation master runs a discovery server to announce both the
+installation's existence, and the installation's dataspace URL</li>
+  <li>Containers use discovery client with digital signature checking
+to discovery the installation dataspace URL</li>
+  <li>Start-up interface uses general discovery client with group "any"
+(or is it "*"??) to create/maintain a list of currently avail able
+installations to join.</li>
+</ul>
+<h3>Design for EQUIP security</h3>
+Connecting to the dataspace should also require the mutual demonstrated
+holding of the shared secret :-) E.g. challenge response using
+deterministically derived key from shared secret.<br>
+<br>
+<h3>What happens next?</h3>
+Presumably the user can see:<br>
+<ul>
+  <li>what if any installations the machine is currently mastering</li>
+  <li>for each active installation which if any containers are
+currently running</li>
+</ul>
+The user can presumably, for each active installation of which this
+machine is currently a master or member:<br>
+<ul>
+  <li>start a new container</li>
+  <li>restart a container that is thought to have crashed?!<br>
+  </li>
+  <li>add/update/remove capabilities for any container<br>
+  </li>
+  <li>start a user interface (there may be more than one kind)<br>
+  </li>
+</ul>
+<h3>What might the filesystem look like?</h3>
+Deterministic choice of common root directory/<br>
+&nbsp;&nbsp;&nbsp; per-installation subdirectory (?made safe version of
+discovery group)/<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; shared secret<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; full version of discovery group, or at
+least Human-readable name<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; installation configuration, e.g.
+restart/rejoin by default, dataspace port number?<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; dataspace persistence directory (for
+installation master, only)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; per-container directories/ (each with)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; container startup
+configuration, e.g. executable pathname, restart/rejoin by default<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; container's own
+persistence stuff... (inc. component-specific persistence)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; container component
+deployment directory/<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; e.g. jar files<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; ??extra
+metadata for update management e.g. origin website??<br>
+<h2>EOF</h2>
+<br>
+</body>
+</html>

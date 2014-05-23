@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>rdf_style_representations_and_ect</title>
+</head>
+<body>
+<h1>Simple RDF/Knowledge-style Representations of ECT State/History</h1>
+Chris Greenhalgh, 2005-06-28<br>
+<h2>Introduction</h2>
+<p>For quite some time - e.g. in and around the EQUATOR Curious Home -
+we have been interested in representing and reasoning over the state of
+the world as apprehended by ECT. See, for example, the <a
+ href="curious-home-design-sketch-1-20040331.doc">scenario </a>and <a
+ href="curious-home-infra-ontology-20040330.doc">ontology </a>notes,
+and an initial <a href="curioushome.rdf">RDF ontology</a>. These take
+the approach of described the state of the ECT installation (devices,
+components, rooms, properties, relationships, etc.) at some "present"
+moment. The prototype client application <a
+ href="../src/equip/ect/apps/rdfview/Main.java">../src/equip/ect/apps/rdfview/Main.java</a>
+is a first exploration of this - using Jena with a placeholder for
+using its RETE forward chaining rule engine. This prototype maintains
+RDF statements concerning current components, and their properties
+(including values), containers and hosts. However, it does not ground
+or relate this to any other parts of the proposed ontology (e.g.
+devices, rooms, etc.).</p>
+<p>This is apparently complemented by (a) exploring issues of
+uncertainty and ambiguity in EQUATOR, especially within the "seamful"
+game activity, and (b) some attempts to apply more formal methods or
+approaches such as process languages to this kind of system.</p>
+<p>The soon-to-be-launched EPSRC-funded Semantic Media project and the
+recently started ESRC-funded e-social science node at Nottingham also
+have an interest in recording, annotating, replaying and analysing
+experiences that directly use or are monitored using ubicomp-type
+systems. <br>
+</p>
+<p>These suggest a more explicit representation of time to directly
+accomodate history rather than just momentary state.<br>
+</p>
+<h2>Direction(s)</h2>
+<p>An "event" is something with an extent in time, i.e. a beginning and
+an end, between which it is "in progress". An event whose end is in our
+past "has occurred"; an event whose start is in our future is "yet to
+occur".<br>
+</p>
+<p>A "state" is a (set of) predicate(s) (without side-effects)
+evaluated as true at some moment in time. E.g. (logical conjunctions
+of) assertions about "observable" "properties" of "entities"/things at
+that time (or in the [known?] past of that time).<br>
+</p>
+<p>An "action" is a kind of event which is "performed by" some (set
+of?) entity(s) and has some effect, typically visible in change(s) of
+state before and after its occurance.<br>
+</p>
+<br>
+</body>
+</html>

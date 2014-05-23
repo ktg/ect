@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT Physical Configuration Guidelines</title>
+</head>
+<body>
+<h1>ECT Physical Configuration Guidelines/Notes</h1>
+Chris Greenhalgh, 2005-09-21<br>
+<h2>Introduction</h2>
+The Physical Configuration Manager is a work-in-progress and concept
+demonstrator, exploring the explicit modelling of the physical
+(non-software) elements of an ECT installation to support
+configuration, understanding (including analysis) and behaviour
+specification. Here are some notes/thoughts about current explorations,
+what to put in the XML files and what kinds of rules to have, etc.<br>
+<h2>General</h2>
+Some basic reasoning can be done to make subsequent rules more concise
+- see <a
+ href="../../../old/resources/physicalconfigurations/facts_common.xml">facts_common.xml</a>:<br>
+<ul>
+  <li>a thing with identifier of type T =&gt; fact: thing, T, value</li>
+  <li>for all thing/class relationships (including superclasses) =&gt;
+fact: thing, hasclass, class <br>
+  </li>
+  <li>similarly =&gt; fact: thing, hasclassname, classtitle</li>
+  <li>if a thing has type (thingtype) which is also the title of a
+class then =&gt; fact: thing, hasclass, class (i.e. the class must
+exist, e.g. "Host", etc. - see below).<br>
+  </li>
+</ul>
+<h2>Configuration</h2>
+Support for configuration is currently primarily:<br>
+<ul>
+  <li>creating the appropriate device interface (proxy) components for
+any connected devices;</li>
+  <li>configuring such device interface components as appropriate.</li>
+</ul>
+<h3>ECT Introspected Information<br>
+</h3>
+In general, ("thingtype") Host, SoftwareContainer,
+SoftwareComponentCapability/SoftwareComponent and
+SoftwareComponentProperty (in that Part-of hierarchy) are created by
+introspection. All are Physical Things (in Physical Configuration
+Manager schema). The identifiers are currently:<br>
+<ul>
+  <li>Host (only created if capabilities are present at the moment):</li>
+  <ul>
+    <li>"hostname" e.g. "kubrick"</li>
+    <li>"title" e.g. "kubrick" or "java on kubrick"
+(capability.getHostID())<br>
+    </li>
+  </ul>
+  <li>SoftwareContainer:</li>
+  <ul>
+    <li>"guid" e.g. "[128.243.87.134:0.1689:1:1127220035]"</li>
+    <li>"title" e.g. "kubrick" or "java on kubrick"
+(capability.getHostID())<br>
+    </li>
+  </ul>
+  <li>SoftwareComponentCapability:</li>
+  <ul>
+    <li>"guid" (capability.getID())</li>
+    <li>"title" e.g. "PhidgetLCD" (capability.getCapabilityName())<br>
+    </li>
+  </ul>
+  <li>SoftwareComponent:</li>
+  <ul>
+    <li>"guid" (component.getID())</li>
+    <li>"title" e.g. "PhidgetInterfaceKit" <br>
+    </li>
+    <li>"componentrequestguid" </li>
+  </ul>
+  <li>SoftwareComponentProperty:</li>
+  <ul>
+    <li>"guid"</li>
+    <li>"title", e.g. "configSerialNumber"</li>
+    <li>"value", e.g. "-1"<br>
+    </li>
+  </ul>
+</ul>
+<h3>General Component Creation Strategy</h3>
+The component creation strategy depends on whether there is <br>
+<ul>
+  <li>one directly requested component per device (e.g. EZIO, current
+PhidgetInterfaceKit) or </li>
+  <li>one directly requested component per device class or family,
+which in turn makes device-specific sub-componented (e.g.
+JoystickInterface, older PhidgquipFactory)<br>
+  </li>
+</ul>
+<p>It also depends on whether the physical connection of the device to
+the host has to be "qualified" or not, e.g. <br>
+</p>
+<ul>
+  <li>for most USB-connected device it does not matter which particular
+USB port is used (unqualified), <br>
+  </li>
+  <li>whereas for RS-232 devices it is necessary to know which
+particular (named) serial (COM) port it is connected to. <br>
+  </li>
+</ul>
+<p>In the former case the device can be described as connected simply
+to the host, while in the latter case it must be described as being
+connected to a particular COM port which is part of the host.</p>
+<p>In general, the type of a physical device is determined by the
+"title" identifier of (one of) its class(es). <br>
+</p>
+<br>
+</body>
+</html>

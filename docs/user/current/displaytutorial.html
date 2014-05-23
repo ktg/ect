@@ -1,0 +1,384 @@
+<html>
+<head><title>Using the display editor</title></head>
+<body>
+<h1>Using the display editor</h1>
+
+Created by Stefan Rennick Egglestone 2006-02-15<BR>
+Last updated by Stefan Rennick Egglestone 2006-06-29<BR><BR>
+
+<a href="#intro">Introduction</a><BR>
+<a href="#using">Using the display editor</a><BR>
+<a href="#tutorial">The tutorial</a><BR>
+
+<h3><a name="intro">Introduction</h3>
+
+<P>
+The display editor is an
+interface to ECT which has been designed to be as simple
+as possible to use, and which has also been optimised
+for use through a touchscreen. Figure 1 below
+shows a screenshot of the display editor.
+</P>
+<img src="images/displayeditor/emailandlcd.png"/><BR>
+<B>Figure 1</b>
+
+<P>
+Each of the icons in figure 1 represents either
+a source of data or a sink for data. Data sources
+appear to the left of the green dividing line, and
+data sinks to the right. In this case, the
+only data source is an email account, and
+the only data sink is an LCD screen. Blue links indicate 
+how data should flow between sources and sinks, 
+and in this case a link exists between a source
+of emails and an LCD screen which can be used
+to display them.
+</P>
+
+<P>
+Note that in some cases, each icon will represent
+a single ECT component, and a link will represent
+a connection of one property on a source component
+to one property of a sink component. However,
+in other cases, data sources and sinks will
+be composed of multiple ECT components. In all
+cases, component have to be instantiated
+through the <a href="ECT_Webstart_User_Guide.html">graph editor</a>,
+as the display editor interface has been designed 
+to be as simple as possible, and does not include
+component instantiation functionality. A detailed 
+<a href="#tutorial">tutorial</a>
+on how to use the graph editor in co-ordination 
+with the display editor is included below.
+</P>
+
+<P>
+Also note that, because the component properties to which
+a link can be connected cannot be defined in the display
+editor, only those components for which it is unambiguous
+as to which property should be used in a connection
+can actually be used in this editor. In practice, there
+are many ECT component for which this is the case. 
+A list of such components
+can be found <a href="../../javadoc/sources_and_sinks.html">here</a>.
+Any pair of sources and sinks from this 
+list can be connected in the display editor, 
+but this does not mean that the resultant
+installation will perform a sensible task. For example,
+connecting a VideoProcessor component to a StringConcatenation
+component is probably not a very useful thing to do!
+</P>
+
+<h3><a name="using">Using the display editor</h3>
+
+<P>
+The rest of this document presents a simple tutorial
+on how to set up an ECT installation
+that can be configured using the display editor. The tutorial:
+</P>
+
+<ul>
+<li>describes how to create a number of data sources and
+sinks in the graph editor
+<li>describes how to make these sources and sinks available
+in the display editor
+<li>describes how to use the display editor to configure
+and reconfigure connections between sources and sinks
+</ul>
+
+<P>
+Instructions on how to construct the following types
+of data source are given in this tutorial:
+</p>
+<ul>
+<li>email (allows a POP- or IMAP-enabled email account to be used as a data source)
+<li>SMS (allows a GSM/GPRS modem to be used as a data source)
+<li>RSS (allows an external RSS feed to be used as a data source)
+<li>environmental information (allows a temperature/humidity/air pressure sensor
+attached to a <a href="http://www.phidgets.com/"
+target="_blank">PhidgetInterfaceKit</a>
+device to be used as a source of environmental information)
+</ul>
+</p>
+
+<P>
+The tutorial also includes instructions on how to construct
+the following data sinks:
+<ul>
+<li>lcd screen (allows a
+<a href="http://www.phidgets.com" target = "_blank">PhidgetTextLCD device</a>, 
+to be used as a data sink)
+<li>web-publisher (publishes items of data using both an RSS feed 
+and a web-page)
+</ul>
+</P>
+
+<P>
+With this particular set of sources and sinks, the data sources can
+be thought of as producing <i>messages</i> (eg a new email message,
+a message indicating the current temperature in a room)
+and the data sinks can be thought of as displays for these messages
+(eg the phidget lcd screen can be used to display a new email,
+or the email can be "displayed" by publishing it on
+a web-page or an RSS feed) 
+</p>
+
+<h3><a name="tutorial">The tutorial</h3>
+
+<P>
+(Please note that this tutorial assumes familiarity with
+the <a href="ECT_Webstart_User_Guide.html">graph editor</a> 
+and its use in requesting instances of components and
+adding connections between component properties. Remember
+that each of the components below will have documentation
+that is viewable in the graph editor 
+(or on this website - eg see the
+<a href="../../javadoc/alphabeticalComponents.html">alphabetical components list</a>)
+which you should consult if you do not know how to use a component.)
+</p>
+
+
+<h4>Getting started</h4>
+
+<ul>
+<li>Start the graph editor via 
+<a href="ECT_Webstart_Getting_Started.html#method1">method 1</a>.
+<li>Note that you should read about
+<a href="web_cache.html">configuring ECT for web-caches/proxies</a>
+if your internet connection requires that you access the web
+through a web-cache/proxy. This is because the RSS component
+in ECT uses web technology
+to fetch information from an RSS news feed.
+</ul>
+
+<h4>Creating an email data source</h4>
+
+<ul>
+<li>To create a simple email data source, just
+instantiate the EmailReceiver component, and configure
+it to connect to your POP or IMAP email account. Once
+configured, you'll find that new emails that have been
+sent to this account start appearing on the 
+EmailReceiver <i>messages</i> property.
+<li>If you wish to create a filtered email data source
+(for example, one that will monitor your email
+account and only pass on emails from people
+on a safe list) then, in addition to EmailReceiver, 
+you can use an instance
+of EmailFilter to perform the filtering. Configure this component 
+as described in the documentation provided with
+it, and connect the
+EmailReceiver <i>messages</i> property to 
+the EmailFilter <i>inputMessages</i> property. Any emails
+that are sent to your email account and which are passed
+by the filter will appear on the EmailFilter
+<i>acceptedMessages</i> property (any that don't pass will
+appear on the <i>rejectedMessages</i> property).
+</ul>
+
+<h4>Creating an SMS data source</h4>
+
+<ul>
+<li>This can be done using the SMS component. Note that
+it is only possible to have one instance of this component
+running at once - so if you also want an SMS data sink
+available at the same time, you must use the same instance
+of the component for this.
+<li>Make an instance of the SMS component, and configure
+it to connect to your GSM/GPRS modem (see component 
+documentation for more details). Any SMS sent to the 
+SIM card plugged into the modem will start to appear
+on the <i>messages</i> property of the SMS component.
+<li>You can make a filtered SMS data source by attaching
+the <i>inputMessages</i> property of 
+a correctly-configured instance of DictionaryFilter to 
+the <i>messages</i> property of your SMS component.
+
+</ul>
+
+
+<h4>Creating an RSS data source</h4>
+<ul>
+<li>If you wish to use a published RSS feed as a source
+of data
+(for example, the <a href="http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml">BBC News front page</a>) then you can do
+this using an instance of the RSSClient component, and an instance
+of ArrayPlayer.
+<li>Connect the <i>messages</i> property of the RSSClient
+to <i>array</i> property of the ArrayPlayer, 
+and set the <i>playing</i> property of the ArrayPlayer
+to <tt>true</tt>.
+<li>provide the address of your RSS feed to the
+ <i>url</i> property of the RSSClient.
+<li>Items of news information should start appearing
+on the <i>output</i> property of ArrayPlayer.
+</ul>
+
+<h4>Creating an environmental information data source</h4>
+<ul>
+<li>This is a bit more complicated to the other data sources. 
+To actually gather environmental information, you'll need
+a PhidgetInterfaceKit, along with either a temperature,
+humidity or air pressure sensor
+(see <a href="http://www.phidgets.com" target="_blank">Phidgets Inc website
+</a> for ordering info)
+<li>To turn this hardware into a data source, you'll need
+instances of the following components: PhidgetInterfaceKit, 
+FunctionFactory and StringConcatenation.
+<li>First, attach your sensor to your interface kit, connect
+your interface kit to your computer, and configure
+your PhidgetInterfaceKit component to communicate with it.
+Once configured, this component will look like figure x below.
+One of the properties labelled
+<i>analogin&lt;x&gt;</i> will be providing data values from your sensor - 
+which one it is will depend upon which port on your PhidgetInterfaceKit
+you have actually plugged your sensor into.<Br>
+<img src="images/displayeditor/phidgintkit.png"><BR>
+<B>Figure x - configured PhigetInterfaceKit component</b><Br>
+<li>Now make an instance of FunctionFactory, which should
+cause a GUI to pop-up looking something like figure y
+below<BR>
+<img src="images/displayeditor/functionfactory.png"><BR>
+<b>Figure 2 - FunctionFactory gui</b>
+<li>Right-clicking on, for example, the entry
+labelled <i>Phidget temperature conversion function</i>
+allows you to choose to make an instance of a component
+that can convert the raw sensor value provided by
+the PhidgetInterfaceKit component into a calibrated
+environmental reading (eg it might convert 0.025
+into 23C - for 23 centrigrade). This will conversion
+component will appear under the name "Function component" in 
+the graph editor.
+<li>Connect the correct <i>analogin</i> property of 
+your PhidgetInterfaceKit to the the <i>input</i>
+property of the conversion component, and calibrated
+data values will start appearing on its <i>outputText</i>
+property.
+<li>You can use an instance of the StringConcatenation
+to convert this into a textual message. eg you might
+convert "23C" into the message "The temperature in your
+lounge is 23C" using this component.
+</ul>
+
+<h4>Creating a PhidgetLCD data sink</h4>
+
+<ul>
+<li>If you are in possession of a PhidgetTextLCD screen, then 
+you can use it to display items of data.
+<li>Doing this requires two components - one of which is
+used to extract information from data items, and one
+of which is used to control the PhidgetLCD.
+<li>The extraction operation is necessary as 
+PhidgetLCD screens only have two lines - so can only
+present a portion of the data contained in a complex
+message such as an email.
+<li>Create an instance of the SmallDisplayStringExtractor
+and PhidgetLCD components.
+<li>Connect the <i>lineOneText</i> property of the
+SmallDisplayStringExtractor to the <i>lineOneText</i>
+property of the PhidgetLCD component, and do a similar
+thing for the <i>lineTwoText</i> properties.
+<li>Configure your PhidgetLCD component to cause it to connect to
+your PhidgetTextLCD device.
+<li>Any messages placed on SmallDisplayStringExtractor property 
+<i>message</i> should then appear in some form on your
+PhidgetTextLCD device.
+</ul>
+
+<h4>Creating a web-publisher data sink</h4>
+<ul>
+<li>To do this, use an instance of the HTTPPublisher component,
+which publishes items of data as both a web-page and an RSS feed.
+<li>Configure HTTPPublisher as described in its documentation,
+providing at minimum a value to the <i>fileName</i> property.
+<li>Any message placed on its <i>messages</i> property will
+then be published in the locations given in the 
+<i>locationOfHTML</i>, <i>locationOfReversedHTML</i>,
+<i>locationOfRSS</i> and <i>locationOfReversedRSS</i> properties.
+<li>Alternately, create an instance of FIFOQueue, and connect
+its <i>queue</i> property to the HTTPPublisher <i>messages</i>
+property. This creates a composite data sink which is capable
+of building up an archive of any messages placed on
+the FIFOQueue <i>newObject</i> property - with this archive
+being published by the HTTPPublisher component.
+<li>For example, every time a new email is added to the queue,
+then the details of this email will be appened to the end
+of the web-page whose location can be found in the
+HTTPPublisher <i>locationOfHTML</i> property - so this
+web-page can be used to browse all emails that have been 
+received recently.
+</ul>
+
+<h4>Making data sources and sinks available in the
+display editor</h4>
+
+<ul>
+<li>For an individual component to appear in the display editor,
+it must be given a name with a specific syntax.
+<li>To change a component's name, drag it down into the
+<i>Editor canvas</i> section of the graph editor, right-click
+on the section at the top of the component, and 
+choose the <tt>Settings</tt> option from the menu that appears.
+<li>This will launch the component settings dialog, which 
+will look like figure 2 below<BR>
+<img src="images/grapheditor/component_settings_dialog.PNG"><Br>
+<B>Figure 2 - the component settings dialog</b><BR><BR>
+<li>Click on the <tt>Manage names</tt> option in the dialog
+that appears
+<li>this will launch the names dialog, which will look like
+figure 3 below
+<img src="images/grapheditor/names_dialog.PNG"><BR>
+<B>Figure 3 - the names dialog</b>
+<li>add a new name for the component to the list that appears.
+If you want your component to appear in the left half
+of the display editor, the name should start with
+the text <tt>(source)</tt>, and if you want it to appear
+in the right half, it should start with the text 
+<tt>(sink)</tt>
+<li>for example, <tt><nobr>(source)Email account</nobr></tt>
+or <tt><nobr>(sink)LCD Screen</nobr></tt>.
+<li>For data sources composed of a chain of  components 
+(eg EmailReceiver + EmailFilter) then only the <i>last</i>
+component in the chain should have its name changed
+(eg in this case the EmailFilter)
+<li>For data sinks composed of a chain (eg FIFOQueue + 
+HTTPPublisher), then the <i>first</i> component in 
+the chain should have its name changed
+</ul>
+
+
+
+
+
+<h4>Starting up the display editor</h4>
+
+<ul>
+<li>Run the display editor by clicking on the
+button labelled <tt>Display Editor</tt> in
+your running installation  manager.
+<li>All components for which you have defined names
+beginning with either (source) or (sink) should appear as icons 
+in the display editor.
+<li>To add a link, click (left button) on a source icon,
+click (left button) on a sink icon.
+<li>To delete a link, click (left button) on the link and
+select <tt>delete</tt> from the menu that appears
+<li>To move an icon, drag it whilst holding
+left mouse button.
+<li>Alternately, you can do the same actions through
+a touch screen using your finger.
+<li>The figures below show a number of setups that you might
+create in the display editor.
+</ul>
+<img src="images/displayeditor/example_one.PNG"><BR>
+<b>Figure x - most recent email displayed on LCD screen, and
+all received emails exported by web-publisher</b><br>
+<img src="images/displayeditor/example_two.PNG"><br>
+<b>Figure x - temperature information displayed on nearby LCD
+screen, and published to the web</b><br>
+<IMG src="images/displayeditor/example_three.PNG"><BR>
+<b>Figure 3 - items from BBC RSS feed displayed onto 
+Phidget LCD screen</b>
+
+</body>
+</html>

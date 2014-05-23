@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>
+Configuring ECT for web-caches/proxies
+</title>
+</head>
+<body>
+<h1>Configuring ECT for web-caches/proxies</h1>
+
+Created by Stefan Rennick Egglestone 2006-02-09<BR>
+Last update by Stefan Rennick Egglestone 2006-02-09<BR><BR>
+
+<a href="#method1">Configuration when using Method 1 to start ECT</a><BR>
+<a href="#method2">Configuration when using Method 2 to start ECT</a><BR>
+
+
+<P>
+A number of components provided with ECT can make 
+use of a connection to the web. Examples are
+SimpleMediaViewer (allows you to view web-pages)
+and RSSClient (allows you to access RSS feeds).
+If your web-access is through a web-cache/web-proxy then
+you will need to provide ECT with the details of 
+these caches/proxies before
+these components can work properly.
+</P>
+<P>
+The exact method by which you do this depends
+upon whether you are starting ECT via
+<a href="ECT_Webstart_Getting_Started.html#method1">Method 1</a>
+or 
+<a href="ECT_Webstart_Getting_Started.html#method2">Method 2</a>.
+</P>
+<h3><a name="method1">Configuration when using Method 1 to start ECT(ie using the 
+<tt>runWebstart.bat</tt> batch file)</h3>
+<P>
+Open up the <tt>runWebstart.bat</tt> batch file. You will see
+a number of lines that look something like this:
+
+</P>
+
+<pre>
+  set ECT_PROXY_SETTINGS=-DproxySet=false
+  rem set ECT_PROXY_SETTINGS=-DproxySet=true
+  rem set ECT_PROXY_SETTINGS=%ECT_PROXY_SETTINGS% -DproxyHost=wwwcache.cs.nott.ac.uk
+  rem set ECT_PROXY_SETTINGS=%ECT_PROXY_SETTINGS% -D3128
+  rem set ECT_PROXY_SETTINGS=%ECT_PROXY_SETTINGS% -Dhttp.proxyHost=wwwcache.cs.nott.ac.uk 
+  rem set ECT_PROXY_SETTINGS=%ECT_PROXY_SETTINGS% -Dhttp.proxyPort=3128
+  rem set ECT_PROXY_SETTINGS=%ECT_PROXY_SETTINGS% -Dhttp.nonProxyHost="localhost|128.243.*"
+</pre>
+
+<P>
+Modify these lines so that they reflect the details
+of your web-cache/web-proxy. Hint -
+<ul>
+<li>delete the first line (beginning <tt>set ECT...</tt>
+<li>delete the word <tt>rem</tt> at the start of each of the following lines
+<li>modify the settings in these lines eg start by replacing
+
+<pre>
+-DproxyHost=wwwcache.cs.nott.ac.uk 
+</pre>
+
+with
+
+<pre>
+-DproxyHost=&lt;address of your web-proxy&gt;
+</pre>
+<li>note that you will have to modify ALL these properties
+(eg even though proxyHost and http.proxyHost will have the same
+values, you still need to do them both)
+<li>see batch file <tt>runWebstartNotts</tt> for an example of 
+a batch file with valid proxy configuration
+</ul>
+</P>
+
+<h3><a name="method2">Configuration when using Method 2 to start ECT(ie by using batch files in
+the <tt>script</tt> directory)</h3> 
+<P>
+Follow the same procedure as for method 1 above, but instead
+modify the <tt>runExporterGUI.bat</tt> file in directory
+<tt>scripts</tt>. See file <tt>runExporterGUINotts.bat</tt>
+for an example.
+</P>
+</body>
+</html>

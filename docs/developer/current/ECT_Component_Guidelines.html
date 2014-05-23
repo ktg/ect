@@ -1,0 +1,136 @@
+<html>
+<head>
+  <title>Component Development Reference</title>
+</head>
+<body>
+<h1>Component Development References</h1>
+Created by Chris Greenhalgh 2005-04-22<BR>
+Last update by Stefan Rennick Egglestone 2006-06-21<BR><BR>
+
+<a href="#intro">Introduction</a><BR>
+<a href="#creation">Component creation</a><BR>
+<a href="#destruction">Component destruction</a><BR>
+<a href="#lifecycle">Components with two-stage lifecycles</a><BR>
+<a href="#aware">ECT-aware components</a><BR>
+<a href="#properties">Available datatypes for properties</a><BR>
+<a href="#developing">Developing factory components</a><BR>
+<a href="#dynamic">Dynamic properties</a><BR>
+
+<h3><a name="intro">Introduction</h3>
+<P>
+This document gives additional details about developing
+new ECT components that were not included 
+in the simple 
+<a href="how_to_add_a_new_component.html">Developing new
+components for ECT</a> document, which you should read first.
+</p>
+
+<h3><a name="creation">Component creation</h3>
+All components must have a public no-args constructor, which will be used to
+create instances. This should leave the component in a usable state.
+
+<h3><a name="destruction">Component destruction</h3>
+<p>If the component makes use of resources that need to be released (e.g.
+if it has opened a window or is controlling a COM port), 
+then it must implement a method with signature 
+<tt>public void stop()</tt> which will
+be called by the ECT system when the component needs to be  
+destroyed for some reason
+(eg a user has requested the destruction of a component, or ECT is
+being shutdown)
+
+<h3><a name="lifecycle">Components with two-stage lifecycles</h3>
+<P>
+When writing components to control physical devices, it is
+common for these components to have a two-stage lifecycle
+<ul>
+<li>stage one: establish a connection with the device
+<li>stage two: control the device once connected
+</ul>
+If this is the case for your component, then any properties
+associated with gathering configuration to perform
+stage one should have names starting
+with the string <i>config</i> (eg <i>configPortNumber</i>),
+and should provide a boolean-typed property called
+<i>configured</i> which a user should set to 
+<tt>true</tt> to indicate that they have provided
+sufficient configuration for the component to attempt
+to establish a connection.
+This is because ECT can save and recreate component states
+to a file, and when recreating such states, it has to 
+know if some property values should be recreated first
+in order to trigger a reconnection to a device.
+</p>
+<P>
+See <tt>equip.ect.components.phidgets.PhidgetInterfaceKit</tt>
+for an example of a component that has a two-stage lifecycle.
+</p>
+
+<h3><a name="aware">ECT-aware components</h3>
+<p>If a component wishes to interact directly with ECT or the
+installation dataspace, or to be aware of property link requests
+applied to it, then it can implement the interface 
+<tt>equip.ect.IActiveComponent</tt>.
+When created the initialise method will be calling, giving the
+component a reference to the container installation dataspace client
+and the container manager.<br>
+</p>
+<p>Additional methods are also called when the component is linked to
+or is about to be updated because of a link. This is used e.g. in the
+dictionaryarraymerge component to merge incoming values (this may
+become default behaviour for array-type properties in the future).<br>
+</p>
+
+<h3><a name="properties">Available datatypes for properties</h3>
+
+<P>
+The available datatypes for a component property are
+constrained. In particular, you can use:
+<ul>
+<li>any java primitive type (boolean, char, byte, short, int, long, double,float and String)
+<li>any java boxing type for primitives  - eg 
+java.lang.Boolean, java.lang.Character, java.lang.Short etc)
+<li>any type extending equip.runtime.ValueBase (eg BooleanBoxImpl, StringBoxImpl, DictionaryImpl)
+<li>1D or 2D arrays of any of these types 
+</ul>
+It should be noted that DictionaryImpl is similar to a hashtable,
+(eg it stores a set of key->value mappings) and can 
+be used to construct a structured data value. See 
+<tt>equip.ect.components.email.EmailReceiver</tt> 
+</p>
+
+<h3><a name="developing">Developing factory components</h3>
+
+<P>
+It is possible to develop ECT components that can construct and destroy
+other components. These are referred to as factory components,
+and the components that they create are referred to as 
+subcomponents. Factory components
+might be useful if you wish to be able to 
+ automatically  construct a component to interface to
+a particular hardware device when your system detects that such a device
+has just been plugged in (eg create new web-cam component when new
+web-cam is plugged into a system).
+</p>
+<P>
+To see an example of a factory component, take a look
+at source files in package
+<tt>equip.ect.components.subcomponenttest</tt> 
+</p>
+
+<h3><a name="dynamic">Dynamic Properties</h3>
+<p>
+In some situations, it may be necessary to develop a component
+that can have a varying number of properties. For example, on connection
+to a device with multiple physical ports, a component might construct
+one property to represent each port. To do this in ECT, you 
+should develop a component implementing the 
+<tt>equip.ect.DynamicProperties</tt> interface, perhaps making
+use of the <tt>equip.ect.DynamicPropertiesSupport</tt> class. This
+interface provides you with methods to dynamically add and remove
+properties of all types. See the
+<tt>equip.ect.components.dynamicbsh.DynamicBeanShell</tt> component
+for an example of a component making use of dynamic properties.
+</p>
+</body>
+</html>

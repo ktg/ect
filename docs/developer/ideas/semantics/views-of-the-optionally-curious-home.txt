@@ -1,0 +1,20 @@
+Views of the Optionally Curious Home
+Chris Greenhalgh
+2004-06-02
+
+Monitoring, Logging and Analysis
+The RCA would like to get text files (e.g. CSV) of sensors to do feasibility studies and mock up alternative interfaces. They would also like live graphing of the same sort of thing for interactive exploration of sensor/system capabilities.
+Similar live monitoring facilities would be useful for diagnostics and maintenance.
+Post-event visualisation and analysis tools would help ethnographers and interested others.
+Requirements:
+-	Time-indexed overview, spooling from (near) live environment and/or recording.
+-	Showing sensors/components present
+-	Selected sensor value(s) (graphs)
+-	Selected events (e.g. property change)
+-	Allowing selection of sensor(s) and time-span for writing custom log files.
+-	Allowing free textual and/or constrained (ontological?!) annotation of (i) moments in time (ii) intervals (iii) particular components (iv) particular component properties (v) particular component property values/event (vi) combinations of the above.
+-	Synchronized views of video, audio and other correlated media/logs.
+Horizontal: interval = window
+Selection: interval or moment, possibly “now” rather than historical, stationary or moving (jog/shuttle, real-time, faster/slower). Recursively nestable.
+Vertical: views/subviews (a) time-linked, contextualised by (a1) window or (a2) selection (b) space/instance-linked (c) general (e.g. total component count, aggregate activity)
+

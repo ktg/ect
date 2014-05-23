@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Documenting Components</title>
+</head>
+<body>
+<h1>Component documentation guide</h1>
+Created by Stefan Rennick Egglestone 2005-11-05<br>
+Update by Chris Greenhalgh 2005-11-28<br>
+Most recent update by Stefan Rennick Egglestone 2006-06-22<BR>
+<br>
+<a href="#intro">Introduction<br>
+</a><a href="#comp">Component-level documentation<br>
+</a><a href="#usingcomp">Use of component-level documentation<br>
+</a><a href="#property">Property-level documentation<br>
+</a><a href="#usingproperty">Use of property-level documentation<br>
+</a><a href="#methods">Methods for specifying documentation<br>
+</a><a href="#javadoc">Specifying documentation through javadoc comments<br>
+</a><a href="#manifest">Specifying documentation using a manifest
+</a>
+<h3><a name="intro">Introduction</a></h3>
+<a name="intro">Although it is not mandatory to provide documentation
+for components, the provision of decent documentation is encouraged.
+This document explains the different types of documentation that are
+available for a component, how they are used by ECT, and how to specify
+them. It assumes familiarity with the
+<a href="how_to_add_a_new_component.html">Developing new components for ECT</a>
+and 
+<a
+ href="ECT_Component_Guidelines.html">Component development reference</a>
+documents, which should be read first.
+<h3><a name="comp">Component-level documentation</a></h3>
+<a name="comp">The types of documenation that can be provided for a
+component are
+</a>
+<ul>
+  <li><a name="comp">a display name
+    </a></li>
+  <li><a name="comp">a categorisation
+    </a></li>
+  <li><a name="comp">a short description
+    </a></li>
+  <li><a name="comp">a long description
+    </a></li>
+</ul>
+<h3><a name="usingcomp">Use of component-level documentation</a></h3>
+<p>
+<a name="usingcomp">All of these types of documentation are used by the
+ECT capability browser. Figure 1 below shows a screen shot of this
+browser.
+</a></p>
+<a name="usingcomp"><img src="images/capbrow.GIF">
+</a>
+<p><a name="usingcomp">Taking the example of the component in the
+capability browser labelled
+"X10_OneWay hosted on ...":
+</a></p>
+<ul>
+  <li><a name="usingcomp">"X10_OneWay" is an example of a display name
+of a component
+    </a></li>
+  <li><a name="usingcomp">The location of the X10_OneWay component in
+the capability browser is determined by its categorisation - X10_OneWay
+is categorised using the string "Hardware/Output"
+    </a></li>
+  <li><a name="usingcomp">Clicking with the left mouse button on the
+X10_OneWay component has caused the short description for this
+component to be displayed in the text field at the bottom of the
+browser - in this case, the short description reads "Interface to
+serially-connected X10 controller". This short description is also
+displayed as a tool-tip when the mouse is moved over the component's
+entry in the browser. </a></li>
+  <li><a name="usingcomp">Right clicking on the component's entry
+brings up a menu, on which one option read "View documentation".
+Selecting this option causes the long description for the component to
+be displayed in a floating frame.
+    </a></li>
+</ul>
+<p></p>
+<p>
+<a name="usingcomp">It should be noted that, whilst html formatting of
+a component's short description is optional, html formatting of a
+component's long description is mandatory. Currently, long descriptions
+must be valid html - eg have opening and closing &lt;html&gt; tags, and
+have at least a body section nested within these tags. </a></p>
+<h3><a name="property">Property-level documentation</a></h3>
+<a name="property">To be filled in </a>
+<h3><a name="usingproperty">Use of property-level documentation</a></h3>
+<a name="usingproperty">To be filled in
+</a>
+<h3><a name="methods">Methods for specifying documentation</a></h3>
+<a name="methods">There are three methods which can be used to specify
+the documentation
+described above.
+</a>
+<ol>
+  <li><a name="methods">Documentation can be specified </a><a
+ href="#javadoc">using javadoc comments</a> placed in the
+component class file. These comments can be used to auto-generate a
+BeanInfo class describing the component.
+  </li>
+  <li>A developer can manually develop a BeanInfo class containing
+documentation about a
+component.
+  </li>
+  <li>A developer can provide a <a href="#manifest">manifest file</a>
+describing all the components in a bean
+  </li>
+</ol>
+Only methods 1 and 3 are described in this document. For details of
+method 2,
+see the <a href="bean_info_reference.html">BeanInfo reference</a> or
+look at BeanInfos that exist in ECT
+<h3><a name="javadoc">Specifying documentation through javadoc comments</a></h3>
+<p>
+<a name="javadoc">Documentation can be specified by the inclusion of
+javadoc comments
+in component source files. If this is the case, then the target which
+builds the component must also use tools provided with ECT to
+auto-generate
+a BeanInfo class for the component from these comments. See the </a><a
+ href="ECT_Component_Guidelines.html">Component Development Guide</a>
+document which decribes how to do this.
+</p>
+<p>
+Component-level documentation can be specified through the use of a
+class-level javadoc comment. For example:
+</p>
+<pre>
+/**
+ * A short description/summary.<br> * &lt;H3&gt;Summary&lt;/H3&gt;<br> * A summary<br>&nbsp;* &lt;H3&gt;Description&lt;/H3&gt;<br> * A longer description<br> * &lt;H3&gt;Installation&lt;/H3&gt;<br> * An installation<br> * &lt;H3&gt;Configuration&lt;/H3&gt;<br> * A configuration<br> * &lt;H3&gt;Usage&lt;/H3&gt;<br> * Some usage<br> * &lt;H3&gt;Technical Details&lt;/H3&gt;<br> * Some technical details <br> *<br> * @displayName component_name
+ * @classification Tutorials/Writing a Component<br> * @defaultInputName input<br> * @defaultOutputName output<br>&nbsp;*/
+
+</pre>
+<p></p>
+<p>
+In this case, a bean info would be generated whose
+</p>
+<ul>
+  <li><span style="font-family: monospace;">shortDescription </span>is
+defined as the characters up to the first full stop
+(eg "An example of some javadoc documentation"); this sould be suitable
+for use as a tool tip.<br>
+  </li>
+  <li><span style="font-family: monospace;">htmlDescription </span>is
+defined as being the main section of the comment up to the stand-alone
+tags.
+  </li>
+  <li><span style="font-family: monospace;">displayName </span>and <span
+ style="font-family: monospace;">classification </span>attribute are
+defined using ect-defined javadoc tags <span
+ style="font-family: monospace;">@displayName</span> and <span
+ style="font-family: monospace;">@classification</span></li>
+</ul>
+Note that you can also specify the following using JavaDoc tags if you
+are using the standard BeanInfo auto-generation:<br>
+<ul>
+  <li><span style="font-family: monospace;">@preferred</span> -
+JavaBean standard thing, not really used at present in ECT</li>
+  <li><span style="font-family: monospace;">@expert</span> - JavaBean
+standard thing, not really used at present in ECT</li>
+  <li><span style="font-family: monospace;">@defaultInputProperty PNAME</span>
+- define the default input, e.g. for use in the the display editor</li>
+  <li><span style="font-family: monospace;">@defaultOutputProperty PNAME</span>
+- define the default output, e.g. for use in the display editor<br>
+  </li>
+</ul>
+<p></p>
+<h3><a name="manifest">Specifying documentation using a manifest</a></h3>
+<p>
+<a name="manifest">A basic manifest entry for a component, which
+contains
+the minimum amount of information necessary to define the component,
+looks like the following:
+</a></p>
+<pre><a name="manifest">    Name: equip/ect/components/phidgets/PhidgetInterfaceKit.class<br>    Java-Bean: True<br></a></pre>
+<p></p>
+<p>
+<a name="manifest">A short description and a category can be specified
+in manifest entry by adding extra lines to the entry:<br>
+<br>
+</a></p>
+<pre><a name="manifest">    Name: equip/ect/components/phidgets/PhidgetInterfaceKit.class<br>    Java-Bean: True<br>    classification: Hardware/Input &amp; Output<br>    shortDescription: put text of short description here<br></a></pre>
+<p></p>
+<p>
+<a name="manifest">There are several methods of specifying a long
+description in the
+manifest. An additional line can be added specifying the description
+within the manifest (as for bean info method, long description must be
+valid html):
+</a></p>
+<pre><a name="manifest">    Name: equip/ect/components/phidgets/PhidgetInterfaceKit.class<br>    Java-Bean: True<br>    classification: Hardware/Input &amp; Output<br>    shortDescription: put text of short description here<br>    htmlDescription: &lt;html&gt;&lt;body&gt;body of long description&lt;/body&gt;&lt;/html&gt;<br></a></pre>
+<p></p>
+<p>
+<a name="manifest">Alternatively, the name of a file which has been
+added anywhere in the same jar as the component can be specified:
+</a></p>
+<pre><a name="manifest">    Name: equip/ect/components/phidgets/PhidgetInterfaceKit.class<br>    Java-Bean: True<br>    classification: Hardware/Input &amp; Output<br>    shortDescription: put text of short description here<br>    htmlFile: name_of_file.html<br></a></pre>
+<p></p>
+<p>
+<a name="manifest">Finally, if neither manifest attributes
+htmlDesription or htmlFile are specified, then
+the jar will be searched for an html file with the same name as
+the class to which the manifest entry refers. So, if a manifest entry
+is for class PhidgetInterfaceKit, then the jar will be searched for a
+file called PhidgetInterfaceKit.html. This searching
+process can slow
+down the startup of the container hosting this particular component,
+so if a developer does not intend to supply a long description, the
+manifest attribute <br>
+<br>
+</a></p>
+<pre><a name="manifest">    nohtml: some random text<br></a></pre>
+<a name="manifest">can be specified. Note that the exact text after the
+: character does not matter - but some text must be there, otherwise
+java will
+complain that the manifest is not formatted correctly!
+</a>
+<p></p>
+</body>
+</html>

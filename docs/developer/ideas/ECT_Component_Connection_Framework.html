@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT Component Connection Framework Design</title>
+</head>
+<body>
+<h1>ECT Component Connection Framework Design</h1>
+Chris Greenhalgh 2005-08-22<br>
+<h2>Introduction</h2>
+<p>At present the vast majority of component interaction is via
+chaining of property values mediated via serialisation to/from the
+dataspace. The only exception is a limited provision for direct
+invocation where interface-valued properties of beans within the same
+container are linked. There is a design for support of event pub/sub
+distribution, but this is currently unimplemented.</p>
+<p>This document describes the extension of this to a more general
+component connnection framework.<br>
+</p>
+<h2>Tasks</h2>
+<ul>
+  <li>Separate property values from property descriptions in the
+dataspace [allows property descriptions to be re-used as general
+connection point descriptions, and allows higher-performance editors by
+avoiding need to track all values]</li>
+  <ul>
+    <li>new class java.ect.ComponentPropertyValue, with value as only
+element.</li>
+    <li>java.ect.ComponentProperty changes:</li>
+    <ul>
+      <li>getPropertyValue/setPropertyValue are same for
+ConnectionPointType "propertyvalue", or utility methods which try to
+get/set the value of the associated value tuple for ConnectionPointType
+"propertyreference".</li>
+      <ul>
+        <li>should mapping in get... be moved to Coerce?!</li>
+        <li>needs handling for more complex Serializable/introspectable
+object classes<br>
+        </li>
+      </ul>
+      <li>getPropertyValueID/setPropertyValueID are added, type GUID,
+replacing value in tuple (index 4), only valid for ConnectionPointType
+"propertyref".<br>
+      </li>
+      <li>getConnectionPointType/setConnectionPointType: String are
+added, as new tuple element. Values:</li>
+      <ul>
+        <li>"propertyvalue" - similar to before.</li>
+        <li>"propertyreference" - value is replaced by GUID of a
+ComponentPropertyValue element</li>
+        <li>"eventpublisher" - value is unused; ComponentProperty GUID
+is used as source discriminator in ECT event TupleEvents (fields:
+"ECTevet", ComponentPropertyGUID, value)</li>
+        <li>"eventsubscriber" - value is unused.</li>
+        <li>"localinterface" - value on provider is string key to
+interface reference</li>
+        <li>"remoteinterface" - value is serialised client stub&nbsp;</li>
+        <li>dataspace...?<br>
+        </li>
+      </ul>
+    </ul>
+    <li>new class java.ect.ComponentEvent - extends/wraps TupleEvent -
+see above eventpublisher</li>
+  </ul>
+  <li>Allow support for complex values:</li>
+  <ul>
+    <li>Coerce maps to/from Dictionary/Hashtable<br>
+    </li>
+  </ul>
+</ul>
+<br>
+<p> </p>
+<br>
+</body>
+</html>

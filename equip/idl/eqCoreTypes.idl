@@ -1,0 +1,178 @@
+/*
+<COPYRIGHT>
+
+Copyright (c) 2004-2005, University of Nottingham
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ - Neither the name of the University of Nottingham
+   nor the names of its contributors may be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</COPYRIGHT>
+
+Created by: Chris Greenhalgh (University of Nottingham)
+Contributors:
+  Chris Greenhalgh (University of Nottingham)
+
+*/
+/*
+
+  File:    eqCoreTypes.idl
+  $Id: eqCoreTypes.idl,v 1.1.1.1 2005/03/08 16:17:17 cgreenhalgh Exp $
+  Created:  15/03/2001
+  Author:  Chris Greenhalgh
+
+  Purpose:
+    some core types - bootstrapping
+
+  To do:
+
+  Change History:
+  $Log: eqCoreTypes.idl,v $
+  Revision 1.1.1.1  2005/03/08 16:17:17  cgreenhalgh
+  From Nottingham CVS
+
+  Revision 1.2  2005/03/08 14:36:24  cmg
+  added BSD license
+
+  Revision 1.1  2004/07/15 08:12:08  cmg
+  initial copy from Equator/Modules/equip//include
+
+  Revision 1.6  2003/06/20 12:15:24  cmg
+  more comments
+
+  Revision 1.5  2002/05/10 13:31:26  cmg
+  comments to javadoc style
+
+  Revision 1.4  2001/09/21 09:13:56  cmg
+  rename STATUS_TIME(D)OUT to avoid win32 clash
+
+  Revision 1.3  2001/09/20 14:23:12  cmg
+  added Mbuf and Mbuf I/O for serialisation to/from packets
+
+  Revision 1.2  2001/04/09 10:04:55  cmg
+  post chi
+
+  Revision 1.1.1.1  2001/04/01 08:40:57  Administrator
+  initial - going to chi
+
+  Revision 1.1.1.1  2001/03/27 12:22:32  cmg
+  Initial import to CVS - in progress
+
+*/
+
+/*======================================================================*/
+/* begin equip namespace */
+
+/**
+ * The equip namespace.
+ *
+ * Most/all equip classes live in sub-namespaces of this.
+ */
+
+module equip {
+
+  /**
+   * The main equip_runtime module.
+   *
+   * Core runtime support for EQUIP. Includes C++ facilities comparable
+   * to build-in Java facilities (i.e. memory management, serialisation
+   * stream classes, sized array types), a few CORBA-compatibility
+   * elements, as well as dual language
+   * EQUIP facilities (e.g. EQUIP's root serialisation class, 
+   * equip.runtime.ValueBase, the equip.runtime.SingletonManager).
+   * 
+   * Note that class and module loading is here, but is currently 
+   * different for C++ (Bamboo module loading) and Java (direct
+   * .class file loading).
+   */
+   
+  module runtime {
+
+    /*==================================================================*/
+    /* status */
+
+    /**
+     * General operation status code - 0 = OK wherever possible
+     * (IDL'd in eqCoreTypes.idl).
+     *
+     * Exceptions are not currently (May 2002) used in EQUIP for the
+     * most part; rather return status codes are used. This is the 
+     * main status code enumeration, although they are no necessarily
+     * used in a very precise way.<P>
+     *
+     * Some values and ideas are inherited from MASSIVE3 (e.g.
+     * STATUS_CONTROL) and not necessary used in EQUIP, at least for
+     * now.<P>
+     * 
+     * NOTES:
+     * <ul>
+     *
+     * <li>STATUS_PARTIAL means it may work if you try again.
+     *
+     * <li>STATUS_PREMATURE_END typically signals an end of stream on
+     * read.  
+     *
+     * </ul> */
+    enum StatusValues {
+      /** no error */
+      STATUS_OK,
+      /** data partially read; may work if you try again */
+      STATUS_PARTIAL,  
+      /** operation failed completely (generic error) */
+      STATUS_ERROR,    
+      /** syntax error */
+      STATUS_SYNTAX_ERROR,
+      /** file (or whatever) ended when more was expected */
+      STATUS_PREMATURE_END,
+      /** request failed due to access control */
+      STATUS_NOT_OWNER,
+      /** request refused */
+      STATUS_REFUSED,
+      /** request could not be performed at the current time */
+      STATUS_NOT_YET,
+      /** can't remember */
+      STATUS_IGNORE,
+      /** MASSIVE-3 status meaning that an indirect request to the
+       * current owner might succeed */
+      STATUS_CONTROLLED, 
+      /** request timed out */
+      STATUS_TIMEDOUT };
+
+    /**
+     * Type alias for status return code; just an <code>int</code>
+     * in Java (IDL'd in eqCoreTypes.idl).
+     *
+     * To give improved type checking in C++. Remember that Java
+     * doesn't support this.  */
+    typedef long Status;
+
+    /*==================================================================*/
+    /* end equip namespace */
+    
+  }; /* module runtime */
+}; /* module equip */
+
+/*======================================================================*/
+/* EOF */    

@@ -1,0 +1,110 @@
+some notes on persistence, failure and recovery in equip and ect
+chris greenhalgh, 2004-05-11
+
+failures:
+- software hangs
+- software crashes
+- software shuts down
+- hardware crashes/restarts 
+- hardware fails completely
+- hardware power fails e.g. due to battery exhausted, disconnection or general power cut
+- local network fails for a period e.g. due to temporary hardware/software problem or interference
+- local network fails entireley
+- isp connection fails for a period
+- isp connection fails for entirely
+
+current ect persistence design current presumes the following outlive any single process:
+- component request
+- property link request 
+- constant pseudo-property (not yet support by browser)
+
+the following are currently presumes to reflect currently active and connected processes & components:
+- capability
+- component advert
+- component property
+
+however the current implementation has a lot of explicit GUIDs...
+
+- ComponentManager allocates its own and host id on start-up
+- CapabilityExporter allocates capability ids on export
+- ComponentLauncher matches ComponentRequests on both ContainerID and CapabilityID
+... [more to follow]
+
+main failure/recovery scenarios...
+
+(F1) a client process stops/fails & restarts (e.g. user, hardware, software)
+(F2) the server process fails & restarts 
+(F3) there is a temporary loss of lan connectivity (e.g. minutes)
+(F4) there is a temporary loss of internet connectivity (e.g. minutes)
+
+General:
+- clients can use 
+--- TCP or JCP short timeout (little direct benefit) or JCP long timeout
+--- sync or async activation
+--- process bound or not process bound items
+
+- server may be
+--- initially up/reachable or down/unreachable
+--- subsequently down and restart
+	+ persistent or not
+	+ same responsible or not
+--- subsequently unreacable and restored
+
+
+(a) client TCP, async, mix of process bound and unbound; server persistent, diff. responsible on restart
+
+client retries TCP connect on failure (client restart, comms outage, server late start or restart)
+while connecting client events queue
+on failure peer association fails: 
+- client removes all remote responsible items
+- server removes all client responsible items
+on re-connection:
+- patterns are re-exchanged and events re-replicated
+
+so if a server is restarting then all client connections must have failed and all process bound items been removed.
+
+-> use equip.data.FileBackedMemoryDataStore
+
+e.g equip.eqconf:
+equip.data.DataManagerBrowser: t
+equip_//128.243.22.74_9123/.dataStore1Name: HostDS
+equip_//128.243.22.74_9123/.dataStore1Class: equip.data.FileBackedMemoryDataStore
+HostDS.maxFlushIntervalS: 2
+
+in the current version, persisting ComponentRequests and PropertyLinkRequests implies consistent use of Container IDs, Capability IDs, ComponentProperty IDs (and perhaps to some extent Component IDs):
+
+- ComponentRequests in their current form specify a particular Container and (currently Container-specific) Capability. Consequently they will/can only be answered by the 'same' Container. Migration of Components to another Container implies that the new Container assumes the old identity, or that the ComponentRequest is modified. I tended to envisage a more general form for expressing ComponentRequests that was less tied to a single Container, but equally that could go into "scripting".
+
+- PropertyLinkRequests in their currently used form specify specific source and destination ComponentPropertys.
+
+option AA:
+
+- Container, Capability, ComponentAdvert, ComponentProperty items are persisted in the shared dataspace. Implies that they will NOT indicate liveness. Implies significant change on restart, with change of responsible, and replication of previously persisted info from the DS server rather than locally, and with their removal on disconnection???
+
+Hmm. I see a problem with the current implementation of non-process bound items:
+
+- they are not deleted from a replica/peer DS on disconnection. 
+- but they will be (re)replicated on reconnection, but deletes and updates will not have been queued.
+
+This is correct for client termination and restart (assuming the client is non-persistent), but incorrect for temporary disconnection, or for persistent server restart.
+
+The missed updates can be fixed using leases, since the subsequent (duplicate) add will act as an update/lease renewal.
+
+Leases would also lead to soft state deletion, but this is on a probably long timescale. :-( Perhaps restart/reconnect could truncate leases?? but which ones??? in a client with server-side persistence this could be all non-process bound...
+
+Or perhaps clients SHOULD delete non-responsible process bound items on disconnection? Unlike servers...
+But this will mean that a restarted client with a new responsible ID will lose all of the items that its previous incarnation created during disconnection (possible). 
+
+Also, what happens about a client that is creating non-process bound items and that temporarily disconnects and then re-connects: the process bound items were retained by the server, and are now re-sent to the server (again, ok with leases), but missed deletes are missed :-(  Would be ok if on (re)connection of a client the server down-graded leases on items from that client to timescale of re-replication refresh.
+
+Is that a plan:
+
+- client deletes all non-responsible items on disconnect (RemoveResponsible), including non-process bound
+- all non-process bound items should use leases (can be very long)
+- server downgrades lease times of a re-connecting responsible before it re-replicates items to expedite coordination of missed deletes
+
+
+
+
+
+

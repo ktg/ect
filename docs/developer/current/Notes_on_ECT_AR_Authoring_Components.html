@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Notes on ECT AR Authoring Components</title>
+</head>
+<body>
+<h1>Notes on ECT AR Authoting Components</h1>
+Author: Alastair Hampshire<br>
+Date: 3/1/07<br>
+<h2>Available Components</h2>
+There are 3 parts to the AR authoring components within the <span
+ style="font-style: italic;">equip.ect.components.arauthoring </span>package:<br>
+<ul>
+  <li>scenegraph (3d output component)<br>
+  </li>
+  <li>transformation (a set of transformation matrix related components
+e.g. creating a rotation matrix from 3 scalars)<br>
+  </li>
+  <li>audioplayer (a very simple .wav player)</li>
+</ul>
+The above components are intended to be used in combination with the
+following components from the <span style="font-style: italic;">equip.ect.components.visionframework</span>
+package:<br>
+<ul>
+  <li>capture (JMF video capture)<br>
+  </li>
+  <li>artoolkit (AR marker tracking)</li>
+</ul>
+<h2>Building</h2>
+The AR authoring components are not in the default build, so build with:<br>
+<ul>
+  <li>ant arauthoring</li>
+</ul>
+To build the visionframework components call:<br>
+<ul>
+  <li>ant visionframework</li>
+</ul>
+<h2>Resources</h2>
+The following resources can be found in the <span
+ style="font-style: italic;">&lt;ect
+install&gt;/ect/java/resources/arauthoring/</span> directory:<br>
+<ul>
+  <li>3dmodels (some models that can be loaded with the scene graph
+component</li>
+  <li>audio-clips (some -currently only 1-&nbsp; audio clips that can
+be played with the audio player component)</li>
+  <li>patterns (a doc containing the pattern file urls for the AR
+marker tracking component and a number of pdfs of AR markers that can
+be printed)</li>
+</ul>
+<h2>Running</h2>
+Notes to follow....<br>
+</body>
+</html>

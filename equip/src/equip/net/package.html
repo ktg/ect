@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+  <HEAD>
+    <TITLE></TITLE>
+  </HEAD>
+<BODY>
+
+Various networking support classes, including C++ versions of some
+java.net classes,an abstraction API, JCP (Jim's Communication
+Protocol, a reliable UDP implementations), a simple service trader and
+service framework.<P>
+
+<H4>Starting points:</H4>
+<ul>
+
+<li>The networking abstraction API, {@link equip.net.ServerSap} and
+{@link equip.net.ConnectionSap}, with TCP ({@link
+equip.net.ServerSapTcp}) and JCP ({@link equip.net.ServerSapJcp})
+implementations.
+
+<li>A collection of moniker classes for service location, rooted in
+{@link equip.net.Moniker} (See COM).
+
+<li>A simple server skeleton ({@link equip.net.SimpleServer}) and
+service proxy ({@link equip.net.ServiceProxy}).
+
+<li>A simple name-based service trader interface, {@link
+equip.net.TraderProxy}, and Java implementation {@link
+equip.net.Trader} (the C++ implementation is in the module
+equip_net_Trader).
+
+<li>A wrapper/helper class for URL, {@link equip.net.ServerURL}.
+
+<li>A plug-in to provide compression of communication (currently only
+over TCP} is in module equip_net_tcpcompress ({@link
+equip.net.tcpcompress}).
+
+</ul>
+
+</BODY></HTML>

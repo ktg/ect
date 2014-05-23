@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+  <HEAD>
+    <TITLE></TITLE>
+  </HEAD>
+<BODY>
+The core EQUIP data sharing facilities and data types.<P>
+
+One of EQUIP's main facilities is its 'dataspace' event and state-sharing
+system. This combines ideas from TupleSpaces, event publish/subscribe
+systems (such as Elvin) and Collaborative Virtual Environments (such
+as MASSIVE-3).<P>
+
+The result is tightly integrated sharing of events and/or state,
+optimised for interactive applications (e.g. latencies around
+50-100ms, throughputs of 10s to 100s of events per second) over
+various networks including wireless, at the expense (for now at least)
+of strong distributed consistency. <P>
+
+Note that the module equip_data_beans (see {@link equip.data.beans}) 
+provides a higher-level (Java only) API and other supporting beans
+for using dataspaces. This is an easier place for Java programmers
+to start.
+
+Note that the modules equip_data_Browser (an old dataspace browser;
+see {@link equip.data.DataBrowser}) and equip_data_Browser2 (a newer - and
+recommended - dataspace browser; see {@link equip.data.Browser2}) also
+contribute classes to this package, as well as the equip_data module.<P>
+
+Note that the module equip_data_ReadFile provides a (currently C++
+only) application to read data items from an ASCII serialisation file
+and insert them into a specified dataspace. (A Java version requires
+the porting of the ASCII input and output streams from C++ to Java.)<P> 
+
+Note that the module equip_data_Server provides the C++ (only) 
+dataspace server application. The Java dataspace server (which is 
+currently better than the C++ version in features and performance) 
+is included in this module/package ({@link equip.data.Server}).<P>
+
+<H4>Starting points:</H4>
+<ul>
+<li>{@link equip.data.ItemData} The base data item type (for shared state)
+
+<li>{@link equip.data.Event} The base event type
+
+<li>{@link equip.data.DataProxy} The main dataspace API
+
+<li>{@link equip.data.beans.IDataspace} A new (Java-only) simpler API to dataspaces.
+
+<li>{@link equip.data.Test.DataTest} The original dataspace example
+     application, showing use of the low-level (non-beans,
+     cross-language) API and custom IDL'd data types (rather than
+     tuples).
+
+<li>{@link equip.data.beans.DataspaceBeanTupleTest} A version using the simpler
+     {@link equip.data.beans.IDataspace} API and generic tuple
+     data items ({@link equip.data.Tuple}).
+
+<li>{@link equip.data.beans.DataspaceBeanEventTest} A version using the simpler
+     {@link equip.data.beans.IDataspace} API and generic tuple
+     <b>events</b> ({@link equip.data.TupleEvent}) rather than data items.
+
+<li>{@link equip.data.TupleTest} A version using the same low-level API
+     but with generic tuple data items ({@link equip.data.Tuple}) 
+     rather than custom IDL'd data types.
+
+<li>{@link equip.data.beans.SimpleBeanTest} A version using the 
+     beans only (no dataspace API programming).
+</ul>
+
+<H4>Security</H4>
+
+Mutual authentication between dataspace server and client can be performed
+based on a 3-way mutual challenge for a shared secret. The secret can be 
+specified either in the equip config "DataspaceSecret", or using a java
+property of the same name (which takes precedence). Currently only a single
+shared secret per process is supported.
+
+</BODY></HTML>

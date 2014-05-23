@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT transferable configurations</title>
+</head>
+<body>
+<h1>ECT Transferable Configurations</h1>
+Chris Greenhalgh, 2005-01-31, updated 2005-10-05<br>
+<h2>Introduction</h2>
+We need a way for users of ECT to share configurations and partial
+configurations (e.g. composite components, partially configured
+components). It needs to be maximally transferable and reusable between
+different installations of ECT. <br>
+The chosen strategy is an XML-encoded description of the original
+configuration (components, links, property values, etc.) containing as
+much information as possible, and a user-guided re-instantiation
+process to resolve any ambiguities/other choices in transfering that
+configuration to the new (or the original!) installation.<br>
+This format is now supported by the graph editor, alongside the graph
+editor's own XML-based screen layout format.<br>
+<br>
+See <a href="../../../old/resources/configurations/testing1.ect">../../../resources/configurations/testing1.ect</a>
+and other in that directory.
+<h2>Representative XML file</h2>
+<pre>&lt;?xml version="1.0"?&gt;<br>&lt;ectconfiguration&gt;<br> &lt;components&gt;<br>  &lt;component id="COMPGUID" capabilityref="CAPGUID" componentrequestref="COMPREQGUID"&gt;<br>   &lt;name&gt;NAME&lt;/name&gt; &lt;!-- may be bean class name --&gt;<br>   &lt;rdfnames&gt;<br>    &lt;rdfname rdfstatementref="RDFSTATGUID"&gt;NAME&lt;/rdfname&gt;<br>   &lt;/rdfnames&gt;<br>  &nbsp;&lt;host&gt;HOST&lt;/host&gt; &lt;!-- typically not filled in correctly --&gt;<br>   &lt;container&gt;CONTAINER&lt;/container&gt;<br>   &lt;properties&gt;<br>    &lt;property id="PROPGUID" readonly="true"&gt;<br>     &lt;name&gt;NAME&lt;/name&gt; &lt;!-- may be bean class name --&gt;<br>     &lt;rdfnames&gt;<br>      &lt;rdfname rdfstatementref="RDFSTATGUID"&gt;NAME&lt;/rdfname&gt;<br>     &lt;/rdfnames&gt;<br>     &lt;class&gt;PROPCLASSNAME&lt;/class&gt;<br>     &lt;value&gt;PROPVALUE&lt;/value&gt;<br>    &lt;/property&gt;<br>   &lt;/properties&gt;<br>  &lt;/component&gt;<br> &lt;/components&gt;<br> &lt;capabilities&gt;<br>  &lt;capability id="CAPGUID"&gt;<br>   &lt;name&gt;NAME&lt;/name&gt;<br>   &lt;rdfnames&gt;<br>    &lt;rdfname rdfstatementref="RDFSTATGUID"&gt;NAME&lt;/rdfname&gt;<br>   &lt;/rdfnames&gt;<br>   &lt;class&gt;CLASSNAME&lt;/class&gt;<br>   &lt;host&gt;HOST&lt;/host&gt;<br>   &lt;container&gt;CONTAINER&lt;/container&gt;<br>  &lt;/capability&gt;<br> &lt;/capabilities&gt;<br> &lt;/componentrequests&gt;<br>  &lt;componentrequest id="COMPREQGUID" capabilityref="CAPGUID" persistent="true"&gt;<br>   &lt;host&gt;HOST&lt;/host&gt; &lt;!-- this host ID is a GUID for some reason --&gt;<br>   &lt;container&gt;CONTAINER&lt;/container&gt;<br>  &lt;/componentrequest&gt;<br> &lt;/componentrequests&gt;<br> &lt;links&gt;<br>  &lt;link id="LINKREQGUID" <br>     srcpropref="SRCPROPGUID" dstpropref="DSTPROPGUID" <br>     srccompref="SRCCOMPGUID" dstcompref="DSTCOMPGUID"<br>     srcpropname="SRCPROPNAME" dstpropname="DSTPROPNAME"<br>     persistent="true"&gt;<br>  &lt;/link&gt;<br> &lt;/links&gt;<br> &lt;rdfstatements&gt;<br>  &lt;rdfstatement id="STATEMENTID" persistent="true"&gt;<br>   &lt;subject&gt;SUBJECT&lt;/subject&gt;<br>   &lt;predicate&gt;PREDICATE&lt;/predicate&gt;<br>   &lt;object&gt;OBJECT&lt;/object&gt;<br>  &lt;/rdfstatement&gt;<br> &lt;/rdfstatements&gt;<br>&lt;/ectconfiguration&gt;<br><br></pre>
+</body>
+</html>

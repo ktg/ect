@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Setting up the Active Map in the Physical Configuration Manager</title>
+</head>
+<body>
+<h3>Setting up the Active Map in the Physical Configuration Manager</h3>
+<ol>
+<li><b>Run the Physical Configuration Manager</b><br />
+To run the physical configuration manager, you just need to run the ant target
+<code>runphysicalconfigurationmgr2</code>. You'll need the
+<a href="http://java.sun.com/webservices/downloads/webservicespack.html">Java
+Web Services pack</a> installed to be able to compile the physical configuration
+manager. Change the <code>jwsdp_home</code> property in the ant build file to point
+to directory you installed the web service pack to.<br />
+The <code>runphysicalconfigurationmgr2</code> connects to a running equip dataspace
+and specifies a configuration file to load. You'll want to change the file loaded to 
+<code>{$resources}/physicalconfigurations/joystick_component_auto_create_with_images.xml</code>,
+since thats the file we'll be using for this example. You can also change the equip
+dataspace, if its not on the local machine or isn't on a standard port.</li>
+<li><b>Add a joystick</b><br />
+To tell the physical configuration manager that you have a joystick, select 
+Add-&gt;Add New Physical Thing... In the dialog, select <code>ClassThing Joystick,
+Logitech Wingman RumblePad, USB1.1</code>, and click Ok. Some of the other fields,
+such as width, depth and colour will be filled in from the ClassThing. It will ask
+if you want to add sub-parts too. Say yes, otherwise you'll get a joystick with no
+buttons, which isn't much use to anyone. The new physical thing representing the
+joystick will be added to the tree under 'Other Things'.
+Now we need to tell the physical configuration manager that the joystick in plugged
+into this computer. So, select the joystick, and click Add-&gt;Add New Relationship...
+Search for something called 'Host <i>&lt;computername&gt;</i>' in the drop down list
+for the object. The relationship should be '<code>is plugged into</code>'.
+</li>
+<li><b>Check Rules</b><br />
+The physical configuration maanger now knows we have a joystick connected to the
+computer, and it can see a JoystickInterface SoftwareComponent capability in the
+dataspace, so it can use rules deduce that we want a JoystickInterface component
+in order to talk to the connected joystick. So, when you first click Rules-&gt;Check
+Rules, it will request a JoystickInterface component. The JoystickInterface 
+component is a factory, creating JoystickProxy components for each joystick. So, 
+when you run Check Rules again it gets the JoystickProxy component for the Wingman
+joystick. It also adds a relationship from each of physical joystick buttons to the
+JoystickProxy property for each button. This allows the Active map for find the state
+for each button.
+</li>
+<li><b>Add the Lounge</b><br />
+Again, select Add-&gt;Add New Physical Thing..., but this time select <code>ClassThing
+Lounge</code> and click Ok. Finally, all you need to do is say that the joystick is in
+the lounge, so select the joystick, and Add-&gt;Add New Location...<br />
+The location relationship is 'is in'. Its relative to the new physical lounge thing you
+just created. Not <code>ClassThing Lounge</code>, which is a mistake I've made various
+times. It should be the very last PhysicalThing in the drop down list.
+</li>
+<li><b>Display the Map</b><br />
+Select the lounge thing you created, and click Show-&gt;Active Map. Voila!
+</li></ol>
+</body>
+</html>

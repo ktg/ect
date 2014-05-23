@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+</head>
+<body>
+<h1>BeanInfo reference</h1>
+Created by Stefan Rennick Egglestone 2005-11-16<br>
+Last updated by Chris Greenhalgh 2005-11-28<br>
+<br>
+<a href="#intro">Introduction</a><br>
+<a href="#beandesc">Using the BeanDescriptor</a><br>
+<a href="#propdesc">Using PropertyDescriptors</a><br>
+<a href="#icon">Supplying an icon</a><br>
+
+<h3><a name="intro">Introduction</a></h3>
+<a name="intro">The provision of one BeanInfo class per component is
+one method which can
+be used to indicate to ECT the existence of that component. For more
+information,
+see the </a><a href="ECT_Component_Guidelines.html">Component
+Development Guide</a>.
+BeanInfo classes can either be auto-generated from a component class,
+or can
+be manually constructed by a developer. This reference guide is
+intended for those who wish to use this latter method, and describes
+the information about
+a component that can be specified in a BeanInfo class.
+<h3><a name="beandesc">Using the BeanDescriptor</a></h3>
+<a name="beandesc">Classes which implement the <span
+ style="font-family: monospace;">BeanInfo</span> interface must provide
+a method which can return a <span style="font-family: monospace;">java.beans.BeanDescriptor</span>)
+object which describes the bean. Information included in a generic
+bean descriptor includes:<br>
+</a>
+<ul>
+  <a name="beandesc"> <li>name</li>
+  <li>displayName </li>
+  <li>shortDescription </li>
+  <li>expert (a boolean flag) </li>
+  <li>hidden (a boolean flag </li>
+  <li>preferred (a boolean flag) </li>
+  <li>an open set of named attributes</li>
+  <li>the bean's class (<span style="font-family: monospace;">java.lang.Class</span>)</li>
+  <li>the bean's customizer class if any (<span
+ style="font-family: monospace;">java.jang.Class</span>)<br>
+  </li>
+  </a>
+</ul>
+<a name="beandesc">BeanInfo classes representing components should use
+these properties
+and attributes
+as following:<br>
+</a>
+<ul>
+  <a name="beandesc"> <li>displayName should be used as the normally
+presented bean name. It is displayed, for example, in the tree
+presented in the capability editor </li>
+  <li>shortDescription should be a brief description of the component.
+It is displayed, for example, in a line of text at the bottom of the
+capability browser, and as a tooltip in the capability browser.
+Optionally, it can be formatted in HTML. </li>
+  <li>preferred, expert and hidden should not normally be used</li>
+  <li>attribute "classification" specifies where the component should
+appear in the capability browser; sub-folders
+names are separated by '/'. For example, "Hardware/Input" for an input
+device interface component. See </li>
+  </a><a href="../../javadoc/categorisedComponentsBlankList.html">component
+classifications list</a>
+for current classifications.<br>
+  <li>attribute "htmlDescription" can be used to specify
+any length documentation necessary for a component.</li>
+  <li>attribute "DefaultInputProperty" can be used to specify the name
+of a property to be used a the (only) default input, for example in the
+display editor.</li>
+  <li>attribute "DefaultOutputProperty" can be used to specify the name
+of a property to be used a the (only) default input, for example in the
+display editor.</li>
+</ul>
+See <a href="documenting_components.html">Component documentation guide</a>
+for more information about how some of these properties and attributes
+are used by ECT.
+<h3><a name="propdesc">Using PropertyDescriptors</a></h3>
+<a name="propdesc">Each component property is described by a Property
+Descriptor (<span style="font-family: monospace;">java.beans.PropertyDescriptor</span>).
+This identifies the properties "external" name, its set and get methods
+(normally both, or just a get method for read-only properties) and the
+property's type (java class, normally automatically determined).
+Property descriptors can contain additional information which may be
+used by ECT. In particular
+</a>
+<ul>
+  <a name="propdesc"> <li>shortName should be set to a short name for
+the property </li>
+  <li>preferred should be set to true for end-user configurable
+(normally
+experience-time) properties</li>
+  <li>expert should be set to true for anciliary properties not
+essential to normal
+configuration or use</li>
+  </a>
+</ul>
+<h3><a name="icon">Supplying an Icon</a></h3>
+<a name="icon">A Bean Info can provide an icon for its bean, in one or
+more
+combinations of 16x16 or 32x32 and mono or colour. 16x16 colour is
+recommended as a minimum, with a transparent background.<br>
+</a>
+</body>
+</html>

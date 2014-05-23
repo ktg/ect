@@ -1,0 +1,386 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT Installation Enhancement Notes</title>
+</head>
+<body>
+<h1>ECT&nbsp; Installation Enhancements Notes</h1>
+Chris Greenhalgh 2005-03-09<br>
+<h2>Background</h2>
+Almost no-one is using the WebStart version, either as webstart or from
+script. Most people are using the separate batch files in the install
+directory. This includes platform and tool developers (e.g. Chris, Jan,
+Shahram), component developers (e.g. Ted) processing (scripting)
+component developers (e.g. Andy B/L), assembly builders/users (RCA,
+Eric).<br>
+Why?<br>
+<ul>
+  <li>"real" webstart:</li>
+  <ul>
+    <li>requires broadband network access to origin server for download</li>
+    <ul>
+      <li>can't do it from an unconnected machine (e.g. developer
+laptop on the move)</li>
+      <li>can't do it viably over a dialup connection (too slow)</li>
+    </ul>
+    <li>start-up delay each time<br>
+    </li>
+  </ul>
+  <li>boot manager</li>
+  <ul>
+    <li>doesn't auto-start installation (even as a GUI option) =&gt;
+startup delay</li>
+  </ul>
+  <ul>
+    <li>waits for discovery fail before starting an installation master
+(common initial case) =&gt; startup delay</li>
+    <ul>
+      <li>although useful to avoid potential failure mode of duplicate
+master(s)</li>
+    </ul>
+    <li>have had problems spawning host manager and other applications
+e.g. under OSX<br>
+    </li>
+  </ul>
+  <li>host manager/installation</li>
+  <ul>
+    <li>downloads components etc. from built-in URL</li>
+    <ul>
+      <li>requires broadband network access... (although does fail
+through with last version)</li>
+      <li>removes local versions</li>
+      <li>hard to add component - host jar on server, add to config
+file, restart installation<br>
+      </li>
+      <li>only downloads when installation first started<br>
+      </li>
+    </ul>
+    <li>have had problems spawning container and other applications</li>
+    <li>doesn't pick up changes to e.g. editor without complete restart
+(from webstart)</li>
+    <li>no detailed status/error reporting, e.g. <br>
+    </li>
+    <ul>
+      <li>component instantiation failure</li>
+      <li>component execution/update failure<br>
+      </li>
+    </ul>
+    <li>difficult to access console log files</li>
+    <ul>
+      <li>location not obvious</li>
+      <li>locked while being written to</li>
+      <li>no remote access<br>
+      </li>
+    </ul>
+    <li>persistence files can grow very large</li>
+    <ul>
+      <li>hard to find</li>
+      <li>not obvious how to prune them</li>
+      <li>no GUI support for management</li>
+    </ul>
+    <li>no remote management/restart facilities</li>
+    <li>dataspace persistence can be a problem <br>
+    </li>
+    <ul>
+      <li>not all things come back - half/half complexity</li>
+      <li>if a component is broken can keep being remade and breaking
+the installation</li>
+    </ul>
+    <li>installation files can be oddly (fixed) placed</li>
+    <ul>
+      <li>on network drive (MRL), causing very slow performance</li>
+      <li>not clear if should be per user or per host</li>
+    </ul>
+  </ul>
+</ul>
+Bottom line:<br>
+<ul>
+  <li>more hastle; no immediate benefits; a few situation-specific
+show-stoppers :-)</li>
+</ul>
+<h2>Key tasks/activities</h2>
+<ul>
+  <li>platform developer</li>
+  <ul>
+    <li>changes to underlying system; recompile; restart all</li>
+    <ul>
+      <li>=&gt; fast start option?!<br>
+      </li>
+    </ul>
+    <li>run test scenario</li>
+    <li>check results</li>
+    <li>check diagnostics, logs, etc.</li>
+    <ul>
+      <li>=&gt; easy access to console/logs/etc,<br>
+      </li>
+    </ul>
+  </ul>
+  <li>tool developer</li>
+  <ul>
+    <li>add/distribute new tool</li>
+    <ul>
+      <li>=&gt; extensible tool framework - distribute, run,
+log/console access, etc.<br>
+      </li>
+    </ul>
+    <li>changes to tool; recompile; restart tool (redistribute tool?!)</li>
+    <li>check diagnostics/logs/console output<br>
+    </li>
+  </ul>
+  <li>Java/native component developer</li>
+  <ul>
+    <li>add new component</li>
+    <ul>
+      <li>=&gt; local component management framework/tool(s)<br>
+      </li>
+    </ul>
+    <li>change, compile, redeploy</li>
+    <ul>
+      <li>=&gt; component distribution support (across installation)</li>
+      <li>=&gt; container restart support (across installation)<br>
+      </li>
+    </ul>
+    <li>distribute across installation</li>
+    <li>restart containers/reload,with/without restart old components
+running</li>
+&lt;&gt;<li>try test scenario</li>
+    <li>check results</li>
+    <li>check diagnostics, logs, etc.<br>
+    </li>
+  </ul>
+  <li>Processing component developer</li>
+  <ul>
+    <li>author/edit in processing</li>
+    <li>convert to ect component; distribute/redeploy</li>
+    <ul>
+      <li>=&gt; special processing development container/tool?!
+(watches directory; converts; re/starts container)<br>
+      </li>
+    </ul>
+    <li>restart container</li>
+    <li>try test scenario</li>
+    <li>check results</li>
+    <li>check diagnostics/logs/etc<br>
+    </li>
+  </ul>
+  <li>Assembler/editor</li>
+  <ul>
+    <li>add/update components</li>
+    <li>restart</li>
+    <li>re/connect<br>
+    </li>
+  </ul>
+  <li>Local operator/user</li>
+  <ul>
+    <li>check status including other machines</li>
+    <ul>
+      <li>=&gt; whole installation status - other machines; all
+errors/warnings (explicit?!)<br>
+      </li>
+    </ul>
+    <li>get report info for errors to send</li>
+    <ul>
+      <li>=&gt; "crash report" generation<br>
+      </li>
+    </ul>
+    <li>change local config e.g. autostart<br>
+    </li>
+  </ul>
+</ul>
+<h2>Parts...</h2>
+<ul>
+  <li>host/installation manager - webstarted, minimal, etc.</li>
+  <li>tools</li>
+  <ul>
+    <li>graph editor</li>
+    <li>configuration editor</li>
+    <li>...<br>
+    </li>
+  </ul>
+  <li>components</li>
+  <ul>
+    <li>...</li>
+  </ul>
+</ul>
+<h2>Distribution, Building, Running...</h2>
+Kinds of files:<br>
+<ul>
+  <li>JARs of Java class files (and resources used by those class files
+such as icons) for</li>
+  <ul>
+    <li>core library(s)</li>
+    <li>component(s)</li>
+    <li>editors/viewers/tools</li>
+    <li>third party libraries on which these depend</li>
+  </ul>
+  <li>Native DLLs <br>
+  </li>
+  <ul>
+    <li>JNI for core, editors, components, etc</li>
+    <li>Dependencies of these</li>
+    <li>External applications?</li>
+  </ul>
+  <li>Source</li>
+  <li>Data files</li>
+  <ul>
+    <li>configurations</li>
+    <li>properties</li>
+    <li>persistence</li>
+    <li>logs (events, console)</li>
+  </ul>
+  <li>Documentation files</li>
+  <ul>
+    <li>HTML</li>
+    <li>text</li>
+    <li>word</li>
+    <li>pdf</li>
+    <li>...</li>
+  </ul>
+</ul>
+<h3>Versioning issues</h3>
+<ul>
+  <li>identification</li>
+  <ul>
+    <li>of file</li>
+    <li>of version</li>
+    <ul>
+      <li>releases, bug fixes, etc.<br>
+      </li>
+    </ul>
+    <li>of dependencies</li>
+  </ul>
+  <li>run-time substitutability</li>
+  <ul>
+    <li>Java 2 <span style="font-style: italic;">allows</span> (does
+it actually do it??) native libraries to be unloaded when the Class
+Loader that loaded them is garbage collected. It does <span
+ style="font-weight: bold;">not </span>allow two Class Loaders in the
+same JVM to load the same native library. (see JNI_OnLoad and
+JNI_OnUnload)</li>
+  </ul>
+</ul>
+<h2>To do</h2>
+<ul>
+  <li style="text-decoration: line-through;">Build process to set
+codebase and download URLs in ect.jnlp</li>
+  <li style="text-decoration: line-through;">Include rendezvous
+properties in ect.jnlp (commented out?!)</li>
+  <li style="text-decoration: line-through;">Boot manager to allow
+autostart (after delay) of a (suitably
+configured) installation</li>
+  <ul>
+    <li>allow configure in installation [later/optional]<br>
+    </li>
+  </ul>
+  <li>Normal build/install to populate directories for webstart from
+local directory or web directory (recursive)</li>
+  <ul>
+    <li style="text-decoration: line-through;">implementation - file</li>
+    <li>i<span style="text-decoration: line-through;">mplementation -
+web/html</span><br>
+    </li>
+    <li>change directory/url in Boot</li>
+    <li>change directory/url in Installation <br>
+    </li>
+    <ul>
+      <li>explicit</li>
+      <li><span style="text-decoration: line-through;">automatic - for
+a slave?! (gets from master via dataspace?!)</span><br>
+      </li>
+    </ul>
+    <li>refresh Installation (just terminate an autostart
+installation?!)</li>
+    <ul>
+      <li>but kill tools?!<br>
+      </li>
+    </ul>
+    <li>convert component build.xml targets to work in this way<br>
+    </li>
+  </ul>
+  <li>Installation manager to present tool buttons dynamically (from
+tool jars) [later]</li>
+  <li style="text-decoration: line-through;">Installation manager give
+access to console</li>
+  <ul>
+    <li>access to tool consoles?<br>
+    </li>
+  </ul>
+  <li style="text-decoration: line-through;">Installation manager give
+remote access to download directories</li>
+  <li><span style="text-decoration: line-through;">Container give
+access to console</span>&nbsp;<br>
+  </li>
+</ul>
+<h3>download.xml File Format</h3>
+Current, representative:<br>
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;download&gt;<br>  &lt;cache&gt;<br>    &lt;directory path="java/components"&gt;<br>	  &lt;url&gt;http://www.crg.cs.nott.ac.uk/~cmg/Equator/Downloads/docs/ect/webstart/processing_asteroids-component.jar&lt;/url&gt;<br>	  &lt;url ifosname="Windows*"&gt;http://www.crg.cs.nott.ac.uk/~cmg/Equator/Downloads/docs/ect/webstart/phidgquip-component.jar&lt;/url&gt;<br>    &lt;/directory&gt;<br>    &lt;directory path="java/common"&gt;<br>    &lt;/directory&gt;<br>    &lt;directory path="java/config"&gt;<br>    &lt;/directory&gt;<br>    &lt;!-- javax containing packages --&gt;<br>    &lt;directory path="java/common/ext"&gt;<br>    &lt;/directory&gt;<br>  &lt;/cache&gt;<br>&lt;/download&gt;<br></pre>
+Proposed:<br>
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>&lt;download baseurl="..."(opt) purge="true(default)|false" purgeonfail="true|false(default)" recurse="false(default)|true"&gt;<br>  &lt;include name="..." baseurl="..."(opt.) ifosname="Windows*" skip="true|false(default)"/&gt;<br>  &lt;directory name="java" purge="true(default)|false" purgeonfail="true|false(default)" baseurl="..."(opt) ifosname="Windows*" skip="true|false(default)" recurse="false(default)|true"&gt;<br>    &lt;directory name="components" ...&gt;<br>      &lt;file name="..." baseurl="..."(opt.) purgeonfail="true|false(default)"<br>        ifosname="Windows*" requires="(name),..." skip="true|false(default)" tool-class="..."(opt.) tool-text="Tool..."(opt.)/&gt;<br>    &lt;/directory&gt;<br>  &lt;/directory&gt;<br>&lt;/download&gt;<br></pre>
+Notes:<br>
+<ul>
+  <li>default for baseurl is baseurl of containing (directory or
+download) element if any, else baseurl of include if this file is
+included, else directory containing download file. <br>
+  </li>
+  <li>default for purge is value of purge in containing (directory or
+download) element if any, else true.</li>
+  <li>default for purgeonfail is value of purgeonfail in containing
+(directory or download) element if any, else true.</li>
+  <li>if the same directory is specified more than once (in the same
+download file or via include), then purge false takes priority over
+purge true. <br>
+  </li>
+  <li>if the same directory is specified more than once (in the same
+download file or via include), purgeonfail, baseurl, ifosname and skip
+affect only the occurance within which they are specified.<br>
+  </li>
+  <li>if the same target file is specified (directory path and name) is
+specified more than once then:</li>
+  <ul>
+    <li>ifosname values are concatenated with ',' (treated as logical
+OR) (optionally, duplicates may be removed)<br>
+    </li>
+    <li>requires values are concatenated with ',' (treated as logical
+AND) (optionally, duplicates may be removed)</li>
+    <li>skip = true takes precedance over skip = false</li>
+    <ul>
+      <li>[rationale: mix in with skip="true" allows a problematic file
+to be ignored]</li>
+    </ul>
+  </ul>
+  <li>values in the requires attribute are checked against file name
+attribute values (ignoring path/directory)</li>
+  <li>tool-class should only be set if the file is a jar containing an
+application (e.g. editor) to be run from the installation<br>
+  </li>
+</ul>
+Implementation notes:<br>
+<ul>
+  <li>by default a component is a single jar with no dependencies in
+java/components, and download info is autogenerated.</li>
+  <li>by default, the complete "download" directory hierarchy ...</li>
+</ul>
+Hmm. How about you just give it a directory URL and it recursively
+copies it...?! And any jar in "tools" is assumed to be a tool (look for
+main...)?!<br>
+<ul>
+  <li>download/</li>
+  <ul>
+    <li>java/</li>
+    <ul>
+      <li>common/</li>
+      <ul>
+        <li>ext/<br>
+        </li>
+      </ul>
+      <li>components/</li>
+      <li>tools/</li>
+      <li>config/<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+</body>
+</html>

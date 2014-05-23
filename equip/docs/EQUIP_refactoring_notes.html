@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>EQUIP refactoring notes</title>
+</head>
+<body>
+<h1>EQUIP refactoring notes</h1>
+Chris Greenhalgh, 2004-12-20<br>
+<h2>Introduction</h2>
+The design goals for EQUIP have shifted over time. In its first version
+it is something of an over-arching and all-inclusive framework, with
+IDL, code loading, etc. Over time this has shifted to empasise ease of
+use for both programmers and users. For some forms of use this is
+supported in ECT through its hosting of standard components and
+provision of GUI tools. However this still leaves ECT in a
+framework/hosting role. In addition to this we wish to consider easier
+use of EQUIP/ECT from non-framework applications across a range of
+languages and platforms, e.g. C/C++ applications (such as Chromium
+and/or OpenGL applications), C# applications, applications on less
+capable platforms (PDAs, phones). <br>
+<h3>Goals</h3>
+<ul>
+  <li>Easy to learn for progammers</li>
+  <ul>
+    <li>small, self-contained APIs</li>
+  </ul>
+  <li>Easy to integrate for programmers</li>
+  <ul>
+    <li>easy data-type mapping/specification</li>
+    <li>API/library available on a range of languages and platforms
+including C#/Windows unmanaged C/Windows, Java</li>
+    <li>wire-protocol standardised and relatively simple to implement
+against for a new platform</li>
+    <li>flexible threading options (including very simple/no internal
+threads)</li>
+    <li>flexible communication options (including very simple, e.g.
+over HTTP for phones)</li>
+    <li>works with firewalls, NAT, etc.</li>
+  </ul>
+  <li>Easy to build/extend<br>
+  </li>
+  <li>Easy to add value</li>
+  <ul>
+    <li>flow control/management</li>
+    <li>logging, record &amp; reuse</li>
+    <li>state management</li>
+    <li>consistency management</li>
+    <li>persistence<br>
+    </li>
+    <li>tool support</li>
+    <li>configuration/deployment support</li>
+    <li>helps to make reusable libraries/modules/services</li>
+    <li>existing set of reusable services/modules/libraries</li>
+  </ul>
+  <li>Backward compatibility?!<br>
+  </li>
+</ul>
+<br>
+</body>
+</html>

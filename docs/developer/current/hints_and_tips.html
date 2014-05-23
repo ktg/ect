@@ -1,0 +1,83 @@
+<html>
+<head><title>Hints and tips for components developers</title></head>
+<body>
+<h1>Hints and tips for components developers</h1>
+
+Created by Stefan Rennick Egglestone 2006-08-14<BR>
+Last update by Stefan Rennick Egglestone 2006-08-14<BR><BR>
+
+Although developing components for ECT is not a difficult task,
+small mistakes made in this process can stop components working
+as expected,
+and debugging these mistakes can take some time. To help
+in this process, we have compiled this page of hints and tips
+to help developers to solve common problems. If you have a
+hint or tip that you would like added to this page, please
+email <a href="mailto:sre@cs.nott.ac.uk">Stefan Rennick Egglestone</a>.
+Note that currently all of these hints and tips relate
+to components developed in Java.
+
+<ol>
+
+<li><h4><i><a name="hint1">Component appears in capability browser,
+but cannot be instantiated</i></h4>
+
+<P>
+Check that your component class implements 
+interface <tt>java.io.Serializable</tt> - if not, then it should!
+</p>
+
+<li><h4><i><a name="hint2">Component doesn't appear in capability browser
+at all</i></h4>
+
+<P>
+A number of possiblities here:
+
+<ul>
+<li>the package directive defined in your component class file 
+doesn't match the directory in which you have placed this class file. 
+This commonly happens if you have copied the template component
+into a new directory, but have failed to modify
+<tt>package equip.components.templates</tt> to 
+<tt>package equip.components.&lt;new_directory_name&gt;</tt>
+<li>a BeanInfo file isn't being generated properly for your
+component - check directory <tt>&lt;ect_home&gt;\build\&lt;new_directory_name&gt;\equip\ect\components\&lt;new_directory_name&gt;</tt> to see if a correctly-named
+BeanInfo file has been placed there. If it hasn't, you should check
+the build file to make sure that it has been correctly set-up to 
+auto-generate BeanInfo files (if you are using the auto-generation mechanism)
+</ul>
+</p>
+
+<li><h4><i><a name="hint3">Although your component is making use of dynamic properties,
+these properties don't appear in the graph editor</i></h4>
+
+<P>
+Check that your component implements interface 
+<tt>equip.ect.DynamicProperties</tt> - dynamic properties will 
+not work if it doesn't. If you are still struggling, take
+a look at class <tt>equip.ect.components.phidgets.PhidgetInterfaceKit</tt>
+for an example of how to use dynamic properties
+</p>
+
+<li><h4><i><a name="#hint4">Exporter GUI fails for no apparent reason</i></h4>
+
+<P>
+A couple of possibilities here:
+
+<ul>
+<li>has one of your components used up all the memory allocated to the Exporter GUI process? If so, you are likely to see 
+<i>java.lang.OutOfMemoryException</i> reported by the Exporter GUI
+<li>does one of your components have a string-typed property onto which
+a string of length 65536 or more characters has been placed? If so, 
+the Exporter GUI will fail with a UTFDataFormatException. If you
+really need a property capable of holding such large amounts of character
+data, you should instead type your property as a char [], and convert
+internally between char [] and String representations as and when necessary
+</ul>
+
+</P>
+
+</table>
+
+</body>
+</html>

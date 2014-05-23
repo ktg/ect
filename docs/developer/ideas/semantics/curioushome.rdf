@@ -1,0 +1,634 @@
+<?xml version="1.0"?>
+<!-- 
+// vim: expandtab sw=4 ts=4 sts=4:
+ -->
+<!DOCTYPE rdf:RDF [
+    <!ENTITY xsd    "http://www.w3.org/2001/XMLSchema#">
+    <!ENTITY rdf    "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <!ENTITY rdfs   "http://www.w3.org/2000/01/rdf-schema#">
+    <!ENTITY dc     "http://purl.org/dc/elements/1.1/">
+    <!ENTITY dct    "http://purl.org/dc/terms/">
+    <!ENTITY ch     "http://equator.ac.uk/schema/curioushome/0.1/#">
+    <!ENTITY base   "http://equator.ac.uk/schema/curioushome/0.1/">
+]>
+
+<rdf:RDF   
+	xmlns:rdf="&rdf;"
+	xmlns:rdfs="&rdfs;"
+	xmlns:xsd="&xsd;"
+    xmlns:dc="&dc;"
+    xmlns:dct="&dct;"
+    xmlns:ch="&ch;"
+	xml:base="&base;"
+>
+
+    <rdf:Description rdf:about="&ch;">
+        <dc:title>Curious Home Infrastructure Vocabulary</dc:title>
+        <dc:description>Initial experimental vocabulary exercised in Phase 0.5 of the Curious Home</dc:description>
+        <dc:format>application/rdf+xml</dc:format>
+        <dct:created>2004-04-22</dct:created>
+        <dc:creator>Mark Thompson (mkt@ecs.soton.ac.uk)</dc:creator>
+    </rdf:Description>
+
+    <rdfs:Class rdf:about="&ch;SensableThing">
+        <rdfs:label>Sensable Thing</rdfs:label>
+        <rdfs:comment>Things that can be sensed</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;PhysicalObject">
+        <rdfs:label>Physical Object</rdfs:label>
+        <rdfs:comment>Objects that are ultrasonically tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;SensableThing"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;hasIdentity">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:label>has Identity</rdfs:label>
+        <rdfs:comment>identity of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasPosition">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;Position"/>
+        <rdfs:label>has Position</rdfs:label>
+        <rdfs:comment>position (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasOrientation-x">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has orientation (x)</rdfs:label>
+        <rdfs:comment>orientation length of unit vector in x (yz plane) (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasOrientation-y">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has orientation (y)</rdfs:label>
+        <rdfs:comment>orientation length of unit vector in y (xz plane) (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasOrientation-z">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has orientation (z)</rdfs:label>
+        <rdfs:comment>orientation length of unit vector in z (xy plane) (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasVelocity-x">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has velocity (x)</rdfs:label>
+        <rdfs:comment>velocity in x cartesian axis (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasVelocity-y">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has velocity (y)</rdfs:label>
+        <rdfs:comment>velocity in y cartesian axis (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasVelocity-z">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has velocity (z)</rdfs:label>
+        <rdfs:comment>velocity in z cartesian axis (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasAcceleration-x">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has acceleration (x)</rdfs:label>
+        <rdfs:comment>acceleration in x cartesian axis (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasAcceleration-y">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has acceleration (y)</rdfs:label>
+        <rdfs:comment>acceleration in y cartesian axis (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasAcceleration-z">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>has acceleration (z)</rdfs:label>
+        <rdfs:comment>acceleration in z cartesian axis (inferred/stated) of object being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isAt">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;Place"/>
+        <rdfs:label>is at</rdfs:label>
+        <rdfs:comment>object in abstract place</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isPositionedRelativeTo">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;Place"/>
+        <rdfs:label>is positioned relative to</rdfs:label>
+        <rdfs:comment>object positioned relative to a place</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isProximateTo">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:label>is proximate to</rdfs:label>
+        <rdfs:comment>objet positioned relative to another object</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+<!-- symmetric! -->
+<!-- transitive! -->
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isAttachedTo">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:label>is attached to</rdfs:label>
+        <rdfs:comment>two objects connected to each other</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+<!-- symmetric! -->
+<!-- transitive! -->
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isPartOf">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:label>is part of</rdfs:label>
+        <rdfs:comment>two objects in a containment relationship</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+<!-- transitive! -->
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isIn">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;Place"/> <!-- ? &ch;Container -->
+        <rdfs:label>is in</rdfs:label>
+        <rdfs:comment>containment relationship for places rather than objects</rdfs:comment>
+<!-- ? inverse of contains -->
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isOn">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&ch;Surface"/>
+        <rdfs:label>is on</rdfs:label>
+        <rdfs:comment>adjacency relationship for places rather than objects</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+<!-- This should really be using the OWL Space Ontology that AKT are developing... -->
+    <rdfs:Class rdf:about="&ch;Position">
+        <rdfs:label>Position</rdfs:label>
+        <rdfs:comment>Abstract position of thing being tracked/identified</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;CartesianPosition">
+        <rdfs:label>cartesian position</rdfs:label>
+        <rdfs:comment>position of thing being tracked/identified relative to some co-ordinate system</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Position"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;x-displacement">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>x displacement </rdfs:label>
+        <rdfs:comment>x co-ord from some arbitrary origin</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;y-displacement">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>y displacement </rdfs:label>
+        <rdfs:comment>y co-ord from some arbitrary origin</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;z-displacement">
+        <rdfs:domain rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>z displacement </rdfs:label>
+        <rdfs:comment>z co-ord from some arbitrary origin</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdfs:Class rdf:about="&ch;LogicalPosition">
+        <rdfs:label>logical position</rdfs:label>
+        <rdfs:comment>position of thing being tracked/identified relative to some other object</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Position"/>
+    </rdfs:Class>
+
+    <!-- properties? -->
+
+    <rdfs:Class rdf:about="&ch;Place">
+        <rdfs:label>place</rdfs:label>
+        <rdfs:comment>somewhere things can be</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;PhysicalObject"/> <!-- ? -->
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Surface">
+        <rdfs:label>surface</rdfs:label>
+        <rdfs:comment>a place for putting things on</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Place"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Container">
+        <rdfs:label>container</rdfs:label>
+        <rdfs:comment>a place for putting things in</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Place"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;contains">
+        <rdfs:domain rdf:resource="&ch;Container"/> <!-- ? &ch;Place -->
+        <rdfs:range rdf:resource="&ch;PhysicalObject"/>
+        <rdfs:label>contains</rdfs:label>
+        <rdfs:comment>containment relationship for objects in places</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+<!-- ? inferred inverse of isIn -->
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isAccessible">
+        <rdfs:domain rdf:resource="&ch;Container"/> <!-- ? &ch;Place -->
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+        <rdfs:label>is accessible</rdfs:label>
+        <rdfs:comment>accessibility property for objects in containers</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isLockable">
+        <rdfs:domain rdf:resource="&ch;Container"/> <!-- ? &ch;Place -->
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+        <rdfs:label>is lockable</rdfs:label>
+        <rdfs:comment>lockability property for objects in containers</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isLocked">
+        <rdfs:domain rdf:resource="&ch;Container"/> <!-- ? &ch;Place -->
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+        <rdfs:label>is locked</rdfs:label>
+        <rdfs:comment>state of whether locked property holds for objects in containers</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdfs:Class rdf:about="&ch;Room">
+        <rdfs:label>room</rdfs:label>
+        <rdfs:comment>a room is a container is a place...</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Container"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Portal">
+        <rdfs:label>portal</rdfs:label>
+        <rdfs:comment>a portal connects places</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Container"/> <!-- ? hmm. this gets hairy -->
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;connects">
+        <rdfs:domain rdf:resource="&ch;Portal"/> 
+        <rdfs:range rdf:resource="&ch;Place"/>
+        <rdfs:label>portal</rdfs:label>
+        <rdfs:comment>connect portal to place(s)</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdfs:Class rdf:about="&ch;Sensor">
+        <rdfs:label>sensor</rdfs:label>
+        <rdfs:comment>something that can sense state</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;DeviceComponent"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Actuator">
+        <rdfs:label>actuator</rdfs:label>
+        <rdfs:comment>something that can change state</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;DeviceComponent"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Device">
+        <rdfs:label>device</rdfs:label>
+        <rdfs:comment>something that can host device components</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;PhysicalObject"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;DeviceComponent">
+        <rdfs:label>device</rdfs:label>
+        <rdfs:comment>something that attaches or comprises devices</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;PhysicalObject"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;hasLastObservation">
+        <rdfs:domain rdf:resource="&ch;Sensor"/>
+        <rdfs:range rdf:resource="&ch;Observation"/>
+        <rdfs:label>has last observation</rdfs:label>
+        <rdfs:comment>last observation made by sensor</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasObservations">
+        <rdfs:domain rdf:resource="&ch;Sensor"/>
+        <rdfs:range rdf:resource="&rdf;List"/> <!-- ? need to be more tightly (type) constrained -->
+        <rdfs:label>has observations</rdfs:label>
+        <rdfs:comment>list of observations made by sensor</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isManagedBy">
+        <rdfs:domain rdf:resource="&ch;DeviceComponent"/>
+        <rdfs:range rdf:resource="&ch;Device"/>
+        <rdfs:label>is managed by</rdfs:label>
+        <rdfs:comment>managerial relationship between devices and device components</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+<!-- ? inferred inverse property: manages ? -->
+
+    <rdf:Property rdf:about="&ch;isConnectedTo">
+        <rdfs:domain rdf:resource="&ch;DeviceComponent"/>
+        <rdfs:range rdf:resource="Device"/>
+        <rdfs:label>is connected to</rdfs:label>
+        <rdfs:comment>connection relationship between devices and device components</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+<!-- ? inferred inverse property: hasConnected ? -->
+
+    <rdf:Property rdf:about="&ch;senses">
+        <rdfs:domain rdf:resource="&ch;Sensor"/>
+        <rdfs:range rdf:resource="&ch;SensableThing"/>
+        <rdfs:label>senses</rdfs:label>
+        <rdfs:comment>what a sensor can sense</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+<!-- ? inverse property: sensedBy ? -->
+
+    <rdf:Property rdf:about="&ch;sensesBy">
+        <rdfs:domain rdf:resource="&ch;Sensor"/>
+        <rdfs:range rdf:resource="&ch;SensingMethod"/>
+        <rdfs:label>sense by</rdfs:label>
+        <rdfs:comment>method a sensor can use to sense something</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdfs:Class rdf:about="&ch;SensingMethod">
+        <rdfs:label>sensing method</rdfs:label>
+        <rdfs:comment>method of sensing something</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;canAffect">
+        <rdfs:domain rdf:resource="&ch;Actuator"/>
+        <rdfs:range rdf:resource="&ch;SensableThing"/>
+        <rdfs:label>can affect</rdfs:label>
+        <rdfs:comment>what sensable things the actuator can affect</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+<!-- ? inverse relationship useful? -->
+
+    <rdf:Property rdf:about="&ch;hasLastOutput">
+        <rdfs:domain rdf:resource="&ch;Actuator"/>
+        <rdfs:range rdf:resource="&ch;AcutatorEvent"/>
+        <rdfs:label>has last output</rdfs:label>
+        <rdfs:comment>change in sensable thing last attempted (output) from actuator</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;isControlledBy">
+        <rdfs:domain rdf:resource="&ch;Actuator"/>
+        <rdfs:range rdf:resource="&ch;Agent"/>
+        <rdfs:label>is controlled by</rdfs:label>
+        <rdfs:comment>controller of actuator</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+<!-- ? inverse property controls? -->
+
+    <rdf:Property rdf:about="&ch;hostsSoftware">
+        <rdfs:domain rdf:resource="&ch;Device"/>
+        <rdfs:range rdf:resource="&ch;SoftwareComponent"/>
+        <rdfs:label>hosts software</rdfs:label>
+        <rdfs:comment>mapping from device to software components running on it</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+<!-- ? inverse property runsOn? -->
+
+    <rdfs:Class rdf:about="&ch;Agent">
+        <rdfs:label>agent</rdfs:label>
+        <rdfs:comment>a curious process</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Person">
+        <rdfs:label>person</rdfs:label>
+        <rdfs:comment>a person (that can act as an agent)</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Agent"/>
+        <rdfs:subClassOf rdf:resource="&ch;PhysicalObject"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;SoftwareComponent">
+        <rdfs:label>software component</rdfs:label>
+        <rdfs:comment>a software component that is an agent, capable of deciding to do stuff or being aware of stuff to observe</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Agent"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;believes">
+        <rdfs:domain rdf:resource="&ch;Agent"/>
+        <rdfs:range rdf:resource="&ch;Belief"/>
+        <rdfs:label>believes</rdfs:label>
+        <rdfs:comment>a belief held by an agent</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;asserts">
+        <rdfs:domain rdf:resource="&ch;Agent"/>
+        <rdfs:range rdf:resource="&ch;Belief"/>
+        <rdfs:label>asserts</rdfs:label>
+        <rdfs:comment>performative assertion of a belief</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;refutes">
+        <rdfs:domain rdf:resource="&ch;Agent"/>
+        <rdfs:range rdf:resource="&ch;Belief"/>
+        <rdfs:label>refutes</rdfs:label>
+        <rdfs:comment>performative refutation of a belief</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;receives">
+        <rdfs:domain rdf:resource="&ch;Agent"/>
+        <rdfs:range rdf:resource="&ch;Observation"/>
+        <rdfs:label>receives</rdfs:label>
+        <rdfs:comment>receives observation</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;hasResponsiveMechanism">
+        <rdfs:domain rdf:resource="&ch;SoftwareComponent"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:label>has responsive mechanism</rdfs:label>
+        <rdfs:comment>dunno.. Chris?</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdfs:Class rdf:about="&ch;Value">
+        <rdfs:label>value</rdfs:label>
+        <rdfs:comment>value of an observable event</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;ValueType">
+        <rdfs:label>value type</rdfs:label>
+        <rdfs:comment>type of a value of an observable event</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Observation">
+        <rdfs:label>observation</rdfs:label>
+        <rdfs:comment>an obersvation made by a sensor</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdfs:Class rdf:about="&ch;Belief">
+        <rdfs:label>belief</rdfs:label>
+        <rdfs:comment>a belief (an interpretation of an observation?) held by an agent</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+        <rdfs:subClassOf rdf:resource="&ch;Observation"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;valueType">
+        <rdfs:domain rdf:resource="&ch;Value"/>
+        <rdfs:range rdf:resource="&ch;ValueType"/>
+        <rdfs:label>value type</rdfs:label>
+        <rdfs:comment>type of value observed</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;type">
+        <rdfs:domain rdf:resource="&ch;ValueType"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:label>type</rdfs:label>
+        <rdfs:comment>ground type binding for a ValueType</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;units">
+        <rdfs:domain rdf:resource="&ch;ValueType"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:label>units</rdfs:label>
+        <rdfs:comment>ground units binding for a ValueType</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;exactValue">
+        <rdfs:domain rdf:resource="&ch;Value"/>
+        <rdfs:range rdf:resource="&xsd;string"/>
+        <rdfs:label>exact value</rdfs:label>
+        <rdfs:comment>exact value</rdfs:comment> <!-- ! this is broken. reconsider how values modelled -->
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;observedBy">
+        <rdfs:domain rdf:resource="&ch;Observation"/>
+        <rdfs:range rdf:resource="&ch;Sensor"/>
+        <rdfs:label>observed by</rdfs:label>
+        <rdfs:comment>which sensor makes this observation</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;concerns">
+        <rdfs:domain rdf:resource="&ch;Observation"/>
+        <rdfs:range rdf:resource="&ch;SensableThing"/>
+        <rdfs:label>concerns</rdfs:label>
+        <rdfs:comment>which sensable thing this observation concerns</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;observedValue">
+        <rdfs:domain rdf:resource="&ch;Observation"/>
+        <rdfs:range rdf:resource="&ch;Value"/>
+        <rdfs:label>observed value</rdfs:label>
+        <rdfs:comment>value that observation represents as being sensed</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;confidence">
+        <rdfs:domain rdf:resource="&ch;Observation"/>
+        <rdfs:range rdf:resource="&xsd;decimal"/>
+        <rdfs:label>confidence</rdfs:label>
+        <rdfs:comment>degree [0..1] of confidence in fidelity of value</rdfs:comment> <!-- constrain! -->
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;observationTime">
+        <rdfs:domain rdf:resource="&ch;Observation"/>
+        <rdfs:range rdf:resource="&xsd;dateTime"/>
+        <rdfs:label>observation time</rdfs:label>
+        <rdfs:comment>time observation made</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;beliefHeldBy">
+        <rdfs:domain rdf:resource="&ch;Belief"/>
+        <rdfs:range rdf:resource="&ch;Agent"/>
+        <rdfs:label>belief held by</rdfs:label>
+        <rdfs:comment>a belief is held by an agent</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdf:Property rdf:about="&ch;beliefRegardedAs">
+        <rdfs:domain rdf:resource="&ch;Belief"/>
+        <rdfs:range rdf:resource="&ch;BeliefStanding"/>
+        <rdfs:label>belief regarded as</rdfs:label>
+        <rdfs:comment>status of a belief held by an agent</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+
+    <rdfs:Class rdf:about="&ch;BeliefStanding">
+        <rdfs:label>belief standing</rdfs:label>
+        <rdfs:comment>status of belief (an enumeration, probably: concur, refute, ...?)</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+<!--
+    <rdfs:Class rdf:about="&ch;xxx">
+        <rdfs:label>xxx</rdfs:label>
+        <rdfs:comment>xxx</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdfs:Class>
+
+    <rdf:Property rdf:about="&ch;xxx">
+        <rdfs:domain rdf:resource="&ch;xxx"/>
+        <rdfs:range rdf:resource="xxx"/>
+        <rdfs:label>xxx</rdfs:label>
+        <rdfs:comment>xxx</rdfs:comment>
+        <rdfs:isDefinedBy rdf:resource="&ch;"/>
+    </rdf:Property>
+-->
+</rdf:RDF>

@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT Ubicomp Experiences in a Box</title>
+</head>
+<body>
+<h1>ECT Ubicomp Experience in a Box (tm)</h1>
+Chris Greenhalgh, 2005-09-14<br>
+<h2>Introduction</h2>
+<p>Still following the thread with physical configuration, but trying
+to look a bit broader/at a slant, by asking how we could technically
+support the packaging, distribution and (locally-tailored)
+deployment/replication of ubicomp experiences...<br>
+</p>
+<p>In EQUATOR we have talked about the "EQUATOR Starter Kit" and
+similar ideas - a literal box of stuff that you might order from (say)
+Amazon, to get you started with building and giving EQUATOR-style
+Ubicomp Experiences. What would be in such a box? How would it work?
+How would you extend it? and so on...<br>
+</p>
+<h3>Example Scenario/Thought Experiment</h3>
+<p>As a starting point we might imagine that the box contains:<br>
+</p>
+<ul>
+  <li>A small infrastructure box (a "server", incorporating
+infrastructure wireless communications facility);</li>
+  <li>A bag of sensors, actuators and displays;</li>
+  <li>A bag of batteries and a recharger :-) <br>
+  </li>
+  <li>A bag of tags (RFID, barcode, etc.), labels, ties, etc.;<br>
+  </li>
+  <li>A mobile wearable or handheld device (and/or a "starter kit" (CF
+card?!) for your phone/PDA);</li>
+  <li>A handheld ubicomp multimeter/universal tool and/or a CDROM-based
+starter application for your PC;</li>
+  <li>A "getting started" DVD;</li>
+  <li>A 1-page "quick start" guide.</li>
+</ul>
+<p>The quick-start guide explains how to turn on the ubimeter (or PC
+starter application). The ubimeter suggests you start with a level 1
+(easy) experience; you choose from the list "phicon-controlled room
+lighting"...<br>
+</p>
+<ul>
+  <li>It shows you how to plug in and turn on the infrastructure box.</li>
+  <li>The ubimeter detects/discoveres this as it comes online and
+giudes you through establishing the trust relationship between the
+ubimeter and the server if not preconfigured (e.g. physical docking
+and/or synchronized actions and/or user entry of (say) visible keys).</li>
+  <li>The ubimeter talks you through connecting the X10 controller and
+the Phidget RFID reader to the infrastructure box.</li>
+  <li>The ubimeter helps you to identify an X10 lamp/appliance module,
+and helps you to allocate a suitable house and device ID to it. </li>
+  <li>The ubimeter talks you through inserting the module to control
+one of your lamps, and asks you to identify (name and/or photograph)
+the lamp associated with that module.</li>
+  <ul>
+    <li>The ubimeter stores the association between that lamp and the
+X10 ID.</li>
+  </ul>
+  <li>The ubimeter allows you to add X10 controllers to more lamps.</li>
+  <li>The ubimeter asks you to choose a couple of small artefacts (e.g.
+non-precious ornaments) to become phicons.</li>
+  <li>The ubimeter asks you to attach an RFID tag to the first artefact
+and then place it on the reader; it asks you identify the artefact by
+name and/or by taking a photo of it with the ubimeter's built-in camera.</li>
+  <ul>
+    <li>The ubimeter stores the association between that artefact and
+the read RFID tag value.</li>
+    <li>Alternatively, the kit may come with some artefacts with
+integrated RFIDs, which are already configured.<br>
+    </li>
+  </ul>
+  <li>The ubimeter allows you to enroll more phicons.</li>
+  <li>Whenever a phicon is on the reader the ubimeter gives you the
+option of the configuring the lighting associated with that phicon:</li>
+  <ul>
+    <li>it gives you a list of the known lamps (your own names and/or
+images), and their state/brightness, and allows you to change it.</li>
+    <li>you can also undo any changes.</li>
+  </ul>
+  <li>The ubimeter allows you to archive the whole arrangement, and
+selectively discard elements of it <br>
+  </li>
+  <ul>
+    <li>such as the mapping between phicons and lighting settings, or
+the presence and/or associations of X10 modules and /or RFID tags.</li>
+  </ul>
+</ul>
+Extension 1:<br>
+<ul>
+  <li>You select the ubimeter option "Ubicomp-enable my phone"</li>
+  <li>The ubimeter installs (talks you through installing) an ECT
+MIDlet on your phone</li>
+  <ul>
+    <li>and gathers various information about your phone's capabilities
+(e.g. bluetooth)</li>
+    <li>and establishes the trust relationship with the phone<br>
+    </li>
+  </ul>
+  <li>You now select the experience extension "Remote control with
+&lt;my phone&gt;".</li>
+  <li>The ubimeter helps you to check bluetooth is enabled on your
+phone and the ECT MIDlet is running.</li>
+  <li>The ubimeter pushes the necessary configuration to the phone
+MIDlet.</li>
+  <li>The user selects the experience trigger option "when i am in
+range".</li>
+  <li>The ECT MIDlet now checks periodically if it is range of the
+installation, and when it is - assuming the relevant experience is
+actuve - offers the user access to a GUI to check the current phicon
+and modify the light levels for the current phicon.<br>
+  </li>
+</ul>
+Variant 2:<br>
+<ul>
+  <li>A friend visits who has their own installation. They have written
+a "disco" extension which is on their phone.</li>
+  <li>When they walk into my house my ubimeter offers me the option of
+allowing them to exchange information. I allow this.</li>
+  <li>Their disco extension determines that it is compability with my
+current installation, and offers an option to activate it.</li>
+  <li>My friend activates it.</li>
+  <li>My ubimeter asks me to confirm if I will allow it to interface to
+my installation; I confirm.</li>
+  <li>The light flash in time to my friend's MP3 (well not very in time
+with X10 :-)</li>
+</ul>
+Variant 3:<br>
+<ul>
+  <li>My friend visits again with their Ubicomp-enabled phone.</li>
+  <li>I have now configured my system to recommend mood music
+associated with each phicon.</li>
+  <li>When my friend is in range, their phone asks if they want to
+receive music recommendations from my installation; the accept.</li>
+  <li>Suitable music is suggested to my friends phone, which it plays <br>
+  </li>
+  <ul>
+    <li>some of it is already on the phone; some is streamed from my
+installation; some is bought by him when it is recommended<br>
+    </li>
+  </ul>
+</ul>
+Comments:<br>
+<ul>
+  <li>can i test/simulate it?</li>
+  <li>how do i author "content" for it?</li>
+  <li>the ubimeter embodies the locus of control/management, all be it
+from outside the experience "run-time". Is this a good real strategy?
+[its a bit like the hitchhiker's guide to the galaxy :o) ]</li>
+  <li>some negotiation/coordination is at the level of "experiences"
+(like "phicon-based lighting-control"); other is lower level (?) (e.g.
+"X10 devices present", or "suggested stream")<br>
+  </li>
+</ul>
+<h2>Ubimeter Mock-up</h2>
+To be viewed in a web-browser with a small window :-)<br>
+<h4><a name="Welcome"></a></h4>
+<hr style="width: 100%; height: 2px;">
+<h4>Welcome</h4>
+Options:<br>
+<ul>
+  <li><a href="#Declare_Wireless_Network">Configure Network<br>
+    </a></li>
+  <li><a href="ECT_Ubicomp_Experience_in_a_Box.html#Declare">Declare
+new Hardware</a></li>
+  <li><a href="#Discover">Discover new Hardware (requires network)<br>
+    </a></li>
+  <li>Search for new Hardware-support Packs (requires network)<br>
+  </li>
+  <li>Search for new Information Components (requires network)<br>
+  </li>
+  <li>Search for new Experiences (requires network)<br>
+  </li>
+</ul>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Declare"></a>Declare</h4>
+I have a (hardware)<br>
+<ul>
+  <li><a href="#Declare_PC">PC</a></li>
+  <li><a href="#Declare_Phidget_Interface_Kit">Phidget Interface Kit</a></li>
+  <ul>
+    <li>Phidget Light Sensor<br>
+    </li>
+  </ul>
+  <li>Phidget RFID Reader</li>
+  <ul>
+    <li>Phidget RFID Tag</li>
+  </ul>
+  <li>X10 Controller</li>
+  <ul>
+    <li>X10 Appliance Module</li>
+    <li>X10 Lamp Module</li>
+  </ul>
+  <li>Mobile Phone<br>
+  </li>
+</ul>
+...<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Discover"></a>Discover</h4>
+Discover:<br>
+<ul>
+  <li>Bluetooth device(s)</li>
+  <li>WaveLAN(s)</li>
+  <li>WaveLAN device(s)</li>
+  <li>USB device(s)</li>
+  <li>Particle(s)<br>
+  </li>
+</ul>
+...<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Declare_Wireless_Network"></a>Declare Wireless Network</h4>
+<p>Please use the Wireless network set-up facilities on this device to
+join the wireless network.</p>
+<p><a href="#Declare">OK | Cancel | Failed</a></p>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Declare_PC"></a>Declare PC</h4>
+<p>What OS does the PC have?<br>
+</p>
+<ul>
+  <li><a href="#Declare_PC:_Windows_XP">Windows XP</a></li>
+  <li><a href="#Declare_PC:_Other_OS">Other</a></li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Declare_PC:_Windows_XP"></a>Declare PC: Windows XP</h4>
+<p>Please ensure that a Java Runtime Environment is installed on the
+machine. For more help go (on that PC) to http://java.sun.com /...
+(requires internet access)<br>
+</p>
+<p>Please ensure that the machine is on the same network as this device.<br>
+</p>
+<p>Now enter the following URL to start ECT on that machine:
+http://localhost:8080/downloads/boot_windows_xp.jar [or use a memory
+stick or external drive or custom CD with the file and/or URL on it, or
+some kind of push technology; unless the URL is dynamically generated
+for this devices current IP then some discovery will be required]<br>
+</p>
+<p><a href="#Configuring_PC">OK</a> | Cancel | Failed<br>
+</p>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Configuring_PC"></a>Configuring PC 'xxx'<br>
+</h4>
+<p>I see that the PC has OS ... and Java version ....<br>
+</p>
+<p>Known issues are as follows...<br>
+</p>
+<p>How do you refer to this PC? e.g. where is it?<br>
+</p>
+<p>The PC appears to have X COM ports; please help to identify them
+[standard COM port, internal modem, USB COM port, Bluetooth COM port,
+...]<br>
+</p>
+<p>Does the PC have USB (master) connections? Does it support USB 1.1?
+USB 2.0?<br>
+</p>
+<p>Do you know if the IP address is statically allocated (fixed
+forever)? yes/no<br>
+</p>
+<p>Do you know any domain names registered to this PC?<br>
+</p>
+<p>OK | Cancel<br>
+</p>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Declare_PC:_Other_OS"></a>Declare PC: Other OS<br>
+</h4>
+<p>Sorry - only Windows XP is supported by this ubimeter.</p>
+<a href="#Welcome">OK</a><br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Declare_Phidget_Interface_Kit"></a>Declare Phidget
+Interface Kit</h4>
+You have the following PCs with USB that could host the interface kit;
+select the one you want to connect it to:<br>
+<ul>
+  <li><a href="#Phidget_Interface_Kit_on_PC_A">PC A</a></li>
+  <li>PC B</li>
+  <li>...</li>
+</ul>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="Phidget_Interface_Kit_on_PC_A"></a>Phidget Interface Kit
+on PC A</h4>
+<p>Downloading Phidget Interface Kit capability to PC A...<br>
+</p>
+<p>Starting Phidget Interface Kit component on PC A...<br>
+</p>
+<p>Please ensure the interface kit is connected to a USB port on PC A<br>
+</p>
+<p>OK | Cancel<br>
+</p>
+<p>That is working OK; the interface kit's Phidget serial number is
+123; you may want to label the board with this number.<br>
+</p>
+<p>How do you want to refer to this particular phidget interface kit?
+(name, location, etc.)<br>
+</p>
+<p>OK<br>
+</p>
+<hr style="width: 100%; height: 2px;">
+<p><br>
+</p>
+<br>
+<br>
+<br>
+<br>
+</body>
+</html>

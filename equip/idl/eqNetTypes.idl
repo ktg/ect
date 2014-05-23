@@ -1,0 +1,268 @@
+/*
+<COPYRIGHT>
+
+Copyright (c) 2004-2005, University of Nottingham
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ - Neither the name of the University of Nottingham
+   nor the names of its contributors may be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</COPYRIGHT>
+
+Created by: Chris Greenhalgh (University of Nottingham)
+Contributors:
+  Chris Greenhalgh (University of Nottingham)
+
+*/
+/*
+
+  File:    eqNetTypes.idl
+  $Id: eqNetTypes.idl,v 1.1.1.1 2005/03/08 16:17:17 cgreenhalgh Exp $
+  Created:  15/03/2001
+  Author:  Chris Greenhalgh
+
+  Purpose:
+    core networking types and valuetypes
+
+  To do:
+
+  Change History:
+  $Log: eqNetTypes.idl,v $
+  Revision 1.1.1.1  2005/03/08 16:17:17  cgreenhalgh
+  From Nottingham CVS
+
+  Revision 1.2  2005/03/08 14:36:24  cmg
+  added BSD license
+
+  Revision 1.1  2004/07/15 08:12:09  cmg
+  initial copy from Equator/Modules/equip//include
+
+  Revision 1.6  2003/06/20 12:40:26  cmg
+  more comments
+
+  Revision 1.5  2002/09/23 15:23:05  cmg
+  all comments made javadoc comments
+
+  Revision 1.4  2002/05/13 21:36:56  cmg
+  comments to javadoc format
+
+  Revision 1.3  2001/09/20 14:33:07  cmg
+  added UDP stuff; added Sap stuff (tcp); added equipm URL form & simple rpc support
+
+  Revision 1.2  2001/04/09 10:06:49  cmg
+  added deactivate callback on failed proxy
+
+  Revision 1.1.1.1  2001/04/01 08:40:56  Administrator
+  initial - going to chi
+
+  Revision 1.1.1.1  2001/03/27 12:22:33  cmg
+  Initial import to CVS - in progress
+
+*/
+
+/*======================================================================*/
+/* includes - time, ValueBase */
+
+#include "eqBasicTypes.idl"
+
+/*======================================================================*/
+/* begin equip namespace */
+
+module equip {
+  /** Core EQUIP Networking module. 
+   * 
+   * E.g. Monikers, simple service/proxy, simple/common networking 
+   * classes. 
+   */
+  module net {
+
+    /*------------------------------------------------------------*/
+    /* service location info - monikers - inspired by COM */
+    
+    /* forward declaration */
+    valuetype SimpleMoniker;
+    
+    /** command base class for all monikers (service locators)
+     * {IDL'd in eqNetTypes.idl).
+     * 
+     * A moniker is a serialisable object containing service 
+     * location information and strategy. Inspired by COM. 
+     */
+    valuetype Moniker {
+      /** convert to simple moniker when ready to use */
+      SimpleMoniker resolve();
+    };
+
+    /** The common base class for all ready-to-use monikers
+     * {IDL'd in eqNetTypes.idl) */
+    valuetype SimpleMoniker : Moniker {
+      // overrides SimpleMoniker resolve(); -> no op
+    };
+    
+    /** different encoding that may be specified for communication. 
+     * encoding/stream types 
+     * {IDL'd in eqNetTypes.idl).
+     *
+     * Values:
+     * <ul>
+     * <li>simple sending of objects over the stream: 
+     *  <ul><li>EQENCODE_EQ_OBJECT_STREAM, 
+     *  <li>EQENCODE_JAVA_OBJECT_STREAM</ul>
+     * <li>encapsulation of objects in messages over the stream:
+     *  <ul><li>EQENCODE_MESSAGE</ul>
+     * <li>objects serialised into packets: 
+     *  <ul><li>EQENCODE_EQ_OBJECT_PACKET, 
+     *  <li>EQENCODE_JAVA_OBJECT_PACKET</ul>
+     * </ul>
+     */
+    enum Encoding {
+      /** EQUIP's own serialisation of objects */
+      EQENCODE_EQ_OBJECT_STREAM, 
+      /** Java's normal serialisation of objects */
+      EQENCODE_JAVA_OBJECT_STREAM, 
+      /** distinct messages */
+      EQENCODE_MESSAGE,
+      /** EQUIP serialisation of objects, mapped to packets */
+      EQENCODE_EQ_OBJECT_PACKET, 
+      /** Java serialisation of objects, mapped to packets */
+      EQENCODE_JAVA_OBJECT_PACKET
+      /* ... ? */
+    };
+    
+    /** Moniker for a standard TCP service
+     * {IDL'd in eqNetTypes.idl)  */
+    valuetype SimpleTCPMoniker : SimpleMoniker {
+      /** communication used by the service ({@link equip.net.Encoding}) */
+      public Encoding encoding;
+      /** IPv4 service host IP address */
+      public unsigned long addr;
+      /** TCP port for service */
+      public unsigned short port;
+      /** optional token object to send as first thing */
+      public runtime::ValueBase token;
+      
+      /** initialisation helper */
+      void initFromPort(in unsigned short port);
+      /** initialisation helper */
+      void initFromHost(in string host, in unsigned short port);
+      /** initialisation helper */
+      void initFromAddr(in unsigned long addr, in unsigned short port);
+    };
+    
+    /** Moniker for a standard UDP-based service
+     * {IDL'd in eqNetTypes.idl) */
+    valuetype SimpleUDPMoniker : SimpleMoniker {
+      /** communication used by the service ({@link equip.net.Encoding}) */
+      public Encoding encoding;
+      /** IPv4 service host IP address */
+      public unsigned long addr;
+      /** UDP port for service */
+      public unsigned short port;
+      
+      /** initialisation helper */
+      void initFromPort(in unsigned short port);
+      /** initialisation helper */ 
+      void initFromHost(in string host, in unsigned short port);
+      /** initialisation helper */
+      void initFromAddr(in unsigned long addr, in unsigned short port);
+    };
+  
+    /** multicast (UDP) service moniker */
+    valuetype MulticastUDPMoniker : SimpleUDPMoniker {
+      //void initFromPort(in unsigned short port); not supported
+    };
+
+    /*------------------------------------------------------------*/
+    valuetype ServiceProxy;
+
+    /** Callback interface for a {@link ServiceProxy} to indicate
+     * forced deactivation of the service proxy (typically network
+     * failure)
+     * {IDL'd in eqNetTypes.idl). */
+    valuetype DeactivateCallback {
+        /** ServiceProxy now inactive */ 
+	void notifyDeactivate(in ServiceProxy proxy,
+			      in equip::runtime::ValueBase closure);
+    };
+
+    /** General-purpose service proxy base class
+     * {IDL'd in eqNetTypes.idl) */
+    valuetype ServiceProxy {
+      /** Request activation of the service proxy, i.e. connect to
+       * server.
+       *
+       * @return success (true = ok). If true, and callback!=null then
+       * if the communication fails before deactivate is intiated then
+       * callback will be notified.  */
+      boolean activate(in DeactivateCallback callback,
+ 		       in equip::runtime::ValueBase closure );
+      /** Request deactivation of an (active) service proxy, i.e.
+       * disconnect from server. */
+      void deactivate();
+      
+      /** info. to locate service */
+      public Moniker serviceMoniker;
+    };
+    
+    /*------------------------------------------------------------*/
+    /* NetSap stuff - internal */
+
+    /** internal -  a keep alive message oject (for NetSap)
+     * {IDL'd in eqNetTypes.idl) */
+    valuetype KeepAlive {
+    };
+    /** internal -  an ACK message - TCP only?? 
+     * {IDL'd in eqNetTypes.idl)*/
+    valuetype Ack {
+    };
+
+    /** internal - a connection request - udp uc or multicast
+     * {IDL'd in eqNetTypes.idl) */
+    valuetype ConnectionSapRequest {
+      public unsigned long cliAddr;
+      public unsigned short cliPort;
+      public Encoding encoding;
+      public long cliRecvBufSize;
+      public long cliSessionId;
+    };
+    /** internal - a connection response
+     * {IDL'd in eqNetTypes.idl) */
+    valuetype ConnectionSapResponse {
+      public ConnectionSapRequest request;
+      public boolean acceptedFlag;
+      public unsigned long svrAddr;
+      public unsigned short svrPort;
+      public long svrRecvBufSize;
+      public long svrSessionId;
+    };
+
+    /*==================================================================*/
+    /* end equip namespace */
+    
+  }; /* module net */
+}; /* module equip */
+
+/*======================================================================*/
+/* EOF */    

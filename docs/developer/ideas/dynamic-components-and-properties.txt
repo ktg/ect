@@ -1,0 +1,56 @@
+Notes on Dynamic Components and Properties
+
+1. C# implementation, 2004-05-06
+
+1.1. Child Components
+
+If a component property is of type System.ComponentModel.IComponent or 1D array of System.ComponentModel.IComponent then equip.component.ComponentWrapper instances are created for the value (or each element, in the case of an array). These are destroyed (.Stop()) of the corresponding value reference is removed (monitored by property change events on the property value/array).
+
+1.2. Script Components
+
+equip.components.ScriptComponent is a IComponent (c.f. Bean) class which has a property called "Properties" which is of type array of equip.components.ScriptProperty; these are the dynamically addable properties to be exposed.
+
+equip.components.ScriptProperty is a class with public Properties:
+- string Name
+- Object Value
+- System.Type Type
+- bool isOutput
+- equip.data.ItemID ItemId
+- System.Collections.ArrayList ConnectionRequests
+
+API has:
+- void setValue(Object newValue) [fires public PropertyChangedEventHandler PropertyChanged with name of ScriptProperty]
+- public ConnectionRequest connectTo(System.Collections.Hashtable otherComponentProperties, string otherPropertyName) [fires change on "ConnectionRequests"]
+- public void disconnect(ConnectionRequest request)
+- public void disconnectAll()
+
+The connect operations are used to requst connections to other components from within the script component or its creating application. The component is specified indirectly by a Hashtable of the property name-> value which must be satisfied by the far-end component.
+
+The current ConnectionRequest directly (per-instance) inspects the dataspace to find any matching component(s) and dynamically create appropriate connection requests. This is very inefficient with lots of ConnectionRequests in one container.
+
+2. EQUIP4J design sketches
+
+2.1. Current design/interactions
+
+New components are created by ect.ComponentLauncher.launch(...) in response to matched ComponentRequests.
+
+The bean is then exported by the ComponentLauncher's ect.ComponentExporter .export(Serializable bean, String name) method. This creates a new ect.MappingObject for the bean/component and inserts it into the ComponentExporter's objectMappers HashMap.
+
+The ect.MappingObject finds the corresponding BeanInfo and creates the initial Component Property tuples, and creates ect.Bean2Equip and ect.Equip2Bean objects which handle Bean property change -> item update and Property Link Requests and corresponding other component property item changes -> set bean property.
+
+Generally there is no synchronization, and not obviously much support for things go away :-)
+
+2.2. Reversibility notes
+
+When a ComponentRequest goes away...
+
+- ComponentLauncher should get a DeleteEvent for the original ComponentRequest...
+- it then calls ect.ComponentExporter.unexport( component )...
+
+Tries to call 'Stop' or 'stop' method on bean. E.g. a window should call 'dispose'.
+
+2.3. Sub-Components
+
+...
+
+EOF

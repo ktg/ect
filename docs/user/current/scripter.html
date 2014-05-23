@@ -1,0 +1,352 @@
+<head>
+<title>Using the scripter (experimental)</title>
+</head>
+<body>
+<h1>Using the Scripter</h1>
+
+Created by Stefan Rennick Egglestone<BR>
+Last update by Stefan Rennick Egglestone 2006-06-29<BR><BR>
+
+<a href="#overview">Overview</a><BR>
+<a href="#getting_started">Getting started</a><BR>
+<a href="#scripter">The Scripter window</a><BR>
+<a href="#simple_example">Constructing a simple example</a><BR>
+<a href="#understanding">Understanding how the script works</a><BR>
+<a href="#advanced">Advanced features of the Scripter</a>
+
+<h3><a name="overview">Overview</a></h3>
+
+<P>
+The Scripter is an experimental application that allows a user 
+to manipulate ECT components by writing scripts
+(rather than by specifying component configurations 
+graphically through
+the <a href="ECT_Webstart_User_Guide.html">Graph Editor</a>). 
+Scripts are written in a version of the 
+<a href="http://www.beanshell.org">BeanShell</a> language
+which has had extra feature added to make it usable
+in this situation. The Scripter application provides
+functionality which can assist a user in the development of 
+a script, and to browse details of a script which is 
+currently being executed.
+</P>
+<P>
+Scripts developed and used in the scripter application have
+access to any components that are available through the
+Graph Editor. As such, they are allowed to access and modify any 
+properties defined by such components, thereby allowing
+scripts to manipulate any hardware devices associated
+with a component. It is also possible to develop scripts
+that can perform tasks when the values
+of any monitored properties change, and it is hoped that 
+the combination of these simple facilities, along with the
+general purpose scripting facilities provided by BeanShell,
+will provide sufficient flexibility to specify many
+different ubicomp installations.
+</P>
+
+<P>
+In fact, it may well be the case that specifications
+of complex behaviours involving large numbers of components
+may well be simpler through the use of scripting than
+through the use of the graph editor, as complex graphs
+can become difficult to understand, maintain and 
+expand. 
+</P>
+
+<P>
+The rest of this section describes how to get started 
+with the Scripter, and describes how to construct 
+a simple installation using software-only components.
+It is hoped that this will provide sufficient information
+to users who wish to construct more complex installations.
+The section assumes that the reader is familiar with
+the ECT graph editor, and associated technologies.
+You should follow the 
+<a href="ECT_Webstart_User_Guide.html">Learning to use ECT</a>
+tutorial if this is not the case (and also
+the <a href="../../ect_overview.html">ECT Overview</a> if 
+you are not familiar with the ECT system.
+</P>
+
+<h3><a name="getting_started">Getting started</a></h3>
+
+<P>
+To get started with the Scripter, you will need to have
+downloaded and unzipped the latest full release of ECT
+(rather than the cut-down release). 
+See the 
+<a href="ECT_Webstart_Getting_Started.html">Getting Started</a>
+guide for information on how to do this. Then follow this 
+procedure (assumes that you are working on a windows machine):
+</P>
+
+<P>
+<ol>
+<li>Follow <a href="ECT_Webstart_Getting_Started.html#method2">
+Method 2</a> in the Getting Started guide to launch
+the graph editor through a mechanism which is suitable for
+experimental pieces of software such as the Scripter.
+<li>locate the <tt>install</tt> directory 
+(with the <tt>ect</tt> and <tt>java</tt> directories in 
+your unzipped ECT installation and double click on the
+<tt>runScripter.bat</tt> file
+</ol>
+</P>
+
+<P>
+You should now have 4 seperate graphical windows, labelled:
+
+<ul>
+<li>ECT Java Container
+<li>Capability Browser
+<li>Graph Component Editor
+<li>Scripter
+</ul>
+</P>
+
+<P>
+Of these, the last three windows are important to the scripter. You should
+use the Capability Browser to create instances of 
+any components that you want to control through a script. These 
+components will then appear on the Graph Component Editor. The Scripter
+window is used to write and test scripts, and any connections created 
+by a script will also appear in the Graph Component Editor.  
+</P>
+
+<h3><a name="scripter">The Scripter window</h3>
+
+<P>
+The scripter window will look something like figure 1
+below:
+</P>
+<IMG src="images/scripter/scripter_window.gif"><BR>
+<B>Figure 1</B>
+<P>
+The white text area on this window contains an example script
+(starting <tt>inputs:...</tt>).
+The three buttons above this text area are used to start the
+execution of this script (left button), stop the execution
+of a running script (middle button) and to browse
+any errors produced by a script (right button). The current 
+example script does not do anything useful without the
+creation of any components to control, so you shouldn't run it.
+Instead, the example section of this document will demonstrate
+how to build a simple example to show how the Scripter works.
+</P>
+
+<h3><a name="simple_example">Constructing a simple example</h3>
+
+<ol>
+<li>Create an instance of the TestingTextFieldInput component
+through the 
+capability browser.
+<li>In the graph component editor, select this new component,
+drag it down to the editor pane, then right click on 
+the top section of the component in the editor pane, and
+select the "Settings" option on the pop-up menu.
+<li>Using the Component Settings dialog that appears, change
+the name of the component to something shorter
+(eg TextInput), then close the dialog.
+<li>Using the same procedure, create an instance of
+the TestingTextFieldOutput, and change its name to something
+shorter (eg TextOutput)
+<li>Now delete the existing example script in the 
+Scripter window, and replace it with the following:
+
+<pre>
+inputs:
+  TextInput.value as String in
+outputs:
+  TextOutput.value as String out
+state:
+status:
+on in:
+  out = in;
+</pre>
+
+<li>Click the run button on the scripter window. A message
+should appear on the bottom of the window indicating that 
+the script is now running
+
+<li>associated with the TestingTextFieldInput component should be 
+a window containing a text input field, and with the
+TestingTextFieldOutput component should be a window which can
+output text. Locate these windows, type some text into the
+input field and press return. If the script is running 
+properly, you should find that the text is copied by the
+script to the output window, without you having to 
+add an edge between these components in the graph editor.
+</ol>
+
+<h3><a name="understanding">Understanding how the script works</h3>
+
+This script consists of five seperate sections, labelled
+<B>inputs</b>,<b>outputs</b>,<b>state</b>,<b>status</b> and
+<b>on in</B>, although the state and status sections are
+empty. This section describes the function of the <b>inputs</b>, 
+<B>outputs</b>
+and <b>on in</b> sections.
+
+<h4>inputs section</h4>
+
+<P>
+This section is used to define the component properties 
+that are to be used as inputs to the script. In the example
+script above, this section only has one line:
+</P>
+
+<pre>
+inputs:
+  TextInput.value as String in
+</pre>
+
+<P>
+This line means that property <i>value</i> on a component
+named <i>TextInput</i> will be considered as an input
+to the script, and that this property will be referable
+to using the variable <i>in</i> throughout the rest
+of the script.
+</P>
+
+<P>
+Users can add as many different properties as they wish
+to the <B>inputs</B> section, providing that each is
+given a different variable name. 
+</P>
+
+<h4>outputs section</h4>
+
+<P>
+This section is used to define the component properties
+to which this script will output values, and in the
+example script above, this section also only has
+one line:
+</p>
+
+<pre>
+outputs:
+  TextOutput.value as String out
+</pre>
+
+<P>
+In this case, this means that property <i>value</i>
+of component <i>TextOutput</i> will be used as an output
+of the script, and will be referable to through the
+variable <i>out</i>
+</P>
+
+<h4>on in section</h4>
+
+<P>
+This section specified what actions should occur 
+when the value in variable <i>in</i> changes. Since
+this variable refers to property <i>value</i>
+of the component named <i>TextInput</i>, then this
+allows a user to specify an action to be performed
+when this property changes. In this case, the
+action that is to be performed is to set the variable
+<i>out</i> to the value of the variable <i>in</i>:
+</P>
+
+<pre>
+on in:
+  out = in;
+</pre>
+
+<P>
+Since variable <i>out</i> refers to property
+<i>value</i> of the component named <i>TextOutput</i>, then
+this has the effect of setting this property to the 
+value of the <i>value</i> property of the <i>TextInput</i>
+component.
+</P>
+<P> 
+Note that the text in this section, ie the line that
+says <tt>out = in;</tt> is called a <i>scriptlet</i>. Scriptlets
+can consist of multiple lines of BeanShell code, but please
+ensure that these lines are seperated by a semi-colon, eg
+</P>
+
+<pre>
+on in:
+  in = in/2;
+  out = in;
+</pre>
+
+<h4>How do scripts appear in the Graph Editor</h4>
+
+<P>
+After having started the script running, take a look
+at the graph editor window, which might look something
+like figure 2 below:
+</P>
+<IMG src="images/scripter/scripter_component_in_graph.gif"/><BR>
+<B>Figure 2</B>
+<P>
+The component labelled <I>ScripterGUI.main</i> has been created
+by the Scripter application, and you can see that
+it has properties which correspond to variables
+defined in the input and output sections of the script,
+as described above. These properties are connected to the
+properties of other components from which they take input, and
+to which they provide output, and these connections have
+also been created automatically by the Scripter application.
+</P>
+
+<h3><a name="advanced">Advanced features of the Scripter</h3>
+
+The Scripter application provides some features that
+can assist you in the development and testing of scripts. Some
+of these are described below:
+
+<h4>Adding a new input/output to a script</h4>
+
+Rather than having to add line such as 
+
+<pre>
+TextInput.value as String in
+</pre>
+
+<P>
+to a script by directly typing it, the Scripter provides graphical
+features that can assist. Move your cursor to the place
+where you want a new line to be added, and select either
+<tt>Input...</tt> or <tt>Output...</tt> from the <tt>Insert</tt> 
+menu. You will then be shown a dialog that looks something like
+figure 3 below:
+</P>
+<IMG src="images/scripter/select.gif"><BR>
+<B>Figure 3</b>
+
+<P>
+This displays a selection of lines that might be added. Click
+on one, and click <tt>OK</tt>, and this line will be added
+at the position where your cursor is. If you add any components
+to your graph whilst viewing this dialog, then you might have
+to click <tt>Refresh</tt> for any properties you have to appear
+in the dialog.
+</P>
+
+<h4>Viewing script variables</h4>
+
+<P>
+Whilst the script is running, you can view the status of 
+any variables that it defines. To do this, select
+the <tt>Variables</tt> option from the <tt>View</tt> menu, 
+which will launch a dialog looking something like figure
+4 below:
+</P>
+<IMG src="images/scripter/variables.gif"><BR>
+<B>Figure 4</B>
+
+<P>
+In this case, this indicates that the script
+has two variables named <I>in</i> and <i>out</i>, gives
+their values, indicates that they are linked to a component
+(ie their <i>Link Status</i> is given as OK) and gives
+the name of the property of the component to which they are linked.
+</P>
+
+</body>
+

@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>ECT Build Notes</title>
+</head>
+<body>
+<h1>Building ECT from SourceForge CVS</h1>
+
+Created by Chris Greenhalgh<BR>
+Most recent update by Stefan Rennick Egglestone 2005-11-15<BR><BR>
+
+<a href="#cvs">Checking out the source code</a><BR>
+<a href="#compiling">Compiling source code</a><BR>
+<a href="#running">Running ECT</a><BR>
+
+<h3><a name="cvs">Checking out the source code</h3>
+<P>
+ECT is currently hosted using CVS facilities provided by 
+<a href="www.sf.net">SourceForge</a>. For instructions on how 
+to check out modules from the EQUIP project at SourceForge, click
+<a href="https://sourceforge.net/cvs/?group_id=126969">here</a>.
+The name of the module containing ECT within EQUIP project CVS is
+<i>ect</i>.
+</P>
+<h3><a name="compiling">Compiling source code</h3>
+<P>
+To compile ECT, you will need to install:<br>
+<ul>
+  <li>Apache Ant (known to work with version 1.6.0)</li>
+  <li>Java 2 SDK (known to work with versions 1.4.2 and 1.5)</li>
+</ul>
+For the physical configuration manager you will also need to install:<br>
+<ul>
+  <li>Java Web-Services Developer Pack (for JAXB) (known to work with
+version 1.5)</li>
+</ul>
+<p>
+Open a commmand shell and set your environment for using Ant and
+Java, e.g. set ANT_HOME to the directory in which ant is installed, set
+JAVA_HOME to the directory in which java is install and set PATH to
+include the /bin subdirectories of each. In some cases you may need to
+overrider the default CLASSPATH, e.g. with just ".". For example:<br>
+</p>
+<pre>set ANT_HOME=C:\ant\apache-ant-1.6.0<br>set JAVA_HOME=C:\j2sdk1.4.2_08<br>set PATH=%ANT_HOME%\bin;%JAVA_HOME%\bin;%PATH%<br>set CLASSPATH=.<br></pre>
+
+<p>To build from source, move to the 
+<span style="font-family: monospace;">ect/java</span>
+sudirectory and run ant using the command line
+</p>
+<pre>&gt; <span style="font-weight: bold;">ant</span><br></pre>
+<p>This should create a webstart installation in the <span
+ style="font-family: monospace;">webstart </span>directory, and
+individual scripts and resources for independent use in the <span
+ style="font-family: monospace;">install </span>directory.<br>
+</p>
+<p>
+<h3><a name="running">Running ECT</h3>
+<P>
+See other documentation for more details on how to run ECT, but to 
+quickly get started in running the graph editor, move to the
+<span style="font-family: monospace;">webstart</span>
+directory and, on a Windows machine, run the runwebstart.bat batch fil
+using command line
+<pre>&gt; <span style="font-weight: bold;">runwebstart</span><br></pre>
+</P>
+<P>
+Scripts also exist in this directory for unix machines.
+</P>
+<hr>
+</body>
+</html>

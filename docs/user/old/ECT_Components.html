@@ -1,0 +1,401 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>EQUIP Component Toolkit: Components</title>
+</head>
+<body>
+<h1>EQUIP Component Toolkit: Components</h1>
+<h2>Testing</h2>
+<h3>http://www.phidgets.com/modules.php?op=modload&amp;name=Downloads&amp;file=index&amp;req=getit&amp;lid=3<br>
+</h3>
+<h3>Chat<br>
+</h3>
+<pre>ect.components.chat.Chat<br></pre>
+<h4>Author/source</h4>
+Ian Taylor? (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Simple graphical text window
+with update facility.<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Has local SWING GUI.<br>
+  </li>
+</ul>
+<h3>Text<br>
+</h3>
+<pre>ect.components.text.Text<br></pre>
+<h4>Author/source</h4>
+Shahram Izadi (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Simple graphical text window
+allowing display and update of a (Java) String with update facility.
+Similar to Chat, but with no history view.<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Has local SWING GUI.<br>
+  </li>
+</ul>
+<h3>Float Value<br>
+</h3>
+<pre>ect.components.floatvalue.FloatValue<br></pre>
+<h4>Author/source</h4>
+Shahram Izadi (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Simple graphical text window
+allowing display and update of a (Java) float with update facility
+(rather than a String as in the Chat and Text components).<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Has local SWING GUI.<br>
+  </li>
+</ul>
+<h3>Slider<br>
+</h3>
+<pre>ect.components.slider.Slider<br></pre>
+<h4>Author/source</h4>
+Shahram Izadi (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Simple graphical (SWING) slider
+allow input/display of an int (Java) in default range 0..100.<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Has local SWING GUI.<br>
+  </li>
+</ul>
+<h3>Email Send Form<br>
+</h3>
+<pre>ect.components.send_form.SendForm<br></pre>
+<h4>Author/source</h4>
+Craig Morrall (Lancaster)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Testing input GUI for the Send
+component. <br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Local Java GUI.<br>
+  </li>
+</ul>
+<h3>Sub-Component Test <br>
+</h3>
+<pre>ect.components.subcomponenttest.ComponentFactory<br>subcomponent ect.components.subcomponenttest.SubComponent<br></pre>
+<h4>Author/source</h4>
+Chris Greenhalgh (Nottingham)<br>
+<h4>Description</h4>
+Requires local Java GUI to demonstrate/test exposure of sub-components.
+<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Kind of a tutorial example of sub-components (but don't include a
+GUI to make them!).</li>
+</ul>
+<h2>Examples<br>
+</h2>
+<h3>Http Configurable Text <br>
+</h3>
+<pre>ect.components.httpconfigtextvalue.HttpConfigText<br></pre>
+<h4>Author/source</h4>
+Chris Greenhalgh (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Variant of the Text component
+that supports configuration via an embedded web server form rather than
+a Java GUI. <br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Tutorial example of embedded web form facility for configuration.<br>
+  </li>
+</ul>
+<h2>Misc</h2>
+<h2>Input/Capture</h2>
+<h3>Camera<br>
+</h3>
+<pre>ect.components.camera.Camera<br></pre>
+<h4>Author/source</h4>
+Shahram Izadi (Nottingham)<br>
+Based on DYNAMO component?<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>On trigger input, grabs current
+frame from default JMF video capture device and publishes URL to JPEG
+file of that image.<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Uses JMF.</li>
+  <li>Fixed (compiled-in) JMF video capture source locator. ("vfw://0"
+?).</li>
+  <li>For a similar component compatible with the video framework see
+VideoFrameExporter.<br>
+  </li>
+</ul>
+<h3>File Exporter<br>
+</h3>
+<pre>ect.components.fileexporter.FileExporter<br></pre>
+<h4>Author/source</h4>
+Shahram Izadi (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Has local Java GUI which allows
+a user to copy a local file to the container's embedded web server and
+publish the URL.<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>File is only available while local container is running and
+reachable.<br>
+  </li>
+</ul>
+<h3>Smart IT Factory<br>
+</h3>
+<pre>ect.components.smartitfactory.SmartItsFactory<br>subcomponent ect.components.smartitfactory.SmartItsInstance<br></pre>
+<h4>Author/source</h4>
+Chris Greenhalgh (Nottingham)<br>
+Based on Smart ITs Default component<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Expose inputs from
+ACCORD-programmed SmartIT via dynamically instantiated per-SmartIT
+sub-components.<br>
+<h4>Notes</h4>
+<ul>
+  <li>Requires ACCORD-programmed SmartITs.<br>
+  </li>
+</ul>
+<h3>System Time<br>
+</h3>
+<pre>ect.components.time.SystemTime<br></pre>
+<h4>Author/source</h4>
+Craig Morrall (Lancaster)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Expose local system time in
+clock-form, i.e. seconds, minutes, hours, etc. <br>
+...<span style="font-weight: bold;"><br>
+</span>
+<h2>Input/Output</h2>
+<h3>Phidgquip<br>
+</h3>
+<pre>equip.ect.components.phidgquip.PhidgquipFactory</pre>
+<h4>Author/source</h4>
+Tom Hard (Nottingham)<br>
+<h4>Description</h4>
+Phidgets.com interface using phidgets 2.0 libraries, currently output
+only (their constraint).<br>
+<h4>Notes</h4>
+<ul>
+  <li>Requires <a
+ href="http://www.phidgets.com/modules.php?op=modload&amp;name=Downloads&amp;file=index&amp;req=getit&amp;lid=3">Phidget.msi</a>
+to be installed on machine.<br>
+  </li>
+</ul>
+<h2>Output/Display</h2>
+<h3>Media Viewer<br>
+</h3>
+<pre>ect.components.dynamo.mediaviewer.DynamoMediaViewer<br></pre>
+<h4>Author/source</h4>
+Shahram Izadi (Nottingham)<br>
+Based on DYNAMO component<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Displays input file (URL) in a
+pop-up full-screen window using e.g. Acrobat, Word, Windows Media
+Player, Internet Explorer (depending on file content type).<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Windows-specific?!</li>
+</ul>
+<h3>Atom Blogger<br>
+</h3>
+<pre>ect.components.atomblogger.AtomBlogger<br></pre>
+<h4>Author/source</h4>
+Mark Thompson (Southampton)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Posts entries to a Blog using
+the Atom API/protocol.<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Currently also has local SWING GUI.<br>
+  </li>
+</ul>
+<h3>Email Sender<br>
+</h3>
+<pre>ect.components.email.EmailSender<br></pre>
+<h4>Author/source</h4>
+Craig Morrall (Lancaster)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Sends an email (subject,
+message) to a specified address.<br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Time field not present or not filled in correctly.</li>
+  <li>See also Send Form component for testing GUI.</li>
+  <li>Requires an outgoing mailserver to be configured (property).<br>
+  </li>
+</ul>
+<h3>Blogger<br>
+</h3>
+<pre>ect.components.blogger.BlogPublisher<br></pre>
+<h4>Author/source</h4>
+Jan Humble (Nottingham)<br>
+Based on ACCORD component.<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Posts entries to a Blog using
+the Atom API/protocol.<br>
+...<br>
+<h2>Local Display</h2>
+<h3>Analogue Clock</h3>
+<pre>ect.components.analogue_clock.AnalogueClock<br></pre>
+<h4>Author/source</h4>
+Craig Morrall (Lancaster)
+<h4>Description</h4>
+Maintains local SWING GUI of analogue clock.<br>
+<h4>Input properties</h4>
+<ul>
+  <li style="font-family: monospace;">seconds: int</li>
+  <li style="font-family: monospace;">minutes: int</li>
+  <li style="font-family: monospace;">hours: int</li>
+</ul>
+<h3>Digital Clock</h3>
+<pre>ect.components.digital_clock.DigitalClock<br></pre>
+<h4>Author/source</h4>
+Craig Morrall (Lancaster)
+<h4>Description</h4>
+Maintains local SWING GUI of digital clock.<br>
+<h4>Input properties</h4>
+<ul>
+  <li style="font-family: monospace;">seconds: int</li>
+  <li style="font-family: monospace;">minutes: int</li>
+  <li style="font-family: monospace;">hours: int</li>
+</ul>
+<h2>Behaviour</h2>
+<h3>Repeat Announcer<br>
+</h3>
+<pre>ect.components.repeatannouncer.RepeatAnnouncer<br></pre>
+<h4>Author/source</h4>
+Mark Thompson (Southampton)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Regularly (periodically,
+configured interval) outputs a message (input). <br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Has local SWING GUI.<br>
+  </li>
+</ul>
+<h3>Association Learner<br>
+</h3>
+<pre>ect.components.associationlearner.AssociationLearner<br></pre>
+<h4>Author/source</h4>
+Chris Greenhalgh, Shahram Izadi (Nottingham)
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Can be trained with a 1D
+mapping between input and output. Training is performed by presenting
+an input to <span style="font-family: monospace;">in</span> and then
+presenting the desired output value to <span
+ style="font-family: monospace;">trainingOut</span>. The output <span
+ style="font-family: monospace;">out</span> will always output the
+mapping (if any) associated with the current input. Where the input is
+a number(Java type) and the output is a number (Java type) then the
+Association Learner will fix a piece-wise linear function to the
+trained associations, i.e. an input between those already seen will
+result in an output interpolated between the trained outputs. When the
+input is a number (Java type) and the output is not then the output
+will be mapping of the trained input that is closest to the current
+input.<br>
+<h4>Input properties</h4>
+<ul>
+  <li style="font-family: monospace;">in: Object<br>
+  </li>
+  <li style="font-family: monospace;">trainingOut: Object</li>
+</ul>
+<h4>Output properties</h4>
+<ul>
+  <li style="font-family: monospace;">out: Object</li>
+</ul>
+<h4>Persistence</h4>
+Implements <span style="font-family: monospace;">equip.ect.Persistable</span>.
+Uses <span style="font-family: monospace;">equip.ect.PersistenceManager</span>
+<span style="font-family: monospace;">persistObject</span> and <span
+ style="font-family: monospace;">loadObject</span> to persist (Java
+Serialize) the bean itself. On load the <span
+ style="font-family: monospace;">trainedInputs</span> (TreeSet) and <span
+ style="font-family: monospace;">associations</span> (Hashtable) are
+restored.<br>
+<h3>Bean Shell Script<br>
+</h3>
+<pre>ect.components.bsh.BeanShell<br>Subcomponent: ect.components.bsh.BeanShellArg<br></pre>
+<h4>Author/source</h4>
+Ted Phelps (Sussex/Lancaster)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Host and execute a single bean
+shell script.Set the "inputNamesString" property to a
+whitespace-separated list of script input arguments; the BeanShell
+component will then create corresponding BeanShellInput sub-components,
+the "value" property of which is linked to the corresponding script
+argumennt. Similarly, set the "outputNamesString" property to create
+BeanShellOutput sub-components. The script is re-executed each time an
+input changes.<br>
+<h4>Notes</h4>
+Implements <span style="font-family: monospace;">equip.ect.Persistable</span>.
+Uses <span style="font-family: monospace;">equip.ect.PersistenceManager</span>
+<span style="font-family: monospace;">persistObject</span> and <span
+ style="font-family: monospace;">loadObject</span> to persist the lists
+of input and output arguments and the script in a text file.On load
+these are restored. <br>
+<h2>Vision Framework</h2>
+JMF image capture/streaming/processing and simple analysis<br>
+...<br>
+<h2>Depracated<br>
+</h2>
+<h3>Float Function<br>
+</h3>
+<pre>ect.components.floatfunction.FloatFunction<br></pre>
+<h4>Author/source</h4>
+Chris Greenhalgh (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Simple Java GUI allows entry of
+a float function of three float inputs. <br>
+...<br>
+<h4>Notes</h4>
+<ul>
+  <li>Has local SWING GUI.</li>
+  <li>Use Bean Shell scripting instead.</li>
+  <li>Uses arcane on-demand code generation and compilation.</li>
+</ul>
+<h3>Smart IT Default<br>
+</h3>
+<pre>ect.components.smartits.SmartItsDefault<br></pre>
+<h4>Author/source</h4>
+Jan Humble, Tom Rodden (?) (Nottingham)<br>
+Based on ACCORD component?<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>Expose inputs from
+ACCORD-programmed SmartIT.<br>
+<h4>Notes</h4>
+<ul>
+  <li>Mapping of instance to smartIT ID depends on order of (multiple)
+instance installation.</li>
+  <li>Use Smart IT Factory instead.</li>
+  <li>Requires ACCORD-programmed SmartITs.<br>
+  </li>
+</ul>
+<h3>Vision Demo<br>
+</h3>
+<pre>ect.components.visiondemo.EquipVisionDemo<br></pre>
+<h4>Author/source</h4>
+Steve Mills, Chris Greenhalgh (Nottingham)<br>
+<h4>Description</h4>
+<span style="font-weight: bold;"></span>First demo/test of Java
+vision/image processing component integration into ECT.<br>
+...<br>
+<h4>Notes</h4>
+Uses URLs to images as inputs.<br>
+<br>
+</body>
+</html>

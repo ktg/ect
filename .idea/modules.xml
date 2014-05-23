@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/components/components.iml" filepath="$PROJECT_DIR$/components/components.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ect.iml" filepath="$PROJECT_DIR$/ect.iml" />
+      <module fileurl="file://$PROJECT_DIR$/equip/equip.iml" filepath="$PROJECT_DIR$/equip/equip.iml" />
+      <module fileurl="file://$PROJECT_DIR$/grapheditor/grapheditor.iml" filepath="$PROJECT_DIR$/grapheditor/grapheditor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/components/phidget/phidget.iml" filepath="$PROJECT_DIR$/components/phidget/phidget.iml" />
+      <module fileurl="file://$PROJECT_DIR$/components/sinewaves/sinewaves.iml" filepath="$PROJECT_DIR$/components/sinewaves/sinewaves.iml" />
+    </modules>
+  </component>
+</project>
+

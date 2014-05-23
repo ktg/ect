@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>EQUIP Component Toolkit TO DO</title>
+</head>
+<body>
+<h1>EQUIP Component Toolkit (ECT) To Do</h1>
+<span style="font-weight: bold;"></span><br>
+last updated 2004-07-30.<br>
+Key:<br>
+<ul>
+  <li><span style="font-style: italic;">W</span> needed for first
+webstart releae</li>
+  <li><span style="font-style: italic;">C </span>needed for RCA
+curious home explorations (also implies <span
+ style="font-style: italic;">W</span>)<br>
+  </li>
+</ul>
+<h2>Documentation</h2>
+<ul>
+  <li>All source files need javadoc formatted comments (present in some
+already).</li>
+  <li>Tutorial docs?</li>
+  <li>etc. :-)<br>
+  </li>
+</ul>
+<h2>Release</h2>
+<ul>
+  <li><span style="font-style: italic;">W</span> Canonical set of core
+components [kind of]<br>
+  </li>
+  <li><span style="font-style: italic;">W</span> Sample networks and
+arrangement [getting there - tar &amp; sxi tutorials/intro/scenarios]<br>
+  </li>
+  <li>Wiki [not done], mailing list [done] and/or similar community
+support for sharing
+arrangements, components, etc.<br>
+  </li>
+</ul>
+<h2>Licencing</h2>
+<ul>
+  <li>Choose open source licence</li>
+  <li>Release on that licence</li>
+  <ul>
+    <li>track/prune non-licencable elements<br>
+    </li>
+  </ul>
+  <li>SourceForge?!<br>
+  </li>
+</ul>
+<h2>Infrastructure</h2>
+<h3>Bugs</h3>
+<ul>
+  <li>Per-component persistence...does not atomically transition from
+one backup to another, i.e. there
+is a period of time during the writing of persistence files in which a
+container or host failure will leave an unreadable (typically
+truncated, i.e. partially written) persistence file.</li>
+  <li>It is still a VERY BAD THING to cross-link component properties
+and then re-activate them all at once, e.g. from persistence recovery.
+Probably unavoidable deadlock possibilities. Could consider making
+property add events (as well as updates) queued.</li>
+  <li>Web start container hard-coded hack to only be able to start java
+container.</li>
+</ul>
+<h3>Desirable features</h3>
+<ul>
+  <li>Standard recording facility (?extension to configuration
+management?) for (a) dataspace state and events [=File backed dataspace
+logs!] (b) internal component
+state and events (c) media (e.g. captured video frames, audio packets).</li>
+  <li>Extensible framework for coercion to target property type on set
+for non-primitive types, e.g. URL or image to float, etc.</li>
+  <li>It should be possible to mark some properties as being propagated
+as <span style="text-decoration: line-through;">non</span>-mandatory
+[note - discovered that all updates are currently unreliable by default
+- beware - 2004-07-13 cmg] updates in EQUIP, specifically those which
+may change
+very rapidly and for which intermediate values may be missed without
+problems. <span style="text-decoration: line-through;">This should
+improve the responsiveness and resilience of the
+system under load. Suggestion: use custom extension of Bean Property
+Info descriptor.</span> Non-mandatory events which change rapidly will
+lose intermediate values, e.g. triggers! beware!<br>
+  </li>
+  <li><span style="font-style: italic;"></span>WebStart version <br>
+  </li>
+  <ul>
+    <li>should show allow installation auto-start to be
+configured.</li>
+  </ul>
+  <ul>
+    <li>should run automatically as a service (Windows)
+or equivalent.</li>
+  </ul>
+  <ul>
+    <li>...on
+stop container or installation... containers should do persistence
+at this point.</li>
+  </ul>
+  <ul>
+    <li>should allow dataspace master a clean shutdown
+(to flush persistence) on installation terminate.</li>
+    <li>(ComponentExporter) should create new component instance(s) in
+a separate thread (remember to resync &amp; check that request still
+exists once successfully created and before actually exporting).</li>
+    <li>should have an extra&nbsp; persistence indication mechanism to
+ensure short-lived components are still persisted <br>
+    </li>
+  </ul>
+  <li>Something like configurations but transferable between
+installations, i.e. templates.</li>
+  <li>Allow a partially configured component to be exposed as a
+capability (e.g. SimpleVideoProcessor with particular config).</li>
+  <li>Move processing import facility to a separate tool, or...<br>
+  </li>
+  <ul>
+    <li>[after Processing support v.1] support Processing jars directly
+as a
+component type in ExporterGUI/Container.<br>
+    </li>
+  </ul>
+  <li><span style="font-style: italic;">C?</span> Timeview can't cope
+with high update rates, i think (was trying a simple video network and
+the whole system bogged down).</li>
+  <li>Container GUI: <br>
+  </li>
+  <ul>
+    <li>add label, e.g 'Capabilities'<br>
+    </li>
+  </ul>
+  <li>Host manager GUI:</li>
+  <ul>
+    <li>reorder tabs: new -&gt; dicovered -&gt; known</li>
+    <li>add restart with download updates options</li>
+    <li>'secure' export of secret, e.g. via memory stick?!<br>
+    </li>
+  </ul>
+</ul>
+<h2>Tools</h2>
+<ul>
+  <li>(more) New browser(s) and configuration tools that are pretty and
+easy
+to use.</li>
+  <li>Easy link from component browser to web browser [improved through
+set value and copy]</li>
+  <li>Structure running components to show parent/child hierarchy</li>
+  <li><span style="font-style: italic;">C </span>Timeview version to
+work on File backed data store logs.</li>
+  <li>Dataspace browser
+does not terminate on close (but consider embedded use with
+DataManager).</li>
+  <li>Log overview/directory/browser ...--&gt;?? replay tool <br>
+  </li>
+</ul>
+<ul>
+</ul>
+<h2>Current Component Issues</h2>
+<ul>
+  <li>Bar Code 1D reader is pretty useless in its current form. Does
+not read reliably or consistently.</li>
+  <li>Component ...X... does not stop. [insert component name] EZIO?<br>
+  </li>
+  <li>Nice if video framework image URLs allowed click to give position
+in image coordinates for use in Region processor.</li>
+  <li>ARToolkit video component missing important outputs - confidence,
+image-space position of glyph.<br>
+  </li>
+</ul>
+<h2>Desirable Components</h2>
+A-list:<br>
+<ul>
+  <li>Input for Java version of the Phidgets Manager and device and
+sensor/etc.
+components comparable to the C# version using the Phidget Java binding
+[still waiting on support from Phidgets- RSN?!].</li>
+  <li>TV remote control input/output (with supporting hardware), to
+allow system to control TVs, etc., and to be controlled/affected using
+a regular remote control. [awaiting parts]<br>
+  </li>
+  <li>Bluetooth device monitor [stalled (was Stripes)]</li>
+  <li>Motes proxy components [partial version exists - jan].</li>
+  <li>URL cacheing/uploading components (a) on infrastructure server
+(container server? 'real' server, e.g. tomcat?) [tom??] (b) on remote
+public server (via webdav??)</li>
+</ul>
+B-list:<br>
+<ul>
+  <li>Platform-independent media viewer?? c.f. dynamo media viewer
+(Windows-specific)</li>
+  <li>Simple image URL viewer?</li>
+  <li>Reminder, e.g. of birthdays, appointments (see also ACCORD
+reminder).</li>
+  <li>Calendar, shared?</li>
+</ul>
+<ul>
+  <li>EQUATOR AudioChair interface component(s).</li>
+  <li>RSS feed source. [started by tom]<br>
+  </li>
+  <li>RSS feed custom client. [probably by tom]<br>
+  </li>
+  <li>Email monitor (e.g. unread messages, etc.)</li>
+  <li>Ticker Tape??Coffee Biff?? etc.<br>
+  </li>
+  <li>Printing and Scanning components - moving documents between
+physical and digital.</li>
+  <li>Data logger/aggregator, collects and outputs time-series data,
+e.g. light level over day, e.g. as CSV [consider processing applets]<br>
+  </li>
+  <li>Graph/display, to show output from logger/aggregator [consider
+processing applets]<br>
+  </li>
+  <li>Contect-aware camera, records annotations with image: who, what,
+where, when.</li>
+  <li>Mobile display - PDA/phone - for video, images, etc.</li>
+  <li>Biometric inputs - fingerprints, etc.</li>
+  <li>LEGO Mindstorms<br>
+  </li>
+</ul>
+<h2>History/done</h2>
+<ul>
+  <li>Build file needs javadoc target. [2004-07-12 cmg]<br>
+  </li>
+  <li>WebStart installation dataspace should be persistent (symptom:
+restarting the dataspace loses all component requests and links).
+[2004-07-12 cmg]<br>
+  </li>
+  <li>Container persistence of sub-component GUIDs for sub-components
+and their properties (symptom: after restarting a persistence container
+any links to/from sub-components are apparently missing (since they
+link to/from the old property GUID)). [2004-07-13 cmg]<br>
+  </li>
+</ul>
+<ul>
+  <li>Auto-export of capabilities from the container (present in
+Webstart version already). [2004-07-12 cmg]<br>
+  </li>
+  <li>WebStart version should show [a little] current status of host,
+and give
+access to browser(s)/GUIs... [2004-07-12 cmg]</li>
+  <li>Automatic coercion to target property type on set, e.g. link a
+string property to an int property causing the target to parse the
+string if it is a stringified number.[basically only for numbers, char,
+boolean and toString - 2004-07-13 cmg]</li>
+  <li>Some attempt to enhance synchronization to avoid
+races/livelock/deadlock. Note: all property item changes will now be
+asynchronous compared to the property change event that triggered them.
+[2004-07-13 cmg]<br>
+  </li>
+</ul>
+<ul>
+  <li>Save and restore configurations, i.e. back up dataspace,
+per-container and per-component persistence information so that the
+same arrangement of components can be restored at a later time.
+Currently only the state of the system at the present time is
+persistent (over partial or complete system failure). [doesn't do
+anything about internal component persistence, but i think that is ok
+2004-07-13 cmg]</li>
+  <li>Component browser adding 'delayed' properties not working (at
+least once) - delayed properties not shown in component tree
+[2004-07-14 cmg]</li>
+  <li>Added Set Value Popup to browser (context menu on Property node
+in running component tree) [2004-07-14 cmg]</li>
+  <li>Occasional deadlock (?) when accessing video processor embedded
+web
+server for image viewing or configuration (symptom: capture device
+stops printing frame #s indicated stopped or stalled) [hopefully fixed
+2004-07-14 cmg]<br>
+  </li>
+  <li>Deadlock is possible, e.g. video capture thread emits frame,
+locking
+capture component and chain of handler components, one of which emits a
+property change event which requires the ContainerManager lock to
+progress. Concurrently, a change on a linked (source) property changes,
+acquires the ContainerManager lock (first), and then attempts to set
+the target property on one of the locked components. Resolution:
+property change event handler must be able to make progress (with
+required sync. access to internal information about bean property
+items) concurrently with in-progress property change and set.
+[2004-07-14 cmg]</li>
+  <li>Vision framework components (processor, average) stop correctly
+[2004-07-14 cmg]</li>
+  <li>Allow (user) naming of capabilities, components [in progress],
+?links, e.g .using RDF statements with property dc:title shared
+persistently in dataspace (needs support from browser(s) and config
+manager) [2004-07-14 cmg]</li>
+  <li>Vision framework capture components crash (JVM crash) if stopped
+and restarted. This seems to be a JMF issue?! A messy workaround would
+retain the internal stuff but just make the surface bean stuff go away.
+[messy workaround done 2004-07-14 cmg]</li>
+  <li>? Restarting a persistent container with a visionframework chain
+does not always correctly set the destination sink value. (may be a
+more general race condition with initial values) [possible fix;
+awaiting confirmation/replication - 2004-07-13 cmg]</li>
+  <li>Security needs implementing in webstart (shared secret)
+[2004-07-15 cmg]</li>
+  <li><span style="font-style: italic;"></span>WebStart access to
+component updates site(s)/facilities with download of components, DLLs,
+etc. [2004-07-15 cmg]</li>
+  <li><span style="font-style: italic;"></span>WebStart handling a JAR
+and DLL dependencies of components (load,
+path)[2004-07-15 cmg]</li>
+  <li><span style="font-style: italic;"></span>Webstart file cache
+should remove old un-needed files.[2004-07-15 cmg]</li>
+  <li><span style="font-style: italic;"></span>WebStart version
+should show [more] current status of host, ...containers to be stopped
+and restarted [2004-07-16 cmg]<br>
+  </li>
+  <li><span style="font-style: italic;"></span>Logging/console
+output fixup - for diagnostics/debugging (to file?) [2004-07-15 cmg]<br>
+  </li>
+  <li><span style="font-style: italic;"></span>Add config manager to
+webstart [2004-07-15 cmg]</li>
+  <li><span style="font-style: italic;"></span>After joining a newly
+discovered installation, then terminating it, the BootFrame still shows
+it as discovered, not known. [2004-07-19 cmg]<br>
+  </li>
+  <li><span style="font-style: italic;"></span>If a webstart slave is
+(auto)started without its master running the installation is started
+but the container is not. This is no good: it should either stop
+installation until discovered, or start container as well so that it
+will (re)try connect to DS. [2004-07-19 cmg]</li>
+  <li><span style="font-style: italic;"></span>Bean Shell Script
+component should have a property that can be used to force it to
+execute and also make it stop when it has gone into an infinite loop.
+[2004-07-19 ted]</li>
+  <li><span style="font-style: italic;"></span>At least once I used
+configuration manager to clear and re-make a video processing network,
+and the simple video processor did not recover its configuration. Not
+sure if this indicates a more general problem. [fixed - persistence
+startup update issue - 2004-07-19 cmg]<br>
+  </li>
+  <li><span style="font-style: italic;"></span>?Once terminated
+installation (with component browser running - might be significant)
+and the host manager did not reappear. [not seen this again for a while
+- cmg]</li>
+  <li><span style="font-style: italic;"></span>Add timeview (live
+and logged) to webstart. [2004-07-19 cmg]</li>
+  <li>Fix timeview time
+stamps to be something useful (e.g. for
+replaytool) [2004-07-19 cmg]<br>
+  </li>
+  <li><span style="font-style: italic;"></span>Timeview should show
+given (RDF) names. [2004-07-19 cmg]</li>
+  <li><span style="font-style: italic;"></span>Timeview should allow
+property names to be specified (for output to log files) (perhaps using
+RDF mechanism). [2004-07-19 cmg]</li>
+  <li><span style="font-style: italic;"></span>Timeview should cope
+with any height of tracks (currently fixed-size panel - tracks lost at
+top). [2004-07-19 cmg]<br>
+  </li>
+  <li><span style="font-style: italic;"></span>Installation manager
+"Dataspace [not] connected" does not change back from "...not..." to
+"...connected" when master is restarted. (not async???) [2004-07-19 cmg]</li>
+  <li>SmartITs factory components do not stop. [2004-07-20 cmg]<br>
+  </li>
+  <li>Video averager does not reflect change in threshold property in
+(persisted) config property. [2004-07-20 cmg]<br>
+  </li>
+  <li> Java version of the Phidgets Manager and device and sensor/etc.
+components comparable to the C# version using the Phidget Java binding
+[NB input only, at present - waiting on support from Phidgets 2.0 input
+- 2004-07-20 tom hart]</li>
+  <li>Various component browser consistency and link view enhancements
+[2004-07-20 cmg]</li>
+  <li><span style="font-style: italic;"></span>We need an easy way to
+build the webstart verion(s). [2004-07-20 sxi]</li>
+  <li>...per-container persistence
+does not atomically transition from one backup to another, i.e. there
+is a period of time during the writing of persistence files in which a
+container or host failure will leave an unreadable (typically
+truncated, i.e. partially written) persistence file. [2004-07-20 sxi]</li>
+  <li><span style="font-style: italic;"></span>Use property values
+serialised in container persistence file to
+initialise writable properties on non-Persistable components (this
+would avoid the need to implement Persistable if a component exposes
+all of its state as properties). [2004-07-21 cmg]</li>
+  <li>Dynamo media viewer does not stop or re-start. [2004-07-21 cmg]</li>
+  <li>Clean shutdown/restart option for containers; Webstart version
+should allow containers a clean shutdown (on
+stop container or installation), ... [2004-07-21 cmg]</li>
+  <li>Dataspace persistence (a) should use write to temp and rename
+strategy to avoid exposing incomplete checkpoint files (b) should catch
+and log/ignore IO exceptions during reading of event log (which may be
+truncated) [2004-07-26 cmg]</li>
+  <li>Webstarted container
+hangs&nbsp; on attempt to instantiate a
+component class which requires (not exactly sure which) loading of a
+native library and/or access to another jar file (which may do the
+same), i.e. video capture, media viewer, phidgets. [2004-07-28 sxi]</li>
+  <li><span style="font-style: italic;"></span>Container persistance
+file path to component jar not always
+matched by actual jar on restart (observed when i used webstart version
+2004-07-21 ish, logged in as local admin). [presumed fixed 2004-07-23
+cmg]</li>
+  <li>Installation GUI: show status of download/update; add 'export
+secret' GUI option (just display in text field for
+now?!) [2004-07-30 cmg]</li>
+  <li>Dynamo media viewer hangs on startup in webstart version (new
+feature today :-( ). [2004-07-28 sxi]</li>
+  <li>Audio capture and processing framework comparable to the video
+framework, e.g. to detect noise level from a microphone. [2004-07-30
+cmg]</li>
+  <li>Bean supporting MIT's Processing language for display components.
+[chris 2004-09-01]<br>
+  </li>
+  <li>Video plus audio, video-only and audio-only streaming and display
+components to support media-server functionality, serving media from
+files. Possible channel abstraction? Could use JMF RTP support. Option:
+video framework transmitter component, e.g. for remote video
+monitoring. [tom has done an initial version]<br>
+  </li>
+  <li>RFID Tag Readers (various) [ted TagIt&nbsp; 2004-09-01]<br>
+  </li>
+  <li>SMS Gateway [shahram 2004-09-05]<br>
+  </li>
+  <li>X10 controller (serial or USB??) [chris 2004-09-19]</li>
+</ul>
+<ul>
+</ul>
+<ul>
+</ul>
+</body>
+</html>

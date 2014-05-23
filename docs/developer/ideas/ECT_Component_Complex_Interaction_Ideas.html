@@ -1,0 +1,568 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT Component Complex Interaction Ideas</title>
+</head>
+<body>
+<h1>ECT Complex Component Interaction Ideas</h1>
+Chris Greenhalgh 2005-07-28<br>
+<h2>Introduction</h2>
+Reflecting on the uses (and non-uses) of ECT I have identified the
+limited forms of component interaction to be a key limitation: at
+present interaction is (almost*) only through direct linking of
+component properties, so that changing values of a source property are
+set as the values of a destination property. The range of types
+supported is also currently limited to strings and (for most purposes)
+1D arrays. This has a number of limitations:<br>
+<ul>
+  <li>although events can be modelling in this way, it is not ideal: <br>
+  </li>
+  <ul>
+    <li>events often have complex types which are not handled at
+present;<br>
+    </li>
+    <li>modelling events as properties can result in a second event
+with the same value being suppressed (e.g. by the standard Java
+property change support).</li>
+  </ul>
+  <li>the editor support is quite limited:</li>
+  <ul>
+    <li>there are no type-specific value editors/display: everything is
+coerced to/from Strings in the current editors;</li>
+  </ul>
+  <li>there is no explicit support for compound values, e.g. tables
+with insert/update/delete</li>
+  <li>context information is effectively lost because just the value is
+propagated along a property link</li>
+  <ul>
+    <li>property values are often implicitly contextualised by the
+component of which they are part (e.g. that two numbers are actually
+the lat/long of a particular GPS receiver) - this is lost by the link's
+simple copy operation;<br>
+    </li>
+    <li>property values are currently constrained to be simple, so it
+is not even possible to communicate values that incorporate context in
+an obvious form.<br>
+    </li>
+  </ul>
+</ul>
+*almost: there is support for linking interface-valued properties
+between local components so that the target component can directly
+invoke operations on the interface made available by the source
+component. However:<br>
+<ul>
+  <li>there is no support for managing or monitoring these invocations;</li>
+  <li>it does not work between containers;</li>
+  <li>it is rather unclear in the Graph Editor and similar views.</li>
+</ul>
+<h2>Proposal(s)</h2>
+So...:<br>
+<ul>
+  <li>add support for complex types (e.g. beans; maps) based on
+introspection to translate to/from Dictionary type.</li>
+  <li>add support for event producers (in java, components with
+addXListener/removeXListener methods) and event consumers (in java,
+components which implement XListener interfaces or have properties
+whose values have type or implement XListener), mapping Bean events to
+EQUIP events. Requires new EventPublisher, EventConsumer and
+EventLinkRequest tuple types and an ComponentEvent event type, plus
+support in the Container(s) and Editor(s), (or overloading the meaning
+of ComponentProperty and PropertyLinkRequest; the source
+pseudo-property value would have to distinguishable as an event source).<br>
+  </li>
+  <li>add support for type matching in the editor, e.g. event source
+-&gt; consumer, including event type; local interface property type;
+"sensible" property value coercions.</li>
+  <li>add support for blackboard-style linking, where some components
+can assert sets of values, while other can retrieve/monitor values
+matching patterns of interest</li>
+</ul>
+<h3>Blackboard Linking</h3>
+This is not so different from merge links, which would populate an
+array with the union of the source values. But...<br>
+<ul>
+  <li>that would not allow filtering, i.e. management or selectivity of
+replication (unless there were an intermediate component)</li>
+  <li>that would not allow incremental changes to values as far as
+components are concerned - the entire composite value would have to be
+communicated and notified</li>
+  <li>that would not allow direct use of dataspace mechanisms?!
+(efficiency, again, I think)<br>
+  </li>
+</ul>
+In the blackboard model, various non-blackboard type could be linked to
+it:<br>
+<ul>
+  <ul>
+    <li>a simple property connected to a blackboard is reflected as an
+item</li>
+    <li>an array-valued property is reflected as a number of items(?)</li>
+    <li>a bag-model-valued property is reflected as number of items</li>
+    <ul>
+      <li>a bag model is a posited active collection with membership
+change events (bag? set? list?)</li>
+    </ul>
+  </ul>
+</ul>
+example:<br>
+<ul>
+  <li>C1:P1 ---&gt; Bag1 ---&gt; C2:P2</li>
+  <ul>
+    <li>so a Bag is kind of like a component (but is really just a
+dataspace - or part of a dataspace, running on some machine); it
+probably only has one "component"<br>
+    </li>
+    <li>a default link does no special filtering or mapping</li>
+    <li>a link from a property to a Bag must be handled by the source
+component's container, which must maintain appropriate data items in
+the dataspace corresponding to the Bag</li>
+    <li>a link to a property from a Bag (or possibly also a link
+direct to a bag-model property) causes the target component's container
+to monitor the corresponding dataspace (or establish its own dataspace)
+and update the Bag model accordingly</li>
+    <li>a link to a property from a Bag may be annotated with a
+filter which will constrain that is requested/replicated</li>
+    <li>a link from a property to a Bag might(??) be annotated with
+extra value-wrapping/mapping information, and correspondingly a link to
+a property from a Bag might be annotated with extra
+value-unwrapping/mapping information</li>
+    <ul>
+    </ul>
+  </ul>
+</ul>
+Could prototype as:<br>
+<ul>
+  <li>Dataspace server component</li>
+  <ul>
+    <li>IDataspace interface property (readonly)<br>
+    </li>
+    <li>Dataspace URL ? (readonly)</li>
+  </ul>
+  <li>Dataspace client component</li>
+  <ul>
+    <li>IDataspace interface property (readonly)<br>
+    </li>
+    <li>Dataspace URL ? (linked from server) <br>
+    </li>
+  </ul>
+</ul>
+Components explicitly use IDataspace interface. But:<br>
+<ul>
+  <li>have to use the right server/client component for each container<br>
+  </li>
+  <li>components have to use the dataspace API directly<br>
+  </li>
+</ul>
+Could prototype as:
+<ul>
+  <ul>
+    <li>BagServer component</li>
+    <ul>
+      <li>Bag URL (readonly)<br>
+      </li>
+      <li>Bag API (readonly)<br>
+      </li>
+      <ul>
+      </ul>
+    </ul>
+    <li>BagClient component</li>
+    <ul>
+      <li>Bag URL (link from BagServer)</li>
+      <li>Bag (client) API (readonly)</li>
+      <ul>
+      </ul>
+    </ul>
+    <li>PropertyToBag component</li>
+    <ul>
+      <li>Bag API (link from BagServer/BagClient)</li>
+      <li>value (singleton or array)<br>
+      </li>
+      <ul>
+      </ul>
+    </ul>
+    <li>BagToProperty component [Note: loses incremental change
+update(s)]<br>
+    </li>
+    <ul>
+      <li>Bag API (link from BagServer/BagClient)</li>
+      <li>template (Dictionary?)<br>
+      </li>
+      <li>value (readonly) (array)</li>
+      <ul>
+      </ul>
+    </ul>
+    <li>[you have to make a lot of components, and make sure you get
+them in the right places, and you get the extra levels of indirection
+via property change handling]</li>
+    <li>[otherwise the containers need to distinguish Bag links
+(preferred) and/or Bag "properties"]</li>
+    <li>[what about persistence, configurations, etc.?]<br>
+    </li>
+    <ul>
+    </ul>
+  </ul>
+</ul>
+(rename to "Blackboard")<br>
+Design choices:<br>
+<ul>
+  <li>how to map ordinary values to the blackboard</li>
+  <ul>
+    <li>single -&gt; item</li>
+    <li>array -&gt; item per element</li>
+    <li>technical mechanism...?</li>
+    <ul>
+      <li>adaptor items</li>
+      <ul>
+        <li>? simple but more messy &amp; complicated</li>
+      </ul>
+      <li>custom support in containers</li>
+      <ul>
+        <li>is this specific to this, or to all (say) remote
+interfaces??</li>
+        <ul>
+          <li>specific so far: "coercing" an interface to a value (or a
+value to an interface)</li>
+        </ul>
+        <li>ordinary -&gt; blackboard</li>
+        <ul>
+          <li>? link from property -&gt; blackboard import property</li>
+          <ul>
+            <li>=&gt; access to source/link information within
+(possibly custom) target setter</li>
+          </ul>
+          <li>? link from remote blackboard interface to property</li>
+          <ul>
+            <li>? how do you know it is an input or an output</li>
+            <li>custom handling by container, e.g. based on
+interface(s) supported by stub<br>
+            </li>
+          </ul>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+  <li>having a distinct blackboard component or just having links
+between properties</li>
+  <li>how it is located (what machine)</li>
+  <ul>
+    <li>=&gt; a distinct component<br>
+    </li>
+  </ul>
+  <li>how it is configured <br>
+  </li>
+  <ul>
+    <li>=&gt; (optional) configuration properties<br>
+    </li>
+  </ul>
+  <li>whether it is a separate DS or shared</li>
+  <ul>
+    <li>cope with installation partition/mobile elements</li>
+    <ul>
+      <li>=&gt; might be shared (internally) but only on a server per
+container/host basis</li>
+    </ul>
+    <li>installation DS??</li>
+    <ul>
+      <li>=&gt; could be for that host/container?!</li>
+    </ul>
+    <li>configurable persistence?!</li>
+    <ul>
+      <li>=&gt; at least per-configuration dataspaces per host</li>
+    </ul>
+    <li>efficient/light-weight</li>
+    <ul>
+      <li>=&gt; either shared, or DS re-engineered to share underlying
+stuff (e.g. connections)</li>
+    </ul>
+  </ul>
+  <li>how links are realised</li>
+  <ul>
+    <li>local interface?</li>
+    <ul>
+      <li>=&gt; NO - would require explicit client per container</li>
+    </ul>
+    <li>remote interface?</li>
+    <ul>
+      <li>=&gt; only if it is a service-specific proxy, not a generic
+RMI proxy (c.f. java.rmi.Remote vs Serializable)</li>
+      <ul>
+        <li>publisher links will go the "wrong" way (unless direction
+is a cosmetic editor feature)</li>
+        <li>want value not set by persistence recovery, and unset by
+link removal (like local interfaces)</li>
+        <li>inter-language issues?! (can't use Java Serialization of
+the stub object, or java bytecode with C#)</li>
+        <ul>
+          <li>may not have multi-language/platform version</li>
+          <ul>
+            <li>=&gt; need option of code loading</li>
+            <ul>
+              <li>=&gt; container HTTP server for code serving? or is
+it loaded from the capability jar?<br>
+              </li>
+            </ul>
+          </ul>
+          <li>may have...</li>
+          <ul>
+            <li>=&gt; need multi-platform options, tagged</li>
+          </ul>
+        </ul>
+        <li>setting (at target) requires careful handling, e.g. to copy
+over values from previous, or other way to allow component to be
+written and execute without being adversely affected but
+setting/unsetting</li>
+        <ul>
+          <li>=&gt; component's view is locally distinct from stub?!</li>
+          <ul>
+            <li>distinct in internal implementation, or in
+container/component separation??<br>
+            </li>
+          </ul>
+        </ul>
+      </ul>
+    </ul>
+    <li>magic value hack (c.f. local interface)</li>
+    <ul>
+      <li>=&gt; not ideal - more custom case handling<br>
+      </li>
+    </ul>
+  </ul>
+  <li>how to map the blackboard to ordinary types</li>
+  <li>what blackboard-specific type/interface to have for aware
+components</li>
+  <ul>
+    <li>Options</li>
+    <ul>
+      <li>IDataspace</li>
+    </ul>
+    <ul>
+      <li>Simpler Dataspace API??</li>
+      <li>non-GUID API (i.e. no item update?), e.g. SetModel</li>
+      <ul>
+        <li>=&gt; good for fact and reasoning-type applications<br>
+        </li>
+      </ul>
+    </ul>
+    <li>issues</li>
+    <ul>
+      <li>GUIDs?</li>
+      <li>needs events</li>
+      <li>incremental changes<br>
+      </li>
+    </ul>
+  </ul>
+  <li>is subscriber filtering supported? how?</li>
+  <ul>
+    <li>link attribute</li>
+    <ul>
+      <li>? more complicated - new link type/attribute; new editor
+facility (link interaction)<br>
+      </li>
+      <li>more visible/declarative<br>
+      </li>
+    </ul>
+    <li>via API from aware components only</li>
+    <ul>
+      <li>less visible/declarative<br>
+      </li>
+    </ul>
+    <li>blackboard dynamic attribute</li>
+  </ul>
+  <li>how/whether to distinguish publishers and subscribers</li>
+  <ul>
+    <li>link direction</li>
+    <li>distinct dataspace properties</li>
+    <li>not at all<br>
+    </li>
+  </ul>
+  <li>what access to blackboard contents from other applications, esp.
+editor</li>
+  <ul>
+    <li>could host the remote interface itself?!</li>
+    <li>and/or load helper "property editor" from the (same?!)
+capability jar<br>
+    </li>
+  </ul>
+  <li>authorable (persistent) values in it?</li>
+  <ul>
+    <li>could depend on editor (above)<br>
+    </li>
+  </ul>
+  <li>how is persistent recovery supported</li>
+  <li>how are transferable configurations supported</li>
+  <li>how is logging/recording supported<br>
+  </li>
+</ul>
+<h3>Alternative(s)</h3>
+What about a more general connector framework? (c.f. control plane vs
+data plane)<br>
+<ul>
+  <li>attributes of link request may identify/configure connector</li>
+  <ul>
+    <li>e.g. reliability, flow control, protocol, logging?,
+visibility?, intermediaries<br>
+    </li>
+  </ul>
+  <li>editor is effectively creating connectors to itself from all
+visible properties in order to show then</li>
+  <li>property values move to separate dataitems</li>
+  <li>property values are not published by default (or not all...?!)</li>
+  <li>properties become "connection points"</li>
+  <li>connection points have various general type characteristics</li>
+  <ul>
+    <li>in, out, inout</li>
+    <li>1:1, 1:n, n:1</li>
+    <li>event, static/changing value, static/changing set, invocations</li>
+    <li>data type(s)</li>
+  </ul>
+  <li>connection points have particular realisation in the component</li>
+  <ul>
+    <li>eventing property (has get method)<br>
+    </li>
+    <li>writable property (has set method)<br>
+    </li>
+    <li>event publisher/registration (has addXListener method)<br>
+    </li>
+    <li>event listener interface (implements XListener, or property
+with get and not set method has type XListener)<br>
+    </li>
+    <li>supported interface (implement I, or property with get and not
+set method has type I)<br>
+    </li>
+    <li>individual method&nbsp; (via interface?)<br>
+    </li>
+    <li>required interface (property with set method has type I)<br>
+    </li>
+    <li>explicit framework connection point (property with get method
+has type ConnectionPoint)<br>
+    </li>
+    <li>network protocol end point (via explicit framework?)<br>
+    </li>
+  </ul>
+  <li>various adaptors and coercions may be available</li>
+  <li>connection points may have configurable logging/dataspace export</li>
+</ul>
+What might this mean for dataspace-style interaction??<br>
+<ul>
+  <li>there is a (say) dataspace type connection point</li>
+  <li>a connection between two dataspaces is a replication request
+(c.f. City):</li>
+  <ul>
+    <li>the (say) destination creates a client for the source, inserts
+a suitable template pattern, and copies matches over into the
+destination</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>? is the destination/source does copy choice artibrary?</li>
+    </ul>
+    <ul>
+      <ul>
+        <li>keep control at destination?? e.g. local value mapping??</li>
+      </ul>
+    </ul>
+    <li>why not dataspace client/server connection points?</li>
+    <ul>
+      <li>doesn't show dataflow direction (does that matter?)</li>
+      <li>doesn't support 1:n on client</li>
+      <li>? can client use DS proxy interleaved with setting DS URL,
+activation, etc.?</li>
+      <ul>
+        <li>depends on whether configuring client and server, or
+dynamically creating server proxy?!<br>
+        </li>
+      </ul>
+    </ul>
+  </ul>
+  <li>a connection with a dataspace connector on only one end inserts a
+whatever-to-dataspace (or dataspace-to-whatever) adapter on one end or
+the other</li>
+  <ul>
+    <li>? is the adapt close to/far from dataspace choice arbitrary?</li>
+    <ul>
+      <li>no. but how to choose...? depends if far end knows how to
+adapt, and/or if near end knows how to adapt?</li>
+      <li>given DS/DS copying, better to do at destination?!</li>
+    </ul>
+  </ul>
+</ul>
+<h2>example scenario?!</h2>
+Simplified macroom/chawton-type system:<br>
+<ul>
+  <li>GPS position is captured</li>
+  <li>classified into &gt;=0 semantic locations predefined by GPS
+position(s)</li>
+  <li>triggers presentation of predefined "content" keyed to that
+location</li>
+  <li>run on a PDA/laptop, without networking (in the first instance?!)</li>
+</ul>
+Components etc<br>
+<ul>
+  <li>GPS device driver</li>
+  <ul>
+    <li>COM port config property</li>
+    <li>configured property</li>
+    <li>Lat/long output (say)</li>
+    <ul>
+      <li>passed through annotator component which outputs:</li>
+      <ul>
+        <li>User U1 at Latitude lat and Longitude long</li>
+        <ul>
+          <li>into...<br>
+          </li>
+        </ul>
+      </ul>
+    </ul>
+  </ul>
+  <li>Local user context space</li>
+  <li>Location definition space</li>
+  <ul>
+    <li>containing definitions</li>
+    <ul>
+      <li>Location L1 is lat1-lat2 by long1-long2<br>
+      </li>
+    </ul>
+  </ul>
+  <li>Location Mapper component</li>
+  <ul>
+    <li>reads locations (Y) from location definition space</li>
+    <li>reads user (X) positions from local user context space</li>
+    <li>when user position is in location, assert back to context space:<br>
+    </li>
+    <ul>
+      <li>User X at Location Y</li>
+    </ul>
+  </ul>
+  <li>Content definition space</li>
+  <li>Content mapper component</li>
+  <ul>
+    <li>reads user (X) locations from local user context space</li>
+    <li>reads content (C) from content definition space</li>
+    <li>when user location matches content location anntation, assert
+back to context space</li>
+    <ul>
+      <li>User X should have content C</li>
+    </ul>
+  </ul>
+  <li>Content display component</li>
+  <ul>
+    <li>reads user content assertions from context space</li>
+    <li>displays current content (if any)<br>
+    </li>
+  </ul>
+</ul>
+Note that various spaces might be linked to/from other spaces to
+support distribution.<br>
+<ul>
+  <li>so a link from a dataspace may be filtering.</li>
+  <li>connecting two dataspaces must be possible; but could be an
+explicit bridge component.</li>
+  <li>it doesn't seem disasterous if a client can only be 1-connected
+(since it could be connected to a server which it turn is connected to
+multiple other servers via the above mechanism)<br>
+  </li>
+</ul>
+</body>
+</html>

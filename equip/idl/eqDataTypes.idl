@@ -1,0 +1,1241 @@
+/*
+<COPYRIGHT>
+
+Copyright (c) 2004-2005, University of Nottingham
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ - Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ - Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ - Neither the name of the University of Nottingham
+   nor the names of its contributors may be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+</COPYRIGHT>
+
+Created by: Chris Greenhalgh (University of Nottingham)
+Contributors:
+  Chris Greenhalgh (University of Nottingham)
+
+*/
+/*
+
+  File:    eqDataTypes.idl
+  $Id: eqDataTypes.idl,v 1.1.1.1 2005/03/08 16:17:17 cgreenhalgh Exp $
+  Created:  15/03/2001
+  Author:  Chris Greenhalgh
+
+  Purpose:
+    data sharing service types
+
+  To do:
+
+  Change History:
+  $Log: eqDataTypes.idl,v $
+  Revision 1.1.1.1  2005/03/08 16:17:17  cgreenhalgh
+  From Nottingham CVS
+
+  Revision 1.4  2005/03/08 14:36:24  cmg
+  added BSD license
+
+  Revision 1.3  2004/07/15 10:18:23  cmg
+  added inter-dataspace challenge with shared secret (idl-derived files regenerated)
+
+  Revision 1.2  2004/07/15 08:18:36  cmg
+  added queueEvent (already in java)
+
+  Revision 1.1  2004/07/15 08:12:09  cmg
+  initial copy from Equator/Modules/equip//include
+
+  Revision 1.21  2003/10/22 14:57:12  cmg
+  added initial support for Leased items (requires synchronized clocks)
+
+  Revision 1.20  2003/10/16 14:48:21  cmg
+  added terminate operation to DataProxy, implemented (currently) only in Java DataProxyImpl (i.e. client), and used by DataManager releaseDataspace
+
+  Revision 1.19  2003/10/16 10:22:06  cmg
+  clarify comments on C++ non-availability
+
+  Revision 1.18  2003/06/20 17:03:28  cmg
+  more comments
+
+  Revision 1.17  2003/01/13 10:04:13  cmg
+  added getResponsible
+
+  Revision 1.16  2002/12/06 17:17:08  cmg
+  updated eqidl - abstract classes and methods and associated fixes
+
+  Revision 1.15  2002/09/25 10:42:56  cmg
+  added DataCallbackPost type for post event callback
+
+  Revision 1.14  2002/09/23 15:23:03  cmg
+  all comments made javadoc comments
+
+  Revision 1.13  2002/09/23 14:37:53  cmg
+  rework operations taking priority as argument to have default version without (C++ and Java); more comments from IDL in generated files
+
+  Revision 1.12  2002/08/27 15:37:07  jcp
+
+  Added C++ UDP transport and support for equipu style URLs. Modified
+  handling of server URLs to support trader and traderless operation.
+  Added comments to Java UDP transport implementation. Added EventMetaData
+  support for event priority, ignored by TCP, but used by UDP to ensure
+  that highest priority event is always output next.
+
+  Revision 1.11  2002/08/14 10:37:39  cmg
+  added waitForEvents op to DataProxy interface; implement in Java (not yet C++); supporting PeerAck data/event; bug fix to handling of event-only patterns
+
+  Revision 1.10  2002/05/13 21:36:56  cmg
+  comments to javadoc format
+
+  Revision 1.9  2002/02/08 16:57:00  cmg
+  exposed begin/endBusy ops to allow control over enactment of events in dataspace
+
+  Revision 1.8  2002/02/07 09:30:31  cmg
+  added ActiveTreeNode w. callbacks
+
+  Revision 1.7  2001/09/20 14:35:35  cmg
+  convert to ConnectionSap for networking; support async activate in client with reactivate; add DataspaceStatus
+
+  Revision 1.6  2001/04/23 08:41:55  cmg
+  first major revision - tighten up concurrency control and do some unreliable event suppression
+
+  Revision 1.5  2001/04/11 13:23:18  cmg
+  order of local & processBound args for consistency of add
+
+  Revision 1.4  2001/04/10 14:18:47  cmg
+  subclass EventPattern from Item for store/distribute
+
+  Revision 1.3  2001/04/09 10:33:49  cmg
+  added peer events
+
+  Revision 1.1.1.1  2001/04/01 08:40:52  Administrator
+  initial - going to chi
+
+  Revision 1.2  2001/03/30 09:15:55  cmg
+  added itemTemplates to EventPattern (for more qualified delete/update)
+
+  Revision 1.1.1.1  2001/03/27 12:22:27  cmg
+  Initial import to CVS - in progress
+
+*/
+
+/*======================================================================*/
+/* includes */
+
+#include "eqNetTypes.idl"
+
+/*======================================================================*/
+/* begin equip namespace */
+
+module equip {
+  /** EQUIP DataSpace module.
+   *
+   * Home of the EQUIP data sharing service.
+   */
+  module data {
+
+    /*------------------------------------------------------------*/
+    /* general/core types */
+
+    /** new globally unique id (IDL'd in eqDataTypes.idl) */
+    valuetype GUID { 
+      /** IPv4 address of generating host - better hope this is unique */
+      public unsigned long host_id;
+      /** tcp port in low 16 bits */
+      public long proc_id; 
+      /** per-process item id */
+      public long item_id;
+      /** UNIX-style time; updated on item_id=0 (start/wrap) */
+      public long time_s;  
+
+      // equals
+      //boolean equals(in GUID guid); // autogen
+      /** check if GUID is null.
+       *
+       * GUID 0.0.0.0 is null.
+       *
+       * @return true if <code>this</code> is a null GUID. */
+      boolean isNull();
+      /* set to null, i.e. 0.0.0.0 */
+      void setNull();
+    };
+
+    /** array of GUIDs */
+    typedef sequence<GUID> GUIDs;
+
+    /** A singleton instance of this class should be used to 
+     * allocate new {@link GUID}s (IDL'd in eqDataTypes.idl).
+     * Should really be an IDL factory method. */
+    valuetype GUIDFactory {
+      /** get a new, unique {@link GUID}.
+       *
+       * @return a new, unique {@link GUID}. */
+      GUID getUnique();
+      /** get a null {@link GUID}.
+       *
+       * @return a null {@link GUID} (see {@link GUID#isNull}). */
+      GUID getNull();
+    };
+
+    /*------------------------------------------------------------*/
+    /** A Lease, c.f.\ Jini (IDL'd in eqDataType.idl).
+     *
+     * A time-limited guarantee/request.
+     * Base class - assumes synchronized clocks. 
+     */
+    valuetype Lease {
+      /** time at which lease expires. */
+      public runtime::Time expireTime;
+
+      /** initialise relative to current time.
+       * 
+       * @param timeToLive time of lease, in seconds, from the current
+       * time */
+      void initFromTimeToLive(in long timeToLive);
+
+      /** has the lease expired?
+       *
+       * @param now The time against which the lease is to be checked.
+       * @return true if the lease has expired. */
+      boolean expired(in runtime::Time now);
+    };
+
+    /*------------------------------------------------------------*/
+    /* root item types, and database bindings of items */
+    
+    /** The common base class for all objects that can be shared 
+     * statefully in a dataspace ({@link DataProxy}). */
+    valuetype ItemData {
+      /** The data item's globally unique ID, used for associating
+       * update and delete requests with the item. */
+      public GUID id;
+      /** The data item's (optional) name; used in some places for
+       * item discovery by matching of pre-agreed names. */
+      public string name;
+    };
+
+    /** Sequence of {@link ItemData} */
+    typedef sequence<ItemData> ItemDatas;
+
+    /** The common base class for all shared {@link ItemData} subclass 
+     * that are organised as trees */
+    valuetype TreeNode : ItemData {
+      /** This item's single parent item, identified by its GUID */
+      public GUID parent;
+    };
+    
+    valuetype DataProxy;
+
+    /** {@link ItemData} subclass that is actively notified (by the
+     * dataspace replica) when it is added to, updated in, or deleted
+     * from a dataspace replica. */
+    valuetype ActiveTreeNode : TreeNode {
+      /** notification of being added to a dataspace replica.
+       *
+       * @param ds The dataspace replica to which this item has been
+       * added. */
+      void notifyDataspaceAdd(in DataProxy ds);
+      /** notification of being updated in a dataspace replica;
+       * called on the new value instance. 
+       *
+       * @param ds The dataspace replica in which this item has been
+       * updated.
+       * @param oldValue The old value in this dataspace with the same
+       * GUID. */
+      void notifyDataspaceUpdate(in DataProxy ds, in ItemData oldValue);
+      /** notification of being deleted from  a dataspace replica.
+       *
+       * @param ds The dataspace replica from which this item has been
+       * deleted. */
+      void notifyDataspaceDelete(in DataProxy ds);
+      /** notification of being updated in a dataspace replica; called
+       * on the oldValue instance, after {@link
+       * #notifyDataspaceUpdate} is called on the new value.
+       *
+       * @param ds The dataspace replica in which this item has been
+       * replaced by the update. */
+      void notifyDataspaceReplaced(in DataProxy ds);
+    };
+    
+    /** Possible lock types applicable to {@link ItemData}; 
+     * <b>not currently used!</b>
+     *
+     * Largely inherited from MASSIVE-3.
+     */
+    enum LockType {
+      /** no consistency guarantee - no owner checking */
+      LOCK_NONE, 
+      /** owner checked; no auto owner transfer */
+      LOCK_HARD, 
+      /** owner checked; auto owner transform */
+      LOCK_SOFT, 
+      /** owner checked, no auta owner transfer, a hint that you have
+	  to send requests another way */
+      LOCK_CONTROL 
+    };
+
+    /** Metadata for an {@link ItemBinding}, which is the link between
+     * an {@link ItemData} and its dataspace.
+     *
+     * Embodies elements of the semantics of the data service. 
+     */
+    valuetype ItemBindingInfo {
+
+      /** unique id for the code fragment 'allowed' to update/mutate/delete */
+      public GUID owner;  
+
+      /** id of database replica allowed/responsible
+       * for auto-deletes (on lease/pattern match)
+       */
+      public GUID responsible; 
+
+      /** kind of lock applied to the data item (not currently used) */
+      public LockType locked;
+
+      /** whether the item should be deleted if its {@link #responsible} 
+       * disconnects or fails. */
+      public boolean processBound;
+
+      /** whether the item should be kept exclusively within the local
+       * dataspace replica */
+      public boolean local;
+
+      /** used internally for deleteItemOnMatch */
+      public boolean deleting;
+
+      /** lease for item  */
+      public Lease itemLease;
+
+      /** initialisation helper */
+      void init(in GUID agentId, in LockType locked, 
+		in boolean processBound,
+		in boolean local,
+		in Lease itemLease);
+    };
+
+    /** The link between an {@link ItemData} and its dataspace.
+     *
+     * Ties the actual value together with {@link ItemBindingInfo}
+     * which governs its management by the dataspace.
+     */
+    valuetype ItemBinding {
+      /** the data item itself */
+      public ItemData item;
+      
+      /** the information that describes how the item is to be
+       * handled by the dataspace */
+      public ItemBindingInfo info;
+
+      /** initialisation helper - creates ItemBindingInfo */
+      void init(in ItemData item,
+		in GUID agentId, in LockType locked, 
+		in boolean processBound,
+		in boolean local, in Lease itemLease);
+    };
+    
+    /*------------------------------------------------------------*/
+    /* core event type */
+    
+    /** metadata for a dataspace {@link Event} */
+    valuetype EventMetadata {
+
+      /** the time at which the event was created */
+      public equip::runtime::Time timestamp;
+
+      /** the GUID of the code fragment generating the event */
+      public GUID requestor;
+
+      /** used internally in event routing (the origin dataspace
+       * replica) */
+      public GUID source; 
+
+      /** whether the event should be kept within the local dataspace
+       * replica */
+      public boolean local; 
+      
+      /** whether the event should be distributed reliably.
+       *
+       * An unreliable event might be dropped by a communication
+       * protocol or dropped from a dataspace internal queue of
+       * similar events ('squashed'). */
+      public boolean reliable;
+
+      /** Event priority, which may cause reordering in some
+       * communications protocols (e.g. JCP).  
+       *
+       * priority defaults to 0; larger value = higher priority  */
+      public long priority;
+
+      /** initialisation helper */
+      void init2(in GUID agentId, in boolean local, 
+		in boolean reliable, in long priority);
+      /** initialisation helper, default to priority 0 */
+      void init(in GUID agentId, in boolean local, 
+		in boolean reliable);
+    };
+
+    /** The common base class for all dataspace events */
+    valuetype Event {
+      /** The metadata about the event; actual event data will
+       * normally be provided in the fields of a subclass. */
+      public EventMetadata metadata;
+
+      /** create and initialise metadata */
+      void initMetadata2(in GUID agentId, in boolean local, 
+			in boolean reliable, in long priority);
+      /** create and initialise metadata, default to priority 0 */
+      void initMetadata(in GUID agentId, in boolean local, 
+			in boolean reliable);
+    };
+
+    /** list of {@link Event} */
+    typedef sequence<Event> Events;
+
+    /*------------------------------------------------------------*/
+    /** An {@link ItemData} subclass which represents a process's
+     * interest in a certain kind of event(s).
+     * 
+     * An instance of the event type itself is the pattern,
+     * using match(). This coniders null strings and valuetype
+     * references to be wildcards, and requires that the pattern
+     * be the same class or a subclass of the matched object. <P>
+     *
+     * The different kinds of patterns define different ways in 
+     * which they are satisfied and/or removed from the system.<P>
+     *
+     * An {@link AddEvent} with kind {@link
+     * ItemEventKind#EQDATA_KIND_PRESENT} (or wildcard) will match
+     * items already in existance (as if the Pattern has been in place
+     * before they were created).<P>
+     *
+     * Similarly, a {@link DeleteEvent} with that kind will cause
+     * callbacks when the pattern is deleted for any matching items
+     * still present in the database.<P>
+     * 
+     * Inherited from ItemData:
+     * <ul>
+     * <li> id of the pattern itself, which may persist within the database
+     * </ul>
+     */
+    valuetype EventPattern : ItemData {
+      // state:
+
+
+      /** Template to be matched by the item to which an item-linked
+       * event relates (add, delete, update, mutate).  
+       *
+       * I.e. the {@link #itemTemplates} AND the {@link
+       * #eventTemplates} must match.  (no itemTemplates -> any item,
+       * no eventTemplates -> any event).
+       */
+      public ItemDatas itemTemplates;
+
+      /** Template to be matched by a dataspace event.
+       *
+       * Note, for item-related events (add, delete, update, mutate),
+       * {@link #itemTemplates} must also match.
+       */
+      public Events eventTemplates;
+
+      /** flag to remove pattern as soon as first full check complete.
+       * i.e. probe momentary current state. 
+       * Only useful with Add/Delete (PRESENT) pseudo-events
+       */
+      public boolean deleteOnCheck; 
+
+      /** flag to delete pattern if a successful match occurs.
+       * c.f. tuplespace 'read' of a single item
+       */
+      public boolean deleteOnMatch;
+
+      /** internal flag indicating pattern has been successfully matched.
+       * used internally in DataSession;
+       * must be set to false when the EventPattern is first added to
+       * a dataspace. */
+      public boolean matched;
+
+      /** Whether to delete the matched item (for Add/Delete pseudo-events)
+       * after any/each successful match. 
+       *
+       * Match is only deemed to succeed if the delete has/will
+       * succeed.  c.f. tuplespace 'out' (single if also
+       * deleteOnMatch, else multiple)
+       */
+      public boolean deleteItemOnMatch;
+
+      /**  Is the event pattern for the local database only? */
+      public boolean local;
+
+      // convenience functions to initialise:
+
+      /** convenience initialisation: tuplespace read - single
+       * matching item (<b>NB</b>only works on <b>local</b> dataspace
+       * at present).  (deleteOnMatch)
+       */
+      void initAsSimpleRead(in ItemData itemTemplate, in boolean local);
+
+      /** convenience initialisation: tuplespace readp (predicate) -
+       * single matching item, or null if no item is present at the
+       * moment (read waits for an item) (<b>NB</b>only works on
+       * <b>local</b> dataspace at present).  (deleteOnMatch,
+       * deleteOnCheck)
+       */
+      void initAsSimpleReadp(in ItemData itemTemplate, in boolean local);
+
+      /** convenience initialisation: tuplespace out - single matching
+       * item, which is atomically removed from the data space
+       * (<b>NB</b>only works on <b>local</b> dataspace at present).
+       * (deleteOnMatch, deleteItemOnMatch)
+       */
+      void initAsSimpleOut(in ItemData itemTemplate, in boolean local);
+
+      /** convenience initialisation: tuplespace copy-collect - all
+       * matching items are returned (read) (<b>NB</b>only works on
+       * <b>local</b> dataspace at present).  (deleteOnCheck)
+       */
+      void initAsSimpleCopyCollect(in ItemData itemTemplate, in boolean local);
+
+      /** convenience initialisation: 
+       * tuplespace collect - all matching items are returned and
+       * deleted (out) (<b>NB</b>only works on <b>local</b> dataspace
+       * at present).
+       * (deleteOnCheck, deleteItemOnMatch)
+       */
+      void initAsSimpleCollect(in ItemData itemTemplate, in boolean local);
+
+      /** convenience initialisation: like an ongoing copy-collect:
+       *  makes an event pattern for Add, update and delete events on
+       *  the matching itemTemplate (works globally but
+       *  asynchrnously). <P>
+       *
+       * Using the {@link ItemEventKind#EQDATA_KIND_PRESENT} kind (or
+       * wildcard) this also returns items existing when the patterns
+       * is first added to a session. It will then return
+       * add/update/delete events matching until the pattern is
+       * removed.<P>
+       *
+       * This is the main method used for inter-dataspace replication,
+       * since a non-local item monitor will be copied to other connected
+       * dataspace replicas and cause matching items to be copied to and
+       * kept up to date in the originating dataspace. <P>
+       */
+      void initAsSimpleItemMonitor(in ItemData itemTemplate, in boolean local);
+
+      /** convenience initialisation: version of {@link
+       * #initAsSimpleItemMonitor} for multiple item templates. */
+      void initAsCompoundItemMonitor(in ItemDatas itemTemplates, 
+				     in boolean local);
+
+      /** convenience initialisation: ongoing monitor for simple
+       * events, rather than data items. <P>
+       * 
+       * Used for stateless event distribution, e.g. comparable to 
+       * Elvin. */
+      void initAsSimpleEventMonitor(in Event eventTemplate, in boolean local);
+
+      /** convenience initialisation: version of {@link
+       * #initAsSimpleEventMonitor} for multiple event templates. */
+      void initAsCompoundEventMonitor(in Events eventTemplates, 
+				      in boolean local);
+
+    };
+
+    /** sequence of {@link EventPattern}s */
+    typedef sequence<EventPattern> EventPatterns;
+
+    /*------------------------------------------------------------*/
+    /* callback/query interface */
+
+    valuetype DataSession;
+
+    /** Original event callback interface for {@link DataProxy}
+     * events; now largely superceded by {@link DataCallbackPost} 
+     * and/or the {@link equip.data.beans.IDataspace} API. <P>
+     *
+     * First you have to get a {@link DataSession} object from the
+     * local {@link DataProxy} using {@link
+     * DataProxy#createSession}. When creating the session object you
+     * provide a callback object (a subclass of this class) that will
+     * be invoked for a matching item/event.<P>
+     * 
+     * This kind of callback is called (for real events) immediate
+     * BEFORE the event is enacted. E.g. an add event will NOT yet
+     * have placed its item in the dataspace, a delete event will NOT
+     * yet have deleted its item. See {@link DataCallbackPost} for a
+     * post-enactment callback.
+     */
+    valuetype DataCallback {
+      /** notification of a matched event or pseudo event.
+       * Note, should really have more info here, e.g. dataspace.
+       * 
+       * @param event The matched event being enacted by the dataspace.
+       * @param pattern The pattern that was matched.
+       * @param patternDeleted Whether the pattern has been deleted 
+       * as a result of the event, e.g. matched.
+       * @param session The {@link DataSession} generating this callback.
+       * @param closure As provided when the {@link DataSession} was
+       * created.
+       */
+      void notify(in Event event, in EventPattern pattern,
+		  in boolean patternDeleted,
+		  in DataSession session,
+		  in equip::runtime::ValueBase closure);
+    };
+
+    /** post-event callback interface, alternative to {@link
+     * DataCallback}, and normally more intuitive.<P>
+     * 
+     * Use in place of a DataCallback object if you wish to 
+     * receive a notification immediately AFTER an event has
+     * been enacted, e.g. after an add event has added its item
+     * to the environment. 
+     */
+    valuetype DataCallbackPost : DataCallback {
+      /** notification of a matched event or pseudo event.
+       *
+       * As with {@link DataCallback}, you pass your own {@link
+       * DataCallbackPost} subclass as an argument to {@link
+       * DataProxy#createSession} when creating a new {@link
+       * DataSession}.
+       *
+       * Note that post callbacks may be received <b>AFTER</b> a
+       * session or pattern has been deleted (if and only if this is
+       * done in a notify callback on the same event).
+       *  
+       * NOTE: this class is not currently (2003-10-16) supported in the C++
+       * version.
+       *
+       * @param event The matched event being enacted by the dataspace.
+       * @param pattern The pattern that was matched.
+       * @param patternDeleted Whether the pattern has been deleted 
+       * as a result of the event, e.g. matched.
+       * @param session The {@link DataSession} generating this callback.
+       * @param dataspace The local dataspace generating this callback.
+       * @param oldValue (for update and delete only) the old value 
+       * of the data item (before this event was enacted)
+       * @param oldBinding (for update and delete only) the old value 
+       * of the item binding (before this event was enacted)
+       * @param closure As provided when the {@link DataSession} was
+       * created.
+       */
+      void notifyPost(in Event event, in EventPattern pattern,
+		      in boolean patternDeleted,
+		      in DataSession session,
+		      in DataProxy dataspace,
+		      in ItemData oldValue,
+		      in ItemBinding oldBinding,
+		      in equip::runtime::ValueBase closure);
+    };
+
+    /** The interface used to register {@link EventPattern}s with
+     * a dataspace replica.
+     *
+     * All events from a single {@link DataSession} will be delivered
+     * to the single {@link DataCallback} or {@link
+     * DataCallbackPost} provided when the session was created.<P>
+     *
+     * <b>Note:</b> always use {@link DataProxy#createSession} to get
+     * a data session. */
+    valuetype DataSession {
+      /** internal - the callback {@link DataCallback} or {@link
+       * DataCallbackPost} */
+      public DataCallback callback;
+      /** internal - the callback closure */
+      public equip::runtime::ValueBase closure;
+      /** internal - the callback pattern of interest */
+      public EventPatterns patterns;
+
+      /** Add a new {@link EventPattern} to this session.
+       *
+       * Generates synchronous callbacks for local items. 
+       *
+       * @param pattern The new event pattern of interest. */
+      void addPattern(in EventPattern pattern);
+
+      /** Add multiple new {@link EventPattern}s to this session.
+       *
+       * Generates synchronous callbacks for local items. 
+       *
+       * @param patterns The new event patterns of interest. */
+      void addPatterns(in EventPatterns patterns);
+
+      /** Delete a previously added {@link EventPattern} from this
+       * session as identified by its GUID.
+       *
+       * Generates synchronous callbacks for local items. 
+       *
+       * @param id The old event pattern's id. */
+      void deletePattern(in GUID id);
+
+      /** Delete multiple previously added {@link EventPattern}s from
+       * this session as identified by their GUIDs.
+       *
+       * Generates synchronous callbacks for local items. 
+       *
+       * @param ids The old event patterns' ids. */
+      void deletePatterns(in GUIDs ids);
+
+      /** Helper API: get a current pattern by GUID (if present).
+       *
+       * @param id The event pattern's id.
+       * @return The matching {@link EventPattern} item registered
+       * in this session, else <code>null</code>. */
+      EventPattern getPattern(in GUID id);
+    };
+
+    /** array of... */
+    typedef sequence<DataSession> DataSessions;
+
+    /*------------------------------------------------------------*/
+
+    /** service type (name/version) for a dataspace (see 
+     * {@link equip.discovery} and {@link equip.service} */
+    const string DATASPACE_SERVICE_TYPE = "equip.data.DataProxy:2.0";
+
+    /** The main API for a dataspace replica, whether client or server.
+     *
+     * Note that {@link equip.data.beans} provides an alternative and
+     * simple Java API {@link equip.data.beans.IDataspace} for
+     * dataspaces using this. */
+    valuetype DataProxy : equip::net::ServiceProxy {
+      /** Create a thread to repeatedly attempt to activate this 
+       * dataspace (assuming that it is a client) whenever its
+       * activation fails.
+       *
+       * This is an alternative to {@link
+       * equip.net.ServiceProxy#activate} and {@link
+       * equip.net.ServiceProxy#deactivate} which are also implemented
+       * for direct control over activation.
+       */
+      void activateAsync();
+
+      /** Internal - any initial data items to place into the dataspace
+       * (e.g. when de-serialised) */
+      public sequence<ItemBinding> initialItems;
+
+      /** Whether this dataspace replica should try to associate
+       * persistently with its server/peer.
+       *
+       * A persistent association will not be garbage collected 
+       * when the underlying network connection is removed or 
+       * fails. This option is largely untested at the moment,
+       * and should really have a {@link Lease} mechanism to
+       * handle garbage collection: use with care.<P>
+       * 
+       * Note that replicas are identified to each other by the
+       * <code>responsible</code> GUID of each.<P>
+       *
+       * @param persistFlag Whether to connect persistently. */
+      void setPersist(in boolean persistFlag);
+
+      /** Add a new event into the dataspace.
+       *
+       * Note that if the dataspace is already busy (e.g. in an 
+       * event notification callback) then the event will be queued
+       * internally for subsequent asynchronous delivery.<P>
+       *
+       * @param event The event to published. */
+      void addEvent(in Event event);
+
+	  /** (always) Queued add of a new event into the dataspace.
+	   *
+	   * @param event The event to published. */
+	  void queueEvent(in Event event);
+
+	  /** Get an {@link ItemBinding} from the local dataspace by item
+       * GUID.
+       *
+       * @param id The item's GUID.
+       * @return The item's binding to the dataspace replica, or null 
+       * if unknown. */
+      ItemBinding getItemBinding(in GUID id);
+
+      /** Get an {@link ItemData} from the local dataspace by item
+       * GUID.
+       *
+       * @param id The item's GUID.
+       * @return The item's value in the dataspace replica, or null 
+       * if unknown. */
+      ItemData getItem(in GUID id);
+
+      /** Set a default GUID to be used as the default owner and/or
+       * requestor for locally generated events and data items.
+       *
+       * @param defaultAgentId GUID to use as default
+       * owner/requestor */
+      void setDefaultAgent(in GUID defaultAgentId);
+
+      /** add item event helper - create and publish an {@link AddEvent}.
+       *
+       * @param item The value of the new item (including id).
+       * @param locked See {@link ItemBindingInfo#locked}.
+       * @param processBound See {@link ItemBindingInfo#processBound}.
+       * @param local See {@link ItemBindingInfo#local}.
+       * @param itemLease See {@link ItemBindingInfo#itemLease}.
+       */
+      void addItem(in ItemData item, in LockType locked,
+		   in boolean processBound,
+		   in boolean local,
+		   in Lease itemLease);
+
+      /** update item event helper - create and publish an {@link
+       * UpdateEvent}.  
+       * 
+       * NOTE: if this is an item with a lease and you want the lease
+       * to be renewed then use an addItem repeatedly instead (with
+       * the new Lease value in the ItemBinding).
+       *
+       * @param item The new value of the item (including original id).
+       * @param local See {@link EventMetadata#local}.
+       * @param reliable See {@link EventMetadata#reliable}.
+       * @param priority See {@link EventMetadata#priority}.
+       */
+      void updateItem2(in ItemData item, in boolean local,
+		      in boolean reliable, in long priority);
+
+      /** update item event helper - create and publish an 
+       * {@link UpdateEvent} with default priority (0).
+       *
+       * NOTE: if this is an item with a lease and you want the lease
+       * to be renewed then use an addItem repeatedly instead (with
+       * the new Lease value in the ItemBinding).
+       *
+       * @param item The new value of the item (including original id).
+       * @param local See {@link EventMetadata#local}.
+       * @param reliable See {@link EventMetadata#reliable}.
+       */
+      void updateItem(in ItemData item, in boolean local,
+		      in boolean reliable);
+
+      /** delete item event helper - create and publish an 
+       * {@link DeleteEvent}.
+       *
+       * @param id The GUID of the item to be deleted.
+       * @param local See {@link EventMetadata#local}.
+       */
+      void deleteItem(in GUID id, in boolean local);
+
+      /** Block and wait for all pending events to be enacted.
+       * Be careful or this will deadlock,
+       * so make sure nothing else is going on in that thread!.
+       *
+       * Only in Java, at the moment (2003-10-16).
+       *
+       * @param local Wait only for local events (if false, then
+       * also send a message to the server dataspace and wait for
+       * it to come back as well).
+       */
+      void waitForEvents(in boolean local);
+
+      /** Create a new data session in which to express interest
+       * in events and data items and to get callbacks/notifications.
+       *
+       * See also information about {@link DataCallback} and 
+       * (usually easier to use) {@link DataCallbackPost}.
+       *
+       * @param callback Event-handling subclass of  {@link
+       * DataCallback} or {@link DataCallbackPost}, notified
+       * about events matching any {@link EventPattern}s that
+       * are added to new session.
+       *
+       * @param closure Optional application parameter provided to the
+       * callback notification (can be null).
+       * 
+       * @return A new {@link DataSession} to which {@link
+       * EventPattern}s can be added to cause replication and/or
+       * notifications of events and items.
+       */
+      DataSession createSession(in DataCallback callback,
+				in equip::runtime::ValueBase closure);
+
+      /** Delete a {@link DataSession} previously created with 
+       * {@link #createSession}; effectively any remaining
+       * {@link EventPattern}s will be removed. <P>
+       *
+       * In C++ the caller will still hold the last reference to the
+       * data session object, which must be released in order for the
+       * session object to actually be deleted.
+       *
+       * @param session The {@link DataSession} object returned
+       * from {@link #createSession} to be deleted from the dataspace.
+       */
+      void deleteSession(in DataSession session);
+
+      /** this <b>dangerous</b> internal API lets you suspend the enactment
+       * of events; also make a matching call to {@link #endBusy}.
+       * Easy to deadlock with unmatched calls!
+       */
+      void beginBusy();
+
+      /** this <b>dangerous</b> internal API lets you resume the enactment
+       * of events; only call to match a previous call to {@link #beginBusy}.
+       * Easy to deadlock - or break synchronization - with unmatched calls!
+       */
+      void endBusy();
+      
+      /** Get this dataspace replica's 'responsible' GUID, which is a
+       * globally unique identifier for this dataspace replica. 
+       *
+       * @return The dataspace replica's own GUID. */
+      GUID getResponsible();
+
+      /** Destroy this dataspace, terminating any communication and threads
+       * and (hopefully) allowing all resources to be released/GCed.
+       */
+      void terminate();
+    };
+
+    /*------------------------------------------------------------*/
+    /* standard data service event types */
+    
+    /** The 'kind' of an {@link AddEvent} or {@link DeleteEvent}.
+     *
+     * EQDATA_KIND_NORMAL: new global event<p>
+     * EQDATA_KIND_LOCAL: local delivery of existing info
+     * pseudo event, synthesised to satisfy patterns looking for
+     * existing items<p>
+     * EQDATA_KIND_PRESENT, 
+     * EQDATA_KIND_BOUND: delete only - due to agent remove
+     * set internally (from NORMAL) if add event with lease
+     * arrives with previous item still in place (this would
+     * be an error with a non-leased item)<p>
+     * EQDATA_KIND_LEASE_RENEW,
+     * EQDATA_KIND_LEASE_EXPIRE: delete generated due to lease expire<p>
+     */
+    enum ItemEventKind {
+      /** new global event */
+      EQDATA_KIND_NORMAL,
+      /** not sure what this is for; local only event? */
+      EQDATA_KIND_LOCAL, 
+      /** pseudo event typically synthesised by the dataspace to
+       * satisfy patterns looking for existing items */
+      EQDATA_KIND_PRESENT,
+      /** delete only - indicates that the event has been synthesised
+       * as a result of a process-bound data item's (see {@link
+       * ItemBindingInfo#processBound}) responsible agent leaving the
+       * dataspace. */
+      EQDATA_KIND_BOUND,
+      /**  set internally (from NORMAL) if add event
+       * with lease arrives with previous item still in place (this
+       * would be an error with a non-leased item). */
+      EQDATA_KIND_LEASE_RENEW,
+      /** delete only - indicates that the event has been synthesised
+       * as a result of a item with a lease expiring (see {@link
+       * ItemBindingInfo#itemLease}). */
+      EQDATA_KIND_LEASE_EXPIRE 
+    };
+    /** A primitive value of type {@link ItemEventKind} wrapped in an
+	object for pattern matching wildcarding */
+    valuetype ItemEventKindBox {
+      /** The actual value */
+      public ItemEventKind data;
+    };
+
+    /** An event representing the addition of a {@link ItemData}
+	instance to the dataspace. Typically generated by calls to
+	{@link DataProxy#addItem}. */
+    valuetype AddEvent : Event {
+      /** The item's value and its binding to the dataspace */
+      public ItemBinding binding;
+
+      /** The kind of add event (see {@link ItemEventKind}) */
+      public ItemEventKindBox kind;
+
+      /** Initialisation helper; see {@link ItemBindingInfo} for most
+	  arguments. */
+      void initFromItem(in ItemData item, 
+			in GUID agentId, 
+			in LockType locked,
+			in boolean processBound,
+			in boolean local,
+			in Lease itemLease);
+    };
+
+    /** An event representing the deletion of a previously added
+     * {@link ItemData} instance from the dataspace. Typically
+     * generated by calls to {@link DataProxy#deleteItem}. */
+    valuetype DeleteEvent : Event {
+      /** The GUID of the item to be deleted */
+      public GUID id;
+      /** The kind of delete event (see  {@link ItemEventKind}) */
+      public ItemEventKindBox kind;
+
+      /** Initialisation helper; see {@link EventMetadata} for most
+	  arguments. */
+      void initFromID(in GUID id, in GUID agentId, in boolean local);
+    };
+    
+    /** An event representing the update of a previously added {@link
+	ItemData} instance in the dataspace; replaces the previous
+	item value with the new value in the event. Typically
+	generated by calls to {@link DataProxy#updateItem}.  NOTE:
+	UpdateEvents should not be created by the application for
+	items with Leases; use an AddEvent instead (with the new Lease
+	value in the ItemBinding).*/
+    valuetype UpdateEvent : Event {
+      /** The new item value (with the same id) */
+      public ItemData item;
+      
+      /** Initialisation helper; see {@link EventMetadata} for most
+	  arguments. NB only UpdateEvent and MutateEvent encourage
+	  unreliable events */
+      void initFromItem2(in ItemData item, in GUID agentId, 
+			in boolean local, in boolean reliable, in long priority);
+      /** Initialisation helper; see {@link EventMetadata} for most
+	  arguments. NB only UpdateEvent and MutateEvent encourage
+	  unreliable events */
+      void initFromItem(in ItemData item, in GUID agentId, 
+			in boolean local, in boolean reliable);
+    };
+
+    /** An object representating a 'mutation', that is a programmatic
+     * modification to a data item.
+     *
+     * This mutator class takes the current item value as argument and
+     * returns a 'new' item to replace it (which may be the original
+     * one with some fields/internal state changed).<P>
+     *
+     * Create an application-specific subclass which includes any
+     * required information as fields and implements {@link
+     * ItemMutator#apply} to perform the desired transformation.
+     */
+    valuetype ItemMutator {
+      /** The application-defined mutation function.
+       *
+       * @param item The previous item value.
+       * @return The new value of the item. */
+      ItemData apply(in ItemData item);
+    };
+
+    /** An event representating a 'mutation', that is modification in
+     * place to a data item previously added to the dataspace
+     * (<b>NB</b> Not currently implemented - June 2003).
+     */
+    valuetype MutateEvent : Event {
+      /** The id of the item in the dataspace to have the mutator
+	  applied to it */
+      public GUID id;
+
+      /** The application-defined subclass of {@link ItemMutator} to 
+	  be applied to the specified item */
+      public ItemMutator mutator;
+      
+      /** Initialisation helper; see {@link EventMetadata} for most
+	  arguments. NB only UpdateEvent and MutateEvent encourage
+	  unreliable events */
+      void init2(in GUID id, in ItemMutator mutator,
+		in GUID agentId, in boolean local,
+		in boolean reliable, in long priority);
+      /** Initialisation helper; see {@link EventMetadata} for most
+	  arguments. NB only UpdateEvent and MutateEvent encourage
+	  unreliable events */
+      void init(in GUID id, in ItemMutator mutator,
+		in GUID agentId, in boolean local,
+		in boolean reliable);
+    };
+
+    /** An event representing a change in a data item's {@link
+	ItemBindingInfo} (not currently supported - June 2003). */
+    valuetype UpdateBindingEvent : Event {
+      /** the id of the item to be changed */
+      public GUID id;
+      /** the new item binding info to be used for that item */
+      public ItemBindingInfo info;
+    };
+    
+    /** An event representing a request for a change of data item
+	ownership (not currently supported - June 2003) */
+    valuetype OwnershipRequest : Event {
+      /** The id of the code fragment requesting ownership */
+      public GUID agent;
+      /** The id of the item for which ownership is requested */
+      public GUID id;
+      /** The kind of {@link LockType} desired after successful
+	  ownership transfer */
+      public LockType locked;
+      /** An originator id for this request (to track multiple
+	  requests in flight) */
+      public long request_id;  
+    };
+
+    /** An event representing the response to an {@link
+	OwnershipRequest} event (not currently supported - June
+	2003) */
+    valuetype OwnershipResponse : OwnershipRequest {
+      /** Was the request successful? */
+      public boolean success;
+    };
+    
+    /** internal item class reflecting some sort of policy of this
+     * dataspace replica. Subclasses ItemData on a whim (in case it
+     * turns out to be useful in the future); expecting more
+     * specialised subclasses such as PersistentPeerPolicy. More
+     * fields to follow...?
+     */
+    valuetype PeerPolicy : ItemData {
+      /** We would like a persistent association (that outlives a
+	  single network level connection). Currently dangerous due to
+	  garbage collection issues (especially lack of {@link Lease}
+	  support. */
+      public boolean persistFlag;
+    };
+
+    /** Internal events - between dataspace replicas that are
+	connected/peered (including client to and from server) */
+    valuetype PeerEvent : Event {
+
+      /** the id ('responsible') of the peer */
+      public GUID peerId;
+    };
+    /** Internal event - starting a new connection or association
+	between two dataspace replicas */
+    valuetype PeerConnectEvent : PeerEvent {
+      
+      /** if this persistent peer still exists then the patterns
+       * are merged (according to unique ids) with existing ones. 
+       */
+      public EventPatterns patterns;
+      /** Is the association to be persistent, etc. */
+      public PeerPolicy policy;
+    };
+    /** Internal event - security challenge on new connection or association
+	between two dataspace replicas */
+    valuetype PeerChallengeEvent : PeerEvent {
+		/** type
+		 */
+		public long challengeType;
+		/** identifier e.g. username
+		 */
+		public string identifier;
+		/** challenge       
+		 */
+		public string challenge;
+		/** response to previous challenge
+		 */
+		public string response;
+    };
+	/** {@link PeerChallengeEvent} challengeType
+	 */
+    enum ChallengeType {
+	  /** failure */
+	  CHALLENGE_FAILURE,
+      /** Simple challenge */
+      CHALLENGE_SIMPLE_CHALLENGE,
+	  /** response/challenge */
+	  CHALLENGE_SIMPLE_CHALLENGE_RESPONSE,
+	  /** response */
+	  CHALLENGE_SIMPLE_RESPONSE
+	};
+    /** Internal event - request to remove a peer, terminating a 
+     * dataspace replica association.
+     * 
+     * This event may be sent explicitly (by the disconnecting
+     * peer) or generated by detecting the failure
+     * of the underlying stream.<P>
+     */
+    valuetype PeerDisconnectEvent : PeerEvent {
+      /** if deleteFlag is set it causes GC on the peer's data and (if
+       * not already being deleted) the deletion of the peer delegate
+       * data. */
+      public boolean deleteFlag;
+    };
+
+    /** Iternal event - expression of interest in items and events to
+	a peer; used to propagate non-local {@link EventPattern}s. */
+    valuetype PeerAddPatternsEvent : PeerEvent {
+      /** event/item patterns of interest to the sending peer */
+      public EventPatterns patterns;
+    };
+    /** Iternal event - removal of previous expression of interest to
+	a peer (see {@link PeerAddPatternsEvent}); used to mark
+	removal of non-local {@link EventPattern}s. */
+    valuetype PeerDeletePatternsEvent : PeerEvent {
+      /** ids of the {@link EventPattern}s to be removed */
+      public GUIDs patternIds;
+    };
+
+    /** Iternal event - generated by the system when it detects that a
+	connected dataspace replica has terminated its association
+	through a network failure or lease expiration. */
+    valuetype RemoveResponsible : Event {
+      /** responsible id of the failed dataspace replica (peer) */
+      public GUID responsible;
+      /** Reverses the sense of the event, indicates that all items
+	  with <b>other</b> responsibles should be deleted (e.g. used
+	  by the a client that loses its connection to the server). */
+      public boolean inverseFlag; 
+    };
+
+    /** Interal - data relating to a {@link PeerAckEvent} */
+    valuetype PeerAckData {
+      /** Ack originator sequence number */
+      public long seq;
+      /** Is this the ack (true) or the request for ack (false)? */
+      public boolean ack;
+    };
+    /** Internal event - requesting a round-trip acknowledgement from
+	a peer, thereby ensuring that all previously sent events will
+	have reached and been processed by that peer. */
+    valuetype PeerAckEvent : PeerEvent {
+      /** The data describing this ack event */
+      public PeerAckData data;
+    };
+
+    /*------------------------------------------------------------*/
+    /** The data association with a {@link DataspaceStatusItem}, which
+     * describes some of the internal state of a particular dataspace
+     * replica.  Maintained in local dataspace, and can be used to
+     * monitor e.g. activation status.
+     */
+    valuetype DataspaceStatus {
+      /** Is this dataspace replica a server? */
+      public boolean serverFlag;
+      /** Is this dataspace replica a client that is connected? */
+      public boolean clientConnectedFlag;
+      /** Is this dataspace replica a client that is known to be slow
+	  in terms of communication? */
+      public boolean clientSlowFlag;
+    };
+    /** A data item created in its own dataspace by each dataspace
+	replica to reflect aspects of its internal state. */
+    valuetype DataspaceStatusItem : ItemData {
+      /** The actual information */
+      public DataspaceStatus data;
+    };
+
+    /*------------------------------------------------------------*/
+    /* internal event types */
+    
+    /** Internal event - a direct request for replication (not used). */
+    valuetype ReplicateRequest : Event {
+      /** The item template of interest */
+      public ItemData pattern;
+    };
+
+    /*------------------------------------------------------------*/
+    /* end equip namespace */
+    
+  }; /* module net */
+}; /* module equip */
+
+/*======================================================================*/
+/* EOF */    

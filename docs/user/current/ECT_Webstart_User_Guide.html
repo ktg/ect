@@ -1,0 +1,527 @@
+<html>
+
+<head>
+<title>Learning to use ECT</title>
+</head>
+
+<body>
+
+<h1>Learning to use ECT</h1>
+
+Created by Chris Greenhalgh, 2005-04-21<br>
+Updated by Alastair Hampshire 2005-11-22<br>
+Last updated by Stefan Rennick Egglestone 2006-06-29<BR><BR>
+
+<a href="#intro">Introduction</a><BR>
+<a href="#installation">Selecting an installation</a><BR>
+<a href="#instman">Using the installation manager</a><BR>
+<a href="#container">The java component container</a><BR>
+<a href="#graph">The graph editor and capability browser</a><BR>
+<a href="#docs">Component documentation</a><BR>
+<a href="#persist">Persisting components and connections</a><BR>
+
+<h3><a name="intro">Introduction</h3>
+
+<p>
+This document describes how to use the ECT graph editor
+and capability browser interface.
+It assumes
+that you have read the <a href="../../ect_overview.html">ECT overview</a>
+which describes concepts necessary to understand this document. It
+also assumes that you have downloaded and installed 
+at least the minimal version of ECT as described in the
+<a href="ECT_Webstart_Getting_Started.html">Getting Started</a> 
+guide, and have started it using 
+<a href="ECT_Webstart_Getting_Started.html#method1">method 1</a>
+as described in this guide. 
+It assumes that you only wish to run ECT on one computer,
+which is called the <i>installation master</i>, 
+rather than using a cluster of networked computers. 
+If you do wish to use a cluster of computers, 
+further tutorials will soon be available on this website  
+which describe how to do this.
+</P>
+
+<h3><a name="installation"></a>Selecting an installation</h3>
+
+<P>
+After having started ECT using the 
+<tt>runWebstart.bat</tt> script, you will first have 
+to decide whether to use an existing installation, if you
+have previously created one,  
+or whether to create a new one.
+</P>
+
+<P>
+If previous installations exists on your system, then
+on first launching ECT, a dialog will appear which
+gives you the option of launching the most recently 
+used one. This dialog will look something like figure 1
+below:
+</P>
+<img border=0 width=451 height=79 
+src="images/webstart/bootmgr-autostart.PNG" hspace=4 vspace=4 
+alt="bootmanager autostart dialog"><br>
+<B>Figure 1</B>
+</p>
+
+<P>
+Clicking <tt>OK</tt>, or waiting for 10 seconds (see countdown
+timer on dialog, currently on <tt>9</tt>) will cause the previous
+installation to which this refers to be re-created, including
+any components, connections and property values which it included.
+Alternatively, clicking <tt>Cancel</tt> will bring up another
+dialog, which allows you to choose the options of either
+starting any of the previous installations stored on this computer, 
+joining another installation running on another machine in the
+cluster as an <i>installation slave</I> (not covered by this tutorial),
+or creating a new installation. This dialog will look something like
+figure 2 below, and is called the <i>boot manager</i>.
+</P>
+<img border=0 width=485 height=298
+src="images/webstart/bootmgr-new-blank.PNG" hspace=4 vspace=4 
+alt="boot manager new pane"><br>
+<B>Figure 2</b>
+
+<P>
+Clicking on the tab labelled <tt>Previous</tt> will reveal a list
+of previous installations, each identified by a name,
+as shown in figure 3 below:
+</P>
+<img border=0 width=485 height=298
+src="images/webstart/bootmgr-previous.PNG" hspace=4 vspace=4 
+alt="boot manager previous installations"><br>
+<b>Figure 3</b>
+<P>
+Select one of these names in the list, and click on the 
+<tt>Restart Installation</tt> button which will appear to restart 
+this installation.
+</P>
+
+<P>
+Alternatively, clicking on the tab labelled <tt>New</tt> will
+ reveal functionality to create a new installation, as shown in figure
+2 above. To create a new installation:
+
+<ol>
+ <li>enter a short name for your installation in the upper text field.</li>
+ <li>(optionally) change the installation secret to something more memorable
+     (you'll only need this if you want another machine to be able
+     to joining your installation, and this process is not covered by this 
+     tutorial).
+ <li>click <tt>Create New Installation</tt>
+</ol>
+
+You will now be presented with a dialog box requesting information
+about where to obtain the components that will be used in
+your installation, as shown in figure 4 below.
+Just click <tt>OK</tt> on this box, and components will be installed
+from your local machine.
+</P>
+<IMG src="images/webstart/bootmgr-new-local-download-url.PNG"/><BR>
+<B>Figure 4</B>
+
+<P>
+The process of creating a new installation is now complete,
+and the <i>installation manager</i> will now start.
+
+<h3><a name="instman">Using the installation manager</i></h3>
+
+<P>
+The installation manager is the ECT graphical user interface (GUI)
+which will give you access to the ECT graph editor and 
+capability browser. It will also allow you to control any ECT
+container running on your machine (or on other machines, if you are
+using ECT on a cluster of machines). Note that a container
+will be automatically started on your local machine when the installation
+manager is started, and will locate any components that are installed
+on your machine.
+</P>
+<P>
+When the installation manager first starts up, it first performs
+some searches for other machines running ECT on your network. 
+It will indicate that it is doing this by displaying the dialog
+box shown in figure 5 below.
+</P>
+<img src="images/webstart/installation-discovery.PNG"><BR>
+<B>Figure 5</b>
+
+<P>
+This process takes about 30 seconds. If you only want to run ECT
+on one computer, then you can close this dialog by clicking on 
+the cross in it's top right corner. Alternatively, just wait 30
+seconds and it will close itself. In either case, the main
+installation manager screen should open, looking something 
+like figure 6 below.
+</p>
+
+<img src="images/webstart/instmgr-running.PNG"><BR>
+<B>Figure 6</B>
+
+<p>
+The installation manager will start by trying to install components
+that it finds available into your chosen installation.
+If you clicked <tt>OK</tt> in the dialog
+box shown in figure 4 above, then these components will be 
+installed from your local machine, and this process should be
+very quick - only a few seconds for all of you components.
+As it installs components, it will show a progress bar for
+each. Once this process has finished, you should see the
+message <tt>Installation started</tt> appear at the bottom
+of the installation manager dialog.
+</p>
+
+<p>
+The installation manager dialog contains quite a lot of features.
+You can perform the following operations using it:
+
+<ul>
+ <li>start the graph editor and capability browser running by clicking the 
+     <tt>Graph Editor</tt> button (see the
+     <a href="#graph">graph editor and capability browser</a>
+     section of this document for more information)
+ <li>start the display editor running by clicking the
+     <tt>Display Editor</tt> button
+     (see the
+     <a href="displaytutorial.html">display editor tutorial</a>
+     for more information about the display editor)
+ <li>terminate the installation by clicking the
+     <tt>Terminate Installation</tt> button. This will
+     return you to the boot manager.
+ <li>view a list of any containers accessible through this
+     installation. If you are just running ECT on one local machine,
+     then only one container will appear in this list, which will
+     be the container running on your local machine. In figure 6
+     above, this container is indicated by the entry in the list
+     entitle <tt>java on kubrick</tt> (kubrick is the name of the 
+     machine on which ECT was running when this screenshot 
+     was taken). See the <a href="#container">java component
+     container</a> section of this document for more information.
+ <li>stop and re-start any containers on this machine using
+     the <tt>Stop all</tt> and <tt>(Re)start all</tt> buttons. Can 
+     be useful if a component running in a container crashes
+ <li>check the installation's shared secret 
+     by clicking the <tt>Export shared secret</tt> button. This is
+     necessary if you wish another computer to join your installation,
+     and have forgotten the shared secret that you define when you 
+     started this installation
+ <li>check the installation's
+     download URL (select the "Export Download
+     URL" from the "Configuration" menu). If you clicked 
+     <tt>OK</tt> in the dialog box in figure 4, this will just
+     be a location on your local machine.
+</ul>
+
+<P>
+There are also other operations that can be performed using the
+installation manager, but which are not covered by this tutorial.
+</P>
+
+<h3><a name="container">The Java component container</h3>
+
+<P>
+Once the installation manager has finished creating an installation,
+you should see another window appear which is labelled
+<tt>ECT Java Container</tt>. This window represents the container
+which is running on your machine and providing access to any 
+components stored there. It doesn't actually provide any useful
+features for normal ECT users - but if it disappears, then this
+indicates that there is a problem with your container, and you
+will have to try and restart it using the installation manager. If you
+are an ECT developer, then selecting the "Show Console" option
+from the "Help" menu will provide you with access to any 
+information or error message produced by components running in the
+container - which can be useful in debugging components.
+</P>
+<P>
+A screenshot of the ECT java container can be seen in figure 7 below.
+</p>
+<img src="images/webstart/container.PNG"/><BR>
+<B>Figure 7</b>
+
+<h3><a name="graph">The graph editor and capability browser</h3>
+
+<P>
+Clicking the <tt>Graph Editor</tt> button will cause two new windows,
+labelled <tt>Graph Editor</tt> and <tt>Capability Browser</tt>
+to open. The Capability Browser allows a user to view which components
+are available to use in an installation (these component 
+availability adverts are referred to as capabilities in ECT),
+and to request the creation of an instance of a component to be used
+in the graph editor. The Graph Editor can be used 
+to view which instances of components that have been created, to 
+examine which properties a component instance defines, and which
+values these properties have been set to, and to 
+update these property values, if the component allows this for a 
+particular property. It also allows connections to be established
+between component properties.
+</P>
+
+<h4>Using the capability browser</h4>
+
+<p>
+A screen shot of the capability browser is shown in figure
+8 below. The capability browser currently provides two alternate
+views of available components. The first view, labelled the
+<tt>Classification View</tt> displays capabilities per container
+in a hierarchical
+structure according to a classification which a component
+defines for itself. The second view, the
+<tt>Host View</tt>, displays an simple list of components available
+per container, in alphabetical order.
+</P>
+
+<img src="images/webstart/capability-browser.PNG" alt="The Capability Browser"/><BR>
+<B>Figure 8</B>
+
+<H4>Creating a component using the capability browser</H4>
+
+If you wish to create a component using the capability browser,
+you will first have to locate the capability for the component.
+There are currently three methods for doing this:
+
+<ul>
+<li>type part of the component's name into the 
+<tt>Search Capabilities</tt> box at the top of the capability
+browser, and click the search button (or press return). Any component
+found that matches this name will be highlighted in 
+<span style='color:red'>red</span>.
+<li>locate the component in the classification view by 
+expanding the categories presented there
+<li>locate the component in the host view by searching for its
+name in the alphabetical list
+</ul>
+
+Once you have found the component, right click on it and
+select the <tt>Create Request</tt> option from the popup menu. 
+This should cause a new instance of the component to be created
+by the container, and expanding the
+capability node in the tree should reveal the component instance just created.
+The created component should also appear in the graph editor.
+</P>
+
+<P>
+Alternately, selecting the <tt>View Documentation</tt> option
+will allow you to vew any documentation defined by the component.
+See the <a href="#docs">Component documentation</a> section of 
+this website for more information about the format of documentation
+which is commonly used by ECT components.
+</P>
+
+<i>Example Use</i>
+
+<ul>
+ <li>type TextFieldOutput into the “Search Capabilities” text box and hit return.</li>
+ <li>Right click on the TestingTextFieldOutput component (which should be highlighted
+     in red) and select “Create request”</li>
+ <li>You
+     have now created a text field output component. A java window containing a
+     text area should appear for this component.</li>
+ <li>Now
+     type Slider into the “Search Capabilities” text box and hit return.</li>
+ <li>Right
+     click on the TestingSliderInput component and select “Create request”</li>
+ <li>You have now created a slider component. A java window with a slider should appear.</li>
+ <li>The two components which you have just created
+     will be available on the graph editor. See the graph
+editor section below for details.</li>
+</ul>
+
+<H4>Deleting a Component</H4>
+
+<p>Select the component in the
+Capability Browser. Right click the component and select “Delete request” from
+the popup menu. This will delete the component and remove it from the Graph
+Editor’s component editing canvas.</p>
+
+<h4>The graph editor</h4>
+
+<P>
+Figure 9 below shows an example of the graph editor window,
+with the two components that you created above already added.
+</P>
+<img src="images/webstart/graph-editor-improved.PNG" alt="The Graph Editor"/><BR>
+<B>Figure 9</B>
+
+<P>
+Newly-added components will appear in the top section of the 
+graph editor, which is labelled <tt>Active components</tt>. Right-clicking
+on a component here will reveal a pop-up menu which allows
+
+<ul>
+<li>the documentation for a component to be viewed
+<li>the component to be deleted
+</ul>
+
+If a user wishes to view the properties defined by a component, or
+to view any connections which have been made to these properties,
+the component must be moved into a more detailed component view
+(the tab in figure 9 labelled "new_view" is an example of a view).
+To do this, first click once on the component with 
+your left mouse button, then 
+drag the component whilst holding the left buttong 
+down into the view. The component will appear
+with a more detailed icon, consisting of a header containing
+the component name, and one row per property defined 
+by the component, each of which
+details a property name and a property value.
+</P>
+
+<P>
+If you wish to remove a component
+from a view (perhaps to save space for other components)
+then drag the component over the trash can icon in the top left
+of the editor canvas. Please note that this will not actually 
+delete the component - just remove it from the view.
+</p>
+
+<p><i>Example Use</i></P>
+
+<ul>
+ <li>Having followed the example in the “Capability Browser” section there should now
+     be 2 components on the Components list.</li>
+ <li>Select
+     the TestingSliderInput component. Now click and hold the left mouse button
+     and drag the TestingSliderInput onto the Editor canvas.</li>
+ <li>Do the same for the TestingTextFieldOuput.</li>
+</ul>
+
+<H4>Modifying property values</H4>
+
+<p>
+To update a value right click on
+the property of a component available on the Editor canvas and select “Examine
+value …” from the popup menu. Change the value as desired and click “Set”. Some
+properties are read only and therefore cannot be changed. If this is the case,
+there will be no “Set” button in the change value popup window.</p>
+
+<p><i>Example Use</i></p>
+
+<ul>
+ <li>Right click the “name” property of the
+     TestingTextFieldOutput component on the Editor canvas and select “Examine
+     value…” from the popup menu. Type “My Text Field” and click set.</li>
+ <li>You should now see that the java window for the
+     text field output component is labelled “My Text Field”.</li>
+</ul>
+
+<h4>Creating connections between properties</h4>
+
+<P>To create a connection between two component properties, click and
+hold the left mouse button over the desired source property. It should turn
+green. Whilst still holding the left mouse button, drag the mouse pointer to
+the desired sink component (which should also turn green) and let go of the
+mouse button. A connection should now have been created from the 
+selected source to
+the selected sink. To delete this connection, 
+right click on it, revealing a popup menu, and select
+the <tt>delete</tt> option.  Note that
+read only properties cannot be the sink of a link.
+The Link Browser can be used
+to view all current links. See the “Link Browser” section for more details.</p>
+
+<p><i>Example Use</i></p>
+
+<ul>
+ <li>To
+     join the components together, left click and hold on the “value” property
+     of the “Slider” component; whilst holding the left mouse button, drag the
+     mouse pointer to the “value” property of the TestingTextFieldoutput
+     component. This should create a link between the two components.</li>
+ <li>Find
+     the two “unnamed” java windows. One should be a slider, the other a text
+     area. If you move the slider, you should see a corresponding change in the
+     text area. Wahhey!</li>
+</ul>
+
+<h4>Link Browser</h4>
+
+<P>
+Figure 10 below shows an screenshot of the link browser.
+To open this window, 
+select the “View” option from the “Graph Component Editor” 
+menu and click “Link browser”. A
+list of current links should appear.
+</P>
+<img src="images/webstart/link-browser.PNG" alt="The Link Browser"/><BR>
+<B>Figure 10</B>
+
+<h3><a name="docs">Component Documentation</h3>
+
+<P>
+Many component follow define documentation in 
+a standard format. Attempting to view documentation in this
+format will reveal a browser window that looks something
+like figure 11 below.
+</P>
+<img src="images/webstart/documentation.PNG" alt="Documentation"/><BR>
+<B>Figure 11</B>
+
+<p>
+This documentation window is divided into different tabs.
+The first tab, labelled <tt>All documentation</tt>, contains
+all of the documentation for this component, in a scrollable
+text box. Each of the other tabs will only 
+contain a section of this document,
+and different sections are targetted at helping a user 
+understnand a different aspect of the component's operations.
+
+<ul>
+<li>the Summary tab contains a brief summary of what the component does
+<li>the Description tab contains a more extended summary
+<li>the Usage tab describes how to use the component once it 
+has been correctly installed and configured
+<li>the Configuration tab describes how to configure the component
+before making it available for general use
+<li>the Installation tag describes how to install any necessary
+drivers etc that are required to make the component work
+<li>the Technical Details tab is intended to describe implementation
+details of the component to developers
+</ul>
+
+Note that many components only define a subset of these sections
+(and some define none at all).
+
+<h3><a name="persist">Persisting components and connections</h3>
+
+<P>
+Creating instances of components, configuring their property values
+and establising connections between properties can take a long
+time, especially if you are creating an installation that 
+involves a lot of components. Luckily, ECT provides a number
+of mechanisms by which a representation of a set of 
+components and connections can be saved to disk and reinstated,
+which are described in the rest of this section.
+</p>
+
+<P>
+The mechanism that ECT users are most likely to make use of is
+called <i>persistency</i>, and it operates in the background
+whilst you are creating an installation. What this means
+is that if you add a component, or modify a property, or establish
+or break a linkage, then all of these changes are recorded to storage
+implicity, without any action required of a user. If you terminate
+an installation and restart it (using the "terminate installation"
+button on the installation manager, and functionality provided
+by the boot manager respectively) then any components, property
+values and linkages will be recreated automatically, as they
+were when you terminated the installation. The persistency
+mechanism should also work if your installation is terminated
+accidentally, eg by a power cut or similar, but in this case you
+may lose a very few of the most recent changes. 
+</p>
+
+<P>
+However, sometimes you may wish to take a snapshot of a particular
+installation - to return to at a later date, for example, 
+or to send to another ECT user to try out. You can do this by
+using the "Save current components and linkages" option on the 
+"View" menu in the graph editor, which allows you to save 
+component instances, property values and linkages to a file in storage.
+You can then load this file in from storage using the 
+"Load components and linkages" option on the same menu.
+</p>
+
+</body>
+
+</html>

@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema targetNamespace="http://www.equator.ac.uk/ect/schemas/physical_configuration/20050706"
+    elementFormDefault="qualified" xmlns="http://www.equator.ac.uk/ect/schemas/physical_configuration/20050706"
+    xmlns:mstns="http://www.equator.ac.uk/ect/schemas/physical_configuration/20050706" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="1.0">
+    <xs:annotation>
+	<xs:appinfo>
+	    <jxb:globalBindings generateIsSetMethod="true" />
+	</xs:appinfo>
+    </xs:annotation>
+    <xs:annotation>
+	<xs:documentation>
+			Experimental XML Schema for representing physical aspects of an ECT installation.
+			Chris Greenhalgh, Copyright (c) University of Nottingham, 2005.
+			2005-07-06, version 1.0.
+		</xs:documentation>
+    </xs:annotation>
+    <xs:element name="things">
+	<xs:annotation>
+	    <xs:documentation>
+			The file is a list of terminology, classthings, classthingcompatibility statements,
+			physicalthings, sensors, thingsimplerelationships and rules.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexType>
+	    <xs:sequence>
+		<xs:element name="terminology" type="Terminology" minOccurs="0" maxOccurs="unbounded" />
+		<xs:group ref="thinggroup" minOccurs="0" maxOccurs="unbounded" />
+		<xs:element name="classthingcompatibility" type="ClassThingCompatibility" minOccurs="0" maxOccurs="unbounded" />
+		<xs:element name="thingsimplerelationship" type="ThingSimpleRelationship" minOccurs="0" maxOccurs="unbounded" />
+		<xs:element name="rule" type="Rule" minOccurs="0" maxOccurs="unbounded" />
+	    </xs:sequence>
+	</xs:complexType>
+    </xs:element>
+    <xs:group id="thinggroup" name="thinggroup">
+	<xs:choice>
+	    <xs:element name="thing" type="Thing" />
+	    <xs:element name="classthing" type="ClassThing" />
+	    <xs:element name="physicalthing" type="PhysicalThing" />
+	    <xs:element name="sensor" type="Sensor" />
+	</xs:choice>
+    </xs:group>
+    <xs:simpleType name="CreationMethod">
+	<xs:annotation>
+	    <xs:documentation>
+			How this thing came about; where it came from.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:restriction base="xs:string">
+	    <xs:enumeration value="inference" />
+	    <xs:enumeration value="introspection" />
+	    <xs:enumeration value="userassertion" />
+	    <xs:enumeration value="unknown" />
+	</xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="Provenance">
+	<xs:annotation>
+	    <xs:documentation>
+			More about how this thing came about; where it came from.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:sequence></xs:sequence>
+	<xs:attribute name="creationMethod" type="CreationMethod" default="unknown" use="optional" />
+    </xs:complexType>
+    <xs:complexType name="Chunk">
+	<xs:annotation>
+	    <xs:documentation>
+			An information chunk, with provenance; a common top thing.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:sequence>
+	    <xs:element name="provenance" type="Provenance" minOccurs="0" maxOccurs="1"/>
+	</xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="Thing">
+	<xs:annotation>
+	    <xs:documentation>
+			Thing is a (currently abstract) base type. A Thing has zero or more identifiers,
+			classes (by id), images, locations and annotations. A Thing may also have physical
+			characteristics, either its own, or those of its instances in the case of a class.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence>
+		    <xs:element name="thingidentifier" type="ThingIdentifier" minOccurs="0" maxOccurs="unbounded" />
+		    <xs:element name="thingclassid" type="xs:IDREF" minOccurs="0" maxOccurs="unbounded" />
+		    <xs:element name="thingimage" type="ThingImage" minOccurs="0" maxOccurs="unbounded" />
+		    <xs:element name="thinglocation" type="ThingLocation" minOccurs="0" maxOccurs="unbounded" />
+		    <xs:element name="thingannotation" type="ThingAnnotation" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+		<xs:attribute name="thingid" type="xs:ID" use="required" />
+		<xs:attribute name="thingtype" type="Term" use="optional" />
+		<xs:attribute name="widthmetres" type="xs:float" use="optional" />
+		<xs:attribute name="heightmetres" type="xs:float" use="optional" />
+		<xs:attribute name="depthmetres" type="xs:float" use="optional" />
+		<xs:attribute name="weightkilograms" type="xs:float" use="optional" />
+		<xs:attribute name="colour" type="xs:string" use="optional" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ThingIdentifier">
+	<xs:annotation>
+	    <xs:documentation>
+			A ThingIdentifier is a name or other identifier associated with a particular thing,
+			possibly relative to some other thing.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence>
+		    <xs:element name="identifier" type="xs:string" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="referencethingid" type="xs:IDREF" use="optional" />
+		<xs:attribute name="identifiertype" type="Term" use="required" />
+		<xs:attribute name="volatility" type="Volatility" use="optional" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="Volatility">
+	<xs:annotation>
+	    <xs:documentation>
+			A ThingIdentifier that is fixed never changes, a durable identifier can be changed
+			but will not change itself, a volatile identifier may change unpredictably, as may
+			a contingent identifier (although this is meant specifically for relative names when
+			reconfiguring devices), while a transient identifier may change on restart/migration.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:restriction base="xs:string">
+	    <xs:enumeration value="fixed" />
+	    <xs:enumeration value="durable" />
+	    <xs:enumeration value="volatile" />
+	    <xs:enumeration value="transient" />
+	    <xs:enumeration value="contingent" />
+	</xs:restriction>
+    </xs:simpleType>
+    
+    <xs:complexType name="PhysicalThing">
+	<xs:annotation>
+	    <xs:documentation>
+			A PhysicalThing is a single particular thing.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Thing">
+		<xs:sequence></xs:sequence>
+		<xs:attribute name="partofthingid" type="xs:IDREF" use="optional" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ThingLocation">
+	<xs:annotation>
+	    <xs:documentation>
+			A ThingLocation should be extended before too long with (e.g.) relative position and 
+			orientation information, etc. Note that it is always relative to some other thing
+			(even if that is an abstract anchor thing).
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence />
+		<xs:attribute name="referencethingid" type="xs:IDREF" use="required" />
+		<xs:attribute name="locationrelationship" type="Term" use="required" />
+		<xs:attribute name="relativex" type="xs:float" use="optional" />
+		<xs:attribute name="relativey" type="xs:float" use="optional" />		
+		<xs:attribute name="relativez" type="xs:float" use="optional" />		
+		<xs:attribute name="rotation" type="xs:float" use="optional" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ClassThing">
+	<xs:annotation>
+	    <xs:documentation>
+			A ClassThing is e.g. a KIND of device rather than a particular instance of that
+			device, and includes information about the kinds of sub-things that such a thing has
+			(e.g. an EZIO board has 10 digital inputs).
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Thing">
+		<xs:sequence>
+		    <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="1" />
+		    <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
+		    <xs:element name="classthinghaspart" type="ClassThingHasPart" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ThingImage">
+	<xs:annotation>
+	    <xs:documentation>
+			A particular physical thing, or its corresponding class, may be illustrated by an image, 
+			especially to help identify connection points and the like.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence>
+		    <xs:element name="image" type="xs:base64Binary" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="mimetype" type="ImageMimeType" use="required" />
+		<xs:attribute name="statematchingrule" type="Term" use="optional" />		
+		<xs:attribute name="state" type="xs:string" use="optional" />
+		<xs:attribute name="pointx" type="xs:int" use="optional" />
+		<xs:attribute name="pointy" type="xs:int" use="optional" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ClassThingHasPart">
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence />
+		<xs:attribute name="partclassthingid" type="xs:IDREF" use="required" />
+		<xs:attribute name="minCardinality" type="xs:int" use="optional" />
+		<xs:attribute name="maxCardinality" type="xs:int" use="optional" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ClassThingCompatibility">
+	<xs:annotation>
+	    <xs:documentation>
+			Indicates that instances of the corresponding classes can participate
+			in the identified relationship (e.g. "a 9-pin Male RS-232 connector" 
+			can be "plugged into" "a 9-pin Female RS-232 connector").
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence />
+		<xs:attribute name="subjectclassthingid" type="xs:IDREF" use="required" />
+		<xs:attribute name="objectclassthingid" type="xs:IDREF" use="required" />
+		<xs:attribute name="relationship" type="Term" use="required" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="ThingSimpleRelationship">
+	<xs:annotation>
+	    <xs:documentation>
+			Indicates an active relationship between two particular things, (e.g.
+			a particular connector is currently "plugged into" another connector).
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence />
+		<xs:attribute name="subjectthingid" type="xs:IDREF" use="required" />
+		<xs:attribute name="objectthingid" type="xs:IDREF" use="required" />
+		<xs:attribute name="relationship" type="Term" use="required" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="Terminology">
+	<xs:annotation>
+	    <xs:documentation>
+			A number of attributes have simple type Term, values of which should be present
+			as Terminology values. I.e. this is a placeholder for simple ontology term definition
+			for use elsewhere in the schema.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence>
+		    <xs:element name="definition" type="xs:string" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="term" type="Term" use="required" />
+		<xs:attribute name="useincolumn" type="xs:string" use="optional" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="Sensor">
+	<xs:annotation>
+	    <xs:documentation>
+			Sensor is the first of several likely extensions classes for PhysicalThing which
+			hold additional key information likely to be required by ECT/analysis.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="PhysicalThing">
+		<xs:sequence />
+		<xs:attribute name="sensorphysicaltype" type="Term" />
+		<xs:attribute name="sensorvaluedimensions" type="xs:int" />
+		<xs:attribute name="sensorvaluetype" type="SensorValueType" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="SensorValueType">
+	<xs:restriction base="xs:string">
+	    <xs:enumeration value="digital" />
+	    <xs:enumeration value="analogue" />
+	</xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="ThingAnnotation">
+	<xs:annotation>
+	    <xs:documentation>
+			A placeholder for general annotations, e.g. purpose of a device.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence>
+		    <xs:element name="annotation" type="xs:string" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+		<xs:attribute name="annotationtype" type="Term" use="required" />
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:simpleType name="Term">
+	<xs:restriction base="xs:string" />
+    </xs:simpleType>
+    <xs:complexType name="Rule">
+	<xs:annotation>
+	    <xs:documentation>
+			A rule relates one pattern of entities (things) and constraints and relationships
+			over them to another (typically overlapping), to express automated or necessary 
+			steps or relationships.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:complexContent>
+	    <xs:extension base="Chunk">
+		<xs:sequence>
+		    <xs:element name="left" type="RulePattern" />
+		    <xs:element name="action" type="RuleAction" minOccurs="0" maxOccurs="unbounded" />
+		    <xs:element name="right" type="RulePattern" />
+		</xs:sequence>
+	    </xs:extension>
+	</xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="RulePattern">
+	<xs:annotation>
+	    <xs:documentation>
+			A rule patterns identifies a number of relationships, and variable and fixed
+			property values (including type relationships). The entities are identified
+			by the set of entity variable names introduced in the parent Rule.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:sequence>
+	    <xs:group ref="patternitem" minOccurs="0" maxOccurs="unbounded" />
+	</xs:sequence>
+    </xs:complexType>
+    <xs:group id="patternitem" name="patternitem">
+	<xs:choice>
+	    <xs:element name="fact">
+		<xs:complexType>
+		    <xs:sequence />
+		    <xs:attribute name="subject" type="xs:string" />
+		    <xs:attribute name="fixedrelationship" type="xs:string" use="optional" />
+		    <xs:attribute name="variablerelationship" type="xs:string" use="optional" />
+		    <xs:attribute name="variablevalue" type="xs:string" use="optional" />
+		    <xs:attribute name="fixedvalue" type="xs:string" use="optional" />
+		</xs:complexType>
+	    </xs:element>
+	    <xs:element name="relationship">
+		<xs:complexType>
+		    <xs:sequence />
+		    <xs:attribute name="subject" type="xs:string" />
+		    <xs:attribute name="fixedrelationship" type="xs:string" use="optional" />
+		    <xs:attribute name="variablerelationship" type="xs:string" use="optional" />
+		    <xs:attribute name="object" type="xs:string" />
+		</xs:complexType>
+	    </xs:element>
+	    <xs:element name="property">
+	    	<xs:complexType>
+	    		<xs:annotation>
+	    			<xs:documentation>
+	    				The property value may be given by fixedvalue, variablevalue or any content
+	    				element (fixed).,
+	    			</xs:documentation>
+	    		</xs:annotation>
+	    		<xs:sequence>
+	    			<xs:any minOccurs="0" />
+	    		</xs:sequence>
+	    		<xs:attribute name="subject" type="xs:string" />
+	    		<xs:attribute name="name" type="xs:string" />
+	    		<xs:attribute name="variablevalue" type="xs:string" use="optional" />
+	    		<xs:attribute name="fixedvalue" type="xs:string" use="optional" />
+	    	</xs:complexType>
+	    </xs:element>
+	    <xs:element name="location">
+	    	<xs:complexType>
+	    		<xs:attribute name="subject" type="xs:string" />
+	    		<xs:attribute name="object" type="xs:string" />
+	    		<xs:attribute name="relationship" type="xs:string" />
+	    		<xs:attribute name="relativex" type="xs:float" use="optional" />
+	    		<xs:attribute name="relativey" type="xs:float" use="optional" />
+	    		<xs:attribute name="relativez" type="xs:float" use="optional" />	    			    		
+	    	</xs:complexType>
+	    </xs:element>
+	</xs:choice>
+    </xs:group>
+    <xs:complexType name="RuleAction">
+	<xs:sequence></xs:sequence>
+	<xs:attribute name="subject" type="xs:string" />
+	<xs:attribute name="operation">
+	    <xs:simpleType>
+		<xs:restriction base="xs:string">
+		    <xs:enumeration value="create" />
+		</xs:restriction>
+	    </xs:simpleType>
+	</xs:attribute>
+	<xs:attribute name="argument" type="xs:string" use="optional" />
+    </xs:complexType>
+    <xs:simpleType name="ImageMimeType">
+    	<xs:restriction base="xs:string">
+		    <xs:enumeration value="image/png" />    	
+		    <xs:enumeration value="image/gif" />
+		    <xs:enumeration value="image/jpeg" />		    
+		    <xs:enumeration value="image/bmp" />		    		    
+    	</xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

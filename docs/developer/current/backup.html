@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<h2><a name="makingsub">Making components with sub-components</a></h2>
+<a name="makingsub">Normal ("top-level") components are instantiated in
+response to
+explicit requests (normally from the capability browser). In some
+situations components should be instantiated
+dynamically by the system, e.g. components which exclusively proxy
+hardware devices (e.g. camera, smart it, phidget) should be
+instantiated when the correponding hardware is detected. The
+recommended way to do this is via sub-components. For an example of how
+this works see the subcomponenttest component.
+</a>
+<ul>
+  <a name="makingsub"> <li>Create a component bean with bean info in
+the normal way to
+represent a factory or manager (a single instance of this will be
+requested to bootstrap the process - it will create the dynamic
+sub-components).</li>
+  </a>
+  <ul>
+    <a name="makingsub"> <li>Give it a readonly property 'children'
+with a public getter,
+the type of which is a 1D array of the sub-component type (e.g. if the
+subcomponent class is 'MySubComponent' then the getter signature would
+be "public MySubComponent[] getChildren()"). If there are no children
+then a zero sized array (not null) must be returned.<br>
+    </li>
+    <li>Fire the property change on 'children' whenever a child
+component is added or removed (and update 'children' accordingly).</li>
+    <li>When stopped ("public void stop()"), the manager component
+should tidy up and destroy/stop all child components.<br>
+    </li>
+    </a>
+  </ul>
+  <a name="makingsub"> <li>Create a sub-component bean but WITHOUT
+bean info (otherwise the
+current component loaded will get confused). Consequently, you must
+stick to java bean idiom, e.g. all public getX/setX methods will be
+exposed as properties. <br>
+  </li>
+  </a>
+  <ul>
+    <a name="makingsub"> <li>The sub-component class must implement
+Serializable.<br>
+    </li>
+    <li>The sub-component will be instantiated by the manager
+component, and may accept arguments from it, e.g. internal references
+to interface objects.</li>
+    <li>The sub-component should expose bean properties appropriate for
+the device (of whatever), and fire its own property change events.</li>
+    <li>Each sub-component should have a String-type readonly property
+called "persistentChild", the value of which is unique to this
+particular sub-component (within the scope of other sub-components of
+this manager). Without this, or if it is not consistent between
+re-creations of the subcomponent then persitent links will not work
+to/from this sub-component.<br>
+    </li>
+    </a>
+  </ul>
+</ul>
+<h2><a name="makingper">Making components persistent </a></h2>
+<p><a name="makingper">The dataspace will persist Component Requests
+and Property Link
+Requests. The container will also persist a components visible property
+values, and try to re-set them when it is created. The configuration
+manager allows components to be recreated in a similar way. Whereever
+possible it is recommended that you make use of this form of
+persistence, i.e. make the component's visible and settable properties
+sufficient to recreate the component. See the </a><a
+ href="ECT_Component_Guidelines.html">Component Development Guide</a>
+for additional information about component life-cycle and configuration
+property naming.</p>
+<p>However, if this is not possible for some reason (e.g. much too much
+state to expose as properties) then it is down to individual components
+to persist their
+own property values and/or internal state. The way to do this
+at present is:</p>
+<ul>
+  <li>Your component bean should implement "equip.ect.Persistable", and
+read/write its state from/to the specified file when requested. The
+file format is down to the bean itself. Standard Java serialisation can
+be used, but also consider persistance across changes to the component
+class.</li>
+</ul>
+At present the container persists all components at a regular interval.
+At some point this should be extended with consideration to (a) not
+persisting too often (b) components being able to request persisting
+(e.g. after a configuration change).<br>
+<p>Note that components that persist themselve will not currently be
+recreated correctly by the configuration manager, since it does not
+have access to these container- and component-specific persistence
+files.<br>
+</p>
+<h2><a name="makingrem">Making components remotely configurable</a></h2>
+<a name="makingrem">Components can be remotely configured in two main
+ways:<br>
+</a>
+<ol>
+  <a name="makingrem"> <li>By exposing input properties for
+configuration, which can be set
+from other component properties via links. Advantage: configuration is
+visible in the dataspace, and can be modified within the component
+system. Disadvantage: relatively slow and restricted to strings and
+simple types that have a coercion from string supported in ect. <br>
+  </li>
+  <li>By exposing an embedded configuration web server, exposing the
+URL to this server via a property. E.g. see the httpconfigtextvalue
+component.</li>
+  </a>
+</ol>
+<a name="makingrem">These should normally be combined, so that web
+server configuration is
+reflected in properties and vice versa.<br>
+The visionframework beans illustrate a short-cut of exposing a single
+configuration property which may be parsed to extract more complex
+configuration. The disadvantage of this is a more complex configuration
+language, and relatively help/feedback in using it.<br>
+At some point another ServiceUI approach could also be considered.<br>
+</a>
+<h2><a name="makinginv">Making components that directly invoke methods
+on each other</a></h2>
+<a name="makinginv">This is currently only supported for components
+within the same JVM.
+The component providing the methods to be called must provide a
+readonly property whose value is an object which is NOT Serializable
+and which implements the interface in question. The component which
+will be calling these methods provides a readwrite property of the same
+type. <br>
+When the user makes Property Link Request FROM the interface provider
+TO the interface caller then a string key will be passed via the
+dataspace, but a (weak) reference to the actual underlying Java object
+will be set as the property value (provided, as noted, it is in the
+same JVM). The link destination component will then be able to invoke
+methods on the interface implemented by the source component. <br>
+See for example the visionframework, which pass video frames in this
+way (via a callback handler to allow sources to split).<br>
+<br>
+</a>
+</body>
+</html>

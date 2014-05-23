@@ -1,0 +1,14 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+version = '1.0'
+archivesBaseName = 'equip'
+mainClassName = "equip.discovery.DataspaceServer"
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+	}
+}

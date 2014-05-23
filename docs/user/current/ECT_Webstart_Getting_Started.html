@@ -1,0 +1,162 @@
+<html>
+<head>
+  <title>Getting started with ECT</title>
+</head>
+<body>
+<h1>Getting started with ECT</h1>
+
+Created by Chris Greenhalgh<BR>
+Latest update by Stefan Rennick Egglestone 2006-06-29<BR><BR>
+
+<a href="#intro">Introduction</a><BR>
+<a href="#pre">Prerequisites</a><BR>
+<a href="#component">Component dependencies</a><BR>
+<a href="#start">Getting the software</a><BR>
+<a href="#starting">Starting ECT</a>
+
+<h3><a name="intro">Introduction</a></h3>
+
+This document explains how to download and install ECT, and how
+to run the ECT graph editor. It assumes that you have 
+read the <a href="../../ect_overview.html">ECT Overview</a>.
+
+<h3><a name="pre">Prerequisites</h3>
+
+<P>
+For best results we recommend that you install ECT on a computer
+running Microsoft Windows (2000 or above). Many of the current 
+components require or are better supported on this. 
+However, some of the components should work on other platforms
+(though this has not necessarily been tested). Our recommended
+Java installation is the Sun Java SDK 1.4.2, but 
+we have encountered no problems with using 
+Sun Java JDK 1.5. You should make sure that 
+<a href="http://java.sun.com/products/javawebstart/index.jsp">Java
+WebStart</a> is installed - this will either be automatically installed
+with the SDK, or in some (older?) SDKs you will
+find a webstart installer in the SDK directories.
+</P>
+<P>
+</P>
+
+<h3><a name="component">Component dependencies</h3>
+Many of the components provided with ECT (such as the 
+<a href="http://www.phidgets.com/" target="_blank">Phidgets</a> components) require
+libraries to be installed. Please refer to individual component 
+documentation to find out details. You can find out how
+to examine component documentation through ECT by following the 
+<a href="ECT_Webstart_User_Guide.html">Learning to use ECT</a> 
+tutorial, or you can view component documentation which
+is provided through these web-pages (eg see the
+<a href="../../javadoc/categorisedComponents.html">Categorised components list</a>
+and click on the link for a particular component).
+
+<h3><a name="start">Getting the software</h3>
+<P>
+There are two methods for downloading, installing and ECT. 
+These are:
+</P>
+
+<ul>
+<li>Downloading a binary release
+<li>Building the software from source code
+</ul>
+
+<P>
+For most users, the recommended approach is to download and install
+a binary release. Two different binary releases are available:
+
+<ul>
+<li>a minimal release, which includes a full set of ECT components
+and the graph editor 
+<li>a full release, which additionally includes source code and experimental interfaces to ECT (including the scripter and the display editor)
+</ul>
+
+You can download current and old releases from the menu on the left-hand side
+ of this page.
+
+</p>
+
+<P>
+Note that, for users who are familiar with CVS, Java and Ant technologies,
+it is possible to obtain and build ECT source code. 
+You should read the
+<a href="../../developer/current/ECT_Build_notes.html">
+Building ECT</a> document
+for further instructions on how to do this.
+</P>
+
+</P>
+
+Download either of these zip files and unzip them to a directory on
+your file system. 
+
+<h3><a name="starting">Starting ECT</h3>
+
+<P>
+ECT consists of a number of different graphical interfaces
+which all share the same software infrastructure, and
+include the Graph Editor, the Display Editor, the 
+Physical Configuration Manager and the Scripter. See
+the <a href="../../ect_overview.html">ECT Overview</a> for
+an introduction to the purpose of each of these interfaces.
+However, most users will want to start with the Graph Editor,
+as this is the most general purpose and tested interface
+in the ECT system.
+</P>
+
+<P>
+There are two methods to start up the graph editor,
+the choice of which is dependent upon whether you wish
+to work with some of the more experimental features
+of ECT. User who only wish to use the graph editor
+or display editor
+should use method 1 below - this is the recommended
+method for most users, and only requires the
+minimal version of ECT referred to above. It launches
+a number of features (such as installation and container
+management) that are not accessable through method 2
+below. However, users who wish to use the 
+<a href="scripter.html">Scripter</a> or the
+<a href="Using_Processing_with_ECT.html">ECT procesing integration</a>
+should
+use method 2 below, which launches a simpler version
+of ECT. This method requires the full release of ECT
+referred to above. Note that it is intended that
+experimental features of ECT will be migrated
+from method 2 to method 1 at an appropriate point
+in their development.
+</P>
+
+<h4><a name="method1">Method 1 (recommended)</h4>
+
+On a Windows system, double click on the directory
+into which you have expanded the ECT zip file, 
+and then successively on the <tt>ect</tt>,<tt>java</tt> and
+<tt>webstart</tt> directories, and then locate the
+<tt>runWebstart.bat</tt> script. Double click on this script
+to start of the process of loading the graph editor.
+You can follow a detailed tutorial, 
+<a href="ECT_Webstart_User_Guide.html">
+Learning to use ECT</a>
+for more information about what to do next.
+
+<h4><a name="method2">Method 2 (experimental)</h4>
+
+On a Windows system, double click on the directory
+into which you have expanded the ECT zip file, and
+then successively on the <tt>ect</tt>,<tt>java</tt>
+and <tt>install</tt> directories. Then double click
+(in this order) on the following batch files in the
+install directory:
+
+<ol>
+<li>runEquipDataSpace.bat
+<li>runExporterGUI.bat
+<li>runGraphEditor.bat
+</ol>
+
+</body>
+</html>
+
+

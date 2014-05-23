@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT Application GUI Notes</title>
+</head>
+<body>
+<h1>ECT Application GUI Notes</h1>
+Chris Greenhalgh 2005-09-01<br>
+<h2>Introduction</h2>
+Current ECT has a number of system GUIs (e.g. installation manager,
+graph editor) but only limited support for application GUIs and their
+management. In particular application GUIs can currently be:<br>
+<ul>
+  <li>a Processing application running from the IDE or converted to a
+component;</li>
+  <li>a custom component with a (Java) GUI (e.g. message board);</li>
+  <li>a custom application using the ECT APIs comparable to the graph
+editor (e.g. link editor).</li>
+</ul>
+<p>While components generated from processing applets expose some
+control over window size and position, this is hard to use from within
+applications. Consequently, there is effectively no support for
+interfaces which might change or be hidden/revealed at different stages
+of an experience, or as an installation moves between multiple
+experiences.<br>
+</p>
+<p>The aim of this note is explore and sketch out one or more
+approaches to supporting GUIs in ubicomp applications constructed using
+ECT in which multiple GUI elements can be combined and managed on
+multiple display-capable devices to reflect e.g. stages in an
+experience, views on an experience, and multiple co-existing
+experiences. <br>
+</p>
+<p>The main classes of display device considered are:<br>
+</p>
+<ul>
+  <li>small embedded displays, including e.g. Phidget text LCD and
+displays based on mobile phone screens<br>
+  </li>
+  <li>mobile phones*</li>
+  <li>PDAs*</li>
+  <li>tablet and wearable PCs*<br>
+  </li>
+  <li>larger embedded displays, including those based on tablet PCs and
+data projectors, with* and without touchscreen facility</li>
+</ul>
+<p>* only a subset have standard coupled input; other are display-only
+or require some kind of remote input and management of this. For now we
+focus on those with standard coupled input.<br>
+</p>
+<h2>Background</h2>
+<h3>J2ME MIDlets</h3>
+<p>A MIDlet is compabable to an applet, and embodies a single
+application for a mobile (e.g. phone) device. Its states are:<br>
+</p>
+<ul>
+  <li>Paused (including new)</li>
+  <li>Active</li>
+  <li>Destroyed<br>
+  </li>
+</ul>
+State changes can be initiated by the container or by the MIDlet. <br>
+<p>At least on some phones (e.g. my Nokia 6680) the user can switch
+between multiple MIDlets without exiting them. The API implies that a
+paused MIDlet can ask to make itself Active (may be vetoed by an
+exception); presumably this would switch it to the foreground. I don't
+know how widely this is supported.<br>
+</p>
+<p>There is a (slightly) distinct notion of whether a MIDlet's current
+Displayable (see below) is currently visible (poll operation). If it is
+not, it may be due to it being "in the background" with another MIDlet
+"in the foreground" (not known if/how this relates to Paused/Active),
+or the system displaying a system screen instead of the Displayable,
+e.g. to allow the user to select between Commands or for editing text
+on some devices.<br>
+</p>
+<h3>MIDP UI<br>
+</h3>
+<p>The J2ME MIDP specification defines a UI model suitable for mobile
+phones, with a significant degree of specific-device independence. This
+seems like a good starting point, as phones are the most
+restricted/restrictive of the main classes of device being considered.<br>
+</p>
+<p>A phone can display exactly one Displayable at a time. This has:<br>
+</p>
+<ul>
+  <li>an option Tickertape (except on full-screen Canvas)<br>
+  </li>
+  <li>a set of user-selectable Commands</li>
+  <li>a main screen area.</li>
+</ul>
+The main screen area is further specialised as one of the following:<br>
+<ul>
+  <li>Screen - high-level classes which encapsulate a data/interaction
+model, including</li>
+  <ul>
+    <li>complex (single) user interface components such as List,
+TextBox or Alert<br>
+    </li>
+    <li>Form, which contain a number of UI Items</li>
+  </ul>
+  <li>Canvas or Graphics - low-level classes giving bit-mapped drawing
+capabilities and low-level input<br>
+  </li>
+</ul>
+<p>Each midlet has a Display class which "acts as the display manager
+that is instantiated for each active MIDlet and provides<br>
+methods to retrieve information about the device&#8217;s display
+capabilities." "A Displayable is made visible by calling the
+setCurrent() method of Display."<br>
+</p>
+<p>High-level class callbacks are:<br>
+</p>
+<ul>
+  <li>CommandListener commandAction</li>
+  <li>ItemListener itemStateChanged</li>
+</ul>
+Low-level callbacks include various primitive inputs including:<br>
+<ul>
+  <li>key presses<br>
+  </li>
+  <li>pointer events (not present on all devices).</li>
+</ul>
+<h3>Chawton system v.1</h3>
+The schools experience at Chawton (mid 2005) uses a card-based
+interface metaphore, which combines:<br>
+<ul>
+  <li>user-driven navigation through available cards</li>
+  <li>asynchronous (sensor-driven) presentation of new cards (card
+sets).<br>
+  </li>
+</ul>
+<h2>Discussion</h2>
+<h3>Possible MIDlet-style approach:</h3>
+<ul>
+  <li>Each capable device has a component which represents its
+application (~MIDlet)-hosting capability</li>
+  <ul>
+    <li>? is this actually a MIDlet (or similar) within some larger
+framework inaccessible to ECT? Probably</li>
+    <li>? is there anything to stop the user exiting it, etc.? Probably
+not :-)<br>
+    </li>
+  </ul>
+  <li>An application is represented by a component which can be
+connected to the application-hosting component to represent its
+availability on that device</li>
+  <ul>
+    <li>? the user can presumably switch between applications, but can
+they also exit them? what about (re)starting them?? i.e. is it like a
+capability or an component/instance? it should be a component, so they
+can switch between them and pause/unpause, but not destroy <br>
+    </li>
+    <ul>
+      <li>(what about suicidal applications?!)<br>
+      </li>
+    </ul>
+    <li>? can be user see all (even "paused") applications? what about
+applications that they shouldn't have access to at present? do they
+have to be disconnected?! Initially, they can see them all</li>
+  </ul>
+  <li>Some applications can accept fragments of some sort (c.f. chawton
+card decks)</li>
+  <ul>
+    <li>? is this a general model (Drawables), or application specific?
+if general, what about navigation and accessibility management?</li>
+    <ul>
+      <li>extra commands added automatically?! index pages?! data
+(graph) descriptions of permitted navigational structures?</li>
+      <li>could be Drawable[] local interface</li>
+      <li>in that case, is multiple applications (above) really just
+the same?!</li>
+      <li>perhaps it can be keyed to "application state" (whatever that
+means - see below)<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+Other Questions:<br>
+<ul>
+  <li>what are the trade-offs between modifying Screens (e.g. Forms)
+and switching between a more static set?</li>
+</ul>
+<h3>Application and Interaction "State"</h3>
+<h4>Example 1: Hitchers</h4>
+<p>Consider Hitchers, for example...<br>
+</p>
+<ul>
+  <li>In some places the Drawables represent hierarchical navigation of
+available options, e.g. Search. <br>
+  </li>
+  <ul>
+    <li>Availability depends on:<br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>state - can only drop what you have a hitcher, only search
+when you don't</li>
+    </ul>
+    <li>Transition depends on:</li>
+    <ul>
+      <li>user choice among next options</li>
+      <li>? asynchronous changes (not it hitchers)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>In some places the Drawables represent stages in a (potentially
+branching) process of (here) user input, e.g. Summon. <br>
+  </li>
+  <ul>
+    <li>Availability depends on:</li>
+  </ul>
+  <ul>
+    <ul>
+      <li>completion of prior stages</li>
+    </ul>
+    <li>Transition depends on:</li>
+    <ul>
+      <li>user input and explicit choice</li>
+      <li>? asynchronous changes (not it hitchers)<br>
+      </li>
+    </ul>
+  </ul>
+  <li>In some places the Drawable represents blocking for extended
+"internal" operations, e.g. contact server. <br>
+  </li>
+  <ul>
+    <li>Availability:</li>
+    <ul>
+      <li>application is performing that action/process</li>
+    </ul>
+    <li>Transition:</li>
+    <ul>
+      <li>process completes successfully, or fails</li>
+      <li>(optional) process is aborted (or orphaned) by the user<br>
+      </li>
+    </ul>
+  </ul>
+</ul>
+Hitcher state changes are all synchronous with user interaction
+(through user initiation plus blocking if necessary). State is a
+combination of:<br>
+<ul>
+  <li>significant internal state (whether you have a hitcher)</li>
+  <li>user choices between options (drop vs answer)</li>
+  <li>stages in sequential activities (stages of summoning)</li>
+</ul>
+Note also:<br>
+<ul>
+  <li>although Displayables are reused, data fields are populated with
+"current" data before re/display (e.g. hitcher name, hitcher image)</li>
+  <ul>
+    <li>typically the callback which navigates to it will do this
+before making it current!</li>
+    <li>but perhaps that is just an implementation detail of an active
+"status" display <br>
+    </li>
+  </ul>
+  <li>forms serve to elicit structured user input; this must be wanted,
+and should go somewhere!</li>
+  <ul>
+    <li>is it a component with corresponding properties?!<br>
+    </li>
+  </ul>
+</ul>
+<h4>Example 2: Chawton</h4>
+Two asynchronous events:<br>
+<ul>
+  <li>receiving a new set of cards (triggered by location change)</li>
+  <ul>
+    <li>makes the new set available</li>
+    <li>pops the head of the new set to be current<br>
+    </li>
+  </ul>
+  <li>timed transition (not before or always after)</li>
+  <ul>
+    <li>? not sure if it prevents going to next for time, or forces
+next after time or both<br>
+    </li>
+  </ul>
+</ul>
+Explicit user actions (not entirely sure as I haven't seen the
+application, but...):<br>
+<ul>
+  <li>push button option to record an audio sample</li>
+  <ul>
+    <li>creates a new card!<br>
+    </li>
+  </ul>
+  <li>explicit "next" within an ordered list of cards</li>
+  <li>some kind of index?! (implied by description of experience)<br>
+  </li>
+</ul>
+<h2>General</h2>
+The Display schedules Displayables.<br>
+But it is a bit more complicated than that :-)<br>
+<br>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Using EQUIP with VPNs and other network arrangements</title>
+</head>
+<body>
+<h1>Using EQUIP with VPNs and other network arrangements</h1>
+Chris Greenhalgh, 2005-02-07<br>
+<h2>VPN...</h2>
+I'll base this on what I see in windows...<br>
+A VPN connection looks in the routing/IP stack like another interface
+with its own IP address, etc.<br>
+If EQUIP does not appear to be picking up the VPN address (check the
+console output) then use the ConfigManager option:<br>
+<pre>localhost: IP-OF-MACHINE-ON-VPN<br></pre>
+Unfortunately, with DHCP, this may change when the machine is
+restarted; sorry.<br>
+Configuration information is normally read from the file <span
+ style="font-family: monospace;">equip.eqconf</span> in the directory
+identified by the EQUIP_PATH environment variable/Java property
+(defaults to the current working directory). Note that this is only
+read when the DataManager initialises, and so this may need to be
+forced by the application at start-up or it may not have been read
+before it is used. NB: make sure that the configuration file ends with
+a newline (or the last line will be silently ignored!).<br>
+<h2>Notes</h2>
+<ul>
+  <li>Not all branches of EQUIP are up-to-date with respect to this,
+especially support changes in equip.discovery. If in doubt use a
+version of equip4j from a build of the CVS HEAD.</li>
+</ul>
+<h2>No multicast...</h2>
+If your VPN (or other network) isn't supporting multicast then...<br>
+<h3>Equip Discovery<br>
+</h3>
+equip.discovery can make use of a unicast reflector as a rendezvous<br>
+1. Run the reflector; default port is 4170.<br>
+<pre>java equip.discovery.DiscoveryRendezvous &lt;udp-port&gt;<br></pre>
+Program will print a discovery URL ("<span
+ style="font-family: monospace;">equipd://&lt;rendezvous-ip&gt;:&lt;port&gt;</span>")
+that should be used to talk to it...<br>
+2. Configure the client, typically in the equip.eqconf file (see above)<br>
+<pre>...<br>discoveryUrls: equipd://&lt;rendezvous-ip&gt;:&lt;port&gt;<br>...<br></pre>
+(Make sure there is a newline at the end of the file).<br>
+<h3>Streaming Media</h3>
+There is now (another) RTP unicast bridge/reflector in CVS <span
+ style="font-family: monospace;">Equator/AccessGrid/multicast-bridge/MulticastBridge.java</span><br>
+Use that :-)<br>
+<br>
+</body>
+</html>

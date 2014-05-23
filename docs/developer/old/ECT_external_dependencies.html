@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT external dependencies</title>
+</head>
+<body>
+<h1>ECT external dependencies</h1>
+Chris Greenhalgh, 2005-03-09 *in progress*<br>
+<h2>WebStart</h2>
+<h3>Dataspace, etc.<br>
+</h3>
+<ul>
+  <li>equip4j.jar (now equip4jcore.jar)</li>
+</ul>
+<h3>ect core (webstart, container, dataspace)<br>
+</h3>
+<ul>
+  <li>ect-core.jar (including .../apps/ExporterGUI* but not other apps)<br>
+  </li>
+  <li>equip4jcore.jar; in resources/common/equip4jcore.jar, from
+sourceforge equip4jcore.jar; copied to install/common/equip4jcore.jar.<br>
+  </li>
+  <li>JAXP 1.0, including with J2SE 1.4 onwards, else xmlparser.jar
+(was also xerces)<br>
+  </li>
+  <li>(removed jini's tools.jar - embedded webserver - to use own
+[might break things])</li>
+  <li>Container attempts javax.comm initialisation! Will fail (probably
+OK?) if not installed in JRE or incorporated by download.</li>
+  <li>resources/ectCore/process_jni.dll (Windows, at runtime (to start
+installation, container)); copied to install/ectCore/process_jni.dll.</li>
+</ul>
+<h4>webstart</h4>
+<ul>
+  <li>resource/ectKeyStore<br>
+  </li>
+</ul>
+compile:<br>
+&nbsp; &lt;path id="ectCoreClassPath"&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/xerces.jar/"/&gt; container persistence
+(explicit!)<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; apache license - in source &amp;
+redistribution; statement in user documentation (or similar): "This
+product includes software developed by the Apache Software Foundation
+(http://www.apache.org/)."
+<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/xmlparser.jar/"/&gt; configurationmgr
+(other?)<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/equip4j.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/tools.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/jgraph.jar/"/&gt; browser<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; dual MPL &amp; LGPL licensing<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/log4j-1.2.8.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; apache license<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/antlr.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; PD<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/junit.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/commons-logging.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/concurrent.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/icu4j.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/jakarta-oro-2.0.5.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/jena.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/rdf-api-2001-01-19.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/javassist.jar/"/&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;pathelement
+path="${resources}/${common}/comm.jar/"/&gt;<br>
+&nbsp; &lt;/path&gt;<br>
+<br>
+<h3>graph editor</h3>
+compile:<br>
+run:<br>
+<ul>
+  <li>ect-core.jar (ours - currently includes too much)<br>
+  </li>
+  <li>grapheditor.jar (ours)<br>
+equip4j.jar<br>
+xerces.jar<br>
+xmlparser.jar</li>
+</ul>
+<h3>capability browser</h3>
+compile:<br>
+run:<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\xmlparser.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\xerces.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\equip4j.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\dynamo.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\jgraph.jar<br>
+<h3>exporter gui (=&gt; components)</h3>
+set ECT_CLASSPATH=.\ect-core.jar;.<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\comm.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\commx.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\jmf.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\motionstudio.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\tools.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\xmlparser.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\xerces.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\equip4j.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\dynamo.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\dynamo-main-gui.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\log4j-1.2.8.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\JARToolKit.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\bsh-2.0b1.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\Phidgets.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\javassist.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\MDateSelector14-00342.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\log4j-1.2.8.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\freetts.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\jsapi.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\cmu_us_kal.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\cmu_time_awb.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\en_us.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\cmulex.jar<br>
+set ECT_CLASSPATH=%ECT_CLASSPATH%;.\common\cmutimelex.jar<br>
+<br>
+<br>
+</body>
+</html>

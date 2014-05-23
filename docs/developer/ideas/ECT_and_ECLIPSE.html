@@ -1,0 +1,148 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>ECT and ECLIPSE: Thoughts and Options</title>
+</head>
+<body>
+<h1>ECT and ECLIPSE: Thoughts and Options</h1>
+Chris Greenhalgh<br>
+2005-10-03<br>
+<h2>Introduction</h2>
+<p>Could/should ECLIPSE (<a href="http://www.eclipse.org/">http://www.eclipse.org/</a>)
+be used as an IDE for ECT? If so, how?<br>
+</p>
+<h2>Eclipse</h2>
+<div style="margin-left: 40px;">"Eclipse is an open source community
+whose projects are focused on providing an extensible development
+platform and application frameworks for building software." (<a
+ href="http://www.eclipse.org/">http://www.eclipse.org/</a>) </div>
+<p>Perhaps the most mature use of Eclipse is as a Java IDE, although it
+aspires to greater generality. However, achieving a reasonable
+conceptual fit to (something like) developing a Java application is
+probably essential for using Eclipse to be worthwhile. From previous
+experience with the NetBeans IDE it is important it is extremely hard
+to work outside or against - for example - the paradigm of folders and
+files which are compiled into a "product" form. <br>
+</p>
+<p>So... what are the main concepts/elements of Eclipse?<br>
+</p>
+<ul>
+  <li>Project - a unit of development, corresponding to a file-system
+folder and contents, annotated with one or more "natures", which
+determine what Perspectives and facilities are available in it.</li>
+  <li>Perspective - a configuration of the Workbench UI oriented to a
+particular task, e.g. a particular combination of menu and toolbar
+actions, Editors and Viewers.</li>
+  <li>Editor - an interactive editor for a particular file type.</li>
+  <li>View - a specialised view onto a resource, synchronized through
+the UI selection model, often a file.</li>
+  <li>Resource - file, folder</li>
+  <li>(can't remember the term) Annotation(?) - of a resource, e.g. a
+to-do item, bug.</li>
+  <li>Action - a task thing can be explicitly performed, may be
+associated with Editor(s), View(s) or menu or toolbar Action Sets. <br>
+  </li>
+  <ul>
+    <li>One class of actions it to run a wizard, which guides a user
+through a stereotyped process which is typically equivalent to a set of
+other coordinated UI operations, optionally plus additional custom
+operations (e.g. template code generation).<br>
+    </li>
+  </ul>
+</ul>
+<p>In addition, the Java Development Tools (JDT) part of Eclipse also
+defines:</p>
+<ul>
+  <li>Builder - for building/compiling projects</li>
+  <li>Lancher - for running built projects</li>
+  <li>Debugger - for monitoring and interacting with a launched
+application.</li>
+</ul>
+<h2>ECT</h2>
+<h3>ECT files and applications<br>
+</h3>
+<p>In terms of Java code ECT consists of:<br>
+</p>
+<ul>
+  <li>Common run-time, including dataspace tuple wrappers, type
+coercion, ECT-specific component interfaces, the implementation of the
+EQUIP-based container, various other supporting facilities (e.g. web
+server implementations).</li>
+  <li>(Heavy-weight Java) Components, each (currently) as one or more
+source files, optional manifest, possible dependent JARs and native
+libraries.</li>
+  <li>Separate tools, including:</li>
+  <ul>
+    <li>graphical editor</li>
+    <li>simpler display editor</li>
+    <li>configuration manager</li>
+    <li>physical configuration manager&nbsp;</li>
+  </ul>
+  <li>WebStart boot and installation manager<br>
+  </li>
+</ul>
+<p>Other files which currently exist include:<br>
+</p>
+<ul>
+  <li>Documentation (mainly HTML)</li>
+  <li>configuration manager XML-based transferable configuration files</li>
+  <li>container XML-based capability and component persistence files</li>
+  <li>component-specific persistence files (for components implementing
+the Persistable interface)</li>
+  <li>graph editor XML-based layout persistence files</li>
+  <li>console logs</li>
+  <li>dataspace logs and checkpoints</li>
+  <li>dataspace configuration file(s)</li>
+  <li>installation and container (webstart) configuration files</li>
+  <li>processing sketches and dependencies (e.g. font files, images)
+(separate)</li>
+</ul>
+<h3>ECT in use</h3>
+<p>The normal way of using ECT has been:<br>
+</p>
+<ol>
+  <li>Check out of CVS &amp; build</li>
+  <li>Develop any additional Java components within the same source
+tree and build</li>
+  <li>Run using scripts - simple or webstart</li>
+  <li>Assemble configuration interactively using the graph editor</li>
+  <li>Voila!<br>
+  </li>
+</ol>
+<h3>ECT activities/"projects"</h3>
+<p>What are the main development tasks done in relation to ECT?<br>
+</p>
+<ul>
+  <li>Extend/debug the ECT runtime</li>
+  <ul>
+    <li>=&gt; a Java project to build it<br>
+    </li>
+  </ul>
+  <li>Develop/extend a particular ECT tool</li>
+  <ul>
+    <li>=&gt; a Java project to build it<br>
+    </li>
+  </ul>
+  <li>Develop/debug an ECT component</li>
+  <ul>
+    <li>=&gt; a Java project to build it<br>
+    </li>
+  </ul>
+  <li>Deploy an ECT-based installation</li>
+  <li>Develop/debug/deploy an ECT-based "application" or "experience"<br>
+  </li>
+  <ul>
+    <li>standalone/complete</li>
+    <ul>
+      <li>=&gt; a custom launcher/debugger??<br>
+      </li>
+    </ul>
+    <li>or alongside other(s) on a "general"/common installation</li>
+  </ul>
+</ul>
+<br>
+<br>
+</body>
+</html>
