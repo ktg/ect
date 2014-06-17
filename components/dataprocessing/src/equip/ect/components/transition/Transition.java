@@ -17,7 +17,7 @@ import java.util.Date;
  * @author ktg
  */
 @ECTComponent
-@Category("data/processing")
+@Category("Data/Processing")
 public class Transition implements Runnable, Serializable, PropertyChangeListener
 {
 	public static void main(final String args[])

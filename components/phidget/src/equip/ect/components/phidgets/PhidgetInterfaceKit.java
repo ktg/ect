@@ -87,7 +87,7 @@ import equip.ect.NoSuchPropertyException;
  * @preferred
  */
 @ECTComponent
-@Category("Hardware/Input & Output")
+@Category("Hardware/Phidgets")
 public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListener, SensorChangeListener
 {
 

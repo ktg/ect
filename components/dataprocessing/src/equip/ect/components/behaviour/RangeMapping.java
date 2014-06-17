@@ -6,7 +6,7 @@ import equip.ect.ECTComponent;
 import java.io.Serializable;
 
 @ECTComponent
-@Category("data/processing")
+@Category("Data/Processing")
 public class RangeMapping extends AbstractMinMax implements Serializable
 {
 	private double inMin = -1;

@@ -55,7 +55,7 @@ import java.io.Serializable;
  * @defaultOutputValue output
  */
 @ECTComponent
-@Category("timing")
+@Category("Timing")
 public class Timer implements Serializable, ActionListener
 {
 	private boolean output = false;

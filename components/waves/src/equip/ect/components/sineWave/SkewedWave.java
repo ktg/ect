@@ -16,7 +16,7 @@ import java.io.Serializable;
  * @author ktg
  */
 @ECTComponent
-@Category("Maths/Waves")
+@Category("Data/Waves")
 public class SkewedWave implements Runnable, Serializable, PropertyChangeListener
 {
 	public static void main(final String args[])

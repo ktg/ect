@@ -16,7 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @ECTComponent
-@Category("Maths/Waves")
+@Category("Data/Waves")
 public class FrequencyAnalyser implements Serializable
 {
 	public static void main(final String[] args)

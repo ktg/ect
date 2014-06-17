@@ -8,7 +8,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 
 @ECTComponent
-@Category("data/processing")
+@Category("Data/Processing")
 public class Delta implements Serializable
 {
 	private int endOffset = 0;

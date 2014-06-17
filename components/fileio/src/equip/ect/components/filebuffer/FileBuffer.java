@@ -62,7 +62,7 @@ import java.io.Serializable;
  * @author ktg
  */
 @ECTComponent
-@Category("file")
+@Category("File")
 public class FileBuffer implements Serializable
 {
 	private double output = 0.0;

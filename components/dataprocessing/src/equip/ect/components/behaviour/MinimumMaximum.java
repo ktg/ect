@@ -7,7 +7,7 @@ import equip.ect.ECTComponent;
 import equip.ect.components.dataprocessing.CircularList;
 
 @ECTComponent
-@Category("data/processing")
+@Category("Data/Processing")
 public class MinimumMaximum extends AbstractMinMax implements Serializable
 {
 	private int inputMaxOffset = 0;

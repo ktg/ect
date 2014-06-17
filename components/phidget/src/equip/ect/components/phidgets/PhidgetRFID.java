@@ -73,7 +73,7 @@ import equip.ect.NoSuchPropertyException;
  * @preferred
  */
 @ECTComponent
-@Category("Hardware/Input & Output")
+@Category("Hardware/Phidgets")
 public class PhidgetRFID extends PhidgetBase implements TagGainListener, TagLossListener
 {
 	static final int NUM_DIGITAL_OUT = 2;// on newer readers

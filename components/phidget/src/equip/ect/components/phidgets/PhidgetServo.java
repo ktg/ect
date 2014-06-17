@@ -77,7 +77,7 @@ import equip.ect.NoSuchPropertyException;
  * @technology Phidgets
  */
 @ECTComponent
-@Category("Hardware/Input & Output")
+@Category("Hardware/Phidgets")
 public class PhidgetServo extends PhidgetBase
 {
 	private int numberOfServoOutputs;

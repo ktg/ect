@@ -48,7 +48,7 @@ import equip.ect.ECTComponent;
  * @author Stefan Rennick Egglestone
  */
 @ECTComponent
-@Category("text")
+@Category("Text")
 public class StringConcatenation extends AbstractStringProcessing
 {
 

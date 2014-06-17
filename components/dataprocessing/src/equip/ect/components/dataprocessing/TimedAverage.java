@@ -38,6 +38,9 @@
  */
 package equip.ect.components.dataprocessing;
 
+import equip.ect.Category;
+import equip.ect.ECTComponent;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
@@ -62,6 +65,8 @@ import java.io.Serializable;
  * @defaultInputProperty input
  * @author stef
  */
+@ECTComponent
+@Category("Data/Processing")
 public class TimedAverage implements Serializable, Runnable
 {
 	private final CircularList buffer = new CircularList(1000);

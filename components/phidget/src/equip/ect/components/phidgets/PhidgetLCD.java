@@ -76,7 +76,7 @@ import equip.ect.ECTComponent;
  * @defaultOutputProperty lineOneText
  */
 @ECTComponent
-@Category("Hardware/Input & Output")
+@Category("Hardware/Phidgets")
 public class PhidgetLCD extends PhidgetBase implements Serializable
 {
 	class ScrollingRunnable implements Runnable
