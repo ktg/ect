@@ -728,7 +728,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 		final String oldValue = errorMessage;
 		errorMessage = newValue;
 
-		if((oldValue == null && newValue != null) || (oldValue != null && !oldValue.equals(newValue)))
+		if(oldValue != newValue && (oldValue == null || !oldValue.equals(newValue)))
 		{
 			propertyChangeListeners.firePropertyChange("errorMessage", oldValue, newValue);
 		}

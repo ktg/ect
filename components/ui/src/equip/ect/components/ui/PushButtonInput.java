@@ -54,7 +54,7 @@ import javax.swing.event.ChangeListener;
  * @author Chris Greenhalgh
  */
 @ECTComponent
-@Category("ui")
+@Category("UI")
 public class PushButtonInput extends UIBase
 {
 	/**
@@ -74,7 +74,7 @@ public class PushButtonInput extends UIBase
 	{
 		super();
 		// make GUI and show
-		final Container contentPane = this.getContentPane();
+		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		button = new JButton("value");
 		contentPane.add(button, BorderLayout.CENTER);
@@ -87,8 +87,8 @@ public class PushButtonInput extends UIBase
 				intSetValue(button.getModel().isArmed(), false);
 			}
 		});
-		this.pack();
-		this.setVisible(true);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -117,7 +117,7 @@ public class PushButtonInput extends UIBase
 			// no change
 			return;
 		}
-		final Object old = new Boolean(this.value);
+		final Object old = this.value;
 		this.value = value;
 		// update gui - may not be swing thread
 		if (updateWidget)
@@ -135,6 +135,6 @@ public class PushButtonInput extends UIBase
 			});
 		}
 		// fire change event
-		propertyChangeListeners.firePropertyChange("value", old, new Boolean(value));
+		propertyChangeListeners.firePropertyChange("value", old, value);
 	}
 }

@@ -47,7 +47,7 @@ import java.io.Serializable;
  * Test input/output base class, with name property, property change support, stop.
  * @author Chris Greenhalgh
  */
-public abstract class UIBase extends JFrame implements Serializable
+public abstract class UIBase implements Serializable
 {
 	/**
 	 * utility method to run on swing thread (later)
@@ -69,6 +69,8 @@ public abstract class UIBase extends JFrame implements Serializable
 	 */
 	protected String name = "unnamed";
 
+	protected final JFrame frame = new JFrame();
+
 	/**
 	 * stopped
 	 */
@@ -83,16 +85,14 @@ public abstract class UIBase extends JFrame implements Serializable
 	 */
 	public UIBase()
 	{
-		super("unnamed");
 		// only allow stop from within framework
-		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		// make GUI and show - done in subclass
 	}
 
 	/**
 	 * Property Change Listeners - required for all beans with active properties
 	 */
-	@Override
 	public synchronized void addPropertyChangeListener(final PropertyChangeListener listener)
 	{
 		propertyChangeListeners.addPropertyChangeListener(listener);
@@ -101,7 +101,6 @@ public abstract class UIBase extends JFrame implements Serializable
 	/**
 	 * name getter
 	 */
-	@Override
 	public synchronized String getName()
 	{
 		return name;
@@ -110,7 +109,6 @@ public abstract class UIBase extends JFrame implements Serializable
 	/**
 	 * Property Change Listeners - required for all beans with active properties
 	 */
-	@Override
 	public synchronized void removePropertyChangeListener(final PropertyChangeListener listener)
 	{
 		propertyChangeListeners.removePropertyChangeListener(listener);
@@ -119,7 +117,6 @@ public abstract class UIBase extends JFrame implements Serializable
 	/**
 	 * name of GUI component, shown as Window title
 	 */
-	@Override
 	public synchronized void setName(final String name)
 	{
 		if (name == this.name || (this.name != null && name != null && this.name.equals(name)))
@@ -136,7 +133,7 @@ public abstract class UIBase extends JFrame implements Serializable
 			@Override
 			public void run()
 			{
-				setTitle(name);
+				frame.setTitle(name);
 			}
 		});
 		// fire change event
@@ -153,8 +150,8 @@ public abstract class UIBase extends JFrame implements Serializable
 			@Override
 			public void run()
 			{
-				setVisible(false);
-				dispose();
+				frame.setVisible(false);
+				frame.dispose();
 			}
 		});
 		// stop subsequent actions on slider

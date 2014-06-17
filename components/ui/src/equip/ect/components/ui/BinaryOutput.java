@@ -53,7 +53,7 @@ import javax.swing.JCheckBox;
  * @author Chris Greenhalgh
  */
 @ECTComponent
-@Category("ui")
+@Category("UI")
 public class BinaryOutput extends UIBase
 {
 	/**
@@ -73,14 +73,14 @@ public class BinaryOutput extends UIBase
 	{
 		super();
 		// make GUI and show
-		final Container contentPane = this.getContentPane();
+		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		button = new JCheckBox("value");
 		// no user input
 		button.setEnabled(false);
 		contentPane.add(button, BorderLayout.CENTER);
-		this.pack();
-		this.setVisible(true);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -109,7 +109,7 @@ public class BinaryOutput extends UIBase
 			// no change
 			return;
 		}
-		final Object old = new Boolean(this.value);
+		final Object old = this.value;
 		this.value = value;
 		// update gui - may not be swing thread
 		if (updateWidget)
@@ -127,6 +127,6 @@ public class BinaryOutput extends UIBase
 			});
 		}
 		// fire change event
-		propertyChangeListeners.firePropertyChange("value", old, new Boolean(value));
+		propertyChangeListeners.firePropertyChange("value", old, value);
 	}
 }

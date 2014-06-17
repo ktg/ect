@@ -63,7 +63,7 @@ import equip.runtime.ValueBase;
  * @author Stefan Rennick Egglestone
  */
 @ECTComponent
-@Category("ui")
+@Category("UI")
 public class MessageOutput extends UIBase
 {
 	private DictionaryImpl[] messages;
@@ -77,7 +77,7 @@ public class MessageOutput extends UIBase
 	{
 		super();
 
-		getContentPane().setLayout(new BorderLayout());
+		frame.getContentPane().setLayout(new BorderLayout());
 
 		textField = new JTextField(NO_MESSAGE);
 
@@ -86,12 +86,12 @@ public class MessageOutput extends UIBase
 
 		tabbedPane = new JTabbedPane();
 
-		getContentPane().add(textField, BorderLayout.NORTH);
-		getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		frame.getContentPane().add(textField, BorderLayout.NORTH);
+		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
-		setSize(new Dimension(400, 300));
+		frame.setSize(new Dimension(400, 300));
 
-		this.setVisible(true);
+		frame.setVisible(true);
 	}
 
 	public synchronized DictionaryImpl[] getMessages()
@@ -191,7 +191,7 @@ public class MessageOutput extends UIBase
 
 								tabbedPane.add(title, fieldPane);
 
-								validate();
+								frame.validate();
 							}
 						}
 					}
@@ -218,10 +218,6 @@ public class MessageOutput extends UIBase
 				fieldPanel.add(fieldArea, BorderLayout.CENTER);
 
 				tbp.add(key, new JScrollPane(fieldPanel));
-			}
-			else
-			{
-				// do nothing
 			}
 		}
 	}

@@ -54,7 +54,7 @@ import javax.swing.JTextField;
  * @author Chris Greenhalgh
  */
 @ECTComponent
-@Category("ui")
+@Category("UI")
 public class TextInput extends UIBase
 {
 	/**
@@ -74,7 +74,7 @@ public class TextInput extends UIBase
 	{
 		super();
 		// make GUI and show
-		final Container contentPane = this.getContentPane();
+		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		field = new JTextField(40);
 		contentPane.add(field, BorderLayout.CENTER);
@@ -87,8 +87,8 @@ public class TextInput extends UIBase
 				intSetValue(field.getText(), false);
 			}
 		});
-		this.pack();
-		this.setVisible(true);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class TextInput extends UIBase
 	 */
 	protected synchronized void intSetValue(final String value, final boolean updateWidget)
 	{
-		if (this.value == value || (this.value != null && value != null && this.value.equals(value)))
+		if (this.value.equals(value) || (this.value != null && value != null && this.value.equals(value)))
 		{
 			// no change
 			return;

@@ -57,7 +57,7 @@ import javax.swing.event.ChangeListener;
  * @author Chris Greenhalgh
  */
 @ECTComponent
-@Category("ui")
+@Category("UI")
 public class SliderInput extends UIBase implements ActionListener
 {
 	/**
@@ -97,7 +97,7 @@ public class SliderInput extends UIBase implements ActionListener
 	{
 		super();
 		// make GUI and show
-		final Container contentPane = this.getContentPane();
+		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(slider, BorderLayout.CENTER);
 		changeTimer = new Timer(MIN_CHANGE_INTERVAL_MS, this);
@@ -121,8 +121,8 @@ public class SliderInput extends UIBase implements ActionListener
 				}
 			}
 		});
-		this.pack();
-		this.setVisible(true);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -178,7 +178,7 @@ public class SliderInput extends UIBase implements ActionListener
 			// no change
 			return;
 		}
-		final Object old = new Float(this.getValue());
+		final Object old = this.getValue();
 		this.value = value;
 		// update gui - may not be swing thread
 		if (updateWidget)
@@ -196,6 +196,6 @@ public class SliderInput extends UIBase implements ActionListener
 			});
 		}
 		// fire change event
-		propertyChangeListeners.firePropertyChange("value", old, new Float(getValue()));
+		propertyChangeListeners.firePropertyChange("value", old, getValue());
 	}
 }

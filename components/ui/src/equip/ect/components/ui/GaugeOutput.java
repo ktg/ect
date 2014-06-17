@@ -52,7 +52,7 @@ import javax.swing.JProgressBar;
  * @author Chris Greenhalgh
  */
 @ECTComponent
-@Category("ui")
+@Category("UI")
 public class GaugeOutput extends UIBase
 {
 	/**
@@ -77,12 +77,12 @@ public class GaugeOutput extends UIBase
 	{
 		super();
 		// make GUI and show
-		final Container contentPane = this.getContentPane();
+		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		bar = new JProgressBar(0, MAX_VALUE);
 		contentPane.add(bar, BorderLayout.CENTER);
-		this.pack();
-		this.setVisible(true);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class GaugeOutput extends UIBase
 			// no change
 			return;
 		}
-		final Object old = new Float(this.getValue());
+		final Object old = this.getValue();
 		this.value = value;
 		// update gui - may not be swing thread
 		if (updateWidget)
@@ -129,6 +129,6 @@ public class GaugeOutput extends UIBase
 			});
 		}
 		// fire change event
-		propertyChangeListeners.firePropertyChange("value", old, new Float(getValue()));
+		propertyChangeListeners.firePropertyChange("value", old, getValue());
 	}
 }

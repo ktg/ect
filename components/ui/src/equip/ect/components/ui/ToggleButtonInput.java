@@ -54,7 +54,7 @@ import javax.swing.event.ChangeListener;
  * @author Chris Greenhalgh
  */
 @ECTComponent
-@Category("ui")
+@Category("UI")
 public class ToggleButtonInput extends UIBase
 {
 
@@ -83,7 +83,7 @@ public class ToggleButtonInput extends UIBase
 	{
 		super();
 		// make GUI and show
-		final Container contentPane = this.getContentPane();
+		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		button = new JCheckBox("value");
 		contentPane.add(button, BorderLayout.CENTER);
@@ -96,8 +96,8 @@ public class ToggleButtonInput extends UIBase
 				intSetValue(button.getModel().isSelected(), false);
 			}
 		});
-		this.pack();
-		this.setVisible(true);
+		frame.pack();
+		frame.setVisible(true);
 	}
 
 	/**
@@ -126,7 +126,7 @@ public class ToggleButtonInput extends UIBase
 			// no change
 			return;
 		}
-		final Object old = new Boolean(this.value);
+		final Object old = this.value;
 		this.value = value;
 		// update gui - may not be swing thread
 		if (updateWidget)
@@ -144,6 +144,6 @@ public class ToggleButtonInput extends UIBase
 			});
 		}
 		// fire change event
-		propertyChangeListeners.firePropertyChange("value", old, new Boolean(value));
+		propertyChangeListeners.firePropertyChange("value", old, value);
 	}
 }
