@@ -38,127 +38,158 @@ Contributors:
 */
 package equip.data;
 
-import equip.net.*;
-import equip.data.*;
 import equip.runtime.ValueBase;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.util.Vector;
 
-public class DataBrowserFrame extends JFrame {
-  Vector itemList = new Vector();
-  JPanel contentPane;
-  BorderLayout borderLayout1 = new BorderLayout();
-  JScrollPane jScrollPane1 = new JScrollPane();
-  JPanel jPanel1 = new JPanel();
-  JButton quit = new JButton();
-  JList jList1 = new JList();
+public class DataBrowserFrame extends JFrame
+{
+	Vector<ItemData> itemList = new Vector<ItemData>();
+	JPanel contentPane;
+	BorderLayout borderLayout1 = new BorderLayout();
+	JScrollPane jScrollPane1 = new JScrollPane();
+	JPanel jPanel1 = new JPanel();
+	JButton quit = new JButton();
+	JList<ItemData> jList1 = new JList<ItemData>();
 
-  /**Construct the frame*/
-  EquipConnector ec;
+	/**
+	 * Construct the frame
+	 */
+	EquipConnector ec;
 
-  public DataBrowserFrame(EquipConnector equipcon) {
-    ec= equipcon;
+	public DataBrowserFrame(EquipConnector equipcon)
+	{
+		ec = equipcon;
 
-    DataSession session = ec.dataservice.createSession(new EventHandler(), null);
-    EventPattern pattern = new EventPatternImpl();
-    pattern.id=ec.idFactory.getUnique();
-    equip.data.ItemData item= new equip.data.ItemDataImpl();
-    pattern.initAsSimpleItemMonitor(item, false);
+		DataSession session = ec.dataservice.createSession(new EventHandler(), null);
+		EventPattern pattern = new EventPatternImpl();
+		pattern.id = ec.idFactory.getUnique();
+		equip.data.ItemData item = new equip.data.ItemDataImpl();
+		pattern.initAsSimpleItemMonitor(item, false);
 
-    session.addPattern(pattern);
+		session.addPattern(pattern);
 
-    enableEvents(AWTEvent.WINDOW_EVENT_MASK);
-    try {
-      jbInit();
-    }
-    catch(Exception e) {
-      e.printStackTrace();
-    }
-  }
-  /**Component initialization*/
-  private void jbInit() throws Exception  {
-    //setIconImage(Toolkit.getDefaultToolkit().createImage(DataBrowserFrame.class.getResource("[Your Icon]")));
-    contentPane = (JPanel) this.getContentPane();
-    contentPane.setLayout(borderLayout1);
-    this.setSize(new Dimension(400, 300));
-    this.setTitle("Equip Beans Browser");
-    quit.setText("Quit");
-    quit.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        quit_actionPerformed(e);
-      }
-    });
+		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
+		try
+		{
+			jbInit();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
-    // The main list stuff
-   // jList1.setCellRenderer(new BeanCellRender());
+	/**
+	 * Component initialization
+	 */
+	private void jbInit() throws Exception
+	{
+		//setIconImage(Toolkit.getDefaultToolkit().createImage(DataBrowserFrame.class.getResource("[Your Icon]")));
+		contentPane = (JPanel) this.getContentPane();
+		contentPane.setLayout(borderLayout1);
+		this.setSize(new Dimension(400, 300));
+		this.setTitle("Equip Beans Browser");
+		quit.setText("Quit");
+		quit.addActionListener(new java.awt.event.ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				System.exit(0);
+			}
+		});
 
-    //specialised mousehandler for doubleclicks
-       jList1.addMouseListener( new MouseAdapter() {
-          public void mouseClicked(MouseEvent e) {
-             if (e.getClickCount() == 2) {
-                int index =
-                         jList1.locationToIndex(e.getPoint());
-                jList1.setSelectedIndex(index);
-                Object item = jList1.getSelectedValue();
+		// The main list stuff
+		// jList1.setCellRenderer(new BeanCellRender());
 
-                if (item != null) {
-                  ItemFrame dataframe = new ItemFrame(item);
-                  dataframe.setTitle("Item: "+item);
-                  dataframe.pack();
-                  dataframe.setVisible(true);
-                }
-             }
-          }
-       });
+		//specialised mousehandler for doubleclicks
+		jList1.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent e)
+			{
+				if (e.getClickCount() == 2)
+				{
+					int index =
+							jList1.locationToIndex(e.getPoint());
+					jList1.setSelectedIndex(index);
+					Object item = jList1.getSelectedValue();
 
-    contentPane.add(jScrollPane1, BorderLayout.CENTER);
-    jScrollPane1.getViewport().add(jList1, null);
-    contentPane.add(jPanel1, BorderLayout.SOUTH);
-    jPanel1.add(quit, null);
-  }
-  /**Overridden so we can exit when window is closed*/
-  protected void processWindowEvent(WindowEvent e) {
-    super.processWindowEvent(e);
-    if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-      System.exit(0);
-    }
-  }
+					if (item != null)
+					{
+						ItemFrame dataframe = new ItemFrame(item);
+						dataframe.setTitle("Item: " + item);
+						dataframe.pack();
+						dataframe.setVisible(true);
+					}
+				}
+			}
+		});
 
-  void quit_actionPerformed(ActionEvent e) {
-       System.exit(0);
-  }
+		contentPane.add(jScrollPane1, BorderLayout.CENTER);
+		jScrollPane1.getViewport().add(jList1, null);
+		contentPane.add(jPanel1, BorderLayout.SOUTH);
+		jPanel1.add(quit, null);
+	}
 
-  // ======== Inner Class to act as a Generic Event Handler ======================
- class EventHandler extends DataCallback {
-    public void notify(equip.data.Event event, EventPattern pattern,
-		       boolean patternDeleted,
-		       DataSession session,
-		       ValueBase closure) {
-     System.out.println("++ main notify..." +event);
+	/**
+	 * Overridden so we can exit when window is closed
+	 */
+	protected void processWindowEvent(WindowEvent e)
+	{
+		super.processWindowEvent(e);
+		if (e.getID() == WindowEvent.WINDOW_CLOSING)
+		{
+			System.exit(0);
+		}
+	}
 
-      if (event instanceof AddEvent) {
-            AddEvent add = (AddEvent)event;
-            if (add.binding.item == null)
-              return; // Should not occur
-           itemList.add(add.binding.item); // Add to the listing
-           jList1.setListData(itemList);
-           //jList1.repaint(); // redraw the list
-        }
+	// ======== Inner Class to act as a Generic Event Handler ======================
+	class EventHandler extends DataCallback
+	{
+		public void notify(equip.data.Event event, EventPattern pattern,
+		                   boolean patternDeleted,
+		                   DataSession session,
+		                   ValueBase closure)
+		{
+			System.out.println("++ main notify..." + event);
 
-      if (event instanceof DeleteEvent) {
-            DeleteEvent del = (DeleteEvent)event;
+			if (event instanceof AddEvent)
+			{
+				AddEvent add = (AddEvent) event;
+				if (add.binding.item == null)
+				{
+					return; // Should not occur
+				}
+				itemList.add(add.binding.item); // Add to the listing
+				jList1.setListData(itemList);
+				//jList1.repaint(); // redraw the list
+			}
 
-            if (ec.dataservice.getItem(del.id) == null)
-              return; // Should not occur
-            itemList.remove(ec.dataservice.getItem(del.id)); // Remove to the listing
-            jList1.setListData(itemList);
-           //jList1.repaint(); // redraw the list
-        }
+			if (event instanceof DeleteEvent)
+			{
+				DeleteEvent del = (DeleteEvent) event;
 
-    }
-  }
+				if (ec.dataservice.getItem(del.id) == null)
+				{
+					return; // Should not occur
+				}
+				itemList.remove(ec.dataservice.getItem(del.id)); // Remove to the listing
+				jList1.setListData(itemList);
+				//jList1.repaint(); // redraw the list
+			}
 
+		}
+	}
 }

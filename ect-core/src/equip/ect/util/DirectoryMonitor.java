@@ -39,60 +39,18 @@ Contributors:
 package equip.ect.util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class DirectoryMonitor implements Runnable
 {
 	private static final int frequency = 1000;
-
-	protected class FileAddedEventDispatcher extends Thread
-	{
-
-		protected int frequency = 10;
-		private File file = null;
-
-		protected FileAddedEventDispatcher(final File file)
-		{
-			this.file = file;
-		}
-
-		@Override
-		public void run()
-		{
-			if (file != null)
-			{
-				if (!file.isDirectory())
-				{
-					while (!existsAndReadable(file))
-					{
-						if (!file.exists() || !file.canRead())
-						{
-							// check if file no longer exists (e.g. if a file copy
-							// has been cancelled) or has been locked by another
-							// process...and bail out.
-							return;
-						}
-						try
-						{
-							Thread.sleep(this.frequency);
-						}
-						catch (final InterruptedException e)
-						{
-							e.printStackTrace();
-						}
-					}
-				}
-				fireFileAddComplete(file);
-			}
-		}
-	}
 
 	protected class MapEntry
 	{
@@ -132,31 +90,6 @@ public class DirectoryMonitor implements Runnable
 		this.directory = directory;
 		this.includeExisting = includeExisting;
 		this.isRecursive = isRecursive;
-	}
-
-	/**
-	 * Check if the specified file exists and is readable.
-	 * <p/>
-	 * Note: the methods File.exists(), File.canRead() & File.canWrite() return true even when the
-	 * file has not been completley written to the backing store or is locked by another process so
-	 * instead we try and open the file and see if an error is thrown.
-	 */
-	public static boolean existsAndReadable(final File file)
-	{
-		try
-		{
-			final FileInputStream input = new FileInputStream(file);
-			input.close();
-		}
-		catch (final FileNotFoundException fnfe)
-		{
-			return false;
-		}
-		catch (final IOException ioe)
-		{
-			ioe.printStackTrace();
-		}
-		return true;
 	}
 
 	public void addDirectoryEventListener(final DirectoryEventListener listener)
@@ -249,13 +182,13 @@ public class DirectoryMonitor implements Runnable
 		}
 	}
 
-	protected void fireFileAddComplete(final File file)
+	protected void fireFileAddComplete(final List<File> files)
 	{
 		synchronized (listenersLock)
 		{
 			for (final DirectoryEventListener listener : listeners)
 			{
-				listener.fileAddComplete(file);
+				listener.filesAdded(files);
 			}
 		}
 	}
@@ -287,22 +220,19 @@ public class DirectoryMonitor implements Runnable
 		synchronized (mapsLock)
 		{
 			// returns non-null
-			final Set<String> currentKeys = currentMap.keySet();
-			final String currentFilenames[] = currentKeys.toArray(new String[0]);
+			final Set<String> currentKeys = new HashSet<String>(currentMap.keySet());
+			final List<File> added = new ArrayList<File>();
 
-			MapEntry previousEntry = null;
-			MapEntry currentEntry = null;
-
-			for (final String currentFilename : currentFilenames)
+			for (final String currentFilename : currentKeys)
 			{
-				previousEntry = previousMap.get(currentFilename);
-				currentEntry = currentMap.get(currentFilename);
+				final MapEntry previousEntry = previousMap.get(currentFilename);
+				final MapEntry currentEntry = currentMap.get(currentFilename);
 				if (currentEntry != null)
 				{
 					if (previousEntry == null)
 					{
 						fireFileAdd(currentEntry.file);
-						new FileAddedEventDispatcher(currentEntry.file).start();
+						added.add(currentEntry.file);
 					}
 					else
 					{
@@ -316,10 +246,15 @@ public class DirectoryMonitor implements Runnable
 			}
 
 			// returns non-null
-			final MapEntry deletedEntries[] = previousMap.values().toArray(new MapEntry[0]);
-			for (final MapEntry deletedEntry : deletedEntries)
+			final Set<MapEntry> deleted = new HashSet<MapEntry>(previousMap.values());
+			for (final MapEntry deletedEntry : deleted)
 			{
 				fireFileDeleted(deletedEntry.file);
+			}
+
+			if(added.size() != 0)
+			{
+				fireFileAddComplete(added);
 			}
 		}
 	}

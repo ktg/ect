@@ -38,6 +38,40 @@ Contributors:
  */
 package equip.ect.apps.configurationmgr;
 
+import equip.data.BooleanBox;
+import equip.data.DataSession;
+import equip.data.GUID;
+import equip.data.ItemBinding;
+import equip.data.ItemData;
+import equip.data.StringBox;
+import equip.data.StringBoxImpl;
+import equip.data.TupleImpl;
+import equip.data.beans.DataspaceBean;
+import equip.data.beans.DataspaceEvent;
+import equip.data.beans.DataspaceEventListener;
+import equip.data.beans.DataspaceInactiveException;
+import equip.ect.*;
+import equip.ect.apps.AppsResources;
+import equip.ect.apps.editor.DataspaceUtils;
+import equip.ect.util.DirectoryEventListener;
+import equip.ect.util.DirectoryMonitor;
+import equip.runtime.ValueBase;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -53,61 +87,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import equip.ect.*;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import equip.data.BooleanBox;
-import equip.data.DataSession;
-import equip.data.GUID;
-import equip.data.ItemBinding;
-import equip.data.ItemData;
-import equip.data.StringBox;
-import equip.data.StringBoxImpl;
-import equip.data.TupleImpl;
-import equip.data.beans.DataspaceBean;
-import equip.data.beans.DataspaceEvent;
-import equip.data.beans.DataspaceEventListener;
-import equip.data.beans.DataspaceInactiveException;
-import equip.ect.apps.AppsResources;
-import equip.ect.apps.editor.DataspaceUtils;
-import equip.ect.util.DirectoryEventListener;
-import equip.ect.util.DirectoryMonitor;
-import equip.runtime.ValueBase;
 
 /**
  * Configuration manager tool for ECT that allows persistent dataspace state to be saved and
@@ -139,7 +118,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		}
 	}
 
-	class CellRenderer extends JLabel implements ListCellRenderer
+	class CellRenderer extends JLabel implements ListCellRenderer<File>
 	{
 		public CellRenderer()
 		{
@@ -147,15 +126,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		}
 
 		@Override
-		public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+		public Component getListCellRendererComponent(final JList list, final File value, final int index,
 				final boolean isSelected, final boolean cellHasFocus)
 		{
-			String s = value.toString();
-			if (value instanceof File)
-			{
-				s = ((File) value).getName();
-			}
-			setText(s);
+			setText(value.getName());
 			setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
 			setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
 			return this;
@@ -184,9 +158,8 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		// ....not yet used....
 	}
 
-	private JList compList = new JList();
-	private DefaultListModel listModel = new DefaultListModel();
-	private JPanel panel = null;
+	private JList<File> compList = new JList<File>();
+	private DefaultListModel<File> listModel = new DefaultListModel<File>();
 	// private Dimension defaultSize = new Dimension(225, 400);
 	/**
 	 * directory
@@ -337,8 +310,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 */
 	public static void main(final String args[]) throws java.io.IOException, DataspaceInactiveException
 	{
-		ConfigurationManager gui = null;
-
+		ConfigurationManager gui;
 		if (args.length == 1)
 		{
 			gui = new ConfigurationManager(args[0], ".");
@@ -352,7 +324,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			gui = new ConfigurationManager("equip://:9123", ".");
 		}
 		final JFrame frame = new JFrame("ECT Configuration Manager");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.getContentPane().add(gui);
 		frame.pack();
 		frame.setVisible(true);
@@ -397,7 +369,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	/**
 	 * load frame component choice panel action chooser
 	 */
-	JComboBox componentAction;
+	JComboBox<String> componentAction;
 	/**
 	 * load frame component choice panel 'go'
 	 */
@@ -413,11 +385,11 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	/**
 	 * load frame, component choice panel, component chooser
 	 */
-	JComboBox candidatesCombo;
+	JComboBox<String> candidatesCombo;
 	/**
 	 * load frame, component choice panel, component chooser model
 	 */
-	DefaultComboBoxModel candidatesComboModel;
+	DefaultComboBoxModel<String> candidatesComboModel;
 
 	/**
 	 * load frame, create panel, progress bar
@@ -427,7 +399,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	/**
 	 * load frame properties panel action chooser
 	 */
-	JComboBox propertiesAction;
+	JComboBox<String> propertiesAction;
 
 	/**
 	 * load frame properties panel 'go'
@@ -585,7 +557,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			DataspaceInactiveException
 	{
 		this.directory = new File(directory);
-		panel = createInnerPanel();
+		JPanel panel = createInnerPanel();
 		setLayout(new BorderLayout());
 		add(panel, BorderLayout.CENTER);
 		// setPreferredSize(defaultSize);
@@ -612,8 +584,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	public File chooseOpenFile(final Component parent)
 	{
 		final String defaultDirectory = System.getProperty(AppsResources.DEFAULT_DIR_PROPERTY_NAME);
-		JFileChooser chooser = null;
-
+		JFileChooser chooser;
 		if (defaultDirectory == null)
 		{
 			chooser = new JFileChooser(".");
@@ -637,8 +608,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	public File chooseSaveFile(final Component parent)
 	{
 		final String defaultDirectory = System.getProperty(AppsResources.DEFAULT_DIR_PROPERTY_NAME);
-		JFileChooser chooser = null;
-
+		JFileChooser chooser;
 		if (defaultDirectory == null)
 		{
 			chooser = new JFileChooser(".");
@@ -1344,34 +1314,37 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 * DirectoryEventListener implementation
 	 */
 	@Override
-	public void fileAddComplete(final File file)
+	public void filesAdded(final List<File> files)
 	{
-		if (!file.getName().endsWith(FILE_SUFFIX))
+		for(final File file: files)
 		{
-			System.out.println("Ignore file " + file);
-			return;
-		}
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
+			if (!file.getName().endsWith(FILE_SUFFIX))
 			{
-				synchronized (listModel)
-				{
-					// in lexical order
-					for (int i = 0; i < listModel.getSize(); i++)
-					{
-						final File f = (File) listModel.getElementAt(i);
-						if (f.getName().compareTo(file.getName()) > 0)
-						{
-							listModel.insertElementAt(file, i);
-							return;
-						}
-					}
-					listModel.addElement(file);
-				}
+				System.out.println("Ignore file " + file);
+				return;
 			}
-		});
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					synchronized (listModel)
+					{
+						// in lexical order
+						for (int i = 0; i < listModel.getSize(); i++)
+						{
+							final File f = (File) listModel.getElementAt(i);
+							if (f.getName().compareTo(file.getName()) > 0)
+							{
+								listModel.insertElementAt(file, i);
+								return;
+							}
+						}
+						listModel.addElement(file);
+					}
+				}
+			});
+		}
 	}
 
 	/**
@@ -1450,7 +1423,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				}
 			}
 		}.start();
-		return;
 	}
 
 	/**
@@ -1903,8 +1875,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			@Override
 			public boolean accept(final File f)
 			{
-				if (f.getName().endsWith(".ect")) { return true; }
-				return false;
+				return f.getName().endsWith(".ect");
 			}
 
 			@Override
@@ -1937,7 +1908,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				final File f = (File) compList.getSelectedValue();
+				final File f = compList.getSelectedValue();
 				if (f != null)
 				{
 					System.out.println("Save as " + f);
@@ -1959,7 +1930,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				final File f = (File) compList.getSelectedValue();
+				final File f = compList.getSelectedValue();
 				if (f != null)
 				{
 					System.out.println("Clear current");
@@ -1974,7 +1945,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				final File f = (File) compList.getSelectedValue();
+				final File f = compList.getSelectedValue();
 				if (f != null)
 				{
 					System.out.println("Load " + f);
@@ -1987,7 +1958,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				final File f = (File) compList.getSelectedValue();
+				final File f = compList.getSelectedValue();
 				if (f != null)
 				{
 					System.out.println("Delete " + f);
@@ -2052,7 +2023,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		// SpringLayout.EAST, p);
 
 		p.add(new JLabel("Select action"));
-		componentAction = new JComboBox(new String[] { ACTION_IGNORE, ACTION_USE_ORIGINAL,
+		componentAction = new JComboBox<String>(new String[] { ACTION_IGNORE, ACTION_USE_ORIGINAL,
 														ACTION_USE_EXISTING_SAME_CLASS,
 														// ACTION_USE_EXISTING_ANY_CLASS,
 														ACTION_CREATE_NEW_DYNAMIC_SAME_CLASS // ,
@@ -2073,8 +2044,8 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		});
 		p.add(componentAction);
 
-		candidatesComboModel = new DefaultComboBoxModel();
-		candidatesCombo = new JComboBox(candidatesComboModel);
+		candidatesComboModel = new DefaultComboBoxModel<String>();
+		candidatesCombo = new JComboBox<String>(candidatesComboModel);
 		candidatesCombo.setEditable(false);
 		candidatesCombo.addActionListener(new ActionListener()
 		{
@@ -2189,7 +2160,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 		p.add(new JLabel("Component's Properties..."));
 
-		propertiesAction = new JComboBox(new String[] { ACTION_LEAVE, ACTION_SET_MATCHING // ,
+		propertiesAction = new JComboBox<String>(new String[] { ACTION_LEAVE, ACTION_SET_MATCHING // ,
 				// ACTION_SET_SELECTED
 				});
 		propertiesAction.setEditable(false);
@@ -2635,11 +2606,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				// matching are...
 				final Element[] properties = getNamedChildElements(	getNamedChildElement(component, ELproperties),
 																	ELproperty);
-				ComponentProperty props[] = null;
 				final ComponentProperty propTemplate = new ComponentProperty((GUID) null);
 				propTemplate.setComponentID(currentComponentId);
 
-				props = propTemplate.copyCollectAsComponentProperty(dataspace);
+				ComponentProperty props[] = propTemplate.copyCollectAsComponentProperty(dataspace);
 
 				for (int i = 0; properties != null && i < properties.length; i++)
 				{
@@ -4136,13 +4106,13 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		try
 		{
 			final GUID guid = new equip.data.GUIDImpl();
-			guid.host_id = (new Integer(matcher.group(1)).intValue() << 24)
-					| (new Integer(matcher.group(2)).intValue() << 16)
-					| (new Integer(matcher.group(3)).intValue() << 8) | (new Integer(matcher.group(4)).intValue());
-			guid.proc_id = (new Integer(matcher.group(5)).intValue() << 16)
-					| (new Integer(matcher.group(6)).intValue());
-			guid.item_id = (new Integer(matcher.group(7)).intValue());
-			guid.time_s = (new Integer(matcher.group(8)).intValue());
+			guid.host_id = (new Integer(matcher.group(1)) << 24)
+					| (new Integer(matcher.group(2)) << 16)
+					| (new Integer(matcher.group(3)) << 8) | (new Integer(matcher.group(4)));
+			guid.proc_id = (new Integer(matcher.group(5)) << 16)
+					| (new Integer(matcher.group(6)));
+			guid.item_id = (new Integer(matcher.group(7)));
+			guid.time_s = (new Integer(matcher.group(8)));
 
 			// test/temp check
 			if (!guid.toString().equals(guids))

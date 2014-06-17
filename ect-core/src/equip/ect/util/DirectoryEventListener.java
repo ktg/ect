@@ -40,12 +40,13 @@ package equip.ect.util;
 
 import java.io.File;
 import java.util.EventListener;
+import java.util.List;
 
 public interface DirectoryEventListener extends EventListener
 {
 	public void fileAdd(File file);
 
-	public void fileAddComplete(File file);
+	public void filesAdded(List<File> files);
 
 	public void fileDeleted(File file);
 
