@@ -1,0 +1,1 @@
+gradlew build ect-core:run
