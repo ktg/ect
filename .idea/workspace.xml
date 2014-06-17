@@ -2,199 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="06879d14-d937-49ce-9774-b2b4330cfa22" name="Default" comment="Stuff">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/resources/component.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/resources/componentRequest.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/resources/folder.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/resources/search.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/AbstractFilter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/AbstractStringProcessing.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/BinaryOutput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/BoxBlurFilter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/CircularList.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ColourFilter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/fileio/src/equip/ect/components/filebuffer/FileBuffer.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/GaugeOutput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageBlur.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageDisplay.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageFade.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageFilter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageLoader.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageMath.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageSink.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageSource.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageUpdateHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageUpdateHandlerImpl.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/src/equip/ect/components/imageframework/ImageUpdateListener.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/MessageOutput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/PushButtonInput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/RollingAverage.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/SliderInput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/StringConcatenation.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/StringReplacement.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/TextInput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/TextOutput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/TimedAverage.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/ToggleButtonInput.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/UIBase.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/build.gradle" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/fileio/build.gradle" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/image/build.gradle" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/ui/build.gradle" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/package.html" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/dynamicbsh/src/equip/ect/components/dynamicbsh/BeanShellParameter.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/sinewaves/build.gradle" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/sinewaves/src/equip/ect/components/sineWave/AsymmetricalWave.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/sinewaves/src/equip/ect/components/sineWave/FourierTransform.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/sinewaves/src/equip/ect/components/sineWave/FrequencyAnalyser.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/sinewaves/src/equip/ect/components/sineWave/SineWave.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/sinewaves/src/equip/ect/components/sineWave/SkewedWave.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/components/sinewaves/src/equip/ect/components/sineWave/ValueTrigger.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/package.html" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/eqBasicTypes.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/eqCoreTypes.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/eqDataTypes.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/eqNetTypes.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/eqTraderTypes.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/equip_config_types.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/equip_data_benchmark.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/equip_data_tuple.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/equip/idl/equip_discovery_types.idl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/LinkFrame.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/build.gradle" afterPath="$PROJECT_DIR$/ect-core/build.gradle" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Bean2Equip.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Bean2Equip.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/BeanDescriptorHelper.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/BeanDescriptorHelper.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/BeanJarContent.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/BeanJarContent.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Capability.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Capability.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/CapabilityExporter.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/CapabilityExporter.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Category.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Category.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Coerce.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Coerce.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/CompInfo.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/CompInfo.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ComponentAdvert.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentAdvert.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ComponentExporter.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentExporter.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ComponentLauncher.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentLauncher.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ComponentProperty.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentProperty.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ComponentRequest.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentRequest.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ComponentStartupData.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentStartupData.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ConnectionPointTypeException.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ConnectionPointTypeException.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Container.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Container.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ContainerManager.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ContainerManager.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ContainerManagerHelper.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ContainerManagerHelper.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/DynamicProperties.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/DynamicProperties.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/DynamicPropertiesSupport.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/DynamicPropertiesSupport.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/DynamicPropertyDescriptor.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/DynamicPropertyDescriptor.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ECTComponent.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ECTComponent.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Equip2Bean.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Equip2Bean.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/HostAdvert.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/HostAdvert.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/IActiveComponent.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/IActiveComponent.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/InstantiateListener.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/InstantiateListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/MappingObject.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/MappingObject.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/NoSuchPropertyException.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/NoSuchPropertyException.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Persistable.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Persistable.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/PersistenceManager.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/PersistenceManager.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/ProcessingHelper.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ProcessingHelper.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/PropertyLinkRequest.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/PropertyLinkRequest.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/PropertyLinkResponse.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/PropertyLinkResponse.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/PublicFieldsProxyComponent.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/PublicFieldsProxyComponent.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/RDFStatement.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/RDFStatement.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/RequestResponse.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/RequestResponse.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/Requester.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Requester.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/SimpleDynamicComponent.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/SimpleDynamicComponent.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/SimpleObjectContainer.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/SimpleObjectContainer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/XMLConstants.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/XMLConstants.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/apps/AppsResources.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/apps/AppsResources.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/apps/ExporterGUI.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/apps/ExporterGUI.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/discovery/DataspaceDiscover.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/discovery/DataspaceDiscover.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/discovery/StartManager.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/discovery/StartManager.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/AbstractHttpServer.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/AbstractHttpServer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/DownloadHttpServer.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/DownloadHttpServer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/SimpleFormHttpServer.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/SimpleFormHttpServer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/SimpleFormModel.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/SimpleFormModel.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/SimpleFormProvider.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/SimpleFormProvider.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/SimpleHttpServer.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/SimpleHttpServer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/UploadHttpServer.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/UploadHttpServer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/http/XmlServer.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/http/XmlServer.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/logs/EquipLogSummary.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/logs/EquipLogSummary.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/DirectoryEventListener.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/DirectoryEventListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/DirectoryMonitor.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/DirectoryMonitor.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/HTMLConstants.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/HTMLConstants.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/MakeIndexPages.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/MakeIndexPages.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/URLUtils.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/URLUtils.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/process/ProcessUtils.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/process/ProcessUtils.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/process/Win32ProcessConstants.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/process/Win32ProcessConstants.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/process/WrappedProcess.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/process/WrappedProcess.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/util/process/win32_process_jni.cpp" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/util/process/win32_process_jni.cpp" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/Boot.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/Boot.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/BootFrame.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/BootFrame.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/BootGlobals.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/BootGlobals.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/Container.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/Container.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/DataspaceConnectedPanel.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/DataspaceConnectedPanel.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/DebugFrame.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/DebugFrame.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/DownloadManager.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/DownloadManager.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/DownloadProgress.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/DownloadProgress.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/HostManager.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/HostManager.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/HostManagerFrame.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/HostManagerFrame.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/Installation.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/Installation.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/StreamPump.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/StreamPump.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/core/src/equip/ect/webstart/UploadManager.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/webstart/UploadManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/new_view.xml" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanGraphPanel.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanGraphPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanListModel.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanListModel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/BooleanBox.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/BooleanBox.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/Browser2.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/Browser2.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CapabilityBrowser.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CapabilityBrowser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/ChallengeType.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/ChallengeType.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/ConnectionSap.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/ConnectionSap.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/ConnectionSapJcp.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/ConnectionSapJcp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CurvedLine.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CurvedLine.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/sql/CustomTableDataStore.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/sql/CustomTableDataStore.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/discovery/DISCOVERY_ATTEMPTS.java" afterPath="$PROJECT_DIR$/equip/src/equip/discovery/DISCOVERY_ATTEMPTS.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/DataManager.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/DataManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/DataManagerBrowser.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/DataManagerBrowser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/DataProxy.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/DataProxy.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/DataProxyImpl.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/DataProxyImpl.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/beans/DataspaceBean.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/beans/DataspaceBean.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/DataspaceMonitor.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/DataspaceMonitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/discovery/DataspaceServer.java" afterPath="$PROJECT_DIR$/equip/src/equip/discovery/DataspaceServer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/discovery/DiscoveryBrowser.java" afterPath="$PROJECT_DIR$/equip/src/equip/discovery/DiscoveryBrowser.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/Drawer.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/Drawer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/EditorResources.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/EditorResources.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/Encoding.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/Encoding.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ExtensionFileFilter.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ExtensionFileFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ExtensionFileFilter.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ExtensionFileFilter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvas.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvas.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/ItemEventKind.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/ItemEventKind.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/LockType.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/LockType.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/runtime/MbufInputStream.java" afterPath="$PROJECT_DIR$/equip/src/equip/runtime/MbufInputStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/runtime/MbufOutputStream.java" afterPath="$PROJECT_DIR$/equip/src/equip/runtime/MbufOutputStream.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/MediaFactory.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/MediaFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/runtime/MultiClassLoader.java" afterPath="$PROJECT_DIR$/equip/src/equip/runtime/MultiClassLoader.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetBase.java" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetBase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetInterfaceKit.java" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetInterfaceKit.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetLCD.java" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetLCD.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetRFID.java" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetRFID.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/ProxyDelegate.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/ProxyDelegate.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.TXT" afterPath="$PROJECT_DIR$/README.TXT" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/data/Server.java" afterPath="$PROJECT_DIR$/equip/src/equip/data/Server.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/ServerSap.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/ServerSap.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/ServerSapTcp.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/ServerSapTcp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/ServerSapUdp.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/ServerSapUdp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/runtime/StatusValues.java" afterPath="$PROJECT_DIR$/equip/src/equip/runtime/StatusValues.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TexturedJList.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TexturedJList.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/src/equip/net/Trader.java" afterPath="$PROJECT_DIR$/equip/src/equip/net/Trader.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TransferableMultiMedia.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TransferableMultiMedia.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TrashView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TrashView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/build.gradle" afterPath="$PROJECT_DIR$/components/phidget/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/equip/build.gradle" afterPath="$PROJECT_DIR$/equip/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/build.gradle" afterPath="$PROJECT_DIR$/grapheditor/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/settings.gradle" afterPath="$PROJECT_DIR$/settings.gradle" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorChoicePanel.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorChoicePanel.java" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -257,63 +67,41 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="BeanChoicePanel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java">
+      <file leaf-file-name="SecureClassLoader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/java/security/SecureClassLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2266" max-vertical-offset="4284">
-              <caret line="243" column="5" selection-start-line="243" selection-start-column="5" selection-end-line="243" selection-end-column="5" />
-              <folding>
-                <element signature="e#0#7018#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/components/phidget/build.gradle">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="198">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1873" max-vertical-offset="3654">
+              <caret line="141" column="0" selection-start-line="141" selection-start-column="0" selection-end-line="141" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/components/ui/build.gradle">
+      <file leaf-file-name="URLClassLoader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/java/net/URLClassLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="180">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="5437" max-vertical-offset="13284">
+              <caret line="366" column="20" selection-start-line="366" selection-start-column="20" selection-end-line="366" selection-end-column="20" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/build.gradle">
+      <file leaf-file-name="Drawer.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/Drawer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="252">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2216" max-vertical-offset="2934">
+              <caret line="140" column="6" selection-start-line="140" selection-start-column="6" selection-end-line="140" selection-end-column="6" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ect-core/build.gradle">
+      <file leaf-file-name="GraphComponent.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="234">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.03837953" vertical-offset="0" max-vertical-offset="938">
-              <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3240" max-vertical-offset="15084">
+              <caret line="167" column="50" selection-start-line="167" selection-start-column="50" selection-end-line="167" selection-end-column="50" />
               <folding />
             </state>
           </provider>
@@ -322,38 +110,61 @@
       <file leaf-file-name="GraphEditorChoicePanel.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorChoicePanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6822">
-              <caret line="72" column="52" selection-start-line="72" selection-start-column="52" selection-end-line="72" selection-end-column="52" />
+            <state vertical-scroll-proportion="-4.1538463" vertical-offset="0" max-vertical-offset="6804">
+              <caret line="72" column="54" selection-start-line="72" selection-start-column="54" selection-end-line="72" selection-end-column="54" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JList.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/javax/swing/JList.java">
+      <file leaf-file-name="GraphEditorCanvas.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="27894" max-vertical-offset="64710">
-              <caret line="1647" column="17" selection-start-line="1647" selection-start-column="17" selection-end-line="1647" selection-end-column="17" />
+            <state vertical-scroll-proportion="-4.5384617" vertical-offset="26" max-vertical-offset="18774">
+              <caret line="85" column="3" selection-start-line="85" selection-start-column="3" selection-end-line="85" selection-end-column="3" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ListModel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/javax/swing/ListModel.java">
+      <file leaf-file-name="GraphEditor.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="30" max-vertical-offset="972">
-              <caret line="42" column="17" selection-start-line="42" selection-start-column="17" selection-end-line="42" selection-end-column="17" />
+            <state vertical-scroll-proportion="-246.96153" vertical-offset="2849" max-vertical-offset="13896">
+              <caret line="623" column="0" selection-start-line="623" selection-start-column="0" selection-end-line="623" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BeanListModel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanListModel.java">
+      <file leaf-file-name="BeanChoicePanel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="432">
-              <caret line="51" column="47" selection-start-line="51" selection-start-column="47" selection-end-line="51" selection-end-column="47" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2284" max-vertical-offset="4284">
+              <caret line="157" column="21" selection-start-line="157" selection-start-column="21" selection-end-line="157" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#7021#0" expanded="true" />
+                <element signature="e#2405#2429#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.gradle" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="252">
+              <caret line="8" column="1" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="build.gradle" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/components/build.gradle">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.19189766" vertical-offset="0" max-vertical-offset="938">
+              <caret line="10" column="5" selection-start-line="10" selection-start-column="5" selection-end-line="10" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -377,12 +188,26 @@
         <entry key=":core/ect/" value="true" />
         <entry key=":ect-core/ect/" value="true" />
         <entry key=":equip/ect/" value="false" />
-        <entry key=":grapheditor/ect/" value="false" />
+        <entry key=":grapheditor/ect/" value="true" />
         <entry key="ect/" value="true" />
       </map>
     </option>
     <option name="recentTasks">
       <list>
+        <ExternalTaskExecutionInfo>
+          <option name="executorId" value="Run" />
+          <option name="settings">
+            <ExternalSystemSettings>
+              <option name="externalProjectPath" value="$PROJECT_DIR$/grapheditor" />
+              <option name="externalSystemIdString" value="GRADLE" />
+              <option name="taskNames">
+                <list>
+                  <option value="run" />
+                </list>
+              </option>
+            </ExternalSystemSettings>
+          </option>
+        </ExternalTaskExecutionInfo>
         <ExternalTaskExecutionInfo>
           <option name="executorId" value="Run" />
           <option name="settings">
@@ -1911,8 +1736,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/components/image/build.gradle" />
-        <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/ArrayTest.java" />
         <option value="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/TestingToggleButtonInput.java" />
         <option value="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/TestingBinaryOutput.java" />
@@ -1960,8 +1783,10 @@
         <option value="$PROJECT_DIR$/equip/src/equip/data/beans/DataspaceBean.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TexturedJList.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanListModel.java" />
-        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java" />
+        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorChoicePanel.java" />
+        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java" />
       </list>
     </option>
   </component>
@@ -2040,143 +1865,7 @@
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="equip" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect-core" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="components" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="components" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ui" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="components" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="phidget" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="components" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="image" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="components" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="fileio" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="components" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="dataprocessing" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="components" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="beanshell" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2228,26 +1917,7 @@
       <recent name="$PROJECT_DIR$/grapheditor/resources" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.ExporterGUI">
-    <configuration default="false" name="ect:equip [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/equip" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="run" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <RunnerSettings RunnerId="ExternalSystemTaskRunner" />
-      <ConfigurationWrapper RunnerId="ExternalSystemTaskRunner" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="Gradle.ect:grapheditor [run]">
     <configuration default="false" name="ect:core [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/core" />
@@ -2320,6 +1990,25 @@
       <envs />
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ect:grapheditor [run]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/grapheditor" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="run" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <RunnerSettings RunnerId="ExternalSystemTaskRunner" />
+      <ConfigurationWrapper RunnerId="ExternalSystemTaskRunner" />
       <method />
     </configuration>
     <configuration default="true" type="GroovyScriptRunConfiguration" factoryName="Groovy">
@@ -2455,19 +2144,19 @@
       <method />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Gradle.ect:equip [run]" />
-      <item index="1" class="java.lang.String" itemvalue="Gradle.ect:core [run]" />
-      <item index="2" class="java.lang.String" itemvalue="Gradle.ect [clean]" />
-      <item index="3" class="java.lang.String" itemvalue="Gradle.ect:ect-core [run]" />
-      <item index="4" class="java.lang.String" itemvalue="Application.ExporterGUI" />
+      <item index="0" class="java.lang.String" itemvalue="Gradle.ect:core [run]" />
+      <item index="1" class="java.lang.String" itemvalue="Gradle.ect [clean]" />
+      <item index="2" class="java.lang.String" itemvalue="Gradle.ect:ect-core [run]" />
+      <item index="3" class="java.lang.String" itemvalue="Application.ExporterGUI" />
+      <item index="4" class="java.lang.String" itemvalue="Gradle.ect:grapheditor [run]" />
     </list>
     <recent_temporary>
       <list size="5">
-        <item index="0" class="java.lang.String" itemvalue="Application.ExporterGUI" />
-        <item index="1" class="java.lang.String" itemvalue="Gradle.ect:ect-core [run]" />
-        <item index="2" class="java.lang.String" itemvalue="Gradle.ect [clean]" />
-        <item index="3" class="java.lang.String" itemvalue="Gradle.ect:core [run]" />
-        <item index="4" class="java.lang.String" itemvalue="Gradle.ect:equip [run]" />
+        <item index="0" class="java.lang.String" itemvalue="Gradle.ect:grapheditor [run]" />
+        <item index="1" class="java.lang.String" itemvalue="Application.ExporterGUI" />
+        <item index="2" class="java.lang.String" itemvalue="Gradle.ect:ect-core [run]" />
+        <item index="3" class="java.lang.String" itemvalue="Gradle.ect [clean]" />
+        <item index="4" class="java.lang.String" itemvalue="Gradle.ect:core [run]" />
       </list>
     </recent_temporary>
     <configuration name="&lt;template&gt;" type="TestNG" default="true" selected="false">
@@ -2520,14 +2209,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1916" height="1058" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32760364" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32712215" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4142562" sideWeight="0.5003734" order="8" side_tool="true" content_ui="tabs" />
@@ -2538,9 +2227,9 @@
       <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.10832444" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18249734" sideWeight="0.5010352" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18249734" sideWeight="0.49896482" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18249734" sideWeight="0.49896482" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28881988" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.41304347" sideWeight="0.49887976" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33850932" sideWeight="0.49887976" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15368196" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -2583,71 +2272,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanGraphPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="16" max-vertical-offset="13780">
-          <caret line="76" column="17" selection-start-line="76" selection-start-column="17" selection-end-line="76" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetInterfaceKit.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1476" max-vertical-offset="4200">
-          <caret line="134" column="36" selection-start-line="134" selection-start-column="36" selection-end-line="134" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/equip/src/equip/net/ConnectionSapJcp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="46560" max-vertical-offset="56100">
-          <caret line="2469" column="20" selection-start-line="2469" selection-start-column="20" selection-end-line="2469" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/equip/src/equip/net/Ack.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="456" max-vertical-offset="1440">
-          <caret line="81" column="5" selection-start-line="81" selection-start-column="5" selection-end-line="81" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/equip/src/equip/data/BooleanBox.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1387" max-vertical-offset="2900">
-          <caret line="87" column="9" selection-start-line="87" selection-start-column="9" selection-end-line="87" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#4006#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#2336#2337#0" expanded="false" />
-            <element signature="e#2354#2355#0" expanded="false" />
-            <element signature="e#2761#2762#0" expanded="false" />
-            <element signature="e#2831#2832#0" expanded="false" />
-            <element signature="e#3273#3274#0" expanded="false" />
-            <element signature="e#3344#3345#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5460">
-          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/CircularList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1720">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/dataprocessing/AbstractStringProcessing.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2320">
@@ -2818,14 +2442,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="360">
-          <caret line="10" column="5" selection-start-line="10" selection-start-column="5" selection-end-line="10" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="702">
@@ -2974,14 +2590,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/java/net/URLClassLoader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5437" max-vertical-offset="13284">
-          <caret line="366" column="0" selection-start-line="366" selection-start-column="0" selection-end-line="366" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/equip/src/equip/runtime/FileClassLoader.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="972">
@@ -3033,24 +2641,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorChoicePanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6822">
-          <caret line="72" column="52" selection-start-line="72" selection-start-column="52" selection-end-line="72" selection-end-column="52" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2266" max-vertical-offset="4284">
-          <caret line="243" column="5" selection-start-line="243" selection-start-column="5" selection-end-line="243" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#7018#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/components/phidget/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="938">
@@ -3060,14 +2650,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/components/ui/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="938">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="938">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -3085,8 +2667,99 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.03837953" vertical-offset="0" max-vertical-offset="938">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="162">
           <caret line="2" column="0" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/java/lang/ClassLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="12205" max-vertical-offset="38106">
+          <caret line="759" column="0" selection-start-line="759" selection-start-column="0" selection-end-line="759" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/java/security/SecureClassLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1873" max-vertical-offset="3654">
+          <caret line="141" column="0" selection-start-line="141" selection-start-column="0" selection-end-line="141" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/java/net/URLClassLoader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5437" max-vertical-offset="13284">
+          <caret line="366" column="20" selection-start-line="366" selection-start-column="20" selection-end-line="366" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/Drawer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2934">
+          <caret line="140" column="6" selection-start-line="140" selection-start-column="6" selection-end-line="140" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3528" max-vertical-offset="15084">
+          <caret line="167" column="50" selection-start-line="167" selection-start-column="50" selection-end-line="167" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.5384617" vertical-offset="26" max-vertical-offset="18774">
+          <caret line="85" column="3" selection-start-line="85" selection-start-column="3" selection-end-line="85" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-246.96153" vertical-offset="2849" max-vertical-offset="13896">
+          <caret line="623" column="0" selection-start-line="623" selection-start-column="0" selection-end-line="623" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorChoicePanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-4.1538463" vertical-offset="0" max-vertical-offset="6804">
+          <caret line="72" column="54" selection-start-line="72" selection-start-column="54" selection-end-line="72" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2284" max-vertical-offset="4284">
+          <caret line="157" column="21" selection-start-line="157" selection-start-column="21" selection-end-line="157" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#7021#0" expanded="true" />
+            <element signature="e#2405#2429#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="252">
+          <caret line="8" column="1" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.19189766" vertical-offset="0" max-vertical-offset="938">
+          <caret line="10" column="5" selection-start-line="10" selection-start-column="5" selection-end-line="10" selection-end-column="5" />
           <folding />
         </state>
       </provider>

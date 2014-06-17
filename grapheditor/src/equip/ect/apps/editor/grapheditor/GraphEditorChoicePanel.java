@@ -228,13 +228,12 @@ public class GraphEditorChoicePanel extends BeanChoicePanel
 			{
 				final int index = beanList.locationToIndex(me.getPoint());
 				/*
-				 * the index does not ensure the point is within a particulat component but returns
+				 * the index does not ensure the point is within a particular component but returns
 				 * the closest one. We need to ensure this.
 				 */
 				if (beanList.getCellBounds(index, index).contains(me.getPoint()))
 				{
-					final BeanCanvasItem component = (BeanCanvasItem) beanList.getModel().getElementAt(index);
-					return component;
+					return beanList.getModel().getElementAt(index);
 				}
 				return null;
 			}
@@ -279,8 +278,8 @@ public class GraphEditorChoicePanel extends BeanChoicePanel
 	public void componentAdvertDeleted(final ComponentAdvert compAdvert)
 	{
 		final String beanid = compAdvert.getComponentID().toString();
-		final BeanCanvasItem removal = (BeanCanvasItem) templates.get(beanid);
-		((BeanListModel) beanList.getModel()).removeElement(removal);
+		final BeanCanvasItem removal = templates.get(beanid);
+		listModel.removeElement(removal);
 		// remove from editor as well
 		templates.remove(beanid);
 	}

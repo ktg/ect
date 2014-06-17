@@ -58,7 +58,7 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	protected final JList<BeanCanvasItem> beanList;
 	protected final BeanListModel<BeanCanvasItem> listModel;
 
-	protected static Map<String, BeanCanvasItem> templates = new HashMap<String, BeanCanvasItem>();
+	protected static final Map<String, BeanCanvasItem> templates = new HashMap<String, BeanCanvasItem>();
 
 	public static Map<String, BeanCanvasItem> getTemplates()
 	{
@@ -155,7 +155,7 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 		if (templates.containsKey(compAdvert.getComponentID().toString())) { return; }
 		final BeanCanvasItem newComp = createComponentTemplate(compAdvert);
 		templates.put(compAdvert.getComponentID().toString(), newComp);
-		listModel.removeElement(newComp);
+		listModel.addElement(newComp);
 	}
 
 	@Override
