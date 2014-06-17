@@ -1,7 +1,7 @@
 version = '1.0'
 
 dependencies {
-	compile "bsh:bsh:+"
+	compile "org.beanshell:bsh:+"
 }
 
 task copyToLib(type: Copy) {

@@ -249,7 +249,7 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 					containerHelper.loadJar(file);
 					jars.add(file);
 				}
-				catch (MalformedURLException e)
+				catch (Throwable e)
 				{
 					e.printStackTrace();
 				}
@@ -262,7 +262,7 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 			{
 				containerHelper.exportFromJarFile(file);
 			}
-			catch (IOException e)
+			catch (Throwable e)
 			{
 				e.printStackTrace();
 			}

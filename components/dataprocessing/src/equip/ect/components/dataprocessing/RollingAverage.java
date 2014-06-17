@@ -68,7 +68,7 @@ import java.io.Serializable;
  * @author stef
  */
 @ECTComponent
-@Category("Data/processing")
+@Category("Data/Processing")
 public class RollingAverage implements Serializable
 {
 	private CircularList buffer = new CircularList(1000);

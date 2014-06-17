@@ -379,7 +379,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	public GraphEditorCanvas(final String title)
 	{
 		super(title);
-		showTrash(true);
+		showTrash(false);
 		// need to call this to enable tooltips
 		this.setToolTipText("");
 	}

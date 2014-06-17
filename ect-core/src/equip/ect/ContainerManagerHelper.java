@@ -420,7 +420,7 @@ public class ContainerManagerHelper implements XMLConstants
 									classNames.add(className);
 								}
 							}
-							catch(Exception e)
+							catch(Throwable e)
 							{
 								// Do nothing
 								//System.err.println("Error whilst loading " + className);

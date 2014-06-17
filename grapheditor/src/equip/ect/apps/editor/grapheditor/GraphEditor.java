@@ -93,7 +93,7 @@ public class GraphEditor extends JFrame
 			cb = new JCheckBox("Audio effects", AudioManager.audioOn);
 			cb.addActionListener(this);
 			panel.add(cb);
-			cb = new JCheckBox("Show trash", true);
+			cb = new JCheckBox("Show trash", false);
 			cb.addActionListener(this);
 			panel.add(cb);
 			final JPanel ttkP = new JPanel();
@@ -215,7 +215,7 @@ public class GraphEditor extends JFrame
 			else if (command.equals("TIME_TO_KILL"))
 			{
 				final Long value = (Long) tf.getValue();
-				CleanerTask.timeUntilKill = value.longValue() * 1000;
+				CleanerTask.timeUntilKill = value * 1000;
 				settings.setProperty("TIME_UNTIL_ITEM_CLEAN", String.valueOf(CleanerTask.timeUntilKill));
 			}
 			else if (command.equals("AUTO_CLEAN_UP"))
@@ -226,11 +226,7 @@ public class GraphEditor extends JFrame
 				if (autoClean)
 				{
 					final Long value = (Long) tf.getValue();
-					CleanerTask.timeUntilKill = value.longValue() * 1000;
-				}
-				else
-				{
-					// stop auto clean
+					CleanerTask.timeUntilKill = value * 1000;
 				}
 				settings.setProperty("AUTO_CLEAN_COMPONENTS", String.valueOf(autoClean));
 			}
