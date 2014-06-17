@@ -163,8 +163,8 @@ public class ContainerManagerHelper implements XMLConstants
 
 	private File persistFile = null;
 	private DirectoryMonitor directoryMonitor = null;
-	private ContainerClassLoader classLoader = new ContainerClassLoader(getClass().getClassLoader());
-	private DataspaceBean dataSpaceBean = null;
+	private final ContainerClassLoader classLoader = new ContainerClassLoader(getClass().getClassLoader());
+	private final DataspaceBean dataSpaceBean;
 	private ContainerManager containerManager = null;
 
 	public ContainerManagerHelper(final DataspaceBean dataSpaceBean, final File componentsDirectory,
@@ -346,6 +346,7 @@ public class ContainerManagerHelper implements XMLConstants
 	// export using new allocated ids
 	public void exportFromJarFile(final File file) throws IOException
 	{
+		System.out.println("Importing from " + file.toString());
 		if (containerManager.capexport != null)
 		{
 			final BeanJarContent beanJarContent = new BeanJarContent();
@@ -377,9 +378,14 @@ public class ContainerManagerHelper implements XMLConstants
 		return directoryMonitor;
 	}
 
+	public boolean canImport(File file)
+	{
+		return file != null && file.exists() && file.getName().toLowerCase().endsWith(JAR_EXTENSION);
+	}
+
 	public List<Class<?>> loadFromJarFile(final File file, final BeanJarContent beanContent) throws IOException
 	{
-		if (file != null && file.exists() && file.getName().toLowerCase().endsWith(JAR_EXTENSION))
+		if (canImport(file))
 		{
 			loadJar(file);
 			final JarFile jarFile = new JarFile(file);

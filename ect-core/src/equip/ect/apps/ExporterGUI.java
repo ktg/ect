@@ -48,7 +48,10 @@ import equip.ect.util.DirectoryEventListener;
 import equip.ect.webstart.Boot;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -58,6 +61,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GUI Application which is the main (current) Java container.
@@ -66,6 +72,7 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 {
 	public static final String JAR_SUFFIX = ".jar";
 	private static final Dimension defaultSize = new Dimension(225, 400);
+	private static final int delay = 1000;
 
 	/**
 	 * app main. Usage: [ dataspaceUrl [ [ componentsDir persistFile ] hostname ] ]. Default
@@ -197,6 +204,7 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 		}
 	}
 
+	private final List<File> importing = new ArrayList<File>();
 	private final JList<File> compList = new JList<File>();
 	private final DefaultListModel<File> listModel = new DefaultListModel<File>();
 	private final DataProxy dataspace;
@@ -235,44 +243,52 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 	@Override
 	public void fileAddComplete(final File file)
 	{
-		SwingUtilities.invokeLater(new Runnable()
+		if(containerHelper.canImport(file))
 		{
-			@Override
-			public void run()
+			System.out.println("Adding " + file.toString());
+			try
 			{
-				if (!file.getName().endsWith(JAR_SUFFIX))
-				{
-					//System.out.println("Ignore non-jar file: " + file);
-					return;
-				}
-				synchronized (listModel)
-				{
-					try
-					{
-						synchronized (ContainerManager.class)
-						{
-							containerHelper.exportFromJarFile(file);
-						}
-					}
-					catch (final IOException e)
-					{
-						System.err.println("ERROR Exporting " + file + ": " + e);
-						e.printStackTrace(System.err);
-					}
-					// in lexical order
-					for (int i = 0; i < listModel.getSize(); i++)
-					{
-						final File f = listModel.getElementAt(i);
-						if (f.getName().compareTo(file.getName()) > 0)
-						{
-							listModel.insertElementAt(file, i);
-							return;
-						}
-					}
-					listModel.addElement(file);
-				}
+				containerHelper.loadJar(file);
 			}
-		});
+			catch (MalformedURLException e)
+			{
+				e.printStackTrace();
+			}
+
+			SwingUtilities.invokeLater(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					synchronized (listModel)
+					{
+						try
+						{
+							synchronized (ContainerManager.class)
+							{
+								containerHelper.exportFromJarFile(file);
+							}
+						}
+						catch (final IOException e)
+						{
+							System.err.println("ERROR Exporting " + file + ": " + e);
+							e.printStackTrace(System.err);
+						}
+						// in lexical order
+						for (int i = 0; i < listModel.getSize(); i++)
+						{
+							final File f = listModel.getElementAt(i);
+							if (f.getName().compareTo(file.getName()) > 0)
+							{
+								listModel.insertElementAt(file, i);
+								return;
+							}
+						}
+						listModel.addElement(file);
+					}
+				}
+			});
+		}
 	}
 
 	@Override

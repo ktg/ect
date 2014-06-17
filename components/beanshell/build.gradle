@@ -2,5 +2,13 @@ version = '1.0'
 
 dependencies {
 	compile "bsh:bsh:+"
-	compile project(":ect-core")
 }
+
+task copyToLib(type: Copy) {
+	into "$buildDir/libs"
+	from configurations.runtime
+	exclude '**/ect-core*'
+	exclude '**/equip*'
+}
+
+build.dependsOn(copyToLib)
