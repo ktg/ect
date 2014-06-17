@@ -9,7 +9,7 @@ public class TrashView extends GraphicCanvasItemView
 
 	public TrashView(final Component canvas)
 	{
-		super(canvas, MediaFactory.createImage(EditorResources.TRASH_ICON, canvas), 48, 48);
+		super(canvas, MediaFactory.createImage(EditorResources.TRASH_ICON, canvas), 32, 32);
 		this.imageBuffer = createImageBuffer(this.width, this.height);
 	}
 

@@ -39,11 +39,7 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 import equip.ect.apps.editor.InteractiveCanvasItemView;
@@ -74,9 +70,10 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 		g2.setFont(propertyFont);
 		final FontMetrics metrics = g2.getFontMetrics();
 		Rectangle2D r2d = metrics.getStringBounds(name, g2);
-		g2.fillRoundRect(posX, posY, width, height, 10, 10);
+		g2.fillRect(posX,posY, width, height);
+		//g2.fillRoundRect(posX, posY, width, height, 10, 10);
 		g2.setColor(Color.black);
-		g2.drawRoundRect(posX, posY, width - 1, height - 1, 10, 10);
+		g2.drawRect(posX, posY, width - 1, height - 1);
 		g2.drawString(name, (int) (posX + 0.5 * (width - r2d.getWidth())), // center
 						posY + (int) r2d.getHeight());
 		if (renderPropValue)

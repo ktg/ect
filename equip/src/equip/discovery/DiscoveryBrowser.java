@@ -135,7 +135,7 @@ public class DiscoveryBrowser extends DiscoveryClientAgentImpl {
 	frame.getContentPane().add(treeView);
 	frame.getContentPane().setSize(300,400);
 	frame.pack();
-	frame.show();
+	frame.setVisible(true);
 
 	Runnable expireTask = new Runnable() {
 		public void run() {

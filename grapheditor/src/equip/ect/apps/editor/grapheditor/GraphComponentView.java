@@ -35,14 +35,7 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
@@ -63,16 +56,16 @@ public class GraphComponentView extends InteractiveCanvasItemView
 
 	private Font hostIDFont = new Font("Helvetica", Font.PLAIN, 10);
 
-	private static Font headerFont = new Font("Helvetica", Font.BOLD, 12);
+	private static Font headerFont = new Font("Arial", Font.PLAIN, 13);
 
 	private transient List<GraphComponentProperty> graphCompProps;
 
 	private String hostID;
 
 	private boolean highlight = false;
-	private static Color HIGHLIGHT_COLOR = new Color(0, 0, 200);
+	private static Color HIGHLIGHT_COLOR = new Color(50, 100, 255);
 
-	public static boolean renderHostID = true;
+	public static boolean renderHostID = false;
 
 	public GraphComponentView(final Component canvas, final String name, final String hostID,
 			final List<GraphComponentProperty> renderableProps)
@@ -83,24 +76,31 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		this.graphCompProps = renderableProps;
 	}
 
-	public void drawHeader(final Graphics g)
+	public void drawHeader(final Graphics2D g2, final boolean collapsed)
 	{
-		final Graphics2D g2 = (Graphics2D) g;
 		g2.setFont(headerFont);
-		FontMetrics fontMetrics = g.getFontMetrics();
-		Rectangle2D r2d = fontMetrics.getStringBounds(name, g);
+		FontMetrics fontMetrics = g2.getFontMetrics();
+		Rectangle2D r2d = fontMetrics.getStringBounds(name, g2);
 		g2.setColor(highlight ? HIGHLIGHT_COLOR : Color.gray);
-		g2.fillRoundRect(posX, posY, headerWidth, headerHeight, 10, 10);
+
+		int height = headerHeight;
+		if (!collapsed && (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT))
+		{
+			height += 10;
+		}
+
+		g2.fillRoundRect(posX, posY, headerWidth, height, 10, 10);
 		g2.setColor(Color.black);
-		g2.drawRoundRect(posX, posY, headerWidth - 1, headerHeight - 1, 10, 10);
+		g2.drawRoundRect(posX, posY, headerWidth - 1, height - 1, 10, 10);
+		g2.setColor(Color.white);
 		g2.drawString(name, (int) (posX + 0.5 * (headerWidth - r2d.getWidth())), // center
-						posY + (int) r2d.getHeight());
+						posY + 1 + (int) r2d.getHeight());
 		if (renderHostID)
 		{
 			g2.setFont(hostIDFont);
 			fontMetrics = g2.getFontMetrics();
 			r2d = fontMetrics.getStringBounds(hostID, g2);
-			g.setColor(Color.green);
+			g2.setColor(Color.green);
 			final double hostWidth = r2d.getWidth();
 			g2.drawString(hostID, (int) (posX + 0.5 * (headerWidth - hostWidth)), // center
 							posY + 2 * (int) r2d.getHeight());
@@ -143,8 +143,11 @@ public class GraphComponentView extends InteractiveCanvasItemView
 	public void paintNormal(final Graphics g)
 	{
 		// paint the drawer first, since we need to hide the top part.
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+				RenderingHints.VALUE_ANTIALIAS_ON);
 		drawer.paintComponent(g);
-		drawHeader(g);
+		drawHeader(g2, false);
 		if (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT)
 		{
 			drawProps(g);

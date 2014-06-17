@@ -82,5 +82,5 @@ public class ItemEventKind {
        * as a result of a item with a lease expiring (see {@link
        * ItemBindingInfo#itemLease}). */
   public static final int EQDATA_KIND_LEASE_EXPIRE = 5;
-};
+}
 /* EOF */

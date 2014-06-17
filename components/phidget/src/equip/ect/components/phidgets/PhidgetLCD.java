@@ -179,7 +179,7 @@ public class PhidgetLCD extends PhidgetBase implements Serializable
 				try
 				{
 					Thread.sleep(100);
-					if (finishedRunning == true) { return; }
+					if (finishedRunning) { return; }
 				}
 				catch (final InterruptedException e)
 				{

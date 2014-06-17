@@ -105,5 +105,5 @@ public abstract class ServerSap {
 		}
 		return addr;
 	}
-};
+}
 

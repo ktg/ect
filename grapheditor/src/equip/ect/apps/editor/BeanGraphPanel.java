@@ -74,7 +74,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		ComponentPropertyUpdateListener, ComponentMetadataListener, DataspaceConfigurationListener
 {
 
-	public static final List<BeanCanvasItem> getBeanInstances(final String beanid, final Collection<InteractiveCanvasItem> beans)
+	public static List<BeanCanvasItem> getBeanInstances(final String beanid, final Collection<InteractiveCanvasItem> beans)
 	{
 		List<BeanCanvasItem> results = null;
 		if (beans != null)
@@ -122,9 +122,9 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 
 	private List<ItemMovementEventListener> itemMovementEventListeners;
 
-	public BeanGraphPanel(final String title, final String texture)
+	public BeanGraphPanel(final String title)
 	{
-		super(title, Color.white, InteractiveCanvas.MULTIPLE_SELECTION, texture);
+		super(title, Color.white, InteractiveCanvas.MULTIPLE_SELECTION);
 		// create the trash icon
 
 		// initiate drag and drop

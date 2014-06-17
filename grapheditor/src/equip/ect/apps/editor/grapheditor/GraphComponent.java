@@ -868,7 +868,7 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		final BufferedImage imageBuffer = new BufferedImage(gcv.getHeaderWidth(), gcv.getHeaderHeight(),
 				BufferedImage.TYPE_INT_ARGB);
 		final Graphics2D g2 = imageBuffer.createGraphics();
-		gcv.drawHeader(g2);
+		gcv.drawHeader(g2, true);
 		return imageBuffer;
 	}
 

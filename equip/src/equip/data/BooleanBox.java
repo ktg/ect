@@ -45,69 +45,96 @@ Contributors:
 
 package equip.data;
 
-import equip.runtime.*;
+import equip.runtime.ObjectInputStream;
+import equip.runtime.ObjectOutputStream;
+import equip.runtime.ValueBase;
 
-/** primitive boolean box type */
-public abstract class BooleanBox extends ValueBase {
-
-  /** Default no-arg constructor */
-  public BooleanBox() {}
+/**
+ * primitive boolean box type
+ */
+public abstract class BooleanBox extends ValueBase
+{
+	/**
+	 * Default no-arg constructor
+	 */
+	public BooleanBox()
+	{
+	}
 
   /* member variables */
-/** the boxed primitive value */
-  public boolean value;
-  /** IDL-generated helper routine to get module name (currently <b>unimplemented</b>).
-  * @return name of this class's module
-  */
-  public String getModuleName() { return null; }
-  /** Standard IDL-generated equality test.
-  * @param c The object to be compared against this.
-  * @return true if this is equal to <code>c</code>
-  */
-  public boolean equals(java.lang.Object c) {
-    if (c==null) return false;
-    if (!c.getClass().equals(getClass())) return false;
-    return _equals_helper((BooleanBox)c);
-  }
-  /** Internal IDL-generated equality test helper */
-  public boolean _equals_helper(BooleanBox c) {
-    if (c==null) return false;
-    if (!super._equals_helper(c)) return false;
-    if(c.value != value) return false;
-    return true;
-  }
-  /** Standard IDL-generated template match test. 
-  * @param c The object to be checked against this template.
-  * @return true if <code>this</code> (as a template) matches the argument
-  */
-  public boolean matches(java.lang.Object c) {
-    if (c==null || !(c instanceof BooleanBox)) return false;
-    return _matches_helper((BooleanBox)c);
-  }
-  /** Internal IDL-generated match test helper */
-  public boolean _matches_helper(BooleanBox c) {
-    if (c==null) return false;
-    if (!super._matches_helper(c)) return false;
-    if(c.value != value) return false;
-    return true;
-  }
-  /** Internal IDL-generated serialisation helper. Used by {@link equip.runtime.ObjectInputStream} and {@link equip.runtime.ObjectOutputStream} only. */
-  public void writeObject(ObjectOutputStream out)
-    throws java.io.IOException {
-    out.writeObjectStart();
-    out.writeBoolean(value);
-    out.writeObjectEnd();
-  }
-  /** Internal IDL-generated serialisation helper. Used by {@link ObjectInputStream} and {@link ObjectOutputStream} only. */
-  public void readObject(ObjectInputStream in)
-    throws java.io.IOException, ClassNotFoundException, 
-      InstantiationException {
-    in.readObjectStart();
-    value = in.readBoolean();
-    in.readObjectEnd();
-  }
+	/**
+	 * the boxed primitive value
+	 */
+	public boolean value;
 
+	/**
+	 * IDL-generated helper routine to get module name (currently <b>unimplemented</b>).
+	 *
+	 * @return name of this class's module
+	 */
+	public String getModuleName()
+	{
+		return null;
+	}
 
-} /* class BooleanBox */
+	/**
+	 * Standard IDL-generated equality test.
+	 *
+	 * @param c The object to be compared against this.
+	 * @return true if this is equal to <code>c</code>
+	 */
+	public boolean equals(java.lang.Object c)
+	{
+		return c != null && c.getClass().equals(getClass()) && _equals_helper((BooleanBox) c);
+	}
 
-/* EOF */
+	/**
+	 * Internal IDL-generated equality test helper
+	 */
+	public boolean _equals_helper(BooleanBox c)
+	{
+		return c != null && super._equals_helper(c) && c.value == value;
+	}
+
+	/**
+	 * Standard IDL-generated template match test.
+	 *
+	 * @param c The object to be checked against this template.
+	 * @return true if <code>this</code> (as a template) matches the argument
+	 */
+	public boolean matches(java.lang.Object c)
+	{
+		return !(c == null || !(c instanceof BooleanBox)) && _matches_helper((BooleanBox) c);
+	}
+
+	/**
+	 * Internal IDL-generated match test helper
+	 */
+	public boolean _matches_helper(BooleanBox c)
+	{
+		return c != null && super._matches_helper(c) && c.value == value;
+	}
+
+	/**
+	 * Internal IDL-generated serialisation helper. Used by {@link equip.runtime.ObjectInputStream} and {@link equip.runtime.ObjectOutputStream} only.
+	 */
+	public void writeObject(ObjectOutputStream out)
+			throws java.io.IOException
+	{
+		out.writeObjectStart();
+		out.writeBoolean(value);
+		out.writeObjectEnd();
+	}
+
+	/**
+	 * Internal IDL-generated serialisation helper. Used by {@link ObjectInputStream} and {@link ObjectOutputStream} only.
+	 */
+	public void readObject(ObjectInputStream in)
+			throws java.io.IOException, ClassNotFoundException,
+			InstantiationException
+	{
+		in.readObjectStart();
+		value = in.readBoolean();
+		in.readObjectEnd();
+	}
+}

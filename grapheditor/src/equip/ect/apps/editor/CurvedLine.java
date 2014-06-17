@@ -49,11 +49,7 @@ Contributors:
 
 package equip.ect.apps.editor;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Path2D;
 
@@ -87,6 +83,8 @@ public class CurvedLine extends RenderableLink
 		final Graphics2D g2 = (Graphics2D) g;
 		g.setColor(color);
 		final Stroke currentStroke = g2.getStroke();
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(stroke);
 		g2.draw(path);
 		// draw arrow heads

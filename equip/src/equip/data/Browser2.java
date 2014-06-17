@@ -239,7 +239,7 @@ public class Browser2 {
       listSelectionModel.addListSelectionListener
 	  (new ListSelectionListener() {
 		  public void valueChanged(ListSelectionEvent e) {
-		      if (e.getValueIsAdjusting() == false) {
+		      if (!e.getValueIsAdjusting()) {
 			  if (eventList.getSelectedValue() == null) {
 			      //No selection
 			  } else {

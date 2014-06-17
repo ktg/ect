@@ -72,47 +72,30 @@ import javax.swing.JDesktopPane;
  */
 public class InteractiveCanvas extends JDesktopPane implements MouseListener, MouseMotionListener
 {
-
-	protected final int SINGLE_MARKER = 0;
-
-	protected final int BOX_MARKER = 1;
-
-	protected final int NO_MARKER = 2;
-
-	protected int markerType;
-
-	private int[] marker;
-
 	public static final int SINGLE_SELECTION = 0;
-
 	public static final int MULTIPLE_SELECTION = 1;
-
-	private int selectionType;
-
-	protected boolean inSelection;
-
 	public static final int NORMAL_MODE = 0;
-
-	protected int mode;
-
-	protected int xPos, yPos, xPosPrev, yPosPrev, xPosAnchor, yPosAnchor;
-
-	protected List<InteractiveCanvasItem> items;
-
-	protected List<InteractiveCanvasItem> selectedItems = null;
-
-	protected TexturePaint texturePaint = null;
-
-	static private final Stroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+	private static final Stroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
 			10.0f, new float[] { 2.1f }, 0);
 
-	public InteractiveCanvas(final Color backgroundColor, final int selectionType, final String texture)
+	protected final int SINGLE_MARKER = 0;
+	protected final int BOX_MARKER = 1;
+	protected final int NO_MARKER = 2;
+	protected int markerType;
+	protected boolean inSelection;
+	protected int mode;
+	protected int xPos, yPos, xPosPrev, yPosPrev, xPosAnchor, yPosAnchor;
+	protected List<InteractiveCanvasItem> items;
+	protected List<InteractiveCanvasItem> selectedItems = null;
+	private int[] marker;
+	private int selectionType;
+
+	public InteractiveCanvas(final Color backgroundColor, final int selectionType)
 	{
-		this("Untitled", backgroundColor, selectionType, texture);
+		this("Untitled", backgroundColor, selectionType);
 	}
 
-	public InteractiveCanvas(final String name, final Color backgroundColor, final int selectionType,
-			final String texture)
+	public InteractiveCanvas(final String name, final Color backgroundColor, final int selectionType)
 	{
 		setName(name);
 		setBackground(backgroundColor);
@@ -122,10 +105,6 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		markerType = NO_MARKER;
 		mode = NORMAL_MODE;
 		setSelectionType(selectionType);
-		if (texture != null)
-		{
-			setTexturePaint(createImageTexture(texture, true));
-		}
 	}
 
 	public void addItem(final InteractiveCanvasItem item)
@@ -400,13 +379,7 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 	public void paintBackground(final Graphics g)
 	{
 		final Graphics2D g2 = (Graphics2D) g;
-		final int w = getSize().width;
-		final int h = getSize().height;
-		if (texturePaint != null)
-		{
-			g2.setPaint(texturePaint);
-			g2.fill(new Rectangle(0, 0, w, h));
-		}
+		g2.setBackground(EditorResources.BACKGROUND_COLOR);
 	}
 
 	@Override
@@ -525,11 +498,6 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 	public void setSelectionType(final int type)
 	{
 		this.selectionType = type;
-	}
-
-	public void setTexturePaint(final TexturePaint texturePaint)
-	{
-		this.texturePaint = texturePaint;
 	}
 
 	/**

@@ -93,5 +93,5 @@ public class StatusValues {
   public static final int STATUS_CONTROLLED = 9;
 /** request timed out */
   public static final int STATUS_TIMEDOUT = 10;
-};
+}
 /* EOF */

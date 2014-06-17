@@ -121,5 +121,5 @@ public class MbufOutputStream extends OutputStream {
   protected Mbuf first;
   protected Mbuf current;
   protected int pos;
-};
+}
 

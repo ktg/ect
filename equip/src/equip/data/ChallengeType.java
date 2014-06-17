@@ -58,5 +58,5 @@ public class ChallengeType {
   public static final int CHALLENGE_SIMPLE_CHALLENGE_RESPONSE = 2;
 /** response */
   public static final int CHALLENGE_SIMPLE_RESPONSE = 3;
-};
+}
 /* EOF */

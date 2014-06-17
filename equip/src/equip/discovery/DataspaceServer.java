@@ -45,47 +45,58 @@ Contributors:
 
 package equip.discovery;
 
-import equip.runtime.*;
-import equip.data.*;
+import equip.data.DataManager;
+import equip.data.DataProxy;
+import equip.data.Server;
 
-public class DataspaceServer {
-  public static void main(String args[]) {
-    if (args.length!=1 && args.length!=2) {
-      System.err.println("Usage: equip.discovery.DataspaceServer <equip-url> [<group>]");
-      System.exit(-1);
-    }
-    System.err.println("Starting data server " + args[0] + "...");
-    DataProxy dataspace = DataManager.getInstance().getDataspace(args[0], 
-					   DataManager.DATASPACE_SERVER,
-					   true);
-	equip.net.ServerURL surl = new equip.net.ServerURL(((Server)dataspace).getMoniker());
-	System.err.println("SURL = "+surl.getURL());
-	String dataspaceName = surl.getURL();
-    System.err.println("Starting discovery server...");
+public class DataspaceServer
+{
+	public static void main(String args[])
+	{
+		if (args.length > 2)
+		{
+			System.err.println("Usage: equip.discovery.DataspaceServer <equip-url> [<group>]");
+			System.exit(-1);
+		}
+		String url = "equip://:9123/";
+		if(args.length > 0)
+		{
+			url = args[0];
+		}
+		System.err.println("Starting data server " + url + "...");
+		DataProxy dataspace = DataManager.getInstance().getDataspace(url,
+				DataManager.DATASPACE_SERVER,
+				true);
+		equip.net.ServerURL surl = new equip.net.ServerURL(((Server) dataspace).getMoniker());
+		System.err.println("SURL = " + surl.getURL());
+		String dataspaceName = surl.getURL();
+		System.err.println("Starting discovery server...");
 
-    ServerDiscoveryInfo [] servers = new ServerDiscoveryInfo[1];
-    servers[0] = new ServerDiscoveryInfoImpl();
-    servers[0].serviceTypes = new String [1];
-    servers[0].serviceTypes[0] = "equip.data.DataProxy:2.0";
-    /* should be this but that means my new version of data...
+		ServerDiscoveryInfo[] servers = new ServerDiscoveryInfo[1];
+		servers[0] = new ServerDiscoveryInfoImpl();
+		servers[0].serviceTypes = new String[1];
+		servers[0].serviceTypes[0] = "equip.data.DataProxy:2.0";
+	/* should be this but that means my new version of data...
        DATASPACE_SERVICE_TYPE.value */
-    System.err.println("- serviceType = "+servers[0].serviceTypes[0]);
-    servers[0].groups = new String [1];
-    if (args.length>1)
-	servers[0].groups[0] = args[1];
-    else
-	servers[0].groups[0] = DISCOVERY_GROUP_DEFAULT.value;
-    System.err.println("- group = "+servers[0].groups[0]);
-    servers[0].urls = new String [1];
-    servers[0].urls[0] = dataspaceName; //args[0];
-    System.err.println("- url = "+servers[0].urls[0]);
-    
-    // go...
-    DiscoveryServerAgent agent = new DiscoveryServerAgentImpl();
-    agent.startDefault(servers);
-    
-    System.err.println("OK");
-  }
-}
+		System.err.println("- serviceType = " + servers[0].serviceTypes[0]);
+		servers[0].groups = new String[1];
+		if (args.length > 1)
+		{
+			servers[0].groups[0] = args[1];
+		}
+		else
+		{
+			servers[0].groups[0] = DISCOVERY_GROUP_DEFAULT.value;
+		}
+		System.err.println("- group = " + servers[0].groups[0]);
+		servers[0].urls = new String[1];
+		servers[0].urls[0] = dataspaceName; //args[0];
+		System.err.println("- url = " + servers[0].urls[0]);
 
-/* EOF */
+		// go...
+		DiscoveryServerAgent agent = new DiscoveryServerAgentImpl();
+		agent.startDefault(servers);
+
+		System.err.println("OK");
+	}
+}

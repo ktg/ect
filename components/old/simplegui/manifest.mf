@@ -1,0 +1,14 @@
+Manifest-Version: 1.0 
+
+Name: equip/ect/components/simplegui/SimpleGuiDisplay.class
+Java-Bean: True
+classification: Experimental/Media/Simple GUI
+
+Name: equip/ect/components/simplegui/SimpleGuiMessage.class
+Java-Bean: True
+classification: Experimental/Media/Simple GUI
+
+Name: equip/ect/components/simplegui/SimpleGuiScreen.class
+Java-Bean: True
+classification: Experimental/Media/Simple GUI
+

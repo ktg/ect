@@ -45,439 +45,550 @@ Contributors:
 
 package equip.data;
 
-import equip.runtime.*;
-import equip.net.*;
-import java.awt.*;
+import equip.net.ConnectionSap;
+import equip.net.ConnectionSapJcp;
+import equip.net.DeactivateCallback;
+import equip.net.ProxyDelegate;
+import equip.net.ServiceProxy;
+import equip.runtime.ValueBase;
 
-/** The normal implementation of the IDL'd dataspace API, {@link
+/**
+ * The normal implementation of the IDL'd dataspace API, {@link
  * DataProxy}; implements a dataspace client, delegating most of the
  * work to an instance of class {@link DataDelegate}. <p>
- *
+ * <p/>
  * Note 1: you should
  * NOT normally create these directly; use the singleton {@link
  * DataManager} to allow sharing of dataspace replicas within a single
  * application. <P>
- * 
+ * <p/>
  * Note 2: you will probably find the {@link
  * equip.data.beans.IDataspace} API easier to use and more familar in
- * terms of Java idiom (see {@link equip.data.beans.DataspaceBean}). <P> */
-public class DataProxyImpl extends DataProxy implements Runnable {
+ * terms of Java idiom (see {@link equip.data.beans.DataspaceBean}). <P>
+ */
+public class DataProxyImpl extends DataProxy implements Runnable
+{
 
-    /* BEGIN implementation - cmg*/
-    private ProxyDelegate proxyDelegate = new ProxyDelegate();
-    private DataDelegate dataDelegate = new DataDelegate();
-    GUID defaultAgentId = null;
-    DataDelegatePeer serverPeer;
-    DataDelegatePeerTCP driver;
-    boolean persistFlag;
-    boolean activeFlag;
-    boolean activateAsyncFlag = false;
-    class MyDeactivateCallback extends DeactivateCallback {
-	private DataProxyImpl proxy;
-	public MyDeactivateCallback(DataProxyImpl proxy) {
-	    this.proxy = proxy;
+	class MyDeactivateCallback extends DeactivateCallback
+	{
+		private DataProxyImpl proxy;
+
+		public MyDeactivateCallback(DataProxyImpl proxy)
+		{
+			this.proxy = proxy;
+		}
+
+		public void notifyDeactivate(ServiceProxy proxy,
+		                             ValueBase closure)
+		{
+			this.proxy.notifyDeactivate(proxy, closure);
+			synchronized (this.proxy)
+			{
+				this.proxy.notifyAll();
+			}
+		}
 	}
-	public void notifyDeactivate(ServiceProxy proxy,
-				     ValueBase closure) {
-	    this.proxy.notifyDeactivate(proxy, closure);
-	    synchronized(this.proxy) {
-		this.proxy.notifyAll();
-	    }
+
+	class ActivateThread implements Runnable
+	{
+		public void run()
+		{
+			while (activateAsyncFlag)
+			{
+				System.err.println
+						("Note: DataProxyImpl::activateThreadS attempting to activate...");
+				if (activateInternal(null, null, false))
+				{
+					// now running
+					driver.run(proxyDelegate.getConnection(),
+							Thread.currentThread(),
+							persistFlag,
+							callback, null);
+				}
+				System.err.println
+						("Note: DataProxyImpl::activateThreadS driver completed "
+								+ "(possible network failure) " + (activateAsyncFlag ? "- retrying" : ""));
+				if (activateAsyncFlag)
+				{
+					try
+					{
+						Thread.sleep(2000);
+					}
+					catch (Exception e)
+					{
+					}
+				}
+			}
+		}
 	}
-    }
-    DeactivateCallback callback = null;
-    DeactivateCallback deactivateCallback = null;
-    ValueBase deactivateClosure = null;
-    /* END implementation - cmg*/
 
-    /* lifecycle */
-    public DataProxyImpl() {
-	init(null);
-    try
-    {
-      jbInit();
-    }
-    catch(Exception e)
-    {
-      e.printStackTrace();
-    }
-    }
-    public DataProxyImpl(GUID responsible) {
-	init(responsible);
-    }
-    void init(GUID responsible) {
-	dataDelegate.setProxy(this);
-	if (responsible!=null)
-	    dataDelegate.setResponsible(responsible);
-	persistFlag = false;
-	serverPeer = null;
-	driver = null;
-	activeFlag = false;
-	callback = new MyDeactivateCallback(this);
-	proxyDelegate.init(this, null, null);
-	dataDelegate.setStatus(false, false, false);
-    }
+	class WaitCallback extends DataCallback
+	{
+		public void notify(equip.data.Event event,
+		                   equip.data.EventPattern pattern,
+		                   boolean patternDeleted,
+		                   equip.data.DataSession session,
+		                   equip.runtime.ValueBase closure)
+		{
+			PeerAckEvent ack = (PeerAckEvent) event;
 
-    /* API */
-    public void setPersist(boolean persistFlag) {
-	// ....
-	this.persistFlag = persistFlag;
-	System.err.println("WARNING: DataProxyImpl::setPersist not fully implemented");
-	// update Policy?!
-	if (driver!=null)
-	    driver.setPersist(persistFlag);
-    }
-    public void addEvent(Event event) {
-        // critical w. notifyDeactivate via serverPeer notify???
+			if (ack.data != null && ack.data.ack)
+			{
+				//System.err.print("WaitCallback.notify....");
+				synchronized (closure)
+				{
+					//System.err.print("notify");
+					lastAckSeq = ack.data.seq;
+					closure.notifyAll();
+				}
+			}
+		}
+	}
 
-	// local
-	dataDelegate.addEvent(event);
+	GUID defaultAgentId = null;
+	DataDelegatePeer serverPeer;
+	DataDelegatePeerTCP driver;
+	boolean persistFlag;
+	boolean activeFlag;
+	boolean activateAsyncFlag = false;
+	DeactivateCallback callback = null;
+	DeactivateCallback deactivateCallback = null;
+	ValueBase deactivateClosure = null;
+	/* END implementation - cmg*/
+	/// set up for waitForEvents
+	boolean waitInited = false;
+	DataSession waitSession;
+	/// wait for all pending events
+	int ackSeq = 1;
+	int lastAckSeq = 0;
+	/* BEGIN implementation - cmg*/
+	private ProxyDelegate proxyDelegate = new ProxyDelegate();
+	private DataDelegate dataDelegate = new DataDelegate();
 
-	// should network via serverPeer session (if any)
-    }
-	/** (always) Queued add of a new event into the dataspace.
+	/* lifecycle */
+	public DataProxyImpl()
+	{
+		init(null);
+		try
+		{
+			jbInit();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public DataProxyImpl(GUID responsible)
+	{
+		init(responsible);
+	}
+
+	void init(GUID responsible)
+	{
+		dataDelegate.setProxy(this);
+		if (responsible != null)
+		{
+			dataDelegate.setResponsible(responsible);
+		}
+		persistFlag = false;
+		serverPeer = null;
+		driver = null;
+		activeFlag = false;
+		callback = new MyDeactivateCallback(this);
+		proxyDelegate.init(this, null, null);
+		dataDelegate.setStatus(false, false, false);
+	}
+
+	/* API */
+	public void setPersist(boolean persistFlag)
+	{
+		// ....
+		this.persistFlag = persistFlag;
+		System.err.println("WARNING: DataProxyImpl::setPersist not fully implemented");
+		// update Policy?!
+		if (driver != null)
+		{
+			driver.setPersist(persistFlag);
+		}
+	}
+
+	public void addEvent(Event event)
+	{
+		// critical w. notifyDeactivate via serverPeer notify???
+
+		// local
+		dataDelegate.addEvent(event);
+
+		// should network via serverPeer session (if any)
+	}
+
+	/**
+	 * (always) Queued add of a new event into the dataspace.
 	 *
-	 * @param event The event to published. */
-	public void queueEvent(equip.data.Event event) 
+	 * @param event The event to published.
+	 */
+	public void queueEvent(equip.data.Event event)
 	{
 		dataDelegate.queueEvent(event);
 	}
-    public ItemBinding getItemBinding(GUID id) 
+
+	public ItemBinding getItemBinding(GUID id)
 	{
-	return dataDelegate.getItemBinding(id);
-    }
-    public ItemData getItem(GUID id) {
-	return dataDelegate.getItem(id);
-    }
-    public void setDefaultAgent(GUID defaultAgentId) {
-	this.defaultAgentId = defaultAgentId;
-    }
-    public void addItem(ItemData item, int locked, boolean processBound, boolean local, Lease itemLease) {
-	AddEvent event = new AddEventImpl();
-	event.initFromItem(item, defaultAgentId, locked,
-			   processBound, local, itemLease);
-	addEvent(event);
-    }
-    public void updateItem(ItemData item, boolean local, boolean reliable) {
-	updateItem2(item, local, reliable, 0);
-    }
-    public void updateItem2(ItemData item, boolean local, boolean reliable, int priority) {
-	UpdateEvent event = new UpdateEventImpl();
-	event.initFromItem2(item, defaultAgentId, local, reliable, priority);
-	addEvent(event);
-    }
-    public void deleteItem(GUID id, boolean local) {
-	DeleteEvent event = new DeleteEventImpl();
-	event.initFromID(id, defaultAgentId, local);
-	addEvent(event);
-    }
-    public DataSession createSession(DataCallback callback, ValueBase closure) {
-	return dataDelegate.createSession(callback, closure);
-    }
-    public void deleteSession(DataSession session) {
-	dataDelegate.deleteSession(session);
-    }
-    /* subclasses....*/
-
-
-    public void activateAsync() {
-      System.err.println
-	("DataProxyImpl::activateAsync starting activate thread");
-      activateAsyncFlag = true;
-      new Thread(new ActivateThread()).start();
-    }
-    class ActivateThread implements Runnable {
-	public void run() {
-	  while (activateAsyncFlag) {
-	    System.err.println
-	      ("Note: DataProxyImpl::activateThreadS attempting to activate...");
-	    if (activateInternal(null, null, false)) {
-	      // now running
-	      driver.run(proxyDelegate.getConnection(),
-			 Thread.currentThread(),
-			 persistFlag,
-			 callback, null);
-	    }
-	    System.err.println
-	      ("Note: DataProxyImpl::activateThreadS driver completed "
-	       + "(possible network failure) "+(activateAsyncFlag ? "- retrying": ""));
-	    if (activateAsyncFlag)
-		try {
-		    Thread.sleep(2000);
-		} catch (Exception e) {}
-	  }
-	}
-    }
-
-    /* subclass ServiceProxy */
-    public synchronized boolean activate(DeactivateCallback callback,
-					 ValueBase closure) {
-	return activateInternal(callback, closure, true);
-    }
-    public synchronized boolean activateInternal(DeactivateCallback callback,
-						 ValueBase closure,
-						 boolean startInputThread) {
-	if (activeFlag) {
-	    System.err.println("WARNING: DataProxyImpl::activate called while active");
-	    deactivate();
+		return dataDelegate.getItemBinding(id);
 	}
 
-	if (!persistFlag) {
-	  if (driver!=null) {
-	    System.err.println
-	      ("DataProxyImpl::(re)activate delete old driver...");
-	    driver.cleanup();
-	    // delete driver?!
-	    driver = null;
-	  }
-	  if (serverPeer!=null) {
-	    System.err.println
-	      ("DataProxyImpl::(re)activate delete old peer...");
-	    serverPeer.cleanup();
-	    //delete serverPeer;
-	    serverPeer = null;
-	  }
+	public ItemData getItem(GUID id)
+	{
+		return dataDelegate.getItem(id);
 	}
 
-	deactivateCallback = callback;
-	deactivateClosure = closure;
+	public void setDefaultAgent(GUID defaultAgentId)
+	{
+		this.defaultAgentId = defaultAgentId;
+	}
+	/* subclasses....*/
 
-	initWaitForEvents();
-
-	boolean okFlag = proxyDelegate.activate(null, null);
-	if (!okFlag) {
-	    deactivateCallback = null;
-	    deactivateClosure = null;
-	    return false;
+	public void addItem(ItemData item, int locked, boolean processBound, boolean local, Lease itemLease)
+	{
+		AddEvent event = new AddEventImpl();
+		event.initFromItem(item, defaultAgentId, locked,
+				processBound, local, itemLease);
+		addEvent(event);
 	}
 
-	// bootstrap server peer
-	if (serverPeer==null) {
-	    serverPeer = new DataDelegatePeer(dataDelegate, null, false);
-	    driver = new DataDelegatePeerTCP(serverPeer);
+	public void updateItem(ItemData item, boolean local, boolean reliable)
+	{
+		updateItem2(item, local, reliable, 0);
 	}
 
-	activeFlag = true;
-	if (startInputThread) {
-	    // thread to pull input
-	    new Thread(this).start();
-
-	    driver.waitForConnect();
-	}
-	return true ;
-    }
-    public synchronized void deactivate() {
-	if (!activeFlag)
-	    return;
-	activeFlag = false;
-
-	System.err.println("DataProxyImpl::deactivate driver...");
-	driver.deactivate();
-	System.err.println("DataProxyImpl::deactivate proxy...");
-	proxyDelegate.deactivate();
-	System.err.println("DataProxyImpl::deactivate done");
-    }
-
-    public synchronized void notifyDeactivate(ServiceProxy proxy,
-					      ValueBase closure) {
-	// critical w. activate/deactivate
-
-	if (!activeFlag) {
-	    System.err.println("WARNING: DataProxyImpl::notifyDeactivate called when inactive");
-	    return;
+	public void updateItem2(ItemData item, boolean local, boolean reliable, int priority)
+	{
+		UpdateEvent event = new UpdateEventImpl();
+		event.initFromItem2(item, defaultAgentId, local, reliable, priority);
+		addEvent(event);
 	}
 
-	System.err.println("NOTE: DataProxyImpl::notifyDeactivate....");
-
-	activeFlag = false;
-
-	if (deactivateCallback!=null)
-	    deactivateCallback.notifyDeactivate(proxy,
-						deactivateClosure);
-	deactivateCallback = null;
-	deactivateClosure = null;
-    }
-    public void run() {
-	driver.run(proxyDelegate.getConnection(),
-		   Thread.currentThread(),
-		   persistFlag,
-		   callback, null);
-    }
-
-    public double getConnectionStrength() {
-	if (proxyDelegate==null)
-	    return 0;
-	ConnectionSap con = proxyDelegate.getConnection();
-	return con.getConnectionStrength();
-    }
-    
-    /** return number of unsent events - connection and outboundEvents */
-    public int getUnsentEvents() {
-	int unsentEvents = 0;
-	if (serverPeer!=null)
-	    unsentEvents += serverPeer.getNumOutboundEvents();
-	if (proxyDelegate!=null) {
-	    ConnectionSap con = proxyDelegate.getConnection();
-	    if (con instanceof ConnectionSapJcp)
-		unsentEvents += ((ConnectionSapJcp)con).getUnsentObjects();
+	public void deleteItem(GUID id, boolean local)
+	{
+		DeleteEvent event = new DeleteEventImpl();
+		event.initFromID(id, defaultAgentId, local);
+		addEvent(event);
 	}
-	return unsentEvents;
-    }
-    /// set up for waitForEvents
-    boolean waitInited = false;
-    DataSession waitSession;
-    synchronized void initWaitForEvents() {
-	if (waitInited)
-	    return;
-	waitInited = true;
-	waitSession = createSession(new WaitCallback(), this);
-	PeerAckEvent ack = new PeerAckEventImpl();
-	EventPattern pattern = new EventPatternImpl();
-	// local
-	pattern.initAsSimpleEventMonitor(ack, true);
-	waitSession.addPattern(pattern);
-    }
-    /// wait for all pending events 
-    int ackSeq = 1;
-    int lastAckSeq = 0;
-    class WaitCallback extends DataCallback {
-	public void notify(equip.data.Event event, 
-			   equip.data.EventPattern pattern, 
-			   boolean patternDeleted, 
-			   equip.data.DataSession session, 
-			   equip.runtime.ValueBase closure) {
-	    PeerAckEvent ack = (PeerAckEvent)event;
-	    
-	    if (ack.data!=null && ack.data.ack) {
-		//System.err.print("WaitCallback.notify....");
-		synchronized(closure) {
-		    //System.err.print("notify");
-		    lastAckSeq = ack.data.seq;
-		    closure.notifyAll();
+
+	public DataSession createSession(DataCallback callback, ValueBase closure)
+	{
+		return dataDelegate.createSession(callback, closure);
+	}
+
+	public void deleteSession(DataSession session)
+	{
+		dataDelegate.deleteSession(session);
+	}
+
+	public void activateAsync()
+	{
+		System.err.println
+				("DataProxyImpl::activateAsync starting activate thread");
+		activateAsyncFlag = true;
+		new Thread(new ActivateThread()).start();
+	}
+
+	/* subclass ServiceProxy */
+	public synchronized boolean activate(DeactivateCallback callback,
+	                                     ValueBase closure)
+	{
+		return activateInternal(callback, closure, true);
+	}
+
+	public synchronized boolean activateInternal(DeactivateCallback callback,
+	                                             ValueBase closure,
+	                                             boolean startInputThread)
+	{
+		if (activeFlag)
+		{
+			System.err.println("WARNING: DataProxyImpl::activate called while active");
+			deactivate();
 		}
-	    }
-	    else
-		//System.err.print("WaitCallback (no ack)");
-	    return;
-	}
-    }
 
-    public void waitForEvents(boolean local) {
-	//System.err.print("waitForEvents...local...");
-	dataDelegate.waitForEvents(local);
-	//System.err.println("OK");
-	if (!local) {
-	    //System.err.print("waitForEvents...remote...");
-   
-	  initWaitForEvents();
-	  // make and send ack
-	  PeerAckEvent ack = new PeerAckEventImpl();
-	  ack.data = new PeerAckDataImpl();
-	  ack.data.ack = false;
-	  synchronized(this) {
-	    ack.data.seq = ackSeq++;
-	  }
-	  // not local, reliable, default priority.
-	  ack.initMetadata2(defaultAgentId, false, true, 0);
-	  //System.err.print("addEvent...");
-	  addEvent(ack);
-	  dataDelegate.waitForEvents(true);
-	  // wait for response
-	  synchronized(this) {
-	      while (activeFlag && 
-		     lastAckSeq!=ack.data.seq) {
-		  try {
-		      //System.err.print("wait...");
-		      wait();
-		  } catch (InterruptedException e) {}
-	      }
-	  }
-	  //System.err.print("done...");
-	  if (!activeFlag) {
-	      System.err.println("Warning: waitForEvents when not active\n");
-	  }
-	  //System.err.println("OK");
+		if (!persistFlag)
+		{
+			if (driver != null)
+			{
+				System.err.println
+						("DataProxyImpl::(re)activate delete old driver...");
+				driver.cleanup();
+				// delete driver?!
+				driver = null;
+			}
+			if (serverPeer != null)
+			{
+				System.err.println
+						("DataProxyImpl::(re)activate delete old peer...");
+				serverPeer.cleanup();
+				//delete serverPeer;
+				serverPeer = null;
+			}
+		}
+
+		deactivateCallback = callback;
+		deactivateClosure = closure;
+
+		initWaitForEvents();
+
+		boolean okFlag = proxyDelegate.activate(null, null);
+		if (!okFlag)
+		{
+			deactivateCallback = null;
+			deactivateClosure = null;
+			return false;
+		}
+
+		// bootstrap server peer
+		if (serverPeer == null)
+		{
+			serverPeer = new DataDelegatePeer(dataDelegate, null, false);
+			driver = new DataDelegatePeerTCP(serverPeer);
+		}
+
+		activeFlag = true;
+		if (startInputThread)
+		{
+			// thread to pull input
+			new Thread(this).start();
+
+			driver.waitForConnect();
+		}
+		return true;
 	}
-    }
+
+	public synchronized void deactivate()
+	{
+		if (!activeFlag)
+		{
+			return;
+		}
+		activeFlag = false;
+
+		System.err.println("DataProxyImpl::deactivate driver...");
+		driver.deactivate();
+		System.err.println("DataProxyImpl::deactivate proxy...");
+		proxyDelegate.deactivate();
+		System.err.println("DataProxyImpl::deactivate done");
+	}
+
+	public synchronized void notifyDeactivate(ServiceProxy proxy,
+	                                          ValueBase closure)
+	{
+		// critical w. activate/deactivate
+
+		if (!activeFlag)
+		{
+			System.err.println("WARNING: DataProxyImpl::notifyDeactivate called when inactive");
+			return;
+		}
+
+		System.err.println("NOTE: DataProxyImpl::notifyDeactivate....");
+
+		activeFlag = false;
+
+		if (deactivateCallback != null)
+		{
+			deactivateCallback.notifyDeactivate(proxy,
+					deactivateClosure);
+		}
+		deactivateCallback = null;
+		deactivateClosure = null;
+	}
+
+	public void run()
+	{
+		driver.run(proxyDelegate.getConnection(),
+				Thread.currentThread(),
+				persistFlag,
+				callback, null);
+	}
+
+	public double getConnectionStrength()
+	{
+		if (proxyDelegate == null)
+		{
+			return 0;
+		}
+		ConnectionSap con = proxyDelegate.getConnection();
+		return con.getConnectionStrength();
+	}
+
+	/**
+	 * return number of unsent events - connection and outboundEvents
+	 */
+	public int getUnsentEvents()
+	{
+		int unsentEvents = 0;
+		if (serverPeer != null)
+		{
+			unsentEvents += serverPeer.getNumOutboundEvents();
+		}
+		if (proxyDelegate != null)
+		{
+			ConnectionSap con = proxyDelegate.getConnection();
+			if (con instanceof ConnectionSapJcp)
+			{
+				unsentEvents += ((ConnectionSapJcp) con).getUnsentObjects();
+			}
+		}
+		return unsentEvents;
+	}
+
+	synchronized void initWaitForEvents()
+	{
+		if (waitInited)
+		{
+			return;
+		}
+		waitInited = true;
+		waitSession = createSession(new WaitCallback(), this);
+		PeerAckEvent ack = new PeerAckEventImpl();
+		EventPattern pattern = new EventPatternImpl();
+		// local
+		pattern.initAsSimpleEventMonitor(ack, true);
+		waitSession.addPattern(pattern);
+	}
+
+	public void waitForEvents(boolean local)
+	{
+		//System.err.print("waitForEvents...local...");
+		dataDelegate.waitForEvents(local);
+		//System.err.println("OK");
+		if (!local)
+		{
+			//System.err.print("waitForEvents...remote...");
+
+			initWaitForEvents();
+			// make and send ack
+			PeerAckEvent ack = new PeerAckEventImpl();
+			ack.data = new PeerAckDataImpl();
+			ack.data.ack = false;
+			synchronized (this)
+			{
+				ack.data.seq = ackSeq++;
+			}
+			// not local, reliable, default priority.
+			ack.initMetadata2(defaultAgentId, false, true, 0);
+			//System.err.print("addEvent...");
+			addEvent(ack);
+			dataDelegate.waitForEvents(true);
+			// wait for response
+			synchronized (this)
+			{
+				while (activeFlag &&
+						lastAckSeq != ack.data.seq)
+				{
+					try
+					{
+						//System.err.print("wait...");
+						wait();
+					}
+					catch (InterruptedException e)
+					{
+					}
+				}
+			}
+			//System.err.print("done...");
+			if (!activeFlag)
+			{
+				System.err.println("Warning: waitForEvents when not active\n");
+			}
+			//System.err.println("OK");
+		}
+	}
 
 	void jbInit()
 	{
 	}
 
-    public void beginBusy() { // ??
-    }
-    public void endBusy() { // ??
-    }
-
-    /** get responsible (replica) ID */
-    public GUID getResponsible() {
-      return dataDelegate.getPeerId();
-    }
-
-    /** Destroy this dataspace, terminating any communication and threads
-     * and (hopefully) allowing all resources to be released/GCed.
-     */
-    public synchronized void terminate() {
-	// 1. initialising the DataProxyImpl creates and initialises:
-	// - ProxyDelegate proxyDeledate
-	// - DataDelegate dataDelegate
-	// 2a. calling activate calls activateInternal, requesting the
-	//     creation of a new thread to handle input.
-	// 2b. calling activateAsync creates a new thread which repeatedly
-	//     calls activateInternal NOT requesting a new input thread,
-	//     and then synchronously calling driver.run itself.
-	// 3. activateInternal
-	// - if non-persistent and a driver (DataDelegatePeerTCP) exists, 
-	//   calls .cleanup() on it (which is currently a null-op).
-	// - if non-persistent and a serverPeer (DataDelegatePeer) exists, 
-	//   calls .cleanup() on it (which deletes the peer session and 
-	//   removes any outbound events.
-	// - calls initWaitForEvents, which initialises a local callback
-	//   for PeerAckEvents
-	// - attemps proxyDelegate.activate(null,null) which
-	//   - calls deactivate()
-	//   - resolves the moniker to a simple moniker
-	//   - establishes a TCP or JCP connection as appropriate, and returns
-	//     ok for ok connection status (i.e. (presumed) established).
-	// - if not ok, returns false, otherwise...
-	// - creates a new DataDelegatePeer(dataDelegate, null, false) as
-	//   serverPeer if not already created (after previous persistent conn.)
-	//   (args=> unknown peer, not a server)
-	// - creates a new DataDelegatePeerTCP(serverPeer) as driver if not
-	//   already created. 
-	// - if asked to startInputThread creates a new thread with this
-	//   as target and starts it, then calls driver.waitForConnect() to
-	//   cope with async connect. this.run calls driver.run once.
-
-	System.err.println("DataProxyImpl.terminate: attempt deactivate...");
-
-	// connections?
-	// async activate thread?
-	if (waitSession!=null) {
-	    deleteSession(waitSession);
-	    waitSession = null;
+	public void beginBusy()
+	{ // ??
 	}
-	activateAsyncFlag = false;
-	deactivate(); // -> driver.deactivate; proxyDelegate.deactivate
-	// input & output threads?
-	// datadelegate
-	if(driver!=null) {
-	    driver.cleanup();
-	    driver = null;
-	}
-	if (serverPeer!=null) {
-	    serverPeer.cleanup();
-	    //delete serverPeer;
-	    serverPeer = null;
-	}
-	dataDelegate.terminate();
-	dataDelegate = null; // has ref to this, so break loop
-	proxyDelegate = null; // has ref to this, so break loop
-	callback =  null; // has ref to this
-	
-	System.err.println("DataProxyImpl.terminate: completed!?");
-    }
 
-} /* class DataProxy */
+	public void endBusy()
+	{ // ??
+	}
 
-/* EOF */
+	/**
+	 * get responsible (replica) ID
+	 */
+	public GUID getResponsible()
+	{
+		return dataDelegate.getPeerId();
+	}
+
+	/**
+	 * Destroy this dataspace, terminating any communication and threads
+	 * and (hopefully) allowing all resources to be released/GCed.
+	 */
+	public synchronized void terminate()
+	{
+		// 1. initialising the DataProxyImpl creates and initialises:
+		// - ProxyDelegate proxyDeledate
+		// - DataDelegate dataDelegate
+		// 2a. calling activate calls activateInternal, requesting the
+		//     creation of a new thread to handle input.
+		// 2b. calling activateAsync creates a new thread which repeatedly
+		//     calls activateInternal NOT requesting a new input thread,
+		//     and then synchronously calling driver.run itself.
+		// 3. activateInternal
+		// - if non-persistent and a driver (DataDelegatePeerTCP) exists,
+		//   calls .cleanup() on it (which is currently a null-op).
+		// - if non-persistent and a serverPeer (DataDelegatePeer) exists,
+		//   calls .cleanup() on it (which deletes the peer session and
+		//   removes any outbound events.
+		// - calls initWaitForEvents, which initialises a local callback
+		//   for PeerAckEvents
+		// - attemps proxyDelegate.activate(null,null) which
+		//   - calls deactivate()
+		//   - resolves the moniker to a simple moniker
+		//   - establishes a TCP or JCP connection as appropriate, and returns
+		//     ok for ok connection status (i.e. (presumed) established).
+		// - if not ok, returns false, otherwise...
+		// - creates a new DataDelegatePeer(dataDelegate, null, false) as
+		//   serverPeer if not already created (after previous persistent conn.)
+		//   (args=> unknown peer, not a server)
+		// - creates a new DataDelegatePeerTCP(serverPeer) as driver if not
+		//   already created.
+		// - if asked to startInputThread creates a new thread with this
+		//   as target and starts it, then calls driver.waitForConnect() to
+		//   cope with async connect. this.run calls driver.run once.
+
+		System.err.println("DataProxyImpl.terminate: attempt deactivate...");
+
+		// connections?
+		// async activate thread?
+		if (waitSession != null)
+		{
+			deleteSession(waitSession);
+			waitSession = null;
+		}
+		activateAsyncFlag = false;
+		deactivate(); // -> driver.deactivate; proxyDelegate.deactivate
+		// input & output threads?
+		// datadelegate
+		if (driver != null)
+		{
+			driver.cleanup();
+			driver = null;
+		}
+		if (serverPeer != null)
+		{
+			serverPeer.cleanup();
+			//delete serverPeer;
+			serverPeer = null;
+		}
+		dataDelegate.terminate();
+		dataDelegate = null; // has ref to this, so break loop
+		proxyDelegate = null; // has ref to this, so break loop
+		callback = null; // has ref to this
+
+		System.err.println("DataProxyImpl.terminate: completed!?");
+	}
+}

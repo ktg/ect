@@ -122,4 +122,4 @@ public class MbufInputStream extends InputStream {
   protected int pos;
 
   private boolean debug = false;
-};
+}

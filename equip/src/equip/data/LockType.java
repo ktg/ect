@@ -62,5 +62,5 @@ public class LockType {
 /** owner checked, no auta owner transfer, a hint that you have
 	  to send requests another way */
   public static final int LOCK_CONTROL = 3;
-};
+}
 /* EOF */

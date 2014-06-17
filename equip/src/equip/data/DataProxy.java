@@ -45,251 +45,370 @@ Contributors:
 
 package equip.data;
 
-import equip.runtime.*;
+import equip.runtime.ObjectInputStream;
+import equip.runtime.ObjectOutputStream;
 
-/** The main API for a dataspace replica, whether client or server.
-     *
-     * Note that {@link equip.data.beans} provides an alternative and
-     * simple Java API {@link equip.data.beans.IDataspace} for
-     * dataspaces using this. */
-public abstract class DataProxy extends equip.net.ServiceProxy {
+/**
+ * The main API for a dataspace replica, whether client or server.
+ * <p/>
+ * Note that {@link equip.data.beans} provides an alternative and
+ * simple Java API {@link equip.data.beans.IDataspace} for
+ * dataspaces using this.
+ */
+public abstract class DataProxy extends equip.net.ServiceProxy
+{
 
-  /** Default no-arg constructor */
-  public DataProxy() {}
+	/**
+	 * Default no-arg constructor
+	 */
+	public DataProxy()
+	{
+	}
 
   /* member variables */
-/** Internal - any initial data items to place into the dataspace
-       * (e.g. when de-serialised) */
-  public equip.data.ItemBinding initialItems[] = new equip.data.ItemBinding [0];
-/** Create a thread to repeatedly attempt to activate this 
-       * dataspace (assuming that it is a client) whenever its
-       * activation fails.
-       *
-       * This is an alternative to {@link
-       * equip.net.ServiceProxy#activate} and {@link
-       * equip.net.ServiceProxy#deactivate} which are also implemented
-       * for direct control over activation.
-       */
-  public abstract void activateAsync();
-/** Whether this dataspace replica should try to associate
-       * persistently with its server/peer.
-       *
-       * A persistent association will not be garbage collected 
-       * when the underlying network connection is removed or 
-       * fails. This option is largely untested at the moment,
-       * and should really have a {@link Lease} mechanism to
-       * handle garbage collection: use with care.<P>
-       * 
-       * Note that replicas are identified to each other by the
-       * <code>responsible</code> GUID of each.<P>
-       *
-       * @param persistFlag Whether to connect persistently. */
-  public abstract void setPersist(boolean persistFlag);
-/** Add a new event into the dataspace.
-       *
-       * Note that if the dataspace is already busy (e.g. in an 
-       * event notification callback) then the event will be queued
-       * internally for subsequent asynchronous delivery.<P>
-       *
-       * @param event The event to published. */
-  public abstract void addEvent(equip.data.Event event);
-/** (always) Queued add of a new event into the dataspace.
-	   *
-	   * @param event The event to published. */
-  public abstract void queueEvent(equip.data.Event event);
-/** Get an {@link ItemBinding} from the local dataspace by item
-       * GUID.
-       *
-       * @param id The item's GUID.
-       * @return The item's binding to the dataspace replica, or null 
-       * if unknown. */
-  public abstract equip.data.ItemBinding getItemBinding(equip.data.GUID id);
-/** Get an {@link ItemData} from the local dataspace by item
-       * GUID.
-       *
-       * @param id The item's GUID.
-       * @return The item's value in the dataspace replica, or null 
-       * if unknown. */
-  public abstract equip.data.ItemData getItem(equip.data.GUID id);
-/** Set a default GUID to be used as the default owner and/or
-       * requestor for locally generated events and data items.
-       *
-       * @param defaultAgentId GUID to use as default
-       * owner/requestor */
-  public abstract void setDefaultAgent(equip.data.GUID defaultAgentId);
-/** add item event helper - create and publish an {@link AddEvent}.
-       *
-       * @param item The value of the new item (including id).
-       * @param locked See {@link ItemBindingInfo#locked}.
-       * @param processBound See {@link ItemBindingInfo#processBound}.
-       * @param local See {@link ItemBindingInfo#local}.
-       * @param itemLease See {@link ItemBindingInfo#itemLease}.
-       */
-  public abstract void addItem(equip.data.ItemData item, int locked, boolean processBound, boolean local, equip.data.Lease itemLease);
-/** update item event helper - create and publish an {@link
-       * UpdateEvent}.  
-       * 
-       * NOTE: if this is an item with a lease and you want the lease
-       * to be renewed then use an addItem repeatedly instead (with
-       * the new Lease value in the ItemBinding).
-       *
-       * @param item The new value of the item (including original id).
-       * @param local See {@link EventMetadata#local}.
-       * @param reliable See {@link EventMetadata#reliable}.
-       * @param priority See {@link EventMetadata#priority}.
-       */
-  public abstract void updateItem2(equip.data.ItemData item, boolean local, boolean reliable, int priority);
-/** update item event helper - create and publish an 
-       * {@link UpdateEvent} with default priority (0).
-       *
-       * NOTE: if this is an item with a lease and you want the lease
-       * to be renewed then use an addItem repeatedly instead (with
-       * the new Lease value in the ItemBinding).
-       *
-       * @param item The new value of the item (including original id).
-       * @param local See {@link EventMetadata#local}.
-       * @param reliable See {@link EventMetadata#reliable}.
-       */
-  public abstract void updateItem(equip.data.ItemData item, boolean local, boolean reliable);
-/** delete item event helper - create and publish an 
-       * {@link DeleteEvent}.
-       *
-       * @param id The GUID of the item to be deleted.
-       * @param local See {@link EventMetadata#local}.
-       */
-  public abstract void deleteItem(equip.data.GUID id, boolean local);
-/** Block and wait for all pending events to be enacted.
-       * Be careful or this will deadlock,
-       * so make sure nothing else is going on in that thread!.
-       *
-       * Only in Java, at the moment (2003-10-16).
-       *
-       * @param local Wait only for local events (if false, then
-       * also send a message to the server dataspace and wait for
-       * it to come back as well).
-       */
-  public abstract void waitForEvents(boolean local);
-/** Create a new data session in which to express interest
-       * in events and data items and to get callbacks/notifications.
-       *
-       * See also information about {@link DataCallback} and 
-       * (usually easier to use) {@link DataCallbackPost}.
-       *
-       * @param callback Event-handling subclass of  {@link
-       * DataCallback} or {@link DataCallbackPost}, notified
-       * about events matching any {@link EventPattern}s that
-       * are added to new session.
-       *
-       * @param closure Optional application parameter provided to the
-       * callback notification (can be null).
-       * 
-       * @return A new {@link DataSession} to which {@link
-       * EventPattern}s can be added to cause replication and/or
-       * notifications of events and items.
-       */
-  public abstract equip.data.DataSession createSession(equip.data.DataCallback callback, equip.runtime.ValueBase closure);
-/** Delete a {@link DataSession} previously created with 
-       * {@link #createSession}; effectively any remaining
-       * {@link EventPattern}s will be removed. <P>
-       *
-       * In C++ the caller will still hold the last reference to the
-       * data session object, which must be released in order for the
-       * session object to actually be deleted.
-       *
-       * @param session The {@link DataSession} object returned
-       * from {@link #createSession} to be deleted from the dataspace.
-       */
-  public abstract void deleteSession(equip.data.DataSession session);
-/** this <b>dangerous</b> internal API lets you suspend the enactment
-       * of events; also make a matching call to {@link #endBusy}.
-       * Easy to deadlock with unmatched calls!
-       */
-  public abstract void beginBusy();
-/** this <b>dangerous</b> internal API lets you resume the enactment
-       * of events; only call to match a previous call to {@link #beginBusy}.
-       * Easy to deadlock - or break synchronization - with unmatched calls!
-       */
-  public abstract void endBusy();
-/** Get this dataspace replica's 'responsible' GUID, which is a
-       * globally unique identifier for this dataspace replica. 
-       *
-       * @return The dataspace replica's own GUID. */
-  public abstract equip.data.GUID getResponsible();
-/** Destroy this dataspace, terminating any communication and threads
-       * and (hopefully) allowing all resources to be released/GCed.
-       */
-  public abstract void terminate();
-  /** IDL-generated helper routine to get module name (currently <b>unimplemented</b>).
-  * @return name of this class's module
-  */
-  public String getModuleName() { return null; }
-  /** Standard IDL-generated equality test.
-  * @param c The object to be compared against this.
-  * @return true if this is equal to <code>c</code>
-  */
-  public boolean equals(java.lang.Object c) {
-    if (c==null) return false;
-    if (!c.getClass().equals(getClass())) return false;
-    return _equals_helper((DataProxy)c);
-  }
-  /** Internal IDL-generated equality test helper */
-  public boolean _equals_helper(DataProxy c) {
-    if (c==null) return false;
-    if (!super._equals_helper(c)) return false;
-    if (c.initialItems==null || initialItems==null || c.initialItems.length!=initialItems.length) return false;
-    int i1;
-    for (i1=0; i1<initialItems.length; i1++) {
-      if (initialItems[i1]!=c.initialItems[i1] && (initialItems[i1]==null || !initialItems[i1].equals(c.initialItems[i1]))) return false;
-    }
-    return true;
-  }
-  /** Standard IDL-generated template match test. 
-  * @param c The object to be checked against this template.
-  * @return true if <code>this</code> (as a template) matches the argument
-  */
-  public boolean matches(java.lang.Object c) {
-    if (c==null || !(c instanceof DataProxy)) return false;
-    return _matches_helper((DataProxy)c);
-  }
-  /** Internal IDL-generated match test helper */
-  public boolean _matches_helper(DataProxy c) {
-    if (c==null) return false;
-    if (!super._matches_helper(c)) return false;
-    if (initialItems!=null && initialItems.length!=0 && (c.initialItems==null || c.initialItems.length!=initialItems.length)) return false;
-    int i1;
-    for (i1=0; i1<initialItems.length; i1++) {
-      if (initialItems[i1]!=null && !initialItems[i1].matches(c.initialItems[i1])) return false;
-    }
-    return true;
-  }
-  /** Internal IDL-generated serialisation helper. Used by {@link equip.runtime.ObjectInputStream} and {@link equip.runtime.ObjectOutputStream} only. */
-  public void writeObject(ObjectOutputStream out)
-    throws java.io.IOException {
-    super.writeObject(out);
-    out.writeObjectStart();
-    out.writeInt(initialItems.length);
-    int i1;
-    for (i1=0; i1<initialItems.length; i1++) {
-      out.writeObject(initialItems[i1]);
-    }
-    out.writeObjectEnd();
-  }
-  /** Internal IDL-generated serialisation helper. Used by {@link ObjectInputStream} and {@link ObjectOutputStream} only. */
-  public void readObject(ObjectInputStream in)
-    throws java.io.IOException, ClassNotFoundException, 
-      InstantiationException {
-    super.readObject(in);
-    in.readObjectStart();
-    { int len=0;
-      len = in.readInt();
-      initialItems = new equip.data.ItemBinding [len];
-    }
-    int i1;
-    for (i1=0; i1<initialItems.length; i1++) {
-      initialItems[i1] = (equip.data.ItemBinding )in.readObject();
-    }
-    in.readObjectEnd();
-  }
+	/**
+	 * Internal - any initial data items to place into the dataspace
+	 * (e.g. when de-serialised)
+	 */
+	public equip.data.ItemBinding initialItems[] = new equip.data.ItemBinding[0];
+
+	/**
+	 * Create a thread to repeatedly attempt to activate this
+	 * dataspace (assuming that it is a client) whenever its
+	 * activation fails.
+	 * <p/>
+	 * This is an alternative to {@link
+	 * equip.net.ServiceProxy#activate} and {@link
+	 * equip.net.ServiceProxy#deactivate} which are also implemented
+	 * for direct control over activation.
+	 */
+	public abstract void activateAsync();
+
+	/**
+	 * Whether this dataspace replica should try to associate
+	 * persistently with its server/peer.
+	 * <p/>
+	 * A persistent association will not be garbage collected
+	 * when the underlying network connection is removed or
+	 * fails. This option is largely untested at the moment,
+	 * and should really have a {@link Lease} mechanism to
+	 * handle garbage collection: use with care.<P>
+	 * <p/>
+	 * Note that replicas are identified to each other by the
+	 * <code>responsible</code> GUID of each.<P>
+	 *
+	 * @param persistFlag Whether to connect persistently.
+	 */
+	public abstract void setPersist(boolean persistFlag);
+
+	/**
+	 * Add a new event into the dataspace.
+	 * <p/>
+	 * Note that if the dataspace is already busy (e.g. in an
+	 * event notification callback) then the event will be queued
+	 * internally for subsequent asynchronous delivery.<P>
+	 *
+	 * @param event The event to published.
+	 */
+	public abstract void addEvent(equip.data.Event event);
+
+	/**
+	 * (always) Queued add of a new event into the dataspace.
+	 *
+	 * @param event The event to published.
+	 */
+	public abstract void queueEvent(equip.data.Event event);
+
+	/**
+	 * Get an {@link ItemBinding} from the local dataspace by item
+	 * GUID.
+	 *
+	 * @param id The item's GUID.
+	 * @return The item's binding to the dataspace replica, or null
+	 * if unknown.
+	 */
+	public abstract equip.data.ItemBinding getItemBinding(equip.data.GUID id);
+
+	/**
+	 * Get an {@link ItemData} from the local dataspace by item
+	 * GUID.
+	 *
+	 * @param id The item's GUID.
+	 * @return The item's value in the dataspace replica, or null
+	 * if unknown.
+	 */
+	public abstract equip.data.ItemData getItem(equip.data.GUID id);
+
+	/**
+	 * Set a default GUID to be used as the default owner and/or
+	 * requestor for locally generated events and data items.
+	 *
+	 * @param defaultAgentId GUID to use as default
+	 *                       owner/requestor
+	 */
+	public abstract void setDefaultAgent(equip.data.GUID defaultAgentId);
+
+	/**
+	 * add item event helper - create and publish an {@link AddEvent}.
+	 *
+	 * @param item         The value of the new item (including id).
+	 * @param locked       See {@link ItemBindingInfo#locked}.
+	 * @param processBound See {@link ItemBindingInfo#processBound}.
+	 * @param local        See {@link ItemBindingInfo#local}.
+	 * @param itemLease    See {@link ItemBindingInfo#itemLease}.
+	 */
+	public abstract void addItem(equip.data.ItemData item, int locked, boolean processBound, boolean local, equip.data.Lease itemLease);
+
+	/**
+	 * update item event helper - create and publish an {@link
+	 * UpdateEvent}.
+	 * <p/>
+	 * NOTE: if this is an item with a lease and you want the lease
+	 * to be renewed then use an addItem repeatedly instead (with
+	 * the new Lease value in the ItemBinding).
+	 *
+	 * @param item     The new value of the item (including original id).
+	 * @param local    See {@link EventMetadata#local}.
+	 * @param reliable See {@link EventMetadata#reliable}.
+	 * @param priority See {@link EventMetadata#priority}.
+	 */
+	public abstract void updateItem2(equip.data.ItemData item, boolean local, boolean reliable, int priority);
+
+	/**
+	 * update item event helper - create and publish an
+	 * {@link UpdateEvent} with default priority (0).
+	 * <p/>
+	 * NOTE: if this is an item with a lease and you want the lease
+	 * to be renewed then use an addItem repeatedly instead (with
+	 * the new Lease value in the ItemBinding).
+	 *
+	 * @param item     The new value of the item (including original id).
+	 * @param local    See {@link EventMetadata#local}.
+	 * @param reliable See {@link EventMetadata#reliable}.
+	 */
+	public abstract void updateItem(equip.data.ItemData item, boolean local, boolean reliable);
+
+	/**
+	 * delete item event helper - create and publish an
+	 * {@link DeleteEvent}.
+	 *
+	 * @param id    The GUID of the item to be deleted.
+	 * @param local See {@link EventMetadata#local}.
+	 */
+	public abstract void deleteItem(equip.data.GUID id, boolean local);
+
+	/**
+	 * Block and wait for all pending events to be enacted.
+	 * Be careful or this will deadlock,
+	 * so make sure nothing else is going on in that thread!.
+	 * <p/>
+	 * Only in Java, at the moment (2003-10-16).
+	 *
+	 * @param local Wait only for local events (if false, then
+	 *              also send a message to the server dataspace and wait for
+	 *              it to come back as well).
+	 */
+	public abstract void waitForEvents(boolean local);
+
+	/**
+	 * Create a new data session in which to express interest
+	 * in events and data items and to get callbacks/notifications.
+	 * <p/>
+	 * See also information about {@link DataCallback} and
+	 * (usually easier to use) {@link DataCallbackPost}.
+	 *
+	 * @param callback Event-handling subclass of  {@link
+	 *                 DataCallback} or {@link DataCallbackPost}, notified
+	 *                 about events matching any {@link EventPattern}s that
+	 *                 are added to new session.
+	 * @param closure  Optional application parameter provided to the
+	 *                 callback notification (can be null).
+	 * @return A new {@link DataSession} to which {@link
+	 * EventPattern}s can be added to cause replication and/or
+	 * notifications of events and items.
+	 */
+	public abstract equip.data.DataSession createSession(equip.data.DataCallback callback, equip.runtime.ValueBase closure);
+
+	/**
+	 * Delete a {@link DataSession} previously created with
+	 * {@link #createSession}; effectively any remaining
+	 * {@link EventPattern}s will be removed. <P>
+	 * <p/>
+	 * In C++ the caller will still hold the last reference to the
+	 * data session object, which must be released in order for the
+	 * session object to actually be deleted.
+	 *
+	 * @param session The {@link DataSession} object returned
+	 *                from {@link #createSession} to be deleted from the dataspace.
+	 */
+	public abstract void deleteSession(equip.data.DataSession session);
+
+	/**
+	 * this <b>dangerous</b> internal API lets you suspend the enactment
+	 * of events; also make a matching call to {@link #endBusy}.
+	 * Easy to deadlock with unmatched calls!
+	 */
+	public abstract void beginBusy();
+
+	/**
+	 * this <b>dangerous</b> internal API lets you resume the enactment
+	 * of events; only call to match a previous call to {@link #beginBusy}.
+	 * Easy to deadlock - or break synchronization - with unmatched calls!
+	 */
+	public abstract void endBusy();
+
+	/**
+	 * Get this dataspace replica's 'responsible' GUID, which is a
+	 * globally unique identifier for this dataspace replica.
+	 *
+	 * @return The dataspace replica's own GUID.
+	 */
+	public abstract equip.data.GUID getResponsible();
+
+	/**
+	 * Destroy this dataspace, terminating any communication and threads
+	 * and (hopefully) allowing all resources to be released/GCed.
+	 */
+	public abstract void terminate();
+
+	/**
+	 * IDL-generated helper routine to get module name (currently <b>unimplemented</b>).
+	 *
+	 * @return name of this class's module
+	 */
+	public String getModuleName()
+	{
+		return null;
+	}
+
+	/**
+	 * Standard IDL-generated equality test.
+	 *
+	 * @param c The object to be compared against this.
+	 * @return true if this is equal to <code>c</code>
+	 */
+	public boolean equals(java.lang.Object c)
+	{
+		if (c == null)
+		{
+			return false;
+		}
+		if (!c.getClass().equals(getClass()))
+		{
+			return false;
+		}
+		return _equals_helper((DataProxy) c);
+	}
+
+	/**
+	 * Internal IDL-generated equality test helper
+	 */
+	public boolean _equals_helper(DataProxy c)
+	{
+		if (c == null)
+		{
+			return false;
+		}
+		if (!super._equals_helper(c))
+		{
+			return false;
+		}
+		if (c.initialItems == null || initialItems == null || c.initialItems.length != initialItems.length)
+		{
+			return false;
+		}
+		int i1;
+		for (i1 = 0; i1 < initialItems.length; i1++)
+		{
+			if (initialItems[i1] != c.initialItems[i1] && (initialItems[i1] == null || !initialItems[i1].equals(c.initialItems[i1])))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Standard IDL-generated template match test.
+	 *
+	 * @param c The object to be checked against this template.
+	 * @return true if <code>this</code> (as a template) matches the argument
+	 */
+	public boolean matches(java.lang.Object c)
+	{
+		if (c == null || !(c instanceof DataProxy))
+		{
+			return false;
+		}
+		return _matches_helper((DataProxy) c);
+	}
+
+	/**
+	 * Internal IDL-generated match test helper
+	 */
+	public boolean _matches_helper(DataProxy c)
+	{
+		if (c == null)
+		{
+			return false;
+		}
+		if (!super._matches_helper(c))
+		{
+			return false;
+		}
+		if (initialItems != null && initialItems.length != 0 && (c.initialItems == null || c.initialItems.length != initialItems.length))
+		{
+			return false;
+		}
+		int i1;
+		for (i1 = 0; i1 < initialItems.length; i1++)
+		{
+			if (initialItems[i1] != null && !initialItems[i1].matches(c.initialItems[i1]))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Internal IDL-generated serialisation helper. Used by {@link equip.runtime.ObjectInputStream} and {@link equip.runtime.ObjectOutputStream} only.
+	 */
+	public void writeObject(ObjectOutputStream out)
+			throws java.io.IOException
+	{
+		super.writeObject(out);
+		out.writeObjectStart();
+		out.writeInt(initialItems.length);
+		int i1;
+		for (i1 = 0; i1 < initialItems.length; i1++)
+		{
+			out.writeObject(initialItems[i1]);
+		}
+		out.writeObjectEnd();
+	}
+
+	/**
+	 * Internal IDL-generated serialisation helper. Used by {@link ObjectInputStream} and {@link ObjectOutputStream} only.
+	 */
+	public void readObject(ObjectInputStream in)
+			throws java.io.IOException, ClassNotFoundException,
+			InstantiationException
+	{
+		super.readObject(in);
+		in.readObjectStart();
+		{
+			int len = 0;
+			len = in.readInt();
+			initialItems = new equip.data.ItemBinding[len];
+		}
+		int i1;
+		for (i1 = 0; i1 < initialItems.length; i1++)
+		{
+			initialItems[i1] = (equip.data.ItemBinding) in.readObject();
+		}
+		in.readObjectEnd();
+	}
 
 
 } /* class DataProxy */

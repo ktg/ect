@@ -153,7 +153,7 @@ public class DataManagerBrowser {
 	frame.getContentPane().add(scrollpane, BorderLayout.CENTER);
 	frame.getContentPane().setSize(400,400);
 	frame.pack();
-	frame.show();
+	frame.setVisible(true);
 
 	Runnable task = new Runnable(){
 		public void run() {

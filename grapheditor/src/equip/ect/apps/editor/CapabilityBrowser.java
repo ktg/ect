@@ -555,7 +555,7 @@ public class CapabilityBrowser extends JPanel implements DataspaceConfigurationL
 						}
 						else
 						{
-							;// System.out.println("Warning: node
+							// System.out.println("Warning: node
 						}
 						// "+treeNode+"
 						// not found in capabilityNodeMapRev");
@@ -563,7 +563,7 @@ public class CapabilityBrowser extends JPanel implements DataspaceConfigurationL
 					}
 					else
 					{
-						;// System.out.println("Warning: treeNode not
+						// System.out.println("Warning: treeNode not
 						// found");
 					}
 				}
@@ -1077,7 +1077,7 @@ public class CapabilityBrowser extends JPanel implements DataspaceConfigurationL
 				// field
 				cancelHighlight();
 				// Check whether the search button should be enabled
-				if (searchField.getText().equals("") == false)
+				if (!searchField.getText().equals(""))
 				{
 					searchButton.setEnabled(true);
 				}

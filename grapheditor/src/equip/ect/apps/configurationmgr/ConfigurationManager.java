@@ -2705,7 +2705,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			}
 			else
 			{
-				;
 			}
 
 		}
@@ -3431,7 +3430,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			if (first != null && first.equals(key))
 			{
 				// done already
-				;
 			}
 			else
 			{

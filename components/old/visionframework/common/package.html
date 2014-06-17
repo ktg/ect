@@ -1,0 +1,58 @@
+<html>
+<head>
+</head>
+<body>
+Interface, classes and ECT-compatible beans for assembling video capture and simple image analysis applications.
+<H2>Vision Framework</H2>
+<P>Framework classes:</P>
+<UL><LI>JMF Video Capture device manager/factory, {@link equip.ect.components.visionframework.capture.JMFVideoCaptureManager} (instantiated by ECT).</LI>
+<LI>{@link equip.ect.components.visionframework.capture.JMFVideoCaptureDevice}, instantiated dynamically by {@link equip.ect.components.visionframework.capture.JMFVideoCaptureManager}, and supporting specification of size, and {@link PushFrameSource} interface for video streaming to other components. Normal formats are RGB, 8bpp, packed into 1 int per pixel, YUV in 3 floats, mono in 1 float, boolean.</LI>
+<LI>{@link PushFrameSource} interface for image stream producers, which allows (un)registration of consumer's {@link FrameHandler}, which is called for each {@link Frame}.</LI>
+<LI>{@link Frame}, a single video/image frame, with various image processing utility methods.</LI>
+<LI>{@link AbstractVideoProcessor}, base class for video components which has embedded HTTP server for configuration and image peeking.
+</UL>
+<P>The initial processor class - take an image (and optionally a reference image), process it, and output another image are all embedded in {@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor} and accessible through its configuration. These are::</P>
+<UL>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.RegionProcessor}, emits frames limited to a sub-region of the input. Configuration syntax "Region(topleftfaction,toprightfraction,widthfraction,heightfraction}", e.g. "Region(0.1,0.1,0.2,0.2)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.SubsampleProcessor}, emits frames subsampled in x and y (i.e. 1 in n pixels in each direction). Configuration syntax "Subsample(xstep,ystep)", e.g. "Subsample(2,2)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.DropProcessor}, emits 1 frame and then drop N frames, repeatedly. Configuration syntax "Drop(dropNum)", e.g. "Drop(5)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.FormatProcessor}, emits frames in the requested format, "RGB" (packed 8bpp), "YUV" (3 floats), "float" (1 float) or "boolean" (1 boolean) per pixel. Syntax "Format(RGB|YUV|float|boolean)", e.g. "Format(YUV)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.ChangeProcessor}, emits frames in "float" format (1 float per pixel), where the value is the square of the difference between the current and the last frame, with the (up to 3) per-pixel components scaled as specified. If the input format has less than 3 components then the other scale factors are ignored. Configuration syntax "Change(yscale,uscale,vscale)", e.g. "Change(1.0,1.0,1.0)".</LI>
+<LI>{@link ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.DifferenceProcessor}, emits frames in "float" format (1 float per pixel), where the value is the square of the difference between the current and the <b>reference</b> frame, with the (up to 3) per-pixel components scaled as specified. If the input format has less than 3 components then the other scale factors are ignored. Configuration syntax "Difference(yscale,uscale,vscale)", e.g. "Difference(1.0,1.0,1.0)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.ColourDistanceProcessor}, emits frames in "float" format (1 float per pixel), where the value is the square of the difference between the current frame and a supplied reference colour, with the (up to 3) per-pixel components scaled as specified. Configuration syntax "ColourDistance(yref,uref,vref,yscale,uscale,vscale)", e.g. "ColourDistance(0.1,0.2,0.5,1.0,1.0,0.1)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.ThresholdProcessor}, emits frames in "boolean" format (1 boolean per pixel), where true indicates that the input (coerced to 1 float per pixel) is greater than (or less than) the specified threshold. Configuration syntax "Threshold(threshold)", e.g. "Threshold(0.1)", for above threshold, "ThresholdBelow(threshold)", e.g. "ThesholdBelow(0.2)" for below threshold.</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.MedianProcessor}, currently coerces input to "boolean" and emits frames in "boolean" format (1 boolean per pixel), where the output value is the commonest in a square +/-radius of the input pixel. The output image will be smaller by the radius all around. Configuration syntax "Median(radius)", e.g. "Median(1)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.MeanProcessor}, currently coerces input to "float" or "YUV" format and emits frames in the same format, where the output value is the average in a square +/-radius of the input pixel. The output image will be smaller by the radius all around. Configuration syntax "Mean(radius)", e.g. "Mean(1)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.ChangeGateProcessor}, is a combination of Change, Threshold, and Median, which emits a frame which is a copy of the input frame but with 'false' pixels after the (optional) median filter forced to '0'/'false'. I.e. it 'gates' the input image to show only changing pixels. Configuration syntax "ChangeGate(yscale,uscale,vscale,threshold,medianRadius)", e.g. "ChangeGate(1.0,1.0,1.0,0.005,1)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.DifferenceGateProcessor}}, is a combination of Difference, Threshold, and Median, which emits a frame which is a copy of the input frame but with 'false' pixels after the (optional) median filter forced to '0'/'false'. I.e. it 'gates' the input image to show only pixels difference from the reference image. Configuration syntax "DifferenceGate(yscale,uscale,vscale,threshold,medianRadius)", e.g. "DifferenceGate(1.0,1.0,1.0,0.005,1)".</LI>
+<LI>{@link equip.ect.components.visionframework.simplevideoprocessor.SimpleVideoProcessor.BackgroundGateProcessor}, is a combination of Change, Threshold, and FrameAverage (see below) which emits a frame which is a copy of the input frame only when the input frame is considered not to have changed for some specified time. (The last accepted background image is re-emitted while considering subsequent frames.). Configuration syntax "BackgroundGate(yscale,uscale,vscale,threshold,changeFraction,staticTimeSeconds)", e.g. "ChangeGate(1.0,1.0,1.0,0.005,0.01,5.0)".</LI>
+</UL>
+<P>Initial analyser classes - take an image, process it, and output summary metrics:</P>
+<UL>
+<LI>{@link equip.ect.components.visionframework.booleanpixelcount.BooleanPixelCount}, emits the fraction of 'true' pixels in the input image forced to boolean, and a boolean based on a threshold test. Also configurable via Browser, syntax "BooleanPixelCount(threshold)", e.g. "BooleanPixelCount(0.01)". Depracated in favour of...</LI>
+<LI>{@link equip.ect.components.visionframework.frameaverage.VideoFrameAverage}, emits the average pixel value for the frame (for a boolean image this is the fraction of 'true' pixels) where the input image is coerced to 1D (e.g. Y for a YUV or RGB image), and a boolean based on a threshold test. Also configurable via Browser, syntax "Average(threshold)", e.g. "Average(0.01)". </LI>
+</UL>
+<P>Initial exporter classes - take an image and make it available elsewhere:</P>
+<UL>
+<LI>{@link equip.ect.components.visionframework.frameexporter.VideoFrameExporter} allows the incoming frame(s) to be exposed as persistent URLs (more like the previous Camera component, but fitting into this vision framework). Exposing an image is triggered by a trigger property, with optional auto-repeat.
+</UL>
+<H2>Examples</H2>
+<H3>Light/lighting monitor</H3>
+<UL>
+<LI>Request a JMFVideoDeviceManager; JMFVideoCaptureDevice components appears to represent available capture device(s).</LI>
+<LI>Request a SimpleVideoProcessor; connect the capture device's "source" to the new processor's "sink"; open a Web browser and point it at the processor's "configUrl"; click on "Configuration" and configure it as a convert to greyscale (float), and select sub-region (which includes a light or area of illumination), e.g. "Format(float),Region(0.1,0.1,0.2,0.2)". </LI>
+<LI>Request a VideoFrameAverage component; connect the processor's "source" to the average's "sink". If you want, configure it (using a web browser) with a change threshold that is around what you are seeing at the moment, e.g. "Average(0.4)".</LI>
+<LI>Voila...the "average" is a measure of light level (give or take camera/capture card auto-level adjustment :-( ). Hopefully.</LI>
+</UL>
+<H3>Static Surface Monitor</H3>
+<UL>
+<LI>Request a JMFVideoDeviceManager; JMFVideoCaptureDevice components appears to represent available capture device(s).</LI>
+<LI>Request a SimpleVideoProcessor; connect the capture device's "source" to the new processor's "sink"; open a Web browser and point it at the processor's "configUrl"; click on "Configuration" and configure it as a BackgroundGate, optionally with reduced resolution and frame rate, followed by a Change detector e.g. "Drop(3),Subsample(4,4),BackgroundGate(1,1,1,0.01,0.01,3),Change(1,1,1),Threshold(0.01)" (you may need/want to adjust these values; the 3s may be a bit short for 'real' use). Check the input image (image 1) (Note the histogram will not work for RGB images); wait a while without moving and refresh the page and check that a second (background) image is now being generated. </LI>
+<LI>Request a VideoFrameAverage component; connect the processor's "source" to its "sink". Configure it with a change count threshold, e.g. "Average(0.01)".</LI>
+<LI>Request a VideoFrameExporter; connect the fist processor's "source" to its "sink"; connect the VideoFrameAverage's "triggerExceeded" to its "trigger".</LI>
+<LI>Request a MediaViewer; connect the exporter's "imageUrl" to its "url".</LI>
+<LI>Wait... the media viewer should show images from the camera, updated when a new (different) "stable" view is visible. Hopefully.</LI>
+</UL>
+</body>
+</html>
+ 

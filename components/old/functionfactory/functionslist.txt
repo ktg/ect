@@ -1,0 +1,6 @@
+ect.components.functionfactory.functions.Threshold
+ect.components.functionfactory.functions.Linear
+ect.components.functionfactory.functions.Exponential
+ect.components.functionfactory.functions.PhidgetTemperatureConversion
+ect.components.functionfactory.functions.PhidgetHumidityConversion
+ect.components.functionfactory.functions.PhidgetPressureConversion

@@ -62,6 +62,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -371,9 +372,7 @@ public abstract class MediaFactory
 
 	public static String createText(final TransferableMediaObject media)
 	{
-		final String text = new String(media.getData());
-		return text;
-
+		return new String(media.getData());
 	}
 
 	/**
@@ -434,7 +433,9 @@ public abstract class MediaFactory
 
 	public static ImageIcon getImageIcon(final String filename, final Component component)
 	{
-		final java.net.URL url = component.getClass().getResource(filename);
+		System.out.println(filename);
+		final URL url = component.getClass().getResource(filename);
+		System.out.println(url);
 		if (url != null)
 		{
 			return new ImageIcon(url);

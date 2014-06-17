@@ -74,5 +74,5 @@ public class Encoding {
   public static final int EQENCODE_EQ_OBJECT_PACKET = 3;
 /** Java serialisation of objects, mapped to packets */
   public static final int EQENCODE_JAVA_OBJECT_PACKET = 4;
-};
+}
 /* EOF */

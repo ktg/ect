@@ -1,13 +1,33 @@
 allprojects {
     apply plugin: 'idea'
+	apply plugin: 'java'
 
 	repositories {
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         mavenLocal();
     }
+
+//	sourceCompatibility = 1.7
+//	targetCompatibility = 1.7
+
+	sourceSets {
+		main {
+			java {
+				srcDir 'src'
+			}
+			resources {
+				srcDir 'resources'
+			}
+		}
+		test {
+			java {
+				srcDir 'test'
+			}
+		}
+	}
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '1.11'
+	gradleVersion = '1.12'
 }

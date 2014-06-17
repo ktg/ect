@@ -118,7 +118,7 @@ public class PhidgetRFID extends PhidgetBase implements TagGainListener, TagLoss
 			{
 				final int ix = new Integer(name.substring(DIGITAL_OUT_PREFIX.length())).intValue();
 				final Boolean bval = (Boolean) Coerce.toClass(value, Boolean.class);
-				final boolean val = (bval == null) ? false : bval.booleanValue();
+				final boolean val = (bval != null) && bval.booleanValue();
 				// System.out.println("Set output "+ix+" to "+val);
 				digitalouts[ix] = val;
 				if (connected)

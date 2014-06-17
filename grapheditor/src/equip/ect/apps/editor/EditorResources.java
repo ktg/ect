@@ -41,28 +41,15 @@ package equip.ect.apps.editor;
 
 public abstract class EditorResources
 {
-
 	public final static java.awt.Color BACKGROUND_COLOR = java.awt.Color.gray.brighter();
 
-	public final static String BACKGROUND_TEXTURE = "/editor_resources/ect_logo_emboss_gray.gif";
+	public final static String TRASH_ICON = "/bin.png";
 
-	public final static String TRASH_ICON = "/editor_resources/trashcan_full.png";
+	public final static String FOLDER_ICON = "/folder.png";
 
-	public final static String FOLDER_ICON = "/editor_resources/folder.png";
+	public final static String COMPONENT_ICON = "/component.png";
 
-	public final static String COMPONENT_ICON = "/editor_resources/component.png";
+	public final static String SEARCH_ICON = "/search.png";
 
-	public final static String DRAG_SOUND1 = "/editor_resources/drag1.wav";
-
-	public final static String DRAG_SOUND2 = "/editor_resources/drag2.wav";
-
-	public final static String DRAG_SOUND3 = "/editor_resources/drag3.wav";
-
-	public final static String TRASH_SOUND = "/editor_resources/trash.wav";
-
-	public final static String UPDATE_SOUND = "/editor_resources/strom.wav";
-
-	public final static String SEARCH_ICON = "/editor_resources/search.png";
-
-	public final static String COMPONENTREQUEST_ICON = "/editor_resources/componentRequest.png";
+	public final static String COMPONENTREQUEST_ICON = "/componentRequest.png";
 }

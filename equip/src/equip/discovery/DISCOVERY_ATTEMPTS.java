@@ -42,17 +42,15 @@ Contributors:
  * DO NOT MODIFY
  */
 
-
 package equip.discovery;
 
-import equip.runtime.*;
-
-/** default request repeats (JINI is undefined).
-     * little point having this*request-interval more than 
-     * announcement-interval.
-     *   No retries with very quick announcements!
-     */
-public interface DISCOVERY_ATTEMPTS {
-  public static final int  value = 1 ;
+/**
+ * default request repeats (JINI is undefined).
+ * little point having this*request-interval more than
+ * announcement-interval.
+ * No retries with very quick announcements!
+ */
+public interface DISCOVERY_ATTEMPTS
+{
+	public static final int value = 1;
 }
-/* EOF */

@@ -227,8 +227,9 @@ public abstract class ConnectionSap implements Runnable {
     protected static class KeepAliveThreadData {
 	ConnectionSap self;
 	java.lang.Object lock;
-    };
-    protected KeepAliveThreadData keepAliveThreadData;
+    }
+
+	protected KeepAliveThreadData keepAliveThreadData;
     protected void keepAliveThreadFn(KeepAliveThreadData data) {
 	KeepAlive keepAlive = new KeepAliveImpl();
 
@@ -270,8 +271,8 @@ public abstract class ConnectionSap implements Runnable {
 			 + waitMs + " (now = " + nowMs 
 			 + ", lastSendTimeMs = " + lastSendTimeMs 
 			 + ", keepAliveTimeMs = " + keepAliveTimeMs
-			 + ")");;
-		if (data.self.getStatus()!=StatusValues.STATUS_OK) {
+			 + ")");
+		    if (data.self.getStatus()!=StatusValues.STATUS_OK) {
 		    if (DEBUG_TCP)
 			System.err.println
 			    ("Debug: ConnectionSap::keepAliveThreadFn force wait - failed conn");
@@ -317,4 +318,4 @@ public abstract class ConnectionSap implements Runnable {
 	lastResponseTimeMs = nowMs;
     }
     protected boolean DEBUG_TCP = false;
-};
+}

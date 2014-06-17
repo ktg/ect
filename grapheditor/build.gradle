@@ -1,24 +1,9 @@
-apply plugin: 'java'
 apply plugin: 'application'
 
 version = '1.0'
-archivesBaseName = 'grapheditor'
 mainClassName = "equip.ect.apps.editor.grapheditor.GraphEditor"
 
-sourceSets
-		{
-			main {
-				java {
-					srcDir 'src'
-				}
-				resources {
-					srcDir 'resources'
-				}
-			}
-		}
-
-dependencies
-		{
-			compile project(":core")
-			compile "net.sourceforge.nekohtml:nekohtml:+"
-		}
+dependencies {
+	compile project(":ect-core")
+	compile "net.sourceforge.nekohtml:nekohtml:+"
+}

@@ -364,11 +364,8 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	}
 
 	public final static int LINK_MODE = 1;
-
 	public final static int LINK_DRAG_MODE = 2;
-
 	public final static int DRAWER_MODE = 3;
-
 	public final static int MENU_MODE = 4;
 
 	private Link currentLink;
@@ -381,14 +378,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 
 	public GraphEditorCanvas(final String title)
 	{
-		super(title, EditorResources.BACKGROUND_TEXTURE);
-
-		final AudioManager am = AudioManager.getAudioManager();
-		am.addResource("drag1", EditorResources.DRAG_SOUND1);
-		am.addResource("drag2", EditorResources.DRAG_SOUND2);
-		am.addResource("drag3", EditorResources.DRAG_SOUND3);
-		am.addResource("trash", EditorResources.TRASH_SOUND);
-		am.addResource("update", EditorResources.UPDATE_SOUND);
+		super(title);
 		showTrash(true);
 		// need to call this to enable tooltips
 		this.setToolTipText("");
@@ -427,7 +417,6 @@ public class GraphEditorCanvas extends BeanGraphPanel
 
 					gc.update();
 					gc.repaint();
-
 				}
 			}
 		}
@@ -925,26 +914,21 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				f.setVisible(false);
 			}
 		}
-		else if (item instanceof GraphEditorLinkGroup)
-		{
-			/*
-			 * GraphEditorLinkGroup linkGroup = (GraphEditorLinkGroup) item; GraphComponent source =
-			 * (GraphComponent) linkGroup.getSource(); GraphComponent target = (GraphComponent)
-			 * linkGroup.getTarget(); if (source != null) { //source.removeOutputLinkGroup(target);
-			 * } if (target != null) { //target.removeInputLinkGroup(source); }
-			 */
-
-		}
-		else if (item instanceof GraphEditorLink)
-		{
-			/*
-			 * GraphEditorLink link = (GraphEditorLink) item; GraphComponentProperty source =
-			 * (GraphComponentProperty) link .getSource(); if (source != null) {
-			 * source.removeOutputLink(link); } GraphComponentProperty target =
-			 * (GraphComponentProperty) link .getTarget(); if (target != null) {
-			 * target.removeInputLink(link); }
-			 */
-		}
+//		else if (item instanceof GraphEditorLinkGroup)
+//		{
+//			GraphEditorLinkGroup linkGroup = (GraphEditorLinkGroup) item; GraphComponent source =
+//			(GraphComponent) linkGroup.getSource(); GraphComponent target = (GraphComponent)
+//			linkGroup.getTarget(); if (source != null) { //source.removeOutputLinkGroup(target);
+//			} if (target != null) { //target.removeInputLinkGroup(source); }
+//		}
+//		else if (item instanceof GraphEditorLink)
+//		{
+//			 GraphEditorLink link = (GraphEditorLink) item; GraphComponentProperty source =
+//			 (GraphComponentProperty) link .getSource(); if (source != null) {
+//			 source.removeOutputLink(link); } GraphComponentProperty target =
+//			 (GraphComponentProperty) link .getTarget(); if (target != null) {
+//			 target.removeInputLink(link); }
+//		}
 		// now just remove this item
 		super.removeItem(item, cleanUp);
 	}
@@ -1017,8 +1001,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		if (!allowComponentSelfConnect && source.getParent().getBeanID().equals(target.getParent().getBeanID())) { return false; }
 
 		// check whether target is read-only
-		if (target.getComponentProperty().isReadonly()) { return false; }
-		return true;
+		return !target.getComponentProperty().isReadonly();
 	}
 
 	boolean connect(final GraphComponentProperty source, final GraphComponentProperty target, final Link link)
@@ -1078,8 +1061,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 
 	GraphComponent getGraphComponent(final int x, final int y)
 	{
-		final GraphComponent gc = (GraphComponent) getItem(x, y, GraphComponent.class);
-		return gc;
+		return (GraphComponent) getItem(x, y, GraphComponent.class);
 	}
 
 	GraphComponentProperty getGraphComponentProperty(final int x, final int y)

@@ -359,8 +359,8 @@ public class DataManager {
 	int refCount;
 	int type;
 	String name;
-    };
-    //typedef std::map<std::string,DataspaceInfo> DataspaceMap; // url -> DataProxy
+    }
+	//typedef std::map<std::string,DataspaceInfo> DataspaceMap; // url -> DataProxy
     /** Internal cache of dataspaces */
     private Hashtable dataspaceMap = new Hashtable();
 }

@@ -407,4 +407,4 @@ public class Trader extends TraderProxy
       mon.initFromAddr(addr, port);
       return mon;
   }
-};
+}

@@ -49,11 +49,11 @@ package equip.ect.apps.editor;
 
 import javax.swing.DefaultListModel;
 
-public class BeanListModel extends DefaultListModel
+public class BeanListModel<T> extends DefaultListModel<T>
 {
 
 	@Override
-	public void addElement(final Object obj)
+	public void addElement(final T obj)
 	{
 		if (!contains(obj))
 		{

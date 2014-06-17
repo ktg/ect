@@ -659,7 +659,7 @@ public class DataspaceMonitor
 		return monitor;
 	}
 
-	public static final void setPropertyValueFromString(final DataspaceBean dataspace,
+	public static void setPropertyValueFromString(final DataspaceBean dataspace,
 			final ComponentProperty targetProperty, final String value)
 	{
 		System.out.println("Set " + targetProperty + " to " + value);

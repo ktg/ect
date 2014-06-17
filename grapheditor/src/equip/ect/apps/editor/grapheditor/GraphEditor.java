@@ -115,7 +115,7 @@ public class GraphEditor extends JFrame
 			cosmeticPanel.setBorder(BorderFactory.createTitledBorder(new LineBorder(Color.black), "Look & Feek"));
 			final JPanel bgTexturePanel = new JPanel();
 			bgTexturePanel.add(new JLabel("Background Texture:"));
-			final JTextField bgTF = new JTextField(EditorResources.BACKGROUND_TEXTURE);
+			final JTextField bgTF = new JTextField();
 			bgTexturePanel.add(bgTF);
 			final JButton bgB = new JButton("Browse");
 			bgB.addActionListener(new ActionListener()
@@ -146,7 +146,6 @@ public class GraphEditor extends JFrame
 								final TexturePaint tp = getActiveCanvas().createImageTexture(path, false);
 								if (tp != null)
 								{
-									getActiveCanvas().setTexturePaint(tp);
 									bgTF.setText(file.getAbsolutePath());
 									settings.setProperty("BACKGROUND_TEXTURE", path);
 								}
@@ -300,7 +299,7 @@ public class GraphEditor extends JFrame
 	/**
 	 * You coould have several instances for controlling different spaces simultaneously.
 	 */
-	public static final GraphEditor getInstance()
+	public static GraphEditor getInstance()
 	{
 		if (instance == null)
 		{
@@ -365,7 +364,7 @@ public class GraphEditor extends JFrame
 			});
 			editor.setVisible(true);
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			try
@@ -375,7 +374,7 @@ public class GraphEditor extends JFrame
 
 				e.printStackTrace(new PrintWriter(new FileWriter(logFile)));
 			}
-			catch(Exception e2)
+			catch (Exception e2)
 			{
 				e2.printStackTrace();
 			}
@@ -389,7 +388,7 @@ public class GraphEditor extends JFrame
 		{
 			return defaultValue;
 		}
-		return Boolean.valueOf(boolString).booleanValue();
+		return Boolean.parseBoolean(boolString);
 	}
 
 	static long getLongProperty(final String key, final long defaultValue, final Properties settings)
@@ -414,14 +413,12 @@ public class GraphEditor extends JFrame
 
 	private final InteractiveCanvasManager canvasManager;
 
-	private JComponent canvasPanel;
-
 	JTabbedPane pane;
 
 	private GraphEditor()
 	{
 		super("ECT Graph Editor");
-		final JPanel mainPanel = new TexturedPanel(new BorderLayout(), EditorResources.BACKGROUND_TEXTURE);
+		final JPanel mainPanel = new TexturedPanel(new BorderLayout());
 
 		final TexturedPanel top = new TexturedPanel(new BorderLayout());
 		bcp = new GraphEditorChoicePanel();
@@ -587,10 +584,6 @@ public class GraphEditor extends JFrame
 
 		this.canvasManager = new InteractiveCanvasManager(new GraphEditorCanvas("new_view"));
 
-		this.canvasPanel = new BasicPanel("Component Views", EditorResources.BACKGROUND_TEXTURE);
-
-		// add listener
-
 		pane = new JTabbedPane();
 		pane.setBackground(mainPanel.getBackground());
 
@@ -642,10 +635,8 @@ public class GraphEditor extends JFrame
 			}
 		});
 
-		canvasPanel.add(BorderLayout.CENTER, pane);
-
 		updateCanvasPane();
-		mainPanel.add(BorderLayout.CENTER, canvasPanel);
+		mainPanel.add(BorderLayout.CENTER, pane);
 
 		loadSettings();
 		showCapabilityBrowser();
@@ -714,11 +705,6 @@ public class GraphEditor extends JFrame
 					BeanGraphPanel.animatePropertyUpdate, settings);
 			AudioManager.audioOn = getBooleanProperty("AUDIO", AudioManager.audioOn, settings);
 			CleanerTask.timeUntilKill = getLongProperty("TIME_UNTIL_ITEM_CLEAN", CleanerTask.timeUntilKill, settings);
-			final String texturePath = settings.getProperty("BACKGROUND_TEXTURE");
-			if (texturePath != null)
-			{
-				getActiveCanvas().setTexturePaint(getActiveCanvas().createImageTexture(texturePath, false));
-			}
 		}
 		catch (final FileNotFoundException fnfe)
 		{
@@ -830,10 +816,7 @@ public class GraphEditor extends JFrame
 	// return JOptionPane option
 	protected int clearConfiguration()
 	{
-
-		final int option = JOptionPane.showConfirmDialog(getActiveCanvas(), "Abandon current component configuration?");
-
-		return option;
+		return JOptionPane.showConfirmDialog(getActiveCanvas(), "Abandon current component configuration?");
 	}
 
 	// return JOptionPane option
@@ -883,15 +866,15 @@ public class GraphEditor extends JFrame
 					break;
 				}
 			}
-			if (found == false)
+			if (!found)
 			{
 				componentsToRemove.add(pane.getComponentAt(i));
 			}
 		}
 
-		for (int i = 0; i < componentsToRemove.size(); i++)
+		for (Component aComponentsToRemove : componentsToRemove)
 		{
-			pane.remove(componentsToRemove.get(i));
+			pane.remove(aComponentsToRemove);
 		}
 
 		for (int i = 0; i < canvases.length; i++)

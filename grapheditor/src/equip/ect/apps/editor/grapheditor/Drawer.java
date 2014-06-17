@@ -39,40 +39,30 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Point;
-
 import equip.ect.apps.editor.InteractiveCanvasItem;
 import equip.ect.apps.editor.InteractiveCanvasItemView;
 
+import java.awt.*;
+
 /**
- * 
  * The Drawer is designed to accomodate subcomponents, and includes features to hide or bring these
  * into view. The actual rendering and default pull down mechanism is proposed through the
  * DrawerView.
- * 
+ *
  * @author Jan Humble
- * 
  */
 
 public class Drawer extends InteractiveCanvasItem
 {
-
 	public final static int OPEN = 1;
-
 	public final static int CLOSED = 2;
-
 	public final static int COMPACT = 3;
 
 	private int drawerState, previousState;
 
 	public final static int NONE = -1;
-
 	public final static int UP = 0;
-
 	public final static int DOWN = 1;
-
 	public final static int BOTH = 2;
 
 	private int type;
@@ -165,6 +155,7 @@ class DrawerView extends InteractiveCanvasItemView
 
 	public void paintDrawer(final Graphics g)
 	{
+		Graphics2D g2 = (Graphics2D) g;
 		g.fillRoundRect(posX, posY - 20, width, height + 20, 10, 10);
 		g.setColor(Color.black);
 		g.drawRoundRect(posX, posY - 20, width, height + 19, 10, 10);
@@ -219,12 +210,12 @@ class DrawerView extends InteractiveCanvasItemView
 
 	private void drawDownArrow(final Graphics g, final int x, final int y, final int arrowWidth, final int arrowHeight)
 	{
-		g.fillPolygon(	new int[] { x - arrowWidth, x, x + arrowWidth },
-						new int[] { y - arrowHeight, y, y - arrowHeight }, 3);
+		g.fillPolygon(new int[]{x - arrowWidth, x, x + arrowWidth},
+				new int[]{y - arrowHeight, y, y - arrowHeight}, 3);
 	}
 
 	private void drawUpArrow(final Graphics g, final int x, final int y, final int arrowWidth, final int arrowHeight)
 	{
-		g.fillPolygon(new int[] { x - arrowWidth, x, x + arrowWidth }, new int[] { y, y - arrowHeight, y }, 3);
+		g.fillPolygon(new int[]{x - arrowWidth, x, x + arrowWidth}, new int[]{y, y - arrowHeight, y}, 3);
 	}
 }

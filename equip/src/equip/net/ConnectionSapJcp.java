@@ -951,7 +951,8 @@ ValueBase readObject() throws java.io.IOException
  		        printState("readObject/no-completed");
 			wait();
 		}
-		catch(InterruptedException e) {;}
+		catch(InterruptedException e) {
+		}
 
 		if(state == STATE_CLOSED ||
 		   state == STATE_CLOSING ||
@@ -1213,7 +1214,8 @@ int writeObject(ValueBase  object, boolean reliableFlag, int[] object_id, int pr
  		        printState("writeObject/unsent>max");
 			wait();
 		}
-		catch(InterruptedException e) {;}
+		catch(InterruptedException e) {
+		}
 	  }
   }
 
@@ -1649,7 +1651,7 @@ boolean output()
 		}
 
 		// See if we need to calculate round trip time.
-		if(roundTripTimer.isSet() == false)
+		if(!roundTripTimer.isSet())
 		{
 			roundTripTimer.startTimer(currentFragment.getHeader().getSeq());
 
@@ -1757,7 +1759,7 @@ void outputFragment(JcpFragment  f)
 	// retransmit pure ACKs (not that they should be queued).
 	// NOTE: Only set timer if JcpFragment is reliable.
 	if(((f.getHeader().getFlags() & ~JcpFlag.FLAG_SACK)!= JcpFlag.FLAG_ACK || (f.getDataLength() > 0)) 
-		&& (retransmissionTimer.isSet() == false) && (f.getHeader().getFlags() & JcpFlag.FLAG_RELIABLE) != 0)
+		&& (!retransmissionTimer.isSet()) && (f.getHeader().getFlags() & JcpFlag.FLAG_RELIABLE) != 0)
 	{
 		retransmissionTimer.setTimer();
 	}
@@ -1795,8 +1797,9 @@ void outputFragment(JcpFragment  f)
 	    } catch(Exception e) {}
 	}
 	}
-	catch(UnknownHostException e) {;}
-	catch(NoRouteToHostException e) { /* ignore -happens when temporarily out of wavelan range */ ;}
+	catch(UnknownHostException e) {
+	}
+	catch(NoRouteToHostException e) { /* ignore -happens when temporarily out of wavelan range */ }
 	catch(IOException e2)
 	{
 		System.err.println("ERROR: ConnectionSapJcp.outputFragment " + e2);
@@ -2555,7 +2558,7 @@ int receiveFragment(JcpFragment  f)
 						inObject = false;
 					}
 				}
-				else if(inObject == false)
+				else if(!inObject)
 				{
 					// Old unreliable JcpFragment outside object: delete.
 				    if (debug)
@@ -2661,7 +2664,7 @@ protected
 void ack()
 {
 
-	if(SapConstants.ACK_EVERY_PACKET || delayedAckTimer.isSet())
+	if(true)
 	{
 		// Ack already delayed,
 		// force one.

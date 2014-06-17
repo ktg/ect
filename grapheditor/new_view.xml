@@ -1,0 +1,42 @@
+<GraphEditorState canvasName="new_view">
+<GraphEditorComponents>
+<GraphEditorItem canvasName="" componentClass="equip.ect.apps.editor.grapheditor.GraphComponent" dataspaceID="[128.243.22.240:0.60849:100:1401282965]" editorID="editorid:1401285021466.5383" posX="282" posY="54" state="1">
+<Properties nrProperties="3">
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:101:1401282965]" itemName="frequency" keepVisible="false" parentEditorID="editorid:1401285021466.5383"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:103:1401282965]" itemName="value" keepVisible="false" parentEditorID="editorid:1401285021466.5383"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:102:1401282965]" itemName="length" keepVisible="false" parentEditorID="editorid:1401285021466.5383"/>
+</Properties>
+</GraphEditorItem>
+<GraphEditorItem canvasName="" componentClass="equip.ect.apps.editor.grapheditor.GraphComponent" dataspaceID="[128.243.22.240:0.60849:63:1401282965]" editorID="editorid:1401285018422.2932" posX="88" posY="71" state="1">
+<Properties nrProperties="7">
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:68:1401282965]" itemName="outFreq" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:65:1401282965]" itemName="max" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:64:1401282965]" itemName="downDuration" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:66:1401282965]" itemName="min" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:69:1401282965]" itemName="running" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:67:1401282965]" itemName="out" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:70:1401282965]" itemName="upDuration" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+</Properties>
+</GraphEditorItem>
+</GraphEditorComponents>
+<GraphEditorLinks>
+<GraphEditorItem canvasName="" componentClass="equip.ect.apps.editor.grapheditor.GraphComponent" dataspaceID="[128.243.22.240:0.60849:100:1401282965]" editorID="editorid:1401285021466.5383" posX="282" posY="54" state="1">
+<Properties nrProperties="3">
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:101:1401282965]" itemName="frequency" keepVisible="false" parentEditorID="editorid:1401285021466.5383"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:103:1401282965]" itemName="value" keepVisible="false" parentEditorID="editorid:1401285021466.5383"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:102:1401282965]" itemName="length" keepVisible="false" parentEditorID="editorid:1401285021466.5383"/>
+</Properties>
+</GraphEditorItem>
+<GraphEditorItem canvasName="" componentClass="equip.ect.apps.editor.grapheditor.GraphComponent" dataspaceID="[128.243.22.240:0.60849:63:1401282965]" editorID="editorid:1401285018422.2932" posX="88" posY="71" state="1">
+<Properties nrProperties="7">
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:68:1401282965]" itemName="outFreq" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:65:1401282965]" itemName="max" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:64:1401282965]" itemName="downDuration" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:66:1401282965]" itemName="min" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:69:1401282965]" itemName="running" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:67:1401282965]" itemName="out" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+<ComponentPropertyItem dataspaceID="[128.243.22.240:0.60849:70:1401282965]" itemName="upDuration" keepVisible="false" parentEditorID="editorid:1401285018422.2932"/>
+</Properties>
+</GraphEditorItem>
+</GraphEditorLinks>
+</GraphEditorState>

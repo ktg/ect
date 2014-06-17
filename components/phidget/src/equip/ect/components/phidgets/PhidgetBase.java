@@ -110,7 +110,7 @@ public abstract class PhidgetBase implements Serializable, DynamicProperties, At
 			setSerialNumber(ae.getSource().getSerialNumber());
 			setConnected(true);
 
-			if (previouslyAttached == false)
+			if (!previouslyAttached)
 			{
 				firstAttachment();
 				previouslyAttached = true;

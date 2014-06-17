@@ -55,7 +55,8 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 		ComponentMetadataListener, DataspaceConfigurationListener
 {
 
-	protected final TexturedJList beanList;
+	protected final JList<BeanCanvasItem> beanList;
+	protected final BeanListModel<BeanCanvasItem> listModel;
 
 	protected static Map<String, BeanCanvasItem> templates = new HashMap<String, BeanCanvasItem>();
 
@@ -75,11 +76,13 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 		// Construct the bean list
 		// beanList = new
 		// TexturedJList(GraphEditorResources.BACKGROUND_TEXTURE);
-		beanList = new TexturedJList(null);
+		listModel = new BeanListModel<BeanCanvasItem>();
+
+		beanList = new JList<BeanCanvasItem>();
 
 		beanList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
 		beanList.setVisibleRowCount(-1); // hack to make it work, java bug
-		beanList.setModel(new BeanListModel());
+		beanList.setModel(listModel);
 		beanList.setCellRenderer(new BeanCellRenderer());
 		// beanList.setFixedCellHeight(80);
 		// beanList.setFixedCellWidth(80);
@@ -115,8 +118,6 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void capabilityAdded(final Capability cap)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -128,8 +129,6 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void capabilityDeleted(final Capability cap)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -141,8 +140,6 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void capabilityUpdated(final Capability cap)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -158,14 +155,14 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 		if (templates.containsKey(compAdvert.getComponentID().toString())) { return; }
 		final BeanCanvasItem newComp = createComponentTemplate(compAdvert);
 		templates.put(compAdvert.getComponentID().toString(), newComp);
-		((BeanListModel) beanList.getModel()).addElement(newComp);
+		listModel.removeElement(newComp);
 	}
 
 	@Override
 	public void componentAdvertDeleted(final ComponentAdvert compAdvert)
 	{
-		final BeanCanvasItem oldComp = (BeanCanvasItem) templates.remove(compAdvert.getComponentID().toString());
-		((BeanListModel) beanList.getModel()).removeElement(oldComp);
+		final BeanCanvasItem oldComp = templates.remove(compAdvert.getComponentID().toString());
+		listModel.removeElement(oldComp);
 	}
 
 	public void componentMetadataChanged(final Object metadata)
@@ -196,8 +193,6 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void componentRequestAdded(final ComponentRequest compReq)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -209,8 +204,6 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void componentRequestDeleted(final ComponentRequest compReq)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	public abstract BeanCanvasItem createComponentTemplate(ComponentAdvert compAdvert);
@@ -224,8 +217,6 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void propertyLinkRequestAdded(final PropertyLinkRequest linkReq)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -238,8 +229,6 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void propertyLinkRequestDeleted(final PropertyLinkRequest linkReq)
 	{
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -252,8 +241,5 @@ public abstract class BeanChoicePanel extends BasicPanel implements ComponentLis
 	@Override
 	public void propertyLinkRequestUpdated(final PropertyLinkRequest linkReq)
 	{
-		// TODO Auto-generated method stub
-
 	}
-
 }

@@ -222,7 +222,8 @@ public class Server extends DataProxy implements Runnable
 			((((int)ip[2]) & 0xff) << 8) |
 			((((int)ip[3]) & 0xff));
 		}
-		catch(Exception e) {;}
+		catch(Exception e) {
+		}
 		tcp.port = serverSap.getPort();
 
 		moniker = tcp;
@@ -255,7 +256,8 @@ public class Server extends DataProxy implements Runnable
 			((((int)ip[2]) & 0xff) << 8) |
 			((((int)ip[3]) & 0xff));
 		}
-		catch(Exception e) {;}
+		catch(Exception e) {
+		}
 		udp.port = serverSap.getPort();
 	}
 
@@ -501,7 +503,7 @@ public class Server extends DataProxy implements Runnable
 	  }
 	  try { Thread.sleep(2000); } catch (Exception e) {}
 	  timeout--;
-	}; // while
+	}// while
 	if (!okFlag) {
 	  System.err.println("ERROR: old connection will not go - sorry - cannot accept new connection");
 	  return;

@@ -44,7 +44,6 @@ Contributors:
  * $Author: chaoticgalen $ Original Author: Jan Humble Copyright (c) 2001, Swedish
  * Institute of Computer Science AB
  */
-
 package equip.ect.apps.editor;
 
 public class TransferableMultiMedia extends TransferableMediaObject

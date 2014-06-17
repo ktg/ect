@@ -63,7 +63,7 @@ import javax.swing.ListModel;
  * Textured version of JList using standard TexturePaint swing method.
  */
 
-public class TexturedJList extends JList
+public class TexturedJList<T> extends JList<T>
 {
 
 	private TexturePaint texturePaint = null;
@@ -73,7 +73,7 @@ public class TexturedJList extends JList
 		this(null);
 	}
 
-	public TexturedJList(final ListModel dataModel, final String textureFile)
+	public TexturedJList(final ListModel<T> dataModel, final String textureFile)
 	{
 		this(textureFile);
 		this.setModel(dataModel);
@@ -119,5 +119,4 @@ public class TexturedJList extends JList
 		}
 		super.paintComponent(g);
 	}
-
 }
