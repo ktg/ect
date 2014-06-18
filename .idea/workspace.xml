@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="06879d14-d937-49ce-9774-b2b4330cfa22" name="Default" comment="Stuff">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -101,11 +100,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GraphComponentView.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="GraphComponentView.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="836" max-vertical-offset="4788">
-              <caret line="134" column="29" selection-start-line="134" selection-start-column="29" selection-end-line="134" selection-end-column="29" />
+            <state vertical-scroll-proportion="0.46615088" vertical-offset="83" max-vertical-offset="4788">
+              <caret line="55" column="23" selection-start-line="55" selection-start-column="23" selection-end-line="55" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -134,11 +133,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GraphComponentPropertyView.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="GraphComponentPropertyView.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.37330756" vertical-offset="617" max-vertical-offset="1872">
-              <caret line="85" column="45" selection-start-line="85" selection-start-column="45" selection-end-line="85" selection-end-column="45" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1872">
+              <caret line="53" column="47" selection-start-line="53" selection-start-column="47" selection-end-line="53" selection-end-column="47" />
               <folding />
             </state>
           </provider>
@@ -2722,18 +2721,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java">
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="836" max-vertical-offset="4788">
-          <caret line="134" column="29" selection-start-line="134" selection-start-column="29" selection-end-line="134" selection-end-column="29" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1872">
+          <caret line="53" column="47" selection-start-line="53" selection-start-column="47" selection-end-line="53" selection-end-column="47" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java">
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.37330756" vertical-offset="617" max-vertical-offset="1872">
-          <caret line="85" column="45" selection-start-line="85" selection-start-column="45" selection-end-line="85" selection-end-column="45" />
+        <state vertical-scroll-proportion="0.46615088" vertical-offset="83" max-vertical-offset="4788">
+          <caret line="55" column="23" selection-start-line="55" selection-start-column="23" selection-end-line="55" selection-end-column="23" />
           <folding />
         </state>
       </provider>

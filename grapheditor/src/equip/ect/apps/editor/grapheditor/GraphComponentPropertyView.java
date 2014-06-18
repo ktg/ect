@@ -51,7 +51,7 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 
 	private Color selectedColor = Color.green.darker();
 
-	private Font propertyFont = new Font("Helvetica", Font.PLAIN, 10);
+	private Font propertyFont = new Font("Arial", Font.PLAIN, 10);
 
 	private String name, value;
 
