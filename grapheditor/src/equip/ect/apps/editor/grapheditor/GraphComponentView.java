@@ -114,13 +114,16 @@ public class GraphComponentView extends InteractiveCanvasItemView
 			Rectangle2D rect = null;
 			for (GraphComponentProperty gcp : graphCompProps)
 			{
-				if(rect == null)
+				if(gcp.isVisible())
 				{
-					rect = gcp.getBounds();
-				}
-				else
-				{
-					rect = rect.createUnion(gcp.getBounds());
+					if (rect == null)
+					{
+						rect = gcp.getBounds();
+					}
+					else
+					{
+						rect = rect.createUnion(gcp.getBounds());
+					}
 				}
 			}
 

@@ -70,17 +70,33 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 		g2.setFont(propertyFont);
 		final FontMetrics metrics = g2.getFontMetrics();
 		Rectangle2D r2d = metrics.getStringBounds(name, g2);
+		final double nameWidth = r2d.getWidth();
 		g2.fillRect(posX + 1,posY + 1, width - 2, height - 2);
 		//g2.fillRoundRect(posX, posY, width, height, 10, 10);
 		g2.setColor(Color.black);
 		//g2.drawRect(posX, posY, width - 1, height - 1);
-		g2.drawString(name, posX + 5, (int)(posY + r2d.getHeight()) + 1);
+		g2.drawString(name, posX + 5, (int)(posY + r2d.getHeight()));
 		if (renderPropValue)
 		{
-			r2d = metrics.getStringBounds(value, g2);
+			double dotWidth = metrics.getStringBounds("...", g2).getWidth();
+			String valueString = value;
+			r2d = metrics.getStringBounds(valueString, g2);
+			double valueWidth = r2d.getWidth();
+			boolean dots = false;
+			while(nameWidth + valueWidth + 15 > width && valueString.length() > 0)
+			{
+				valueString = valueString.substring(0, valueString.length() - 1);
+				r2d = metrics.getStringBounds(valueString, g2);
+				valueWidth = r2d.getWidth() + dotWidth;
+				dots = true;
+			}
+
+			if(dots)
+			{
+				valueString = valueString + "...";
+			}
 			g.setColor(Color.blue);
-			final double valueWidth = r2d.getWidth();
-			g2.drawString(value, (int)(posX + width - valueWidth - 5), (int)(posY + r2d.getHeight()) + 1);
+			g2.drawString(valueString, (int)(posX + width - valueWidth - 5), (int)(posY + r2d.getHeight()));
 		}
 	}
 
