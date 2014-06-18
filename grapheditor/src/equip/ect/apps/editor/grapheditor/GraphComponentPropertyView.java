@@ -47,7 +47,7 @@ import equip.ect.apps.editor.InteractiveCanvasItemView;
 public class GraphComponentPropertyView extends InteractiveCanvasItemView
 {
 
-	private Color normalColor = Color.gray.brighter();
+	private Color normalColor = Color.white;
 
 	private Color selectedColor = Color.green.darker();
 
@@ -70,20 +70,17 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 		g2.setFont(propertyFont);
 		final FontMetrics metrics = g2.getFontMetrics();
 		Rectangle2D r2d = metrics.getStringBounds(name, g2);
-		g2.fillRect(posX,posY, width, height);
+		g2.fillRect(posX + 1,posY + 1, width - 2, height - 2);
 		//g2.fillRoundRect(posX, posY, width, height, 10, 10);
 		g2.setColor(Color.black);
-		g2.drawRect(posX, posY, width - 1, height - 1);
-		g2.drawString(name, (int) (posX + 0.5 * (width - r2d.getWidth())), // center
-						posY + (int) r2d.getHeight());
+		//g2.drawRect(posX, posY, width - 1, height - 1);
+		g2.drawString(name, posX + 5, (int)(posY + r2d.getHeight()) + 1);
 		if (renderPropValue)
 		{
 			r2d = metrics.getStringBounds(value, g2);
 			g.setColor(Color.blue);
 			final double valueWidth = r2d.getWidth();
-			g2.drawString(value, (int) (posX + 0.5 * (width - valueWidth)), // center
-							posY + 2 * (int) r2d.getHeight());
-
+			g2.drawString(value, (int)(posX + width - valueWidth - 5), (int)(posY + r2d.getHeight()) + 1);
 		}
 	}
 

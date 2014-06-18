@@ -35,15 +35,14 @@
 
 package equip.ect.apps.editor.grapheditor;
 
+import equip.ect.apps.editor.InteractiveCanvasItemView;
+
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import equip.ect.apps.editor.InteractiveCanvasItemView;
-
 /**
  * The default view (or rendering strategy) for a GraphComponent.
- * 
  */
 public class GraphComponentView extends InteractiveCanvasItemView
 {
@@ -68,7 +67,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 	public static boolean renderHostID = false;
 
 	public GraphComponentView(final Component canvas, final String name, final String hostID,
-			final List<GraphComponentProperty> renderableProps)
+	                          final List<GraphComponentProperty> renderableProps)
 	{
 		super(canvas);
 		this.name = name;
@@ -94,7 +93,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		g2.drawRoundRect(posX, posY, headerWidth - 1, height - 1, 10, 10);
 		g2.setColor(Color.white);
 		g2.drawString(name, (int) (posX + 0.5 * (headerWidth - r2d.getWidth())), // center
-						posY + 1 + (int) r2d.getHeight());
+				posY + 1 + (int) r2d.getHeight());
 		if (renderHostID)
 		{
 			g2.setFont(hostIDFont);
@@ -103,16 +102,37 @@ public class GraphComponentView extends InteractiveCanvasItemView
 			g2.setColor(Color.green);
 			final double hostWidth = r2d.getWidth();
 			g2.drawString(hostID, (int) (posX + 0.5 * (headerWidth - hostWidth)), // center
-							posY + 2 * (int) r2d.getHeight());
+					posY + 2 * (int) r2d.getHeight());
 
 		}
 	}
 
-	public void drawProps(final Graphics g)
+	public void drawProps(final Graphics2D g)
 	{
 		if (graphCompProps != null)
 		{
-			for (GraphComponentProperty gcp: graphCompProps)
+			Rectangle2D rect = null;
+			for (GraphComponentProperty gcp : graphCompProps)
+			{
+				if(rect == null)
+				{
+					rect = gcp.getBounds();
+				}
+				else
+				{
+					rect = rect.createUnion(gcp.getBounds());
+				}
+			}
+
+			if(rect != null)
+			{
+				g.setColor(Color.white);
+				g.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth() - 1, (int)rect.getHeight() - 1);
+				g.setColor(Color.black);
+				g.drawRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth() - 1, (int)rect.getHeight() - 1);
+			}
+
+			for (GraphComponentProperty gcp : graphCompProps)
 			{
 				if (gcp.isVisible())
 				{
@@ -150,7 +170,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		drawHeader(g2, false);
 		if (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT)
 		{
-			drawProps(g);
+			drawProps(g2);
 		}
 	}
 
@@ -214,7 +234,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		this.lastHeight = height;
 
 		final int insetX = 10;
-		final int insetY = 10;
+		final int insetY = 5;
 		final Graphics g = canvas.getGraphics();
 		g.setFont(headerFont);
 		final FontMetrics fontMetrics = g.getFontMetrics();
@@ -227,7 +247,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		int maxWidth = Math.max(headerWidth, drawer.getWidth());
 		if (graphCompProps != null)
 		{
-			for (GraphComponentProperty gcp: graphCompProps)
+			for (GraphComponentProperty gcp : graphCompProps)
 			{
 				r2d = fontMetrics.getStringBounds(gcp.getName(), g);
 				final int currentWidth = (int) r2d.getWidth() + insetX;
@@ -255,7 +275,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 
 			this.width = this.headerWidth = maxWidth;
 			int y = posY + headerHeight - 1;
-			for (GraphComponentProperty gcp: graphCompProps)
+			for (GraphComponentProperty gcp : graphCompProps)
 			{
 				if (drawer.getDrawerState() == Drawer.OPEN)
 				{
@@ -280,7 +300,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 				if (gcp.isVisible())
 				{
 					gcp.setWidth(maxWidth);
-					gcp.setHeight(headerHeight);
+					gcp.setHeight(headerHeight - 5);
 					gcp.setPosition(posX, y);
 					y += gcp.getHeight() - 1;
 					height += gcp.getHeight() - 1;
