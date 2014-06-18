@@ -1,5 +1,0 @@
-Manifest-Version: 1.0 
-
-Name: equip/ect/components/ipergobjectproxy/IPerGObjectProxyFactory.class
-Java-Bean: True
-classification: Experimental/IPerG
