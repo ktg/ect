@@ -2,13 +2,14 @@ version = '1.0'
 
 dependencies {
 	compile "org.beanshell:bsh:+"
+	compile project(":ect-core")
 }
 
 task copyToLib(type: Copy) {
 	into "$buildDir/libs"
 	from configurations.runtime
-	exclude '**/ect-core*'
-	exclude '**/equip*'
+	exclude '**/ect-core*.jar'
+	exclude '**/equip*.jar'
 }
 
 build.dependsOn(copyToLib)

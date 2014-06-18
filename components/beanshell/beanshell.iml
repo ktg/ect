@@ -15,8 +15,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="ect-core" exported="" />
     <orderEntry type="library" exported="" name="Gradle: bsh-2.0b5" level="project" />
+    <orderEntry type="module" module-name="ect-core" exported="" />
   </component>
 </module>
 

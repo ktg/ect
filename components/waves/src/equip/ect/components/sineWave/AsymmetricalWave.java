@@ -47,6 +47,8 @@ public class AsymmetricalWave implements Runnable, Serializable, PropertyChangeL
 
 	public AsymmetricalWave()
 	{
+		updateDelta();
+		updateRange();
 	}
 
 	public synchronized void addPropertyChangeListener(final PropertyChangeListener l)
@@ -127,8 +129,6 @@ public class AsymmetricalWave implements Runnable, Serializable, PropertyChangeL
 				y = Math.cos(time / (upDuration / Math.PI) + Math.PI * (1 - (downDuration / upDuration)));
 			}
 			out = ((y + 1) * range) + min;
-
-			System.out.println(out);
 
 			propertyChangeListeners.firePropertyChange("out", oldOut, out);
 

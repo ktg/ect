@@ -15,10 +15,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="ect-core" exported="" />
     <orderEntry type="library" exported="" name="Gradle: nekohtml-1.9.21" level="project" />
     <orderEntry type="library" exported="" name="Gradle: xml-apis-1.4.01" level="project" />
     <orderEntry type="library" exported="" name="Gradle: xercesImpl-2.10.0" level="project" />
+    <orderEntry type="module" module-name="ect-core" exported="" />
   </component>
 </module>
 
