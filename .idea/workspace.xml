@@ -2,93 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="06879d14-d937-49ce-9774-b2b4330cfa22" name="Default" comment="Stuff">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/resources/layer_remove.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/resources/link.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/resources/settings.png" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/ComponentPropertyAdapter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ComponentState.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/DrawerView.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/LinkState.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/PropertyState.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/SelectionModel.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/State.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/resources/search.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/AudioManager.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BasicPanel.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanCellRenderer.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanChoicePanel.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanListModel.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanPropertyQuery.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CapabilityDialog.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvasFrame.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvasItemPlacer.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/LinkFrame.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/PropertyLinkBrowser.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/PropertyLinkDialog.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TexturedJList.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TexturedPanel.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorChoicePanel.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorStateManager.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/PropertyLinkBrowser.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/UpdateTimerPaint.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/EditorID.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/EditorItemState.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/EditorState.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/EditorStateManager.java" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanCanvasItemTransferableSupport.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentGUIDTransferableSupport.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanTransferHandler.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentGUIDTransferHandler.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CapabilityBrowser.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentBrowser.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CleanerTask.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/interactive/CleanerTask.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentListener.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/ComponentListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentMetadataListener.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/ComponentMetadataListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentPropertyListener.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/ComponentPropertyListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentPropertyUpdateListener.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/ComponentPropertyUpdateListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/DataspaceConfigurationListener.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceConfigurationListener.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/DataspaceMonitor.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/DataspaceUtils.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceUtils.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvas.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/interactive/InteractiveCanvas.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvasDaemon.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/interactive/InteractiveCanvasDaemon.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvasItem.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/interactive/InteractiveCanvasItem.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvasItemView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/interactive/InteractiveCanvasItemView.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/InteractiveCanvasManager.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/interactive/InteractiveCanvasManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanCanvasItem.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanCanvasItem.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanGraphPanel.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanGraphPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ect-core/src/equip/ect/Coerce.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/Coerce.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ect-core/src/equip/ect/CompInfo.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/CompInfo.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentLauncher.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ComponentLauncher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentMetadataStore.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentMetadataStore.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/ComponentSettingsPanel.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/ComponentSettingsPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/CompoundComponentEditor.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/CompoundComponentEditor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/Connectable.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/Connectable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ect-core/src/equip/ect/ContainerManager.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/ContainerManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CurvedLine.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/CurvedLine.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/Drawer.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/Drawer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/EditorResources.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/EditorResources.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentProperty.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentProperty.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentPropertyView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorLink.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorLink.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorLinkGroup.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorLinkGroup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/GraphicCanvasItemView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/GraphicCanvasItemView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/Link.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/Link.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/LinkGroup.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/LinkGroup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/MediaFactory.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/MediaFactory.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/NameDialog.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/NameDialog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ect-core/src/equip/ect/PropertyLinkRequest.java" afterPath="$PROJECT_DIR$/ect-core/src/equip/ect/PropertyLinkRequest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/RenderableLink.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/RenderableLink.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/SetValuePopup.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/SetValuePopup.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/StraightLine.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/StraightLine.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TimerPaint.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TimerPaint.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TrashCanvasItem.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TrashCanvasItem.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TrashView.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/TrashView.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/build.gradle" afterPath="$PROJECT_DIR$/grapheditor/build.gradle" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/test.ect" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/test2.json" afterPath="" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -151,21 +66,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="ConfigurationManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java">
+      <file leaf-file-name="build.gradle" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/grapheditor/build.gradle">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="50337" max-vertical-offset="67482">
-              <caret line="3475" column="19" selection-start-line="3475" selection-start-column="19" selection-end-line="3475" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="635">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PropertyState.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/PropertyState.java">
+      <file leaf-file-name="ConfigurationManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="176" max-vertical-offset="1116">
-              <caret line="20" column="25" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="25" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="50337" max-vertical-offset="67482">
+              <caret line="3475" column="19" selection-start-line="3475" selection-start-column="19" selection-end-line="3475" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -228,20 +143,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.ect" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/test.ect">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2430">
-              <caret line="0" column="19" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="19" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProgressDialog.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ProgressDialog.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.74488187" vertical-offset="1129" max-vertical-offset="1764">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1129" max-vertical-offset="1764">
               <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -2465,10 +2370,10 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20064034" sideWeight="0.50206614" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Gradle" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12059765" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12059765" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19477054" sideWeight="0.3822314" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19477054" sideWeight="0.6177686" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19477054" sideWeight="0.6177686" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31508264" sideWeight="0.49887976" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15368196" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -2792,14 +2697,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/test2.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="373" max-vertical-offset="1260">
-          <caret line="2" column="40" selection-start-line="2" selection-start-column="40" selection-end-line="2" selection-end-column="40" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanCanvasItem.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="355" max-vertical-offset="1170">
@@ -2890,14 +2787,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/test.ect">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2430">
-          <caret line="0" column="19" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3757" max-vertical-offset="8388">
@@ -2934,7 +2823,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.74488187" vertical-offset="1129" max-vertical-offset="1764">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1129" max-vertical-offset="1764">
           <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -2945,6 +2834,14 @@
             <element signature="e#2038#2039#0" expanded="true" />
             <element signature="e#2072#2073#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/build.gradle">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="635">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
