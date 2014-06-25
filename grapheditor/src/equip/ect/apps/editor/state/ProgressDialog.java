@@ -87,6 +87,8 @@ public class ProgressDialog extends JFrame
 
 	public void finished()
 	{
+		setStatus("Finished");
+		progress.setValue(progress.getMaximum());
 		doneButton.setEnabled(true);
 	}
 }

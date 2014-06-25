@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="06879d14-d937-49ce-9774-b2b4330cfa22" name="Default" comment="Stuff">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -128,11 +128,23 @@
       <file leaf-file-name="StateManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="981" max-vertical-offset="4500">
-              <caret line="71" column="76" selection-start-line="71" selection-start-column="76" selection-end-line="71" selection-end-column="76" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1305" max-vertical-offset="4500">
+              <caret line="106" column="17" selection-start-line="106" selection-start-column="17" selection-end-line="106" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#1365#1390#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ProgressDialog.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.85984254" vertical-offset="894" max-vertical-offset="1620">
+              <caret line="90" column="47" selection-start-line="90" selection-start-column="47" selection-end-line="90" selection-end-column="47" />
+              <folding>
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -152,10 +164,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataspaceMonitor.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DataspaceMonitor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7574803" vertical-offset="17573" max-vertical-offset="19818">
+            <state vertical-scroll-proportion="0.0" vertical-offset="17609" max-vertical-offset="19818">
               <caret line="1038" column="65" selection-start-line="1038" selection-start-column="65" selection-end-line="1038" selection-end-column="65" />
               <folding>
                 <element signature="e#0#33152#0" expanded="true" />
@@ -1769,10 +1781,10 @@
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentBrowser.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java" />
-        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java" />
         <option value="$PROJECT_DIR$/grapheditor/test2.json" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" />
+        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java" />
       </list>
     </option>
   </component>
@@ -2389,7 +2401,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1916" height="1058" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -2403,7 +2415,7 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20064034" sideWeight="0.50206614" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Gradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12059765" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Gradle" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12059765" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19477054" sideWeight="0.3822314" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19477054" sideWeight="0.6177686" order="0" side_tool="false" content_ui="combo" />
@@ -2774,33 +2786,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1129" max-vertical-offset="1764">
-          <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#662#785#0" expanded="true" />
-            <element signature="e#780#781#0" expanded="true" />
-            <element signature="e#1838#1839#0" expanded="true" />
-            <element signature="e#1887#1888#0" expanded="true" />
-            <element signature="e#2038#2039#0" expanded="true" />
-            <element signature="e#2072#2073#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1143" max-vertical-offset="4500">
-          <caret line="71" column="76" selection-start-line="71" selection-start-column="76" selection-end-line="71" selection-end-column="76" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1365#1390#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ect-core/src/equip/ect/ComponentProperty.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.16220473" vertical-offset="707" max-vertical-offset="6804">
@@ -2873,7 +2858,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7574803" vertical-offset="17573" max-vertical-offset="19818">
+        <state vertical-scroll-proportion="0.0" vertical-offset="17609" max-vertical-offset="19818">
           <caret line="1038" column="65" selection-start-line="1038" selection-start-column="65" selection-end-line="1038" selection-end-column="65" />
           <folding>
             <element signature="e#0#33152#0" expanded="true" />
@@ -2892,6 +2877,27 @@
             <element signature="e#21577#21578#0" expanded="true" />
             <element signature="e#23293#23305#0" expanded="true" />
             <element signature="e#24314#24335#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1305" max-vertical-offset="4500">
+          <caret line="106" column="17" selection-start-line="106" selection-start-column="17" selection-end-line="106" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1365#1390#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.85984254" vertical-offset="894" max-vertical-offset="1620">
+          <caret line="90" column="47" selection-start-line="90" selection-start-column="47" selection-end-line="90" selection-end-column="47" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
