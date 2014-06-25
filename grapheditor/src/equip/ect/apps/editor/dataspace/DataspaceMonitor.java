@@ -1024,7 +1024,7 @@ public class DataspaceMonitor
 			long start = System.currentTimeMillis();
 			while((System.currentTimeMillis() - start) < TIMEOUT)
 			{
-				Thread.sleep(300);
+				Thread.sleep(100);
 				actualValue = getPropertyValue(targetProperty.getID());
 				System.out.println("Value = " + actualValue + ". Setting to " + value);
 				if((value == null && actualValue == null) || (value != null && value.equals(actualValue)))
@@ -1036,7 +1036,7 @@ public class DataspaceMonitor
 			dataspace.delete(linkID);
 			dataspace.delete(propertyID);
 
-			actualValue = getPropertyValue(targetProperty);
+			actualValue = getPropertyValue(targetProperty.getID());
 
 			return (value == null && actualValue == null) || (value != null && value.equals(actualValue));
 		}
