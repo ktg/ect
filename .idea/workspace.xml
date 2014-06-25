@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="06879d14-d937-49ce-9774-b2b4330cfa22" name="Default" comment="Stuff">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/test.ect" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/grapheditor/test2.json" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -76,11 +76,34 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="GraphComponent.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1566" max-vertical-offset="14436">
+              <caret line="168" column="19" selection-start-line="168" selection-start-column="19" selection-end-line="168" selection-end-column="19" />
+              <folding>
+                <element signature="e#5756#5788#0" expanded="true" />
+                <element signature="e#5877#5901#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="ConfigurationManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="50337" max-vertical-offset="67482">
-              <caret line="3475" column="19" selection-start-line="3475" selection-start-column="19" selection-end-line="3475" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="46974" max-vertical-offset="67482">
+              <caret line="2856" column="43" selection-start-line="2856" selection-start-column="43" selection-end-line="2856" selection-end-column="43" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="PersistenceManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ect-core/src/equip/ect/PersistenceManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="4490" max-vertical-offset="15012">
+              <caret line="343" column="22" selection-start-line="343" selection-start-column="22" selection-end-line="343" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -89,7 +112,7 @@
       <file leaf-file-name="GraphEditor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="3757" max-vertical-offset="8388">
+            <state vertical-scroll-proportion="0.0" vertical-offset="6817" max-vertical-offset="8388">
               <caret line="326" column="54" selection-start-line="326" selection-start-column="54" selection-end-line="326" selection-end-column="54" />
               <folding>
                 <element signature="e#10050#10223#0" expanded="true" />
@@ -106,7 +129,7 @@
       <file leaf-file-name="StateManager.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1143" max-vertical-offset="4500">
+            <state vertical-scroll-proportion="0.0" vertical-offset="981" max-vertical-offset="4500">
               <caret line="71" column="76" selection-start-line="71" selection-start-column="76" selection-end-line="71" selection-end-column="76" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -116,46 +139,15 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ComponentBrowser.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentBrowser.java">
+      <file leaf-file-name="GraphEditorCanvas.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="14567" max-vertical-offset="16002">
-              <caret line="874" column="0" selection-start-line="874" selection-start-column="0" selection-end-line="874" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="7781" max-vertical-offset="19728">
+              <caret line="470" column="31" selection-start-line="470" selection-start-column="31" selection-end-line="470" selection-end-column="31" />
               <folding>
-                <element signature="e#0#26203#0" expanded="true" />
+                <element signature="e#0#28376#0" expanded="true" />
                 <element signature="imports" expanded="true" />
-                <element signature="e#7055#7087#0" expanded="true" />
-                <element signature="e#8057#8065#0" expanded="true" />
-                <element signature="e#11752#11762#0" expanded="true" />
-                <element signature="e#19878#19897#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SelectionModel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/SelectionModel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="985" max-vertical-offset="1800">
-              <caret line="84" column="12" selection-start-line="84" selection-start-column="12" selection-end-line="84" selection-end-column="12" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ProgressDialog.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1129" max-vertical-offset="1764">
-              <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#662#785#0" expanded="true" />
-                <element signature="e#780#781#0" expanded="true" />
-                <element signature="e#1838#1839#0" expanded="true" />
-                <element signature="e#1887#1888#0" expanded="true" />
-                <element signature="e#2038#2039#0" expanded="true" />
-                <element signature="e#2072#2073#0" expanded="true" />
+                <element signature="e#9816#9835#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -164,10 +156,10 @@
       <file leaf-file-name="DataspaceMonitor.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="16727" max-vertical-offset="19314">
-              <caret line="988" column="17" selection-start-line="988" selection-start-column="17" selection-end-line="988" selection-end-column="17" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="17537" max-vertical-offset="19818">
+              <caret line="1027" column="69" selection-start-line="1027" selection-start-column="69" selection-end-line="1027" selection-end-column="69" />
               <folding>
-                <element signature="e#0#32306#0" expanded="true" />
+                <element signature="e#0#33144#0" expanded="true" />
                 <element signature="imports" expanded="true" />
                 <element signature="e#12680#12696#0" expanded="true" />
                 <element signature="e#19043#19063#0" expanded="true" />
@@ -179,22 +171,10 @@
                 <element signature="e#19673#19700#0" expanded="true" />
                 <element signature="e#19794#19826#0" expanded="true" />
                 <element signature="e#20085#20103#0" expanded="true" />
+                <element signature="e#21545#21546#0" expanded="true" />
+                <element signature="e#21577#21578#0" expanded="true" />
                 <element signature="e#23293#23305#0" expanded="true" />
                 <element signature="e#24314#24335#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GraphEditorCanvas.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1924" max-vertical-offset="19638">
-              <caret line="133" column="0" selection-start-line="133" selection-start-column="0" selection-end-line="135" selection-end-column="103" />
-              <folding>
-                <element signature="e#0#28292#0" expanded="true" />
-                <element signature="imports" expanded="true" />
-                <element signature="e#9816#9835#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -1782,18 +1762,18 @@
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/interactive/InteractiveCanvas.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/SetValuePopup.java" />
-        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
         <option value="$PROJECT_DIR$/grapheditor/test5.json" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/PropertyState.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceUtils.java" />
-        <option value="$PROJECT_DIR$/grapheditor/test2.json" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/BeanGraphPanel.java" />
-        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/SelectionModel.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentBrowser.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java" />
+        <option value="$PROJECT_DIR$/grapheditor/test2.json" />
+        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" />
+        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
       </list>
     </option>
   </component>
@@ -1942,28 +1922,6 @@
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="dataspace" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ect" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="grapheditor" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="editor" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -2005,6 +1963,60 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect-core" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect-core" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect-core" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ect" />
               <option name="myItemType" value="com.android.tools.idea.gradle.projectView.AndroidPsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2569,17 +2581,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1566" max-vertical-offset="14436">
-          <caret line="168" column="19" selection-start-line="168" selection-start-column="19" selection-end-line="168" selection-end-column="19" />
-          <folding>
-            <element signature="e#5756#5788#0" expanded="true" />
-            <element signature="e#5877#5901#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponentProperty.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1074" max-vertical-offset="3276">
@@ -2643,8 +2644,8 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="617" max-vertical-offset="8010">
           <caret line="94" column="5" selection-start-line="94" selection-start-column="5" selection-end-line="94" selection-end-column="5" />
           <folding>
-            <element signature="e#3827#3828#0" expanded="true" />
-            <element signature="e#3853#3854#0" expanded="true" />
+            <element signature="e#3827#3828#0" expanded="false" />
+            <element signature="e#3853#3854#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -2729,41 +2730,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1924" max-vertical-offset="19638">
-          <caret line="133" column="0" selection-start-line="133" selection-start-column="0" selection-end-line="135" selection-end-column="103" />
-          <folding>
-            <element signature="e#0#28292#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-            <element signature="e#9816#9835#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="16727" max-vertical-offset="19314">
-          <caret line="988" column="17" selection-start-line="988" selection-start-column="17" selection-end-line="988" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#32306#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-            <element signature="e#12680#12696#0" expanded="true" />
-            <element signature="e#19043#19063#0" expanded="true" />
-            <element signature="e#19135#19160#0" expanded="true" />
-            <element signature="e#19247#19287#0" expanded="true" />
-            <element signature="e#19358#19387#0" expanded="true" />
-            <element signature="e#19459#19478#0" expanded="true" />
-            <element signature="e#19562#19589#0" expanded="true" />
-            <element signature="e#19673#19700#0" expanded="true" />
-            <element signature="e#19794#19826#0" expanded="true" />
-            <element signature="e#20085#20103#0" expanded="true" />
-            <element signature="e#23293#23305#0" expanded="true" />
-            <element signature="e#24314#24335#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/SelectionModel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="985" max-vertical-offset="1800">
@@ -2787,6 +2753,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1129" max-vertical-offset="1764">
+          <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#662#785#0" expanded="true" />
+            <element signature="e#780#781#0" expanded="true" />
+            <element signature="e#1838#1839#0" expanded="true" />
+            <element signature="e#1887#1888#0" expanded="true" />
+            <element signature="e#2038#2039#0" expanded="true" />
+            <element signature="e#2072#2073#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1143" max-vertical-offset="4500">
+          <caret line="71" column="76" selection-start-line="71" selection-start-column="76" selection-end-line="71" selection-end-column="76" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1365#1390#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ect-core/src/equip/ect/ComponentProperty.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.16220473" vertical-offset="707" max-vertical-offset="6804">
+          <caret line="93" column="11" selection-start-line="93" selection-start-column="11" selection-end-line="93" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3757" max-vertical-offset="8388">
@@ -2804,35 +2805,64 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/configurationmgr/ConfigurationManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="50337" max-vertical-offset="67482">
-          <caret line="3475" column="19" selection-start-line="3475" selection-start-column="19" selection-end-line="3475" selection-end-column="19" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="46974" max-vertical-offset="67482">
+          <caret line="2856" column="43" selection-start-line="2856" selection-start-column="43" selection-end-line="2856" selection-end-column="43" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java">
+    <entry file="file://$PROJECT_DIR$/ect-core/src/equip/ect/PersistenceManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1143" max-vertical-offset="4500">
-          <caret line="71" column="76" selection-start-line="71" selection-start-column="76" selection-end-line="71" selection-end-column="76" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="4490" max-vertical-offset="15012">
+          <caret line="343" column="22" selection-start-line="343" selection-start-column="22" selection-end-line="343" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="17537" max-vertical-offset="19818">
+          <caret line="1027" column="69" selection-start-line="1027" selection-start-column="69" selection-end-line="1027" selection-end-column="69" />
           <folding>
+            <element signature="e#0#33144#0" expanded="true" />
             <element signature="imports" expanded="true" />
-            <element signature="e#1365#1390#0" expanded="true" />
+            <element signature="e#12680#12696#0" expanded="true" />
+            <element signature="e#19043#19063#0" expanded="true" />
+            <element signature="e#19135#19160#0" expanded="true" />
+            <element signature="e#19247#19287#0" expanded="true" />
+            <element signature="e#19358#19387#0" expanded="true" />
+            <element signature="e#19459#19478#0" expanded="true" />
+            <element signature="e#19562#19589#0" expanded="true" />
+            <element signature="e#19673#19700#0" expanded="true" />
+            <element signature="e#19794#19826#0" expanded="true" />
+            <element signature="e#20085#20103#0" expanded="true" />
+            <element signature="e#21545#21546#0" expanded="true" />
+            <element signature="e#21577#21578#0" expanded="true" />
+            <element signature="e#23293#23305#0" expanded="true" />
+            <element signature="e#24314#24335#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java">
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphComponent.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1129" max-vertical-offset="1764">
-          <caret line="89" column="34" selection-start-line="89" selection-start-column="34" selection-end-line="89" selection-end-column="34" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1566" max-vertical-offset="14436">
+          <caret line="168" column="19" selection-start-line="168" selection-start-column="19" selection-end-line="168" selection-end-column="19" />
           <folding>
+            <element signature="e#5756#5788#0" expanded="true" />
+            <element signature="e#5877#5901#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="7781" max-vertical-offset="19728">
+          <caret line="470" column="31" selection-start-line="470" selection-start-column="31" selection-end-line="470" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#28376#0" expanded="true" />
             <element signature="imports" expanded="true" />
-            <element signature="e#662#785#0" expanded="true" />
-            <element signature="e#780#781#0" expanded="true" />
-            <element signature="e#1838#1839#0" expanded="true" />
-            <element signature="e#1887#1888#0" expanded="true" />
-            <element signature="e#2038#2039#0" expanded="true" />
-            <element signature="e#2072#2073#0" expanded="true" />
+            <element signature="e#9816#9835#0" expanded="true" />
           </folding>
         </state>
       </provider>

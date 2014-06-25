@@ -466,6 +466,11 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		GraphComponent gc = new GraphComponent(this, beanID, currentName, hostName);
 		gc.watchLinks(true);
 
+		if(selectionModel.getSelected().contains(guid))
+		{
+			gc.setSelected(true);
+		}
+
 		return gc;
 	}
 

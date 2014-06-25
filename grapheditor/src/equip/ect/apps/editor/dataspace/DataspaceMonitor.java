@@ -945,6 +945,29 @@ public class DataspaceMonitor
 		configurationListeners.remove(configurationListener);
 	}
 
+	public String getPropertyValue(final GUID propertyID)
+	{
+		try
+		{
+			final ComponentProperty template = new ComponentProperty(propertyID);
+			final ComponentProperty property = template.copyCollectAsComponentProperty(dataspace)[0];
+			final Object value = property.getPropertyValue(dataspace);
+			return Coerce.toClass(value, String.class);
+		}
+		catch (final ConnectionPointTypeException ex)
+		{
+			System.err.println("ERROR: " + ex);
+			ex.printStackTrace(System.err);
+			return null;
+		}
+		catch (final Exception cnfe)
+		{
+			System.err.println("Warning: Could not get value for property '" + propertyID.toString() + "'");
+			cnfe.printStackTrace();
+			return null;
+		}
+	}
+
 	public String getPropertyValue(final ComponentProperty property)
 	{
 		try
@@ -972,6 +995,7 @@ public class DataspaceMonitor
 		try
 		{
 			String actualValue = getPropertyValue(targetProperty);
+			System.out.println("Value = " + actualValue + ". Setting to " + value);
 			if((value == null && actualValue == null) || (value != null && value.equals(actualValue)))
 			{
 				// Already set
@@ -1001,7 +1025,8 @@ public class DataspaceMonitor
 			while((System.currentTimeMillis() - start) < TIMEOUT)
 			{
 				Thread.sleep(300);
-				actualValue = getPropertyValue(targetProperty);
+				actualValue = getPropertyValue(targetProperty.getID());
+				System.out.println("Value = " + actualValue + ". Setting to " + value);
 				if((value == null && actualValue == null) || (value != null && value.equals(actualValue)))
 				{
 					break;
