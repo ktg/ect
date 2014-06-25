@@ -6,4 +6,5 @@ mainClassName = "equip.ect.apps.editor.grapheditor.GraphEditor"
 dependencies {
 	compile project(":ect-core")
 	compile "net.sourceforge.nekohtml:nekohtml:+"
+	compile "com.google.code.gson:gson:+"
 }

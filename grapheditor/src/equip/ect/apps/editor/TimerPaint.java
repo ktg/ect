@@ -49,6 +49,8 @@ Contributors:
 
 package equip.ect.apps.editor;
 
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
+
 import java.util.List;
 
 /**
@@ -73,9 +75,9 @@ public class TimerPaint extends Thread
 	{
 		if (items != null)
 		{
-			for(final InteractiveCanvasItem item: items)
+			for (final InteractiveCanvasItem item : items)
 			{
-				item.setActive(InteractiveCanvasItem.ACTIVE);
+				item.setActive(true);
 			}
 			try
 			{
@@ -88,9 +90,9 @@ public class TimerPaint extends Thread
 				return;
 			}
 
-			for(final InteractiveCanvasItem item: items)
+			for (final InteractiveCanvasItem item : items)
 			{
-				item.setActive(InteractiveCanvasItem.INACTIVE);
+				item.setActive(false);
 			}
 		}
 	}

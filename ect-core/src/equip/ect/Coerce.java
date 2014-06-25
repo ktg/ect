@@ -270,7 +270,7 @@ public class Coerce
 	/**
 	 * return an object assignable to the requested class from the given value
 	 */
-	public static Object toClass(final Object o, final Class<?> cls) throws ClassNotFoundException, IOException
+	public static <T> T toClass(final Object o, final Class<T> cls) throws ClassNotFoundException, IOException
 	{
 		return toClass(o, cls, false);
 	}
@@ -278,7 +278,8 @@ public class Coerce
 	/**
 	 * return an object assignable to the requested class from the given value
 	 */
-	public static Object toClass(Object o, Class<?> cls, final boolean escapeStrings) throws ClassNotFoundException,
+	@SuppressWarnings("unchecked")
+	public static <T> T toClass(Object o, Class<T> cls, final boolean escapeStrings) throws ClassNotFoundException,
 			IOException
 	{
 		if (escapeStrings && o instanceof String)
@@ -289,7 +290,7 @@ public class Coerce
 		}
 		Class<?> cls2 = cls;
 		// ok already?
-		if (o != null && cls.isAssignableFrom(o.getClass())) { return o; }
+		if (o != null && cls.isAssignableFrom(o.getClass())) { return (T)o; }
 		java.lang.reflect.Field valuef = null;
 		// special handling for ValueBase subclasses - our own container/transport classes
 		if (o instanceof Map)
@@ -301,7 +302,7 @@ public class Coerce
 			// convert via dictionary
 			final DictionaryImpl d = (DictionaryImpl) toClass(o, DictionaryImpl.class);
 			if (d == null) { return null; }
-			return toHashtable(d);
+			return (T)toHashtable(d);
 		}
 		if (o instanceof ValueBase)
 		{
@@ -331,7 +332,7 @@ public class Coerce
 		if (ValueBase.class.equals(cls))
 		{
 			// just the abstract base class implies do our best!!
-			if (o == null) { return o; }
+			if (o == null) { return null; }
 			String arraySuffix = "", suffix = "BoxImpl";
 			Class<?> c2 = o.getClass();
 			if (c2.isArray())
@@ -421,7 +422,7 @@ public class Coerce
 			}
 			try
 			{
-				cls = Class.forName("equip.data." + typePrefix + arraySuffix + suffix);
+				cls = (Class<T>) Class.forName("equip.data." + typePrefix + arraySuffix + suffix);
 				// debug
 				// System.out.println("Boxing a "+o.getClass()+" as a "+cls);
 			}
@@ -474,7 +475,7 @@ public class Coerce
 				}
 			}
 		}
-		return r;
+		return (T)r;
 	}
 
 	public static Object toClass2(Object o, Class<?> cls, final boolean escapeStrings) throws ClassNotFoundException,

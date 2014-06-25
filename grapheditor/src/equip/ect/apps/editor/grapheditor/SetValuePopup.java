@@ -40,6 +40,7 @@ Contributors:
 package equip.ect.apps.editor.grapheditor;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
@@ -57,8 +58,8 @@ import javax.swing.JTextArea;
 
 import equip.data.beans.DataspaceBean;
 import equip.ect.ComponentProperty;
-import equip.ect.apps.editor.DataspaceMonitor;
-import equip.ect.apps.editor.DataspaceUtils;
+import equip.ect.apps.editor.dataspace.DataspaceMonitor;
+import equip.ect.apps.editor.dataspace.DataspaceUtils;
 
 /**
  * popup dialog allowing (attempt) to set a property value by making a temporary pseudo-property,
@@ -189,7 +190,8 @@ public class SetValuePopup extends JDialog
 		{
 			newVal = val.replaceAll("\\\\", "\\\\\\\\");
 		}
-		DataspaceMonitor.getMonitor().setPropertyValueFromString(targetProperty, newVal);
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		DataspaceMonitor.getMonitor().setProperty(targetProperty, newVal);
+		setCursor(Cursor.getDefaultCursor());
 	}
-
 }

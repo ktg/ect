@@ -39,8 +39,7 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import equip.ect.apps.editor.InteractiveCanvasItem;
-import equip.ect.apps.editor.InteractiveCanvasItemView;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
 
 import java.awt.*;
 
@@ -97,6 +96,8 @@ public class Drawer extends InteractiveCanvasItem
 		}
 	}
 
+	public String getID() { return null; }
+
 	public final int getDrawerState()
 	{
 		return this.drawerState;
@@ -135,87 +136,5 @@ public class Drawer extends InteractiveCanvasItem
 	public void setType(final int type)
 	{
 		this.type = type;
-	}
-}
-
-class DrawerView extends InteractiveCanvasItemView
-{
-
-	private final Drawer drawer;
-
-	DrawerView(final Drawer drawer)
-	{
-		this.drawer = drawer;
-	}
-
-	@Override
-	public void paintActive(final Graphics g)
-	{
-	}
-
-	public void paintDrawer(final Graphics g)
-	{
-		Graphics2D g2 = (Graphics2D) g;
-		g.fillRoundRect(posX, posY - 20, width, height + 20, 10, 10);
-		g.setColor(Color.black);
-		g.drawRoundRect(posX, posY - 20, width, height + 19, 10, 10);
-		final Point center = getCenter();
-		final int arrowWidth = 5;
-		final int arrowHeight = 7;
-		switch (drawer.getType())
-		{
-			case Drawer.UP:
-				drawUpArrow(g, center.x, posY + height - 2, arrowWidth, arrowHeight);
-				break;
-			case Drawer.DOWN:
-				drawDownArrow(g, center.x, posY + height - 2, arrowWidth, arrowHeight);
-				break;
-			case Drawer.BOTH:
-				drawUpArrow(g, center.x - 10, posY + height - 2, arrowWidth, arrowHeight);
-				drawDownArrow(g, center.x + 10, posY + height - 2, arrowWidth, arrowHeight);
-				break;
-		}
-	}
-
-	@Override
-	public void paintNormal(final Graphics g)
-	{
-		g.setColor(Color.gray);
-		paintDrawer(g);
-	}
-
-	@Override
-	public void paintSelected(final Graphics g)
-	{
-		g.setColor(Color.blue);
-		paintNormal(g);
-	}
-
-	@Override
-	public void paintShadowed(final Graphics g)
-	{
-		paintNormal(g);
-	}
-
-	@Override
-	public void paintUnavailable(final Graphics g)
-	{
-		paintNormal(g);
-	}
-
-	public void paintUnselected(final Graphics g)
-	{
-		paintNormal(g);
-	}
-
-	private void drawDownArrow(final Graphics g, final int x, final int y, final int arrowWidth, final int arrowHeight)
-	{
-		g.fillPolygon(new int[]{x - arrowWidth, x, x + arrowWidth},
-				new int[]{y - arrowHeight, y, y - arrowHeight}, 3);
-	}
-
-	private void drawUpArrow(final Graphics g, final int x, final int y, final int arrowWidth, final int arrowHeight)
-	{
-		g.fillPolygon(new int[]{x - arrowWidth, x, x + arrowWidth}, new int[]{y, y - arrowHeight, y}, 3);
 	}
 }

@@ -39,6 +39,20 @@
 
 package equip.ect.apps.editor;
 
+import equip.ect.Capability;
+import equip.ect.ComponentAdvert;
+import equip.ect.ComponentProperty;
+import equip.ect.ComponentRequest;
+import equip.ect.PropertyLinkRequest;
+import equip.ect.apps.editor.dataspace.ComponentListener;
+import equip.ect.apps.editor.dataspace.ComponentMetadataListener;
+import equip.ect.apps.editor.dataspace.ComponentPropertyUpdateListener;
+import equip.ect.apps.editor.dataspace.DataspaceConfigurationListener;
+import equip.ect.apps.editor.dataspace.DataspaceMonitor;
+import equip.ect.apps.editor.interactive.InteractiveCanvas;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
+
+import javax.swing.JComponent;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -51,28 +65,20 @@ import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
-import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.JComponent;
-
-import equip.ect.Capability;
-import equip.ect.ComponentAdvert;
-import equip.ect.ComponentProperty;
-import equip.ect.ComponentRequest;
-import equip.ect.PropertyLinkRequest;
-import equip.ect.apps.editor.state.EditorID;
 
 public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListener, ComponentListener,
 		ComponentPropertyUpdateListener, ComponentMetadataListener, DataspaceConfigurationListener
 {
+
+	private static final boolean dynamicCanvas = true;
+	public static boolean animatePropertyUpdate = true;
 
 	public static List<BeanCanvasItem> getBeanInstances(final String beanid, final Collection<InteractiveCanvasItem> beans)
 	{
@@ -81,7 +87,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		{
 			synchronized (beans)
 			{
-				for(final InteractiveCanvasItem obj: beans)
+				for (final InteractiveCanvasItem obj : beans)
 				{
 					if (obj instanceof BeanCanvasItem)
 					{
@@ -101,36 +107,25 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		return results;
 	}
 
+	protected transient List<BeanCanvasItem> unattachableItems = new ArrayList<BeanCanvasItem>();
+	protected transient List<BeanCanvasItem> attachableItems = new ArrayList<BeanCanvasItem>();
 	private int dragging = 0;
 
-	private boolean dynamicCanvas = true;
-
+	private static final boolean singleInstance = true;
 	/**
 	 * enables this component to be a dropTarget
 	 */
 	private DropTarget dropTarget = null;
 
-	protected TrashCanvasItem trash;
-
-	public static boolean animatePropertyUpdate = true;
-
-	protected transient List<BeanCanvasItem> unattachableItems = new ArrayList<BeanCanvasItem>();
-
-	protected transient List<BeanCanvasItem> attachableItems = new ArrayList<BeanCanvasItem>();
-
-	private List<EditorEventListener> editorEventListeners;
-
-	private List<ItemMovementEventListener> itemMovementEventListeners;
-
-	public BeanGraphPanel(final String title)
+	public BeanGraphPanel(final String title, final SelectionModel selectionModel)
 	{
-		super(title, Color.white, InteractiveCanvas.MULTIPLE_SELECTION);
+		super(title, Color.white, selectionModel);
 		// create the trash icon
 
 		// initiate drag and drop
 		dropTarget = new DropTarget(this, this);
 
-		setTransferHandler(new BeanTransferHandler());
+		setTransferHandler(new ComponentGUIDTransferHandler());
 		/*
 		 * MouseMotionListener ml = new MouseMotionAdapter() { public void mouseDragged(MouseEvent
 		 * e) {
@@ -179,54 +174,23 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		}
 		DataspaceMonitor.getMonitor().addComponentListener(this);
 		DataspaceMonitor.getMonitor().addComponentPropertyListener(this);
-
 		DataspaceMonitor.getMonitor().addComponentMetadataListener(this);
 
-		final List<Capability> caps = DataspaceMonitor.getMonitor().getCapabilities();
+		final Collection<Capability> caps = DataspaceMonitor.getMonitor().getCapabilities();
 		if (caps != null)
 		{
-			for(final Capability cap: caps)
+			for (final Capability cap : caps)
 			{
 				capabilityAdded(cap);
 
 			}
 		}
 		DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(this);
-		// showTrash(true);
-	}
-
-	/*
-	 * public void mouseExited(MouseEvent me) { if (dragging > 0 && inSelection) {
-	 * //System.out.println("Mouse Exited In Selection, triggering drag"); JComponent c =
-	 * (JComponent) me.getSource(); TransferHandler th = c.getTransferHandler(); th.exportAsDrag(c,
-	 * me, TransferHandler.COPY); } else { //System.out.println("Mouse Exited"); } }
-	 */
-
-	public void addEditorEventListener(final EditorEventListener listener)
-	{
-
-		if (editorEventListeners == null)
-		{
-			editorEventListeners = new ArrayList<EditorEventListener>();
-		}
-
-		editorEventListeners.add(listener);
-	}
-
-	public void addItemMovementEventListener(final ItemMovementEventListener listener)
-	{
-		if (itemMovementEventListeners == null)
-		{
-			itemMovementEventListeners = new ArrayList<ItemMovementEventListener>();
-		}
-
-		itemMovementEventListeners.add(listener);
 	}
 
 	public void animateActiveItems(final List<? extends BeanCanvasItem> items)
 	{
 		new TimerPaint(items, 500).start();
-		AudioManager.getAudioManager().playSoundResource("update");
 	}
 
 	@Override
@@ -237,6 +201,26 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	@Override
 	public void capabilityDeleted(final Capability cap)
 	{
+	}
+
+	@Override
+	public void selectionChanged(Collection<String> selection)
+	{
+		for(InteractiveCanvasItem item: items)
+		{
+			boolean selected = false;
+			if(item instanceof BeanCanvasItem)
+			{
+				String id = ((BeanCanvasItem) item).getBeanID();
+				if(id != null && selection.contains(id))
+				{
+					selected = true;
+				}
+			}
+
+			item.setSelected(selected);
+		}
+		super.selectionChanged(selection);
 	}
 
 	@Override
@@ -252,7 +236,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	@Override
 	public void componentAdvertUpdated(ComponentAdvert compAd)
 	{
-		
+
 	}
 
 	@Override
@@ -265,7 +249,6 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	@Override
 	public void componentMetadataAdded(final Object metadata)
 	{
-		// TODO Auto-generated method stub
 		componentMetadataChanged(metadata);
 	}
 
@@ -277,14 +260,12 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	@Override
 	public void componentMetadataDeleted(final Object metadata)
 	{
-		// TODO Auto-generated method stub
 		componentMetadataChanged(metadata);
 	}
 
 	@Override
 	public void componentMetadataUpdated(final Object metadata)
 	{
-		// TODO Auto-generated method stub
 		componentMetadataChanged(metadata);
 	}
 
@@ -296,18 +277,6 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	public void componentPropertyAdded(final ComponentProperty compProp)
 	{
 	}
-
-	/*
-	 * public void removeSelectedItems() { Vector selectedItems = getSelectedItems(); if
-	 * (selectedItems != null) { synchronized(selectedItems) { for (Enumeration e =
-	 * selectedItems.elements(); e.hasMoreElements();) { Object obj = e.nextElement();
-	 * 
-	 * if (obj instanceof BeanCanvasItem) { BeanCanvasItem item = (BeanCanvasItem) obj;
-	 * System.out.println("Removing item " + item.getName() + selectedItems.size());
-	 * item.setSelected(false); removeItem(item); } }
-	 * 
-	 * selectedItems.clear(); selectedItems = null; } } }
-	 */
 
 	@Override
 	public void componentPropertyDeleted(final ComponentProperty compProp)
@@ -337,37 +306,19 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	@Override
 	public void doOnMouseDragged(final MouseEvent me)
 	{
-
-		if (selectedItems != null)
+		if (dragging == 0)
 		{
-			// start dragging sound
-			if (dragging == 0)
-			{
-				dragging = 1;
-				// AudioManager.getAudioManager().playSoundResource("drag"+dragging);
-			}
+			dragging = 1;
 		}
-
 	}
 
 	@Override
 	public void doOnMouseReleased(final int x, final int y)
 	{
 		// stop dragging sound
-		if (selectedItems != null && dragging != 0)
+		if (dragging != 0)
 		{
-			AudioManager.getAudioManager().stopSoundResource("drag" + dragging, true);
 			dragging = 0;
-		}
-
-		if (trash != null && trash.isInside(x, y))
-		{
-			unselectItem(trash);
-			if (selectedItems != null)
-			{
-				removeItems(new ArrayList<InteractiveCanvasItem>(selectedItems), true);
-			}
-			AudioManager.getAudioManager().playSoundResource("trash");
 		}
 
 		validateViewportSize();
@@ -378,42 +329,26 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	@Override
 	public void dragEnter(final DropTargetDragEvent event)
 	{
-		// debug messages for diagnostics
-		// System.out.println("dragEnter");
-		/*
-		 * if (event.getSource() == this.dropTarget) { System.out.println("rejecting");
-		 * event.getDropTargetContext().rejectDrop(); return; }
-		 */
-		// System.out.println("Accepting drag " + event.getSource());
 		event.acceptDrag(DnDConstants.ACTION_MOVE);
-
 	}
 
 	@Override
 	public void dragExit(final DropTargetEvent event)
 	{
-		// System.out.println("drag exit");
 	}
 
 	@Override
 	public void dragOver(final DropTargetDragEvent event)
 	{
-		// System.out.println("drag over");
 	}
 
 	/**
 	 * a drop has occurred
-	 * 
 	 */
 	@Override
 	public void drop(final DropTargetDropEvent event)
 	{
 		dragging = 0;
-		// System.out.println("source =" + event.getSource());
-		/*
-		 * if (event.getDropTargetContext().getComponent() == this) { event.rejectDrop(); return; }
-		 */
-		unselectAll();
 
 		try
 		{
@@ -422,32 +357,30 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 			final int x = (int) location.getX();
 			final int y = (int) location.getY();
 
-			if (transferable.isDataFlavorSupported(BeanCanvasItemTransferableSupport.beanCanvasItemDataFlavor))
+			if (transferable.isDataFlavorSupported(ComponentGUIDTransferableSupport.componentGUIDDataFlavor))
 			{
-				final BeanCanvasItem template = (BeanCanvasItem) transferable
-						.getTransferData(BeanCanvasItemTransferableSupport.beanCanvasItemDataFlavor);
-				/**
-				 * We now create a copy from the original template. NOTE: The drag mechanism creates
-				 * already a copy of the original item from the source component. So creating
-				 * another copy here is perhaps unecessary, but logical in design since we don't
-				 * want a copy of the original template but a new instance based on the template
-				 * deemed for purposes of the target drop component. The copy made by the drag
-				 * mechanism will just get trash collected.
-				 */
-				final BeanCanvasItem piece = setBeanFromTemplate(template, x, y);
-				selectItem(piece);
-			} /*
-			 * else if (transferable. isDataFlavorSupported(JigsawPieceTransferableSupport.
-			 * beanGroupDataFlavor)) { BeanGroupSupport bcm = (BeanGroupSupport) transferable.
-			 * getTransferData(JigsawPieceTransferableSupport. beanGroupDataFlavor); int offset =
-			 * 100; JigsawPiece prev = null; unselectAll(); for (ListIterator it =
-			 * bcm.getItemListIterator(); it.hasNext();) { JigsawPiece template = (JigsawPiece)
-			 * it.next(); JigsawPiece current = setBeanFromTemplate(template, x, y); offset =
-			 * current.getOffset(); if (prev != null) {
-			 * current.attachViaAttractor(current.getInAttractor(), prev.getOutAttractor());
-			 * current.getInAttractor().attach(prev.getOutAttractor(), true); } selectItem(current);
-			 * current.setIsAttached(true); prev = current; x += (100 - offset); } }
-			 */
+				final String componentGUID = (String) transferable.getTransferData(ComponentGUIDTransferableSupport.componentGUIDDataFlavor);
+
+				if(singleInstance)
+				{
+					List<BeanCanvasItem> items = getBeanInstances(componentGUID);
+					if(items != null && items.size() > 0)
+					{
+						event.rejectDrop();
+						return;
+					}
+				}
+				final BeanCanvasItem item = createItem(componentGUID, x, y);
+				if (item == null)
+				{
+					event.rejectDrop();
+					return;
+				}
+
+				selectionModel.set(item.getBeanID());
+				event.acceptDrop(event.getDropAction());
+				event.dropComplete(true);
+			}
 			else
 			{
 				event.rejectDrop();
@@ -456,68 +389,40 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		catch (final IOException exception)
 		{
 			exception.printStackTrace();
-			System.err.println("Exception" + exception.getMessage());
 			event.rejectDrop();
 		}
 		catch (final UnsupportedFlavorException ufException)
 		{
 			ufException.printStackTrace();
-			System.err.println("Exception" + ufException.getMessage());
 			event.rejectDrop();
 		}
 	}
 
+	public BeanCanvasItem createItem(String guid, int x, int y)
+	{
+		final BeanCanvasItem item = createFromGUID(guid);
+		if(item != null)
+		{
+			item.setPosition(x, y);
+			addItem(item);
+		}
+		return item;
+	}
+
+	protected BeanCanvasItem createFromGUID(String guid)
+	{
+		return null;
+	}
+
+
 	@Override
 	public void dropActionChanged(final DropTargetDragEvent event)
 	{
-		// System.out.println("drop action changed");
-	}
-
-	public BeanCanvasItem getBeanInstance(final EditorID editorID)
-	{
-		return getBeanInstance(editorID, getItems());
-	}
-
-	public BeanCanvasItem getBeanInstance(final EditorID editorID, final Collection<InteractiveCanvasItem> beans)
-	{
-		if (beans != null)
-		{
-			synchronized (beans)
-			{
-				for (InteractiveCanvasItem obj: beans)
-				{
-					if (obj instanceof BeanCanvasItem)
-					{
-						final BeanCanvasItem item = (BeanCanvasItem) obj;
-						if (editorID.equals(item.getID())) { return item; }
-					}
-				}
-			}
-		}
-
-		return null;
 	}
 
 	public List<BeanCanvasItem> getBeanInstances(final String beanid)
 	{
 		return getBeanInstances(beanid, getItems());
-	}
-
-	@Override
-	public void mousePressed(final MouseEvent me)
-	{
-		switch (me.getModifiers())
-		{
-			case InputEvent.BUTTON1_MASK: // left mouse button
-
-		}
-		super.mousePressed(me);
-		final InteractiveCanvasItem selectedItem = selectedItems != null && selectedItems.size() > 0 ? (InteractiveCanvasItem) selectedItems
-				.get(0) : null;
-		if (selectedItem != null && selectedItem instanceof BeanCanvasItem)
-		{
-			filterValidAttachable((BeanCanvasItem) selectedItem, items);
-		}
 	}
 
 	@Override
@@ -548,71 +453,6 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		final List<BeanCanvasItem> removals = getBeanInstances(beanid);
 		System.out.println("Removing " + beanid);
 		removeItems(removals, cleanUp);
-		/*
-		 * if (removals != null) { for (Enumeration e = removals.elements(); e.hasMoreElements();) {
-		 * BeanCanvasItem piece = (BeanCanvasItem) e.nextElement(); removeItem(piece, cleanUp); } }
-		 */
-	}
-
-	public void removeEditorEventListener(final EditorEventListener listener)
-	{
-		if (editorEventListeners == null) { return; }
-
-		editorEventListeners.remove(listener);
-		if (editorEventListeners.size() < 1)
-		{
-			editorEventListeners = null;
-		}
-	}
-
-	public void removeItemMovementEventListener(final ItemMovementEventListener listener)
-	{
-		if (itemMovementEventListeners == null) { return; }
-
-		itemMovementEventListeners.remove(listener);
-		if (itemMovementEventListeners.size() < 1)
-		{
-			itemMovementEventListeners = null;
-		}
-	}
-
-	public void removeSelectedItems()
-	{
-		removeItems(new ArrayList<InteractiveCanvasItem>(getSelectedItems()));
-	}
-
-	public BeanCanvasItem setBeanFromTemplate(final BeanCanvasItem template, final int x, final int y)
-	{
-		final BeanCanvasItem newBean = createFromTemplate(template);
-		newBean.setPosition(x, y);
-
-		addItem(newBean);
-
-		/*
-		 * BeanManager.getManager().addBeanPropertyListener(newBean.getBeanID(), this);
-		 */
-		return newBean;
-	}
-
-	public void showTrash(final boolean showTrash)
-	{
-		if (showTrash)
-		{
-			if (trash == null)
-			{
-				this.trash = new TrashCanvasItem(this);
-				addItem(trash);
-				trash.repaint();
-			}
-		}
-		else
-		{
-			if (trash != null)
-			{
-				removeItem(trash);
-				trash = null;
-			}
-		}
 	}
 
 	public void validateViewportSize()
@@ -633,32 +473,6 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	@Override
 	protected void doOnDoubleClick(final MouseEvent me)
 	{
-		//final InteractiveCanvasItem selectedItem = getItem(me.getX(), me.getY(), BeanCanvasItem.class);
-		//final BeanCanvasItem item = (BeanCanvasItem) selectedItem;
-		/*
-		 * BeanAccessDialog bad = new BeanAccessDialog(((BeanCanvasItem)selectedItem).getBeanID());
-		 * bad.pack(); bad.setVisible(true);
-		 */
-	}
-
-	@Override
-	protected void doOnTranslate(final int newPosX, final int newPosY)
-	{
-		// check if inside trash
-		if (trash != null)
-		{
-			if (trash.isInside(newPosX, newPosY))
-			{
-				if (trash.getSelectStatus() == InteractiveCanvasItem.UNSELECTED)
-				{
-					trash.setSelected(InteractiveCanvasItem.SELECTED);
-				}
-			}
-			else if (trash.getSelectStatus() == InteractiveCanvasItem.SELECTED)
-			{
-				trash.setSelected(InteractiveCanvasItem.UNSELECTED);
-			}
-		}
 	}
 
 	/**
@@ -667,7 +481,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	protected void filterValidAttachable(final BeanCanvasItem pp, final List<InteractiveCanvasItem> allBeanCanvasItems)
 	{
 		List<BeanCanvasItem> possible = null;
-		for (final InteractiveCanvasItem obj: allBeanCanvasItems)
+		for (final InteractiveCanvasItem obj : allBeanCanvasItems)
 		{
 			if (obj instanceof BeanCanvasItem)
 			{
@@ -688,91 +502,8 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 				else
 				{
 					unattachableItems.add(foreignBit);
-					foreignBit.setAvailable(InteractiveCanvasItem.UNAVAILABLE);
+					foreignBit.setAvailable(false);
 				}
-			}
-		}
-	}
-
-	protected final void fireEditorEvent(final EditorEvent event, final String callback)
-	{
-
-		if (editorEventListeners == null) { return; }
-		final java.lang.reflect.Method method;
-		try
-		{
-			method = EditorEventListener.class.getMethod(callback, new Class[] { EditorEvent.class });
-		}
-		catch (final Exception e)
-		{
-			e.printStackTrace();
-			return;
-		}
-		new Thread()
-		{
-			@Override
-			public void run()
-			{
-				for(EditorEventListener listener: editorEventListeners)
-				{
-					try
-					{
-						method.invoke(listener, new Object[] { event });
-					}
-					catch (final Exception e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}.start();
-	}
-
-	protected final void fireItemMovementEvent(final ItemMovementEvent event, final String callback)
-	{
-
-		if (itemMovementEventListeners == null) { return; }
-		final java.lang.reflect.Method method;
-		try
-		{
-			method = ItemMovementEventListener.class.getMethod(callback, new Class[] { ItemMovementEvent.class });
-		}
-		catch (final Exception e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		new Thread()
-		{
-			@Override
-			public void run()
-			{
-				for(ItemMovementEventListener listener: itemMovementEventListeners)
-				{
-					try
-					{
-						method.invoke(listener, new Object[] { event });
-					}
-					catch (final Exception e)
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		}.start();
-	}
-
-	protected void restoreItemDefaultStates()
-	{
-		// Restore items marked unavailable to default
-		if (unattachableItems != null)
-		{
-			for (final Iterator<BeanCanvasItem> it = unattachableItems.iterator(); it.hasNext();)
-			{
-				it.next().setAvailable(InteractiveCanvasItem.AVAILABLE);
 			}
 		}
 	}

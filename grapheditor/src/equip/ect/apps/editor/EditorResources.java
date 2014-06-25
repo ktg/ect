@@ -39,6 +39,8 @@ Contributors:
 
 package equip.ect.apps.editor;
 
+import javax.swing.ImageIcon;
+
 public abstract class EditorResources
 {
 	public final static java.awt.Color BACKGROUND_COLOR = java.awt.Color.gray.brighter();
@@ -49,7 +51,32 @@ public abstract class EditorResources
 
 	public final static String COMPONENT_ICON = "/component.png";
 
+	public final static String LINK_ICON = "/link.png";
+
+
 	public final static String SEARCH_ICON = "/search.png";
 
 	public final static String COMPONENTREQUEST_ICON = "/componentRequest.png";
+
+	public final static String CLEAR_ICON = "/layer_remove.png";
+
+	public final static String SAVE_ICON = "/layer_save.png";
+
+	public final static String LOAD_ICON = "/layer_open.png";
+
+	public final static String SETTINGS_ICON = "/settings.png";
+
+	public static ImageIcon createImageIcon(String path, String description)
+	{
+		java.net.URL imgURL = EditorResources.class.getResource(path);
+		if (imgURL != null)
+		{
+			return new ImageIcon(imgURL, description);
+		}
+		else
+		{
+			System.err.println("Couldn't find file: " + path);
+			return null;
+		}
+	}
 }

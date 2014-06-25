@@ -51,8 +51,11 @@ package equip.ect.apps.editor;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.ImageIcon;
+import java.awt.Component;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -101,11 +104,7 @@ public abstract class MediaFactory
 			@Override
 			public boolean accept(final File dir, final String name)
 			{
-				if (name.endsWith(".jpg") || name.endsWith(".gif"))
-				{
-					return true;
-				}
-				return false;
+				return name.endsWith(".jpg") || name.endsWith(".gif");
 			}
 		};
 
@@ -114,11 +113,7 @@ public abstract class MediaFactory
 			@Override
 			public boolean accept(final File dir, final String name)
 			{
-				if (name.endsWith(".prop"))
-				{
-					return true;
-				}
-				return false;
+				return name.endsWith(".prop");
 			}
 		};
 
@@ -158,37 +153,27 @@ public abstract class MediaFactory
 
 	public static TransferableMediaObject createFromAudio(final byte[] audioData)
 	{
-		TransferableMediaObject media = null;
-		media = new TransferableMediaObject(TransferableMediaObject.AUDIO, audioData);
-		return media;
+		return new TransferableMediaObject(TransferableMediaObject.AUDIO, audioData);
 	}
 
 	public static TransferableMediaObject createFromAudio(final String filename)
 	{
-		TransferableMediaObject media = null;
-		media = new TransferableMediaObject(TransferableMediaObject.AUDIO, getBytesFromFile(filename));
-		return media;
+		return new TransferableMediaObject(TransferableMediaObject.AUDIO, getBytesFromFile(filename));
 	}
 
 	public static TransferableMediaObject createFromImage(final String filename)
 	{
-		TransferableMediaObject media = null;
-		media = new TransferableMediaObject(TransferableMediaObject.IMAGE, getBytesFromFile(filename));
-		return media;
+		return new TransferableMediaObject(TransferableMediaObject.IMAGE, getBytesFromFile(filename));
 	}
 
 	public static TransferableMediaObject createFromText(final String text)
 	{
-		TransferableMediaObject media = null;
-		media = new TransferableMediaObject(TransferableMediaObject.TEXT, text.getBytes());
-		return media;
+		return new TransferableMediaObject(TransferableMediaObject.TEXT, text.getBytes());
 	}
 
 	public static TransferableMediaObject createFromTextFile(final String filename)
 	{
-		TransferableMediaObject media = null;
-		media = new TransferableMediaObject(TransferableMediaObject.TEXT, getBytesFromFile(filename));
-		return media;
+		return new TransferableMediaObject(TransferableMediaObject.TEXT, getBytesFromFile(filename));
 	}
 
 	public static Image createImage(final File file, final Component component)
@@ -203,7 +188,6 @@ public abstract class MediaFactory
 	public static Image createImage(final String filename)
 	{
 		return (new ImageIcon(filename)).getImage();
-		// return Toolkit.getDefaultToolkit().createImage(filename);
 	}
 
 	public static Image createImage(final String filename, final Component component)
@@ -276,14 +260,10 @@ public abstract class MediaFactory
 		final byte[] data = media.getData();
 		if (data != null)
 		{
-			final Image image = Toolkit.getDefaultToolkit().createImage(data);
-			return image;
+			return Toolkit.getDefaultToolkit().createImage(data);
 		}
-		else
-		{
-			System.out.println("Empty Data");
-			return null;
-		}
+		System.out.println("Empty Data");
+		return null;
 	}
 
 	public static Image createImage(final TransferableMediaObject media, final Component component)

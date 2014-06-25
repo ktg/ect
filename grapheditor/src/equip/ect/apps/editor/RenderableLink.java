@@ -49,9 +49,11 @@
 
 package equip.ect.apps.editor;
 
+import equip.ect.apps.editor.interactive.InteractiveCanvasItemView;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
@@ -59,7 +61,6 @@ import java.awt.geom.GeneralPath;
 
 public abstract class RenderableLink extends InteractiveCanvasItemView
 {
-
 	protected final Point startPoint, endPoint;
 
 	protected Color color;
@@ -84,7 +85,7 @@ public abstract class RenderableLink extends InteractiveCanvasItemView
 		setStroke(stroke);
 	}
 
-	public abstract void drawLink(Graphics g);
+	public abstract void drawLink(Graphics2D g);
 
 	@Override
 	public Rectangle getBounds()
@@ -104,38 +105,38 @@ public abstract class RenderableLink extends InteractiveCanvasItemView
 	}
 
 	@Override
-	public void paintActive(final Graphics g)
+	public void paintActive(final Graphics2D g)
 	{
 		paintNormal(g);
 	}
 
 	@Override
-	public void paintNormal(final Graphics g)
+	public void paintNormal(final Graphics2D g)
 	{
 		setColor(Color.black);
 		drawLink(g);
 	}
 
 	@Override
-	public void paintSelected(final Graphics g)
+	public void paintSelected(final Graphics2D g)
 	{
 		setColor(Color.red);
 		drawLink(g);
 	}
 
 	@Override
-	public void paintShadowed(final Graphics g)
+	public void paintShadowed(final Graphics2D g)
 	{
 		paintNormal(g);
 	}
 
 	@Override
-	public void paintUnavailable(final Graphics g)
+	public void paintUnavailable(final Graphics2D g)
 	{
 		paintNormal(g);
 	}
 
-	public void paintUnselected(final Graphics g)
+	public void paintUnselected(final Graphics2D g)
 	{
 		paintNormal(g);
 	}

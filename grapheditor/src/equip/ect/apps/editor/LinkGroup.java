@@ -89,7 +89,7 @@ public abstract class LinkGroup extends Link
 
 	public final Link getLink(final String beanid)
 	{
-		return (Link) links.get(beanid);
+		return links.get(beanid);
 	}
 
 	public final Iterable<Link> getLinks()
@@ -104,6 +104,6 @@ public abstract class LinkGroup extends Link
 
 	public final Link removeLink(final Link link)
 	{
-		return (Link) links.remove(link.getBeanID());
+		return links.remove(link.getBeanID());
 	}
 }

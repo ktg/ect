@@ -53,9 +53,7 @@ import java.awt.Point;
 
 public interface Connectable
 {
-
 	public Point getInAnchorPoint();
 
 	public Point getOutAnchorPoint();
-
 }

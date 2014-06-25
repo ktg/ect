@@ -39,25 +39,6 @@
  */
 package equip.ect.apps.editor.grapheditor;
 
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-
 import equip.data.GUID;
 import equip.data.StringBox;
 import equip.data.StringBoxImpl;
@@ -68,29 +49,46 @@ import equip.ect.ComponentAdvert;
 import equip.ect.ComponentProperty;
 import equip.ect.PropertyLinkRequest;
 import equip.ect.RDFStatement;
-import equip.ect.apps.editor.AudioManager;
 import equip.ect.apps.editor.BeanCanvasItem;
 import equip.ect.apps.editor.BeanGraphPanel;
-import equip.ect.apps.editor.DataspaceMonitor;
-import equip.ect.apps.editor.DataspaceUtils;
-import equip.ect.apps.editor.DocsDialog;
-import equip.ect.apps.editor.EditorResources;
 import equip.ect.apps.editor.Info;
-import equip.ect.apps.editor.InteractiveCanvasItem;
 import equip.ect.apps.editor.Link;
 import equip.ect.apps.editor.LinkGroup;
+import equip.ect.apps.editor.SelectionModel;
+import equip.ect.apps.editor.dataspace.DataspaceMonitor;
+import equip.ect.apps.editor.dataspace.DataspaceUtils;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
+
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The GraphEditorCanvas is the main editing component in which component properties are linked
  * together.
- * 
+ *
  * @author humble
- * 
  */
 public class GraphEditorCanvas extends BeanGraphPanel
 {
 
-	/** ************** INNER CLASSES ******************************* */
+	/**
+	 * ************* INNER CLASSES *******************************
+	 */
 	class CanvasPopupMenu extends JPopupMenu
 	{
 
@@ -129,29 +127,28 @@ public class GraphEditorCanvas extends BeanGraphPanel
 						GraphComponent graphComp = (GraphComponent) component;
 						ComponentAdvert advert = graphComp.getComponentAdvert();
 						String name = JOptionPane.showInputDialog("Edit Name:", DataspaceUtils.getCurrentName(advert));
-						if(name != null)
+						if (name != null)
 						{
 							try
 							{
 								StringBox value = new StringBoxImpl(name);
 								advert.setAttribute(BeanDescriptorHelper.DISPLAY_NAME, value);
 								advert.updateinDataSpace(DataspaceMonitor.getMonitor().getDataspace());
-								
+
 								graphComp.setName(name);
-								graphComp.update();		
+								graphComp.update();
 								graphComp.repaint();
 							}
 							catch (Exception e)
 							{
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 
 						}
 					}
-				}				
+				}
 			});
-			
+
 			add(new AbstractAction("Settings...")
 			{
 				@Override
@@ -233,7 +230,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 					}
 					else if (link instanceof GraphEditorLinkGroup)
 					{
-						for(Link linkItem: ((GraphEditorLinkGroup) link).getLinks())
+						for (Link linkItem : ((GraphEditorLinkGroup) link).getLinks())
 						{
 							final PropertyLinkRequest linkReq = linkItem.getLinkRequest();
 							if (linkReq != null)
@@ -376,10 +373,9 @@ public class GraphEditorCanvas extends BeanGraphPanel
 
 	private Map<String, Component> componentDialogs = new HashMap<String, Component>();
 
-	public GraphEditorCanvas(final String title)
+	public GraphEditorCanvas(final String title, SelectionModel selectionModel)
 	{
-		super(title);
-		showTrash(false);
+		super(title, selectionModel);
 		// need to call this to enable tooltips
 		this.setToolTipText("");
 	}
@@ -387,8 +383,6 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	@Override
 	public void componentMetadataChanged(final Object metadata)
 	{
-		// System.out.println("Metadata changed graph editor canvas");
-
 		if (metadata instanceof RDFStatement)
 		{
 			final RDFStatement rdf = (RDFStatement) metadata;
@@ -410,7 +404,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 			synchronized (comps)
 			{
 
-				for(BeanCanvasItem item: comps)
+				for (BeanCanvasItem item : comps)
 				{
 					final GraphComponent gc = (GraphComponent) item;
 					gc.addGraphComponentProperty(compProp);
@@ -429,7 +423,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		final List<BeanCanvasItem> comps = getBeanInstances(beanid);
 		if (comps != null)
 		{
-			for(BeanCanvasItem item: comps)
+			for (BeanCanvasItem item : comps)
 			{
 				final GraphComponent gc = (GraphComponent) item;
 				gc.removeGraphComponentProperty(compProp);
@@ -449,7 +443,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 			{
 				synchronized (graphProps)
 				{
-					for(GraphComponentProperty gcp: graphProps)
+					for (GraphComponentProperty gcp : graphProps)
 					{
 						gcp.componentPropertyUpdated(compProp);
 						gcp.repaint();
@@ -460,9 +454,24 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		}
 	}
 
+	@Override
+	protected BeanCanvasItem createFromGUID(String guid)
+	{
+		final ComponentAdvert component = DataspaceMonitor.getMonitor().getComponentAdvert(guid);
+		final String currentName = DataspaceUtils.getCurrentName(component);
+
+		final String beanID = component.getID().toString();
+		final String hostName = DataspaceUtils.getHostID(component, DataspaceMonitor.getMonitor().getDataspace());
+
+		GraphComponent gc = new GraphComponent(this, beanID, currentName, hostName);
+		gc.watchLinks(true);
+
+		return gc;
+	}
+
 	public List<GraphComponentProperty> getGraphComponentProperties(final ComponentProperty compProp)
 	{
-		if(compProp == null || compProp.getID() == null)
+		if (compProp == null || compProp.getID() == null)
 		{
 			return null;
 		}
@@ -472,22 +481,19 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	public List<GraphComponentProperty> getGraphComponentProperties(final String compPropID)
 	{
 		List<GraphComponentProperty> results = null;
-		if (items != null)
+		for (InteractiveCanvasItem item : items)
 		{
-			for(InteractiveCanvasItem item: items)
+			if (item instanceof GraphComponent)
 			{
-				if (item instanceof GraphComponent)
+				final GraphComponentProperty gcp = ((GraphComponent) item)
+						.getGraphComponentProperties().get(compPropID);
+				if (gcp != null)
 				{
-					final GraphComponentProperty gcp = ((GraphComponent) item)
-							.getGraphComponentProperties().get(compPropID);
-					if (gcp != null)
+					if (results == null)
 					{
-						if (results == null)
-						{
-							results = new ArrayList<GraphComponentProperty>();
-						}
-						results.add(gcp);
+						results = new ArrayList<GraphComponentProperty>();
 					}
+					results.add(gcp);
 				}
 			}
 		}
@@ -543,7 +549,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		final Point end = new Point(xPos, yPos);
 		switch (me.getModifiers())
 		{
-			case InputEvent.BUTTON1_MASK: // left
+			case MouseEvent.BUTTON1_MASK: // left
 				switch (mode)
 				{
 
@@ -558,36 +564,15 @@ public class GraphEditorCanvas extends BeanGraphPanel
 					case LINK_DRAG_MODE:
 						currentLink.setEndPoint(end);
 						final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
-						if (gcp != null)
+						if (gcp != null && gcp != currentAnchor && checkIfCanConnect(currentAnchor, gcp))
 						{
-							if (currentTarget != null)
-							{
-								if (gcp != currentTarget)
-								{
-									currentTarget.setSelected(false);
-									currentTarget = null;
-									if (checkIfCanConnect(currentAnchor, gcp))
-									{ // no
-										// self
-										// links
-										currentTarget = gcp;
-										currentTarget.setSelected(true);
-									}
-								}
-							}
-							else if (gcp != currentAnchor && checkIfCanConnect(currentAnchor, gcp))
-							{
-								currentTarget = gcp;
-								currentTarget.setSelected(true);
-							}
+							currentTarget = gcp;
+							selectionModel.set(currentAnchor.getBeanID(), currentTarget.getBeanID());
 						}
 						else
 						{
-							if (currentTarget != null)
-							{
-								currentTarget.setSelected(false);
-								currentTarget = null;
-							}
+							currentTarget = null;
+							selectionModel.set(currentAnchor.getBeanID());
 						}
 
 						currentLink.repaint(); // optimize
@@ -595,10 +580,10 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				}
 				break;
 
-			case InputEvent.BUTTON2_MASK:
+			case MouseEvent.BUTTON2_MASK:
 				break;
 
-			case InputEvent.BUTTON3_MASK:
+			case MouseEvent.BUTTON3_MASK:
 
 				break;
 		}
@@ -609,9 +594,9 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	{
 		xPos = me.getX();
 		yPos = me.getY();
-		switch (me.getModifiers())
+		switch (me.getButton())
 		{
-			case InputEvent.BUTTON1_MASK: // left
+			case MouseEvent.BUTTON1: // left
 				switch (mode)
 				{
 					case NORMAL_MODE:
@@ -621,9 +606,23 @@ public class GraphEditorCanvas extends BeanGraphPanel
 							final GraphComponentProperty gcp = gc.getGraphComponentProperty(xPos, yPos);
 							if (gcp != null)
 							{
-								currentAnchor = gcp;
-								gcp.setSelected(true);
-								mode = LINK_MODE;
+								if (me.getClickCount() == 2)
+								{
+									new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), gcp.getComponentProperty());
+								}
+								else
+								{
+									currentAnchor = gcp;
+									if (me.isShiftDown())
+									{
+										selectionModel.add(gcp.getBeanID());
+									}
+									else
+									{
+										selectionModel.set(gcp.getBeanID());
+									}
+									mode = LINK_MODE;
+								}
 							}
 							else
 							{
@@ -649,27 +648,29 @@ public class GraphEditorCanvas extends BeanGraphPanel
 						final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
 						if (gcp != null)
 						{
-							gcp.setSelected(true);
+							selectionModel.set(gcp.getBeanID());
 							currentTarget = gcp;
 						}
 						else if (currentTarget != null)
 						{
-							currentTarget.setSelected(false);
+							selectionModel.set(currentTarget.getBeanID());
+							//currentTarget.setSelected(false);
 							currentTarget = null;
 						}
 						break;
 				}
 
 				break;
-			case InputEvent.BUTTON2_MASK: // middle
+			case MouseEvent.BUTTON2: // middle
 				break;
 
-			case InputEvent.BUTTON3_MASK: // right
+			case MouseEvent.BUTTON3: // right
 				if (mode == LINK_MODE)
 				{
 					if (currentAnchor != null)
 					{
-						currentAnchor.setSelected(false);
+						selectionModel.set(currentAnchor.getBeanID());
+						//currentAnchor.setSelected(false);
 						currentAnchor = null;
 					}
 				}
@@ -683,10 +684,9 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	{
 		xPos = me.getX();
 		yPos = me.getY();
-		switch (me.getModifiers())
+		switch (me.getButton())
 		{
-
-			case InputEvent.BUTTON1_MASK:
+			case MouseEvent.BUTTON1:
 				switch (mode)
 				{
 					case LINK_MODE:
@@ -710,22 +710,18 @@ public class GraphEditorCanvas extends BeanGraphPanel
 											addItem(link);
 											link.repaint();
 											connect(currentAnchor, gcp, link);
-											currentAnchor.setSelected(false);
-											// currentAnchor = null;
-											// mode = NORMAL_MODE;
 										}
 									}
-									currentTarget.setSelected(false);
-									currentTarget = null;
 
-									currentAnchor.setSelected(false);
+									selectionModel.clear();
+									currentTarget = null;
 									currentAnchor = null;
 									mode = NORMAL_MODE;
 								}
 							}
 							else
-							{ // no new selection so reset
-								currentAnchor.setSelected(false);
+							{
+								selectionModel.clear();
 								currentAnchor = null;
 								mode = NORMAL_MODE;
 							}
@@ -746,7 +742,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 										currentTarget = gcp;
 										if (connect(currentAnchor, currentTarget, currentLink))
 										{
-											currentTarget.setSelected(false);
+											// TODO selectItem(currentTarget, me.isShiftDown());
 											currentLink = null;
 										}
 										currentTarget = null;
@@ -763,7 +759,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 									currentLink = null;
 								}
 							}
-							currentAnchor.setSelected(false);
+							selectionModel.clear();
 							currentAnchor = null;
 						}
 
@@ -780,12 +776,12 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				}
 				break;
 
-			case InputEvent.BUTTON2_MASK:
+			case MouseEvent.BUTTON2:
 				mode = NORMAL_MODE;
 				super.mouseReleased(me);
 				break;
 
-			case InputEvent.BUTTON3_MASK:
+			case MouseEvent.BUTTON3:
 
 				if (mode == MENU_MODE)
 				{
@@ -793,7 +789,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 					if (item instanceof Link)
 					{
 						final Link link = (Link) item;
-						link.setSelected(InteractiveCanvasItem.SELECTED);
+						selectionModel.set(link.getBeanID());
 						final LinkPopupMenu popup = new LinkPopupMenu(link);
 						popup.show(this, xPos, yPos);
 					}
@@ -804,7 +800,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 						// check first if the selection is a property
 						if (gcp != null)
 						{
-							// gcp.setSelected(true);
+							selectionModel.set(gcp.getBeanID());
 							final PropertyPopupMenu popup = new PropertyPopupMenu(gcp);
 							popup.show(this, xPos, yPos);
 
@@ -814,12 +810,14 @@ public class GraphEditorCanvas extends BeanGraphPanel
 							// if not then just show the common settings for
 							// component
 							final ComponentPopupMenu popup = new ComponentPopupMenu(gc);
+							selectionModel.set(item.getBeanID());
 							popup.show(this, xPos, yPos);
 						}
 					}
 					else
 					{
 						final CanvasPopupMenu popup = new CanvasPopupMenu();
+						selectionModel.clear();
 						popup.show(this, xPos, yPos);
 					}
 				}
@@ -842,7 +840,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		final List<LinkGroup> allLinkGroups = getItems(LinkGroup.class);
 		if (allLinkGroups != null)
 		{
-			for(LinkGroup linkGroup: allLinkGroups)
+			for (LinkGroup linkGroup : allLinkGroups)
 			{
 				final Link link = linkGroup.getLink(beanid);
 				if (link != null)
@@ -862,6 +860,27 @@ public class GraphEditorCanvas extends BeanGraphPanel
 			}
 		}
 		removeBeans(beanid, true);
+	}
+
+	@Override
+	public void selectionChanged(Collection<String> selection)
+	{
+		super.selectionChanged(selection);
+		for (InteractiveCanvasItem item : items)
+		{
+			if (item instanceof GraphComponent)
+			{
+				GraphComponent component = (GraphComponent) item;
+				for (GraphComponentProperty property : component.getGraphComponentProperties().values())
+				{
+					String id = property.getBeanID();
+					if (selection.contains(id))
+					{
+						property.setSelected(true);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -886,11 +905,11 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				removeItems(new ArrayList<LinkGroup>(inLinkGroups.values()), false);
 			}
 
-			synchronized (props)
+			if (props != null)
 			{
-				if (props != null)
+				synchronized (props)
 				{
-					for(GraphComponentProperty gcp: props.values())
+					for (GraphComponentProperty gcp : props.values())
 					{
 						List<Link> links = gcp.getInputLinks();
 						if (links != null)
@@ -914,41 +933,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				f.setVisible(false);
 			}
 		}
-//		else if (item instanceof GraphEditorLinkGroup)
-//		{
-//			GraphEditorLinkGroup linkGroup = (GraphEditorLinkGroup) item; GraphComponent source =
-//			(GraphComponent) linkGroup.getSource(); GraphComponent target = (GraphComponent)
-//			linkGroup.getTarget(); if (source != null) { //source.removeOutputLinkGroup(target);
-//			} if (target != null) { //target.removeInputLinkGroup(source); }
-//		}
-//		else if (item instanceof GraphEditorLink)
-//		{
-//			 GraphEditorLink link = (GraphEditorLink) item; GraphComponentProperty source =
-//			 (GraphComponentProperty) link .getSource(); if (source != null) {
-//			 source.removeOutputLink(link); } GraphComponentProperty target =
-//			 (GraphComponentProperty) link .getTarget(); if (target != null) {
-//			 target.removeInputLink(link); }
-//		}
-		// now just remove this item
 		super.removeItem(item, cleanUp);
-	}
-
-	public void setHighlightComponents(final String beanID, final boolean highlight)
-	{
-		final List<BeanCanvasItem> comps = getBeanInstances(beanID);
-		if (comps != null)
-		{
-			synchronized (comps)
-			{
-				for(BeanCanvasItem item: comps)
-				{
-					final GraphComponent gc = (GraphComponent) item;
-					gc.setHighlighted(highlight);
-					gc.repaint();
-
-				}
-			}
-		}
 	}
 
 	public void showComponentSettings(final GraphComponent gc, final int x, final int y)
@@ -998,7 +983,10 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		}
 
 		// check if connect within same component allowed
-		if (!allowComponentSelfConnect && source.getParent().getBeanID().equals(target.getParent().getBeanID())) { return false; }
+		if (!allowComponentSelfConnect && source.getParent().getBeanID().equals(target.getParent().getBeanID()))
+		{
+			return false;
+		}
 
 		// check whether target is read-only
 		return !target.getComponentProperty().isReadonly();
@@ -1010,14 +998,14 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	}
 
 	boolean connect(final GraphComponentProperty source, final GraphComponentProperty target, final Link link,
-			final boolean publish)
+	                final boolean publish)
 	{
 		synchronized (link)
 		{
 			if (publish)
 			{
 				final PropertyLinkRequest plr = DataspaceMonitor.getMonitor()
-						.publishLink(source.getComponentProperty(), target.getComponentProperty());
+						.createLink(source.getComponentProperty(), target.getComponentProperty());
 				if (plr != null)
 				{
 					link.setLinkRequest(plr);
@@ -1047,7 +1035,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	}
 
 	boolean connect(final GraphComponentProperty source, final GraphComponentProperty target,
-			final PropertyLinkRequest req)
+	                final PropertyLinkRequest req)
 	{
 
 		final Point start = source.getOutAnchorPoint();
@@ -1067,7 +1055,10 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	GraphComponentProperty getGraphComponentProperty(final int x, final int y)
 	{
 		final GraphComponent gc = getGraphComponent(x, y);
-		if (gc != null) { return gc.getGraphComponentProperty(x, y); }
+		if (gc != null)
+		{
+			return gc.getGraphComponentProperty(x, y);
+		}
 		return null;
 	}
 
@@ -1097,9 +1088,9 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				final String currentName = DataspaceUtils.getCurrentName(monitor
 						.getComponentAdvert(beanGUID.toString()));
 
-				for(BeanCanvasItem item: comps)
+				for (BeanCanvasItem item : comps)
 				{
-					GraphComponent gc = (GraphComponent)item;
+					GraphComponent gc = (GraphComponent) item;
 					if (!gc.getName().equals(currentName))
 					{
 						gc.setName(currentName);
@@ -1110,23 +1101,4 @@ public class GraphEditorCanvas extends BeanGraphPanel
 			}
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * ect.apps.editor.DataspaceConfigurationListener#capabilityAdded(ect.Capability)
-	 */
-	/*
-	 * public void capabilityAdded(Capability cap) { ComponentAdvert temp = new
-	 * ComponentAdvert((GUID) null); temp.setCapabilityID(cap.getID()); try { ComponentAdvert[]
-	 * results = temp.copyCollectAsComponentAdvert(DataspaceMonitor.getMonitor() .getDataspace());
-	 * if (results != null) { for (int i = 0; i < results.length; i++) { ComponentAdvert ca =
-	 * results[i]; String beanID = ca.getComponentID().toString(); Vector gcs =
-	 * getBeanInstances(beanID); if (gcs == null) { continue; } String hostName = cap.getHostID();
-	 * for (Enumeration e = gcs.elements(); e.hasMoreElements(); ) { GraphComponent gc =
-	 * (GraphComponent) e.nextElement(); gc.setHostName(hostName); gc.repaint(); } } } } catch
-	 * (DataspaceInactiveException e) { // TODO Auto-generated catch block e.printStackTrace(); } }
-	 */
-
 }

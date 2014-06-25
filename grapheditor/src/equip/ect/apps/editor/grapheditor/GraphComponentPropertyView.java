@@ -42,20 +42,16 @@ package equip.ect.apps.editor.grapheditor;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-import equip.ect.apps.editor.InteractiveCanvasItemView;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItemView;
 
 public class GraphComponentPropertyView extends InteractiveCanvasItemView
 {
-
-	private Color normalColor = Color.white;
-
-	private Color selectedColor = Color.green.darker();
-
-	private Font propertyFont = new Font("Arial", Font.PLAIN, 10);
-
-	private String name, value;
-
 	public static boolean renderPropValue = true;
+	private static final Color normalColor = Color.white;
+	private static final Color selectedColor = Color.green.darker();
+	private static final Color valueColor = Color.blue.darker();
+	private static final Font propertyFont = new Font("Arial", Font.PLAIN, 10);
+	private String name, value;
 
 	GraphComponentPropertyView(final String name, final String value)
 	{
@@ -63,30 +59,29 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 		setValue(value);
 	}
 
-	public void paint(final Graphics g)
+	public void paint(final Graphics2D g)
 	{
 		// g.setClip(posX, posY, width, height);
-		final Graphics2D g2 = (Graphics2D) g;
-		g2.setFont(propertyFont);
-		final FontMetrics metrics = g2.getFontMetrics();
-		Rectangle2D r2d = metrics.getStringBounds(name, g2);
+		g.setFont(propertyFont);
+		final FontMetrics metrics = g.getFontMetrics();
+		Rectangle2D r2d = metrics.getStringBounds(name, g);
 		final double nameWidth = r2d.getWidth();
-		g2.fillRect(posX + 1,posY + 1, width - 2, height - 2);
-		//g2.fillRoundRect(posX, posY, width, height, 10, 10);
-		g2.setColor(Color.black);
-		//g2.drawRect(posX, posY, width - 1, height - 1);
-		g2.drawString(name, posX + 5, (int)(posY + r2d.getHeight()));
+		g.fillRect(posX + 1,posY + 1, width - 2, height - 2);
+		//g.fillRoundRect(posX, posY, width, height, 10, 10);
+		g.setColor(Color.black);
+		//g.drawRect(posX, posY, width - 1, height - 1);
+		g.drawString(name, posX + 5, (int)(posY + r2d.getHeight()) - 1);
 		if (renderPropValue)
 		{
-			double dotWidth = metrics.getStringBounds("...", g2).getWidth();
+			double dotWidth = metrics.getStringBounds("...", g).getWidth();
 			String valueString = value;
-			r2d = metrics.getStringBounds(valueString, g2);
+			r2d = metrics.getStringBounds(valueString, g);
 			double valueWidth = r2d.getWidth();
 			boolean dots = false;
 			while(nameWidth + valueWidth + 15 > width && valueString.length() > 0)
 			{
 				valueString = valueString.substring(0, valueString.length() - 1);
-				r2d = metrics.getStringBounds(valueString, g2);
+				r2d = metrics.getStringBounds(valueString, g);
 				valueWidth = r2d.getWidth() + dotWidth;
 				dots = true;
 			}
@@ -95,39 +90,39 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 			{
 				valueString = valueString + "...";
 			}
-			g.setColor(Color.blue);
-			g2.drawString(valueString, (int)(posX + width - valueWidth - 5), (int)(posY + r2d.getHeight()));
+			g.setColor(valueColor);
+			g.drawString(valueString, (int)(posX + width - valueWidth - 5), (int)(posY + r2d.getHeight()) - 1);
 		}
 	}
 
 	@Override
-	public void paintActive(final Graphics g)
+	public void paintActive(final Graphics2D g)
 	{
 		g.setColor(GraphEditorResources.PROPERTY_ACTIVE_COLOR);
 		paint(g);
 	}
 
 	@Override
-	public void paintNormal(final Graphics g)
+	public void paintNormal(final Graphics2D g)
 	{
 		g.setColor(normalColor);
 		paint(g);
 	}
 
 	@Override
-	public void paintSelected(final Graphics g)
+	public void paintSelected(final Graphics2D g)
 	{
 		g.setColor(selectedColor);
 		paint(g);
 	}
 
 	@Override
-	public void paintShadowed(final Graphics g)
+	public void paintShadowed(final Graphics2D g)
 	{
 	}
 
 	@Override
-	public void paintUnavailable(final Graphics g)
+	public void paintUnavailable(final Graphics2D g)
 	{
 	}
 
@@ -140,5 +135,4 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 	{
 		this.value = (value != null ? value : "null");
 	}
-
 }

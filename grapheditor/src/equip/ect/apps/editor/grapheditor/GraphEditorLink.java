@@ -50,62 +50,17 @@ import equip.ect.apps.editor.RenderableLink;
  */
 public class GraphEditorLink extends Link
 {
-
-	/**
-	 * @param canvas
-	 * @param source
-	 * @param target
-	 */
-	public GraphEditorLink(final Component canvas, final Connectable source, final Connectable target)
-	{
-		this(canvas, source.getOutAnchorPoint(), target.getInAnchorPoint(), source, target);
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * @param canvas
-	 * @param startPoint
-	 * @param endPoint
-	 * @param source
-	 * @param target
-	 */
 	public GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target)
 	{
 		super(canvas, startPoint, endPoint, source, target, new CurvedLine(startPoint, endPoint), null);
-		// TODO Auto-generated constructor stub
 	}
 
-	/**
-	 * @param canvas
-	 * @param startPoint
-	 * @param endPoint
-	 * @param source
-	 * @param target
-	 * @param linkView
-	 */
-	public GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
-			final Connectable source, final Connectable target, final RenderableLink linkView)
-	{
-		super(canvas, startPoint, endPoint, source, target, linkView, null);
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * @param canvas
-	 * @param startPoint
-	 * @param endPoint
-	 * @param source
-	 * @param target
-	 * @param linkView
-	 * @param link
-	 */
 	public GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target, final RenderableLink linkView,
 			final PropertyLinkRequest link)
 	{
 		super(canvas, startPoint, endPoint, source, target, linkView, link);
-		// TODO Auto-generated constructor stub
 	}
 
 	/*
@@ -116,13 +71,6 @@ public class GraphEditorLink extends Link
 	@Override
 	public void cleanUp()
 	{
-		/*
-		 * if (linkReq != null) { try {
-		 * DataspaceMonitor.getMonitor().getDataspace().delete(linkReq.getID()); } catch
-		 * (DataspaceInactiveException ex) {
-		 * Info.message("Warning: Error removing link from dataspace");
-		 * Info.message(ex.getMessage()); } }
-		 */
 		Info.message(this, "Cleaning up link");
 
 		if (source != null)
@@ -151,5 +99,4 @@ public class GraphEditorLink extends Link
 		final double THRESH = 5.0;
 		return ((CurvedLine) view).intersects(x - THRESH, y - THRESH, THRESH * 2, THRESH * 2);
 	}
-
 }

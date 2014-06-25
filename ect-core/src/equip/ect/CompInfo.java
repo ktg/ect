@@ -95,7 +95,6 @@ public class CompInfo
 
 	public CompInfo[] copyCollect(final DataspaceBean dataspace) throws DataspaceInactiveException
 	{
-
 		final ItemData[] ret = dataspace.copyCollect(this.tuple);
 		if (ret != null)
 		{

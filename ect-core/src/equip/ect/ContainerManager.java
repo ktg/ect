@@ -328,7 +328,7 @@ public class ContainerManager implements Runnable
 	{
 		synchronized (startupDataMapLock)
 		{
-			ComponentStartupData data = (ComponentStartupData) startupDataMap.get(requestGUID);
+			ComponentStartupData data = startupDataMap.get(requestGUID);
 			if (data == null)
 			{
 				// a bit iffy - partial knowledge

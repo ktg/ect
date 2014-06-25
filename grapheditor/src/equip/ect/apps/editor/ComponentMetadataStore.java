@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import equip.data.GUID;
+import equip.ect.apps.editor.dataspace.ComponentMetadataListener;
 
 /**
  * Allows metadata events for a particular component to be stored until required.

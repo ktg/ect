@@ -47,8 +47,10 @@ Contributors:
 
 package equip.ect.apps.editor;
 
+import equip.ect.apps.editor.interactive.InteractiveCanvasItemView;
+
 import java.awt.Component;
-import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 
@@ -92,12 +94,12 @@ public class GraphicCanvasItemView extends InteractiveCanvasItemView
 	}
 
 	@Override
-	public void paintActive(final Graphics g)
+	public void paintActive(final Graphics2D g)
 	{
 	}
 
 	@Override
-	public void paintNormal(final Graphics g)
+	public void paintNormal(final Graphics2D g)
 	{
 		if (imageBuffer == null)
 		{
@@ -107,18 +109,18 @@ public class GraphicCanvasItemView extends InteractiveCanvasItemView
 	}
 
 	@Override
-	public void paintSelected(final Graphics g)
+	public void paintSelected(final Graphics2D g)
 	{
 		paintNormal(g);
 	}
 
 	@Override
-	public void paintShadowed(final Graphics g)
+	public void paintShadowed(final Graphics2D g)
 	{
 	}
 
 	@Override
-	public void paintUnavailable(final Graphics g)
+	public void paintUnavailable(final Graphics2D g)
 	{
 	}
 

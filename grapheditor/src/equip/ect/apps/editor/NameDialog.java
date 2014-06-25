@@ -64,13 +64,14 @@ import javax.swing.event.ListSelectionListener;
 import equip.data.GUID;
 import equip.data.beans.DataspaceBean;
 import equip.ect.RDFStatement;
+import equip.ect.apps.editor.dataspace.DataspaceUtils;
 
 /**
  * dialog for viewing/setting RDFStatement-specified names of things
  */
 public class NameDialog extends JDialog
 {
-	class ActiveCellRenderer extends JLabel implements ListCellRenderer
+	class ActiveCellRenderer extends JLabel implements ListCellRenderer<String>
 	{
 		public ActiveCellRenderer()
 		{
@@ -78,12 +79,12 @@ public class NameDialog extends JDialog
 		}
 
 		@Override
-		public Component getListCellRendererComponent(final JList list, final Object value, final int index,
+		public Component getListCellRendererComponent(final JList list, final String value, final int index,
 				final boolean isSelected, final boolean cellHasFocus)
 		{
 			final String activeName = ((ActiveListModel) (list.getModel())).getActiveName();
 
-			String stringValue = (String) value;
+			String stringValue = value;
 
 			if (stringValue.equals(activeName))
 			{
@@ -108,7 +109,7 @@ public class NameDialog extends JDialog
 		}
 	}
 
-	class ActiveListModel extends DefaultListModel
+	class ActiveListModel extends DefaultListModel<String>
 	{
 		String activeName = null;
 
@@ -141,7 +142,7 @@ public class NameDialog extends JDialog
 	/**
 	 * jlist
 	 */
-	protected JList jlist;
+	protected JList<String> jlist;
 
 	/**
 	 * text field
@@ -179,7 +180,7 @@ public class NameDialog extends JDialog
 		list = new ActiveListModel();
 		refresh();
 
-		jlist = new JList(list);
+		jlist = new JList<String>(list);
 		jlist.setCellRenderer(new ActiveCellRenderer());
 		jlist.setVisibleRowCount(8);
 		jlist.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -189,7 +190,7 @@ public class NameDialog extends JDialog
 			@Override
 			public void valueChanged(final ListSelectionEvent e)
 			{
-				final String val = (String) jlist.getSelectedValue();
+				final String val = jlist.getSelectedValue();
 				if (val != null)
 				{
 					name.setText(val);
@@ -249,7 +250,7 @@ public class NameDialog extends JDialog
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				updateName((String) jlist.getSelectedValue(), name.getText());
+				updateName(jlist.getSelectedValue(), name.getText());
 				refresh();
 				enableActions();
 			}
@@ -388,7 +389,7 @@ public class NameDialog extends JDialog
 	 */
 	protected void enableActions()
 	{
-		final String selected = (String) jlist.getSelectedValue();
+		final String selected = jlist.getSelectedValue();
 		deleteAction.setEnabled(selected != null);
 
 		if (selected != null)
@@ -427,7 +428,7 @@ public class NameDialog extends JDialog
 			boolean novel = true;
 			for (int i = 0; i < list.size(); i++)
 			{
-				final String s = (String) list.elementAt(i);
+				final String s = list.elementAt(i);
 				if (s.equals(text))
 				{
 					novel = false;
@@ -462,7 +463,7 @@ public class NameDialog extends JDialog
 				int j;
 				for (j = 0; j < list.size(); j++)
 				{
-					final String el = (String) list.elementAt(j);
+					final String el = list.elementAt(j);
 					if (el.compareTo(name) > 0)
 					{
 						break;

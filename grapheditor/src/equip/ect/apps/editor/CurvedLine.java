@@ -78,25 +78,24 @@ public class CurvedLine extends RenderableLink
 	}
 
 	@Override
-	public void drawLink(final Graphics g)
+	public void drawLink(final Graphics2D g)
 	{
-		final Graphics2D g2 = (Graphics2D) g;
 		g.setColor(color);
-		final Stroke currentStroke = g2.getStroke();
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+		final Stroke currentStroke = g.getStroke();
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
 				RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setStroke(stroke);
-		g2.draw(path);
+		g.setStroke(stroke);
+		g.draw(path);
 		// draw arrow heads
 		// start
-		g2.fillPolygon(new int[] { startPoint.x + 5, startPoint.x, startPoint.x }, new int[] { startPoint.y,
+		g.fillPolygon(new int[] { startPoint.x + 5, startPoint.x, startPoint.x }, new int[] { startPoint.y,
 																								startPoint.y + 5,
 																								startPoint.y - 5 }, 3);
 		// end
-		g2.fillPolygon(new int[] { endPoint.x, endPoint.x - 5, endPoint.x - 5 }, new int[] { endPoint.y,
+		g.fillPolygon(new int[] { endPoint.x, endPoint.x - 5, endPoint.x - 5 }, new int[] { endPoint.y,
 																							endPoint.y + 5,
 																							endPoint.y - 5 }, 3);
-		g2.setStroke(currentStroke);
+		g.setStroke(currentStroke);
 	}
 
 	@Override

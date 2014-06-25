@@ -35,9 +35,15 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import equip.ect.apps.editor.InteractiveCanvasItemView;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItemView;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
@@ -46,41 +52,27 @@ import java.util.List;
  */
 public class GraphComponentView extends InteractiveCanvasItemView
 {
-
+	private static final Font headerFont = new Font("Arial", Font.PLAIN, 11);
+	private static final Color SELECTED_COLOR = new Color(95, 175, 239);
+	private static final Color UNSELECTED_COLOR = new Color(175, 175, 175);
 	private Drawer drawer;
-
 	private String name;
-
 	private int headerWidth, headerHeight;
-
-	private Font hostIDFont = new Font("Helvetica", Font.PLAIN, 10);
-
-	private static Font headerFont = new Font("Arial", Font.PLAIN, 13);
-
 	private transient List<GraphComponentProperty> graphCompProps;
 
-	private String hostID;
-
-	private boolean highlight = false;
-	private static Color HIGHLIGHT_COLOR = new Color(50, 100, 255);
-
-	public static boolean renderHostID = false;
-
-	public GraphComponentView(final Component canvas, final String name, final String hostID,
-	                          final List<GraphComponentProperty> renderableProps)
+	public GraphComponentView(final Component canvas, final String name, final List<GraphComponentProperty> renderableProps)
 	{
 		super(canvas);
 		this.name = name;
-		this.hostID = (hostID != null) ? hostID : "unknown host";
 		this.graphCompProps = renderableProps;
 	}
 
-	public void drawHeader(final Graphics2D g2, final boolean collapsed)
+	public void drawHeader(final Graphics2D g2, final boolean collapsed, final boolean selected)
 	{
 		g2.setFont(headerFont);
 		FontMetrics fontMetrics = g2.getFontMetrics();
 		Rectangle2D r2d = fontMetrics.getStringBounds(name, g2);
-		g2.setColor(highlight ? HIGHLIGHT_COLOR : Color.gray);
+		g2.setColor(selected ? SELECTED_COLOR : UNSELECTED_COLOR);
 
 		int height = headerHeight;
 		if (!collapsed && (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT))
@@ -91,20 +83,9 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		g2.fillRoundRect(posX, posY, headerWidth, height, 10, 10);
 		g2.setColor(Color.black);
 		g2.drawRoundRect(posX, posY, headerWidth - 1, height - 1, 10, 10);
-		g2.setColor(Color.white);
+		//g2.setColor(Color.white);
 		g2.drawString(name, (int) (posX + 0.5 * (headerWidth - r2d.getWidth())), // center
 				posY + 1 + (int) r2d.getHeight());
-		if (renderHostID)
-		{
-			g2.setFont(hostIDFont);
-			fontMetrics = g2.getFontMetrics();
-			r2d = fontMetrics.getStringBounds(hostID, g2);
-			g2.setColor(Color.green);
-			final double hostWidth = r2d.getWidth();
-			g2.drawString(hostID, (int) (posX + 0.5 * (headerWidth - hostWidth)), // center
-					posY + 2 * (int) r2d.getHeight());
-
-		}
 	}
 
 	public void drawProps(final Graphics2D g)
@@ -114,7 +95,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 			Rectangle2D rect = null;
 			for (GraphComponentProperty gcp : graphCompProps)
 			{
-				if(gcp.isVisible())
+				if (gcp.isVisible())
 				{
 					if (rect == null)
 					{
@@ -127,12 +108,12 @@ public class GraphComponentView extends InteractiveCanvasItemView
 				}
 			}
 
-			if(rect != null)
+			if (rect != null)
 			{
 				g.setColor(Color.white);
-				g.fillRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth() - 1, (int)rect.getHeight() - 1);
+				g.fillRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth() - 1, (int) rect.getHeight() - 1);
 				g.setColor(Color.black);
-				g.drawRect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth() - 1, (int)rect.getHeight() - 1);
+				g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth() - 1, (int) rect.getHeight() - 1);
 			}
 
 			for (GraphComponentProperty gcp : graphCompProps)
@@ -156,47 +137,48 @@ public class GraphComponentView extends InteractiveCanvasItemView
 	}
 
 	@Override
-	public void paintActive(final Graphics g)
+	public void paintActive(final Graphics2D g)
 	{
 		g.setColor(Color.red);
 		g.fillRect(posX, posY, width, height);
 	}
 
 	@Override
-	public void paintNormal(final Graphics g)
+	public void paintNormal(final Graphics2D g)
 	{
 		// paint the drawer first, since we need to hide the top part.
-		Graphics2D g2 = (Graphics2D) g;
-		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		drawer.paintComponent(g);
-		drawHeader(g2, false);
+		drawHeader(g, false, false);
 		if (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT)
 		{
-			drawProps(g2);
+			drawProps(g);
 		}
 	}
 
 	@Override
-	public void paintSelected(final Graphics g)
+	public void paintSelected(final Graphics2D g)
 	{
-		paintNormal(g);
-		final Graphics2D g2 = (Graphics2D) g;
-		g2.setColor(Color.red);
-		final Stroke current = g2.getStroke();
-		g2.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
-		g2.drawRoundRect(posX, posY, width, height, 10, 10);
-		g2.setStroke(current);
+		// paint the drawer first, since we need to hide the top part.
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+				RenderingHints.VALUE_ANTIALIAS_ON);
+		drawer.paintComponent(g);
+		drawHeader(g, false, true);
+		if (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT)
+		{
+			drawProps(g);
+		}
 	}
 
 	@Override
-	public void paintShadowed(final Graphics g)
+	public void paintShadowed(final Graphics2D g)
 	{
 		paintNormal(g);
 	}
 
 	@Override
-	public void paintUnavailable(final Graphics g)
+	public void paintUnavailable(final Graphics2D g)
 	{
 		paintNormal(g);
 	}
@@ -209,17 +191,6 @@ public class GraphComponentView extends InteractiveCanvasItemView
 	public void setGraphComponentProperties(final List<GraphComponentProperty> graphCompProps)
 	{
 		this.graphCompProps = graphCompProps;
-	}
-
-	public void setHighlighted(final boolean highlight)
-	{
-		this.highlight = highlight;
-
-	}
-
-	public void setHostID(final String hostID)
-	{
-		this.hostID = hostID;
 	}
 
 	public void setName(final String name)
@@ -247,7 +218,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		this.height = headerHeight;
 		this.width = headerWidth;
 		//final int visibleCount = 0;
-		int maxWidth = Math.max(headerWidth, drawer.getWidth());
+		int maxWidth = Math.max(Math.max(headerWidth, drawer.getWidth()), 100);
 		if (graphCompProps != null)
 		{
 			for (GraphComponentProperty gcp : graphCompProps)
@@ -258,23 +229,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 				{
 					maxWidth = currentWidth;
 				}
-				/*
-				 * if (drawer.getDrawerState() == Drawer.OPEN) { gcp.setVisible(true);
-				 * visibleCount++; } else if (drawer.getDrawerState() == Drawer.COMPACT) { if
-				 * (gcp.keepVisible() || gcp.isLinked()) { gcp.setVisible(true); visibleCount++; }
-				 * else { gcp.setVisible(false); } } else { gcp.setVisible(false); }
-				 */
 			}
-
-			/*
-			 * if (drawer.getDrawerState() == Drawer.COMPACT) { if (drawer.getPreviousDrawerState()
-			 * == Drawer.CLOSED) { if (visibleCount == graphCompProps.size()) {
-			 * drawer.setDrawerState(Drawer.OPEN); } else if (visibleCount < 1) {
-			 * drawer.setDrawerState(Drawer.OPEN); } } else if (drawer.getPreviousDrawerState() ==
-			 * Drawer.OPEN) { if (visibleCount < 1) { drawer.setDrawerState(Drawer.CLOSED); } else
-			 * if (visibleCount == graphCompProps.size()) { drawer.setDrawerState(Drawer.CLOSED); }
-			 * } }
-			 */
 
 			this.width = this.headerWidth = maxWidth;
 			int y = posY + headerHeight - 1;
@@ -314,5 +269,4 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		final int ddx = (int) (0.5 * (headerWidth - drawer.getWidth()));
 		drawer.setPosition(posX + ddx, posY + height - drawer.getHeight());
 	}
-
 }

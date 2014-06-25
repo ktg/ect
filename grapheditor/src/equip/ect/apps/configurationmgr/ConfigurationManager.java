@@ -52,7 +52,7 @@ import equip.data.beans.DataspaceEventListener;
 import equip.data.beans.DataspaceInactiveException;
 import equip.ect.*;
 import equip.ect.apps.AppsResources;
-import equip.ect.apps.editor.DataspaceUtils;
+import equip.ect.apps.editor.dataspace.DataspaceUtils;
 import equip.ect.util.DirectoryEventListener;
 import equip.ect.util.DirectoryMonitor;
 import equip.runtime.ValueBase;
@@ -83,7 +83,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,35 +126,13 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 		@Override
 		public Component getListCellRendererComponent(final JList list, final File value, final int index,
-				final boolean isSelected, final boolean cellHasFocus)
+		                                              final boolean isSelected, final boolean cellHasFocus)
 		{
 			setText(value.getName());
 			setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
 			setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
 			return this;
 		}
-	}
-
-	/**
-	 * options to do with a reloaded component. - new dynamic request --> map capability - use an
-	 * existing component (no create) --> map component, container, host, class, capability - start
-	 * by hand (user explicit) - ignore - create a parent component and/or --> identify/map parent
-	 * component --> select corresponding/appropriate child - configure one or more ancestor
-	 * components --> identify/map ancestor component --> select corresponding/appropriate child
-	 */
-	static class ComponentLoadOption
-	{
-		/**
-		 * the component's original ID
-		 */
-		GUID id;
-		/**
-		 * the component still exists - use it
-		 */
-		boolean useStillExisting;
-		/** 
-	 */
-		// ....not yet used....
 	}
 
 	private JList<File> compList = new JList<File>();
@@ -355,10 +332,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 */
 	JPanel linksPanel;
 	/**
-	 * load frame log panel
-	 */
-	JPanel logPanel;
-	/**
 	 * load frame status line
 	 */
 	JLabel status;
@@ -421,7 +394,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	/**
 	 * load frame links panel action chooser
 	 */
-	JComboBox linksAction;
+	JComboBox<String> linksAction;
 	/**
 	 * load frame links panel 'go'
 	 */
@@ -547,7 +520,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		// dataspace.addDataspaceEventListener(compPropTemplate.tuple, false, this);
 		capTemplate = new Capability((GUID) null);
 		// dataspace.addDataspaceEventListener(capTemplate.tuple, false, this);
-		templates = new CompInfo[] { compReqTemplate, linkReqTemplate, rdfTemplate };
+		templates = new CompInfo[]{compReqTemplate, linkReqTemplate, rdfTemplate};
 	}
 
 	/**
@@ -575,7 +548,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		dataspace.addDataspaceEventListener(compPropTemplate.tuple, false, this);
 		capTemplate = new Capability((GUID) null);
 		dataspace.addDataspaceEventListener(capTemplate.tuple, false, this);
-		templates = new CompInfo[] { compReqTemplate, linkReqTemplate, rdfTemplate };
+		templates = new CompInfo[]{compReqTemplate, linkReqTemplate, rdfTemplate};
 		final DirectoryMonitor directoryMonitor = new DirectoryMonitor(this.directory, true, false);
 		new Thread(directoryMonitor).start();
 		directoryMonitor.addDirectoryEventListener(this);
@@ -661,7 +634,9 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		return false;
 	}
 
-	/** notify of event (cf DataCallbackPost) */
+	/**
+	 * notify of event (cf DataCallbackPost)
+	 */
 	@Override
 	public void dataspaceEvent(final DataspaceEvent event)
 	{
@@ -720,9 +695,9 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				{
 					boolean parent = true;
 					{
-						final Element props[] = getNamedChildElements(	getNamedChildElement(	component[ci],
-																								ELproperties),
-																		ELproperty);
+						final Element props[] = getNamedChildElements(getNamedChildElement(component[ci],
+										ELproperties),
+								ELproperty);
 						for (int pi = 0; parent && props != null && pi < props.length; pi++)
 						{
 							final String propname = getElementText(getNamedChildElement(props[pi], ELname));
@@ -752,8 +727,8 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 								status.setText("Dealing with component " + fci + "...");
 
 								componentLabel.setText("Component "
-										+ getElementText(getNamedChildElement(	ConfigurationManager.this.component,
-																				ELname)));
+										+ getElementText(getNamedChildElement(ConfigurationManager.this.component,
+										ELname)));
 								String action = ACTION_CREATE_NEW_DYNAMIC_SAME_CLASS;
 								if (hasParent)
 								{
@@ -795,7 +770,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 							{
 								wait();
 							}
-							if (giveup) { throw new GiveUpException(); }
+							if (giveup)
+							{
+								throw new GiveUpException();
+							}
 						}
 						catch (final InterruptedException e)
 						{
@@ -869,14 +847,14 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			for (final String ck : componentMapping.keySet())
 			{
 				final GUID id = componentMapping.get(ck);
-				rdfmapping.put(	RDFStatement.GUID_NAMESPACE + ck.substring(1, ck.length() - 1),
-								RDFStatement.GUIDToUrl(id));
+				rdfmapping.put(RDFStatement.GUID_NAMESPACE + ck.substring(1, ck.length() - 1),
+						RDFStatement.GUIDToUrl(id));
 			}
 			for (final String pk : propertyMapping.keySet())
 			{
 				final GUID id = propertyMapping.get(pk);
-				rdfmapping.put(	RDFStatement.GUID_NAMESPACE + pk.substring(1, pk.length() - 1),
-								RDFStatement.GUIDToUrl(id));
+				rdfmapping.put(RDFStatement.GUID_NAMESPACE + pk.substring(1, pk.length() - 1),
+						RDFStatement.GUIDToUrl(id));
 			}
 			final Element rdfels[] = (rdfstatements != null) ? getNamedChildElements(rdfstatements, ELrdfstatement)
 					: null;
@@ -969,7 +947,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 			for (final Element capability : getNamedChildElements(capabilities, ELcapability))
 			{
-				final GUID oldID = stringToGUID(capability.getAttribute(ATid));
+				final GUID oldID = DataspaceUtils.stringToGUID(capability.getAttribute(ATid));
 				ItemData item = dataspace.getItem(oldID);
 				if (item == null)
 				{
@@ -1005,7 +983,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				DataSession session = null;
 				try
 				{
-					final GUID requestid = stringToGUID(componentRequest.getAttribute(ATid));
+					final GUID requestid = DataspaceUtils.stringToGUID(componentRequest.getAttribute(ATid));
 
 					if (dataspace.getItem(requestid) != null)
 					{
@@ -1013,8 +991,8 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 						continue;
 					}
 
-					System.out.println("Looking for " + stringToGUID(componentRequest.getAttribute(ATcapabilityref)));
-					final GUID capid = idMapping.get(stringToGUID(componentRequest.getAttribute(ATcapabilityref)));
+					System.out.println("Looking for " + DataspaceUtils.stringToGUID(componentRequest.getAttribute(ATcapabilityref)));
+					final GUID capid = idMapping.get(DataspaceUtils.stringToGUID(componentRequest.getAttribute(ATcapabilityref)));
 					final ItemData cap = dataspace.getItem(capid);
 					if (cap == null)
 					{
@@ -1029,7 +1007,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 					final ComponentRequest request = new ComponentRequest(requestid);
 					request.setRequestID(requestid.toString());
-					request.setHostID(stringToGUID(capability.getHostID()));
+					request.setHostID(DataspaceUtils.stringToGUID(capability.getHostID()));
 					request.setContainerID(capability.getContainerID());
 					request.setCapabilityID(capid);
 
@@ -1100,6 +1078,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 						}
 						catch (final Exception e2)
 						{
+							// Do nothing?
 						}
 					}
 				}
@@ -1120,7 +1099,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					final String componentName = getElementText(getNamedChildElement(component, ELname));
 					if (iconfig == 0)
 					{
-						idMapping.put(stringToGUID(component.getAttribute("id")), componentID);
+						idMapping.put(DataspaceUtils.stringToGUID(component.getAttribute("id")), componentID);
 
 						setComponentName(componentID, componentName);
 					}
@@ -1163,7 +1142,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 						GUID oldID = null;
 						try
 						{
-							oldID = stringToGUID(property.getAttribute(ATid));
+							oldID = DataspaceUtils.stringToGUID(property.getAttribute(ATid));
 							ItemData item = dataspace.getItem(oldID);
 							if (item == null)
 							{
@@ -1212,45 +1191,45 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				GUID id = null;
 				try
 				{
-					id = stringToGUID(link.getAttribute(ATid));
+					id = DataspaceUtils.stringToGUID(link.getAttribute(ATid));
 					if (dataspace.getItem(id) != null)
 					{
 						restoreLog("WARNING: cannot restore link " + id + ": already present\n");
 						continue;
 					}
-					
-					if(!idExists(idMapping, link.getAttribute(ATsrcpropref)))
+
+					if (!idExists(idMapping, link.getAttribute(ATsrcpropref)))
 					{
 						restoreLog("WARNING: cannot restore link " + id + ": Source Property " + link.getAttribute(ATsrcpropname) + " cannot be found\n");
 						continue;
 					}
 
-					if(!idExists(idMapping, link.getAttribute(ATsrccompref)))
+					if (!idExists(idMapping, link.getAttribute(ATsrccompref)))
 					{
 						restoreLog("WARNING: cannot restore link " + id + ": Source Component cannot be found\n");
 						continue;
 					}
 
-					if(!idExists(idMapping, link.getAttribute(ATdstpropref)))
+					if (!idExists(idMapping, link.getAttribute(ATdstpropref)))
 					{
-						restoreLog("WARNING: cannot restore link " + id + ": Destination Property "+link.getAttribute(ATdstpropname) + " cannot be found\n");
+						restoreLog("WARNING: cannot restore link " + id + ": Destination Property " + link.getAttribute(ATdstpropname) + " cannot be found\n");
 						continue;
 					}
 
-					if(!idExists(idMapping, link.getAttribute(ATdstcompref)))
+					if (!idExists(idMapping, link.getAttribute(ATdstcompref)))
 					{
 						restoreLog("WARNING: cannot restore link " + id + ": Destination Component cannot be found\n");
 						continue;
 					}
-					
+
 					final PropertyLinkRequest l = new PropertyLinkRequest(id);
 					l.setSourcePropertyName(link.getAttribute(ATsrcpropname));
 					l.setDestinationPropertyName(link.getAttribute(ATdstpropname));
-					l.setSourcePropID(idMapping.get(stringToGUID(link.getAttribute(ATsrcpropref))));
-					l.setSourceComponentID(idMapping.get(stringToGUID(link.getAttribute(ATsrccompref))));
+					l.setSourcePropID(idMapping.get(DataspaceUtils.stringToGUID(link.getAttribute(ATsrcpropref))));
+					l.setSourceComponentID(idMapping.get(DataspaceUtils.stringToGUID(link.getAttribute(ATsrccompref))));
 
-					l.setDestinationPropID(idMapping.get(stringToGUID(link.getAttribute(ATdstpropref))));
-					l.setDestComponentID(idMapping.get(stringToGUID(link.getAttribute(ATdstcompref))));
+					l.setDestinationPropID(idMapping.get(DataspaceUtils.stringToGUID(link.getAttribute(ATdstpropref))));
+					l.setDestComponentID(idMapping.get(DataspaceUtils.stringToGUID(link.getAttribute(ATdstcompref))));
 
 					dataspace.addPersistent(l.tuple, null);
 					restoreLog("Recreated link " + id + " " + link.getAttribute(ATsrcpropname) + " -> "
@@ -1316,7 +1295,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	@Override
 	public void filesAdded(final List<File> files)
 	{
-		for(final File file: files)
+		for (final File file : files)
 		{
 			if (!file.getName().endsWith(FILE_SUFFIX))
 			{
@@ -1333,7 +1312,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 						// in lexical order
 						for (int i = 0; i < listModel.getSize(); i++)
 						{
-							final File f = (File) listModel.getElementAt(i);
+							final File f = listModel.getElementAt(i);
 							if (f.getName().compareTo(file.getName()) > 0)
 							{
 								listModel.insertElementAt(file, i);
@@ -1476,45 +1455,44 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		return true;
 	}
 
-	/**
-	 * save configuration to file (overwrite). Save in (hopefully) transferable and relatively
-	 * future-proof XML format with supporting information.
-	 */
-	public boolean saveConfigurationAs(final File f)
+	public boolean saveConfigurationAs(File file)
 	{
-		return saveConfigurationAs(f, null);
+		return saveXMLDoc(file, toXML());
+	}
+
+	public boolean saveXMLDoc(File file, Document doc)
+	{
+		try
+		{
+			// Use a Transformer for output
+			final TransformerFactory tFactory = TransformerFactory.newInstance();
+			final Transformer transformer = tFactory.newTransformer();
+			// we want to pretty format the XML output
+			// note : aparently this is broken in jdk1.5 beta!
+			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+			final DOMSource source = new DOMSource(doc);
+			final StreamResult result = new StreamResult(file);
+			// StreamResult result = new StreamResult(System.out);
+			transformer.transform(source, result);
+
+			System.out.println("Done");
+			return true;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 	/**
 	 * save configuration to file (overwrite). Save in (hopefully) transferable and relatively
-	 * future-proof XML format with supporting information. Save only selected components and their
-	 * related stuff.
+	 * future-proof XML format with supporting information.
 	 */
-	public boolean saveConfigurationAs(final File f, final String[] selectedComponentGuids)
+	public Document toXML()
 	{
-		List<GUID> componentGuids = null;
-		List<String> subjectGuidUrls = null;
-		if (selectedComponentGuids != null)
-		{
-			final GUID[] guids = new GUID[selectedComponentGuids.length];
-			for (int i = 0; i < selectedComponentGuids.length; i++)
-			{
-				// hacky convert back to GUID
-				guids[i] = RDFStatement.urlToGUID(RDFStatement.GUID_NAMESPACE
-						+ (selectedComponentGuids[i].substring(1, selectedComponentGuids[i].length() - 1)));
-				System.out.println("Selected " + guids[i] + " (" + selectedComponentGuids[i] + ")");
-			}
-			// selected components as Vector to allow .contains(x)
-			componentGuids = Arrays.asList(guids);
-			// equivalent RDFStatement strings
-			final String[] selectedComponentSubjects = new String[guids.length];
-			for (int i = 0; i < guids.length; i++)
-			{
-				selectedComponentSubjects[i] = RDFStatement.GUIDToUrl(guids[i]);
-			}
-			subjectGuidUrls = Arrays.asList(selectedComponentSubjects);
-		}
-
 		try
 		{
 			final DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -1532,13 +1510,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			for (final ItemData item : dataspace.copyCollect(compAdTemplate.tuple))
 			{
 				final ComponentAdvert compitem = new ComponentAdvert((TupleImpl) item);
-
-				if (componentGuids != null && !componentGuids.contains(compitem.getComponentID()))
-				{
-					components
-							.appendChild(doc.createComment("Component " + compitem.getComponentID() + " not selected"));
-					continue;
-				}
 				final Element component = doc.createElement(ELcomponent);
 				components.appendChild(component);
 				component.setAttribute(ATid, compitem.getComponentID().toString());
@@ -1587,11 +1558,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					final Element property = doc.createElement(ELproperty);
 					properties.appendChild(property);
 					property.setAttribute(ATid, prop.getID().toString());
-
-					if (subjectGuidUrls != null)
-					{
-						subjectGuidUrls.add(RDFStatement.GUIDToUrl(prop.getID()));
-					}
 
 					final ValueBase value = prop.getAttributeValue("dynamic");
 					if (value != null && value instanceof BooleanBox && ((BooleanBox) value).value)
@@ -1694,12 +1660,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			for (int i = 0; reqitems != null && i < reqitems.length; i++)
 			{
 				final ComponentRequest reqitem = new ComponentRequest((TupleImpl) reqitems[i]);
-				if (componentGuids != null && !reqtable.containsValue(reqitem.getID()))
-				{
-					componentrequests.appendChild(doc.createComment("ComponentRequest " + reqitem.getID()
-							+ " unreferenced by selected component(s)"));
-					continue;
-				}
 				final Element componentrequest = doc.createElement(ELcomponentrequest);
 				componentrequests.appendChild(componentrequest);
 				if (!reqtable.containsValue(reqitem.getID()))
@@ -1744,16 +1704,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			for (int i = 0; linkreqitems != null && i < linkreqitems.length; i++)
 			{
 				final PropertyLinkRequest linkreqitem = new PropertyLinkRequest((TupleImpl) linkreqitems[i]);
-
-				if (componentGuids != null
-						&& (!componentGuids.contains(linkreqitem.getSourceComponentID()) || !componentGuids
-								.contains(linkreqitem.getDestComponentID())))
-				{
-					links.appendChild(doc.createComment("Link " + linkreqitem.getID()
-							+ " does not involve selected components"));
-					continue;
-				}
-
 				final Element link = doc.createElement(ELlink);
 				links.appendChild(link);
 				link.setAttribute(ATid, linkreqitem.getID().toString());
@@ -1789,28 +1739,14 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				}
 			}
 
-			// Use a Transformer for output
-			final TransformerFactory tFactory = TransformerFactory.newInstance();
-			final Transformer transformer = tFactory.newTransformer();
-			// we want to pretty format the XML output
-			// note : aparently this is broken in jdk1.5 beta!
-			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-			final DOMSource source = new DOMSource(doc);
-			final StreamResult result = new StreamResult(f);
-			// StreamResult result = new StreamResult(System.out);
-			transformer.transform(source, result);
-
-			System.out.println("Done");
-			return true;
+			return doc;
 		}
 		catch (final Exception e)
 		{
-			System.err.println("ERROR saving " + f + ": " + e);
+			System.err.println("ERROR Convering to XML");
 			e.printStackTrace(System.err);
 		}
-		return false;
+		return null;
 	}
 
 	/**
@@ -1859,6 +1795,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			element.setEnabled(enabled);
 		}
 	}
+
 
 	protected JPanel createInnerPanel()
 	{
@@ -2212,7 +2149,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 		p.add(new JLabel("Re-create Link..."));
 
-		linksAction = new JComboBox(new String[] { ACTION_OMIT, ACTION_CREATE_EXACT, ACTION_CREATE_ALTERNATIVE });
+		linksAction = new JComboBox<String>(new String[] { ACTION_OMIT, ACTION_CREATE_EXACT, ACTION_CREATE_ALTERNATIVE });
 		linksAction.setEditable(false);
 		linksAction.addActionListener(new ActionListener()
 		{
@@ -2352,7 +2289,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			requestid = dataspace.allocateId();
 			final ComponentRequest request = new ComponentRequest(requestid);
 			request.setRequestID(requestid.toString());
-			request.setHostID(stringToGUID(capability.getHostID()));// !!hack yuck - null?!
+			request.setHostID(DataspaceUtils.stringToGUID(capability.getHostID()));// !!hack yuck - null?!
 			request.setContainerID(capability.getContainerID());
 			request.setCapabilityID(capability.getID());
 
@@ -2955,7 +2892,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 																										.getAddItem());
 																						synchronized (value)
 																						{
-																							value[0] = (String) Coerce.toClass(	p.getPropertyValue(),
+																							value[0] = Coerce.toClass(p.getPropertyValue(),
 																																String.class);
 																							System.out
 																									.println("Add target property: "
@@ -2970,7 +2907,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 																										.getUpdateItem());
 																						synchronized (value)
 																						{
-																							value[0] = (String) Coerce.toClass(	p.getPropertyValue(),
+																							value[0] = Coerce.toClass(	p.getPropertyValue(),
 																																String.class);
 																							System.out
 																									.println("Update target property: "
@@ -3036,11 +2973,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			restoreLog("FAILED to set property " + pid + " to " + newvalue + "; "
 					+ (value[0] != null ? value[0] + " instead" : "") + "\n");
 		}
-		else
-		{
-			// restoreLog("set property " + targetProperty.getPropertyName() + " to " + newvalue +
-			// "\n");
-		}
 
 		dataspace.delete(myLinkID);
 		dataspace.delete(myPropertyID);
@@ -3055,16 +2987,16 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	protected String getElementText(final Element el)
 	{
 		if (el == null) { return null; }
-		final StringBuffer buf = new StringBuffer();
+		final StringBuilder builder = new StringBuilder();
 		final NodeList children = el.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++)
 		{
 			if (children.item(i).getNodeType() == Node.TEXT_NODE)
 			{
-				buf.append(children.item(i).getNodeValue());
+				builder.append(children.item(i).getNodeValue());
 			}
 		}
-		return buf.toString();
+		return builder.toString();
 	}
 
 	/**
@@ -3188,7 +3120,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			}
 			else if (action.equals(ACTION_USE_ORIGINAL))
 			{
-				final GUID id = stringToGUID(component.getAttribute(ATid));
+				final GUID id = DataspaceUtils.stringToGUID(component.getAttribute(ATid));
 				handleCandidate(id);
 			}
 			else if (action.equals(ACTION_USE_EXISTING_SAME_CLASS))
@@ -3229,7 +3161,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 						persistentChild = getElementText(getNamedChildElement(props[pi], ELvalue));
 					}
 				}
-				final GUID parentid = parent != null ? (GUID) componentMapping.get(parent) : null;
+				final GUID parentid = parent != null ? componentMapping.get(parent) : null;
 				System.out.println("Component parent=" + parent + " (now " + parentid + "), child=" + persistentChild);
 
 				// ComponentAdvert [] comps =
@@ -3580,21 +3512,20 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			// matching are...
 			final Element[] properties = getNamedChildElements(	getNamedChildElement(component, ELproperties),
 																ELproperty);
-			ComponentProperty props[] = null;
 			final ComponentProperty propTemplate = new ComponentProperty((GUID) null);
 			propTemplate.setComponentID(currentComponentId);
 
-			props = propTemplate.copyCollectAsComponentProperty(dataspace);
+			ComponentProperty props[] = propTemplate.copyCollectAsComponentProperty(dataspace);
 
 			for (int i = 0; properties != null && i < properties.length; i++)
 			{
 				final String propname = getElementText(getNamedChildElement(properties[i], ELname));
-				for (int j = 0; props != null && j < props.length; j++)
+				for(ComponentProperty prop: props)
 				{
-					if (props[j].getPropertyName().equals(propname))
+					if (prop.getPropertyName().equals(propname))
 					{
 						final String propid = properties[i].getAttribute(ATid);
-						propertyMapping.put(propid, props[j].getID());
+						propertyMapping.put(propid, prop.getID());
 					}
 				}
 			}
@@ -3626,8 +3557,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			model.addRow(new String[] { "Component name", name, name2 });
 
 			StringBuffer otherNames = new StringBuffer();
-			RDFStatement rdfTemplate = new RDFStatement((GUID) null, RDFStatement.GUIDToUrl(srccomp.getID()),
-					RDFStatement.DC_TITLE, null);
+			RDFStatement rdfTemplate = new RDFStatement(null, RDFStatement.GUIDToUrl(srccomp.getID()), RDFStatement.DC_TITLE, null);
 			RDFStatement rdfstatements[];
 			rdfstatements = rdfTemplate.copyCollectAsRDFStatement(dataspace);
 			for (int i = 0; rdfstatements != null && i < rdfstatements.length; i++)
@@ -3639,8 +3569,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				otherNames.append(rdfstatements[i].getObject());
 			}
 			StringBuffer otherNames2 = new StringBuffer();
-			rdfTemplate = new RDFStatement((GUID) null, RDFStatement.GUIDToUrl(dstcomp.getID()), RDFStatement.DC_TITLE,
-					null);
+			rdfTemplate = new RDFStatement(null, RDFStatement.GUIDToUrl(dstcomp.getID()), RDFStatement.DC_TITLE, null);
 			rdfstatements = rdfTemplate.copyCollectAsRDFStatement(dataspace);
 			for (int i = 0; rdfstatements != null && i < rdfstatements.length; i++)
 			{
@@ -3729,9 +3658,11 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			}
 			catch (final ClassNotFoundException e)
 			{
+				// Do nothing?
 			}
 			catch (final IOException e)
 			{
+				// Do nothing?
 			}
 
 			model.addRow(new String[] { "Property value", otherValue, otherValue2 });
@@ -3873,16 +3804,6 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 	/**
 	 * load frame, component choice panel, populate component table from xml plus a current
-	 * component
-	 */
-	protected boolean populateTableModel2(final DefaultTableModel model, final Element component,
-			final Element capabilities, final GUID id) throws DataspaceInactiveException
-	{
-		return populateTableModel2(model, component, capabilities, id, false);
-	}
-
-	/**
-	 * load frame, component choice panel, populate component table from xml plus a current
 	 * component or capability (iff capabilityOnly true)
 	 */
 	protected boolean populateTableModel2(final DefaultTableModel model, final Element component,
@@ -3969,9 +3890,11 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					}
 					catch (final ClassNotFoundException e)
 					{
+						// Do nothing?
 					}
 					catch (final IOException e)
 					{
+						// Do nothing?
 					}
 				}
 			}
@@ -4004,9 +3927,11 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				}
 				catch (final ClassNotFoundException e)
 				{
+					// Do nothing?
 				}
 				catch (final IOException e)
 				{
+					// Do nothing?
 				}
 
 				model.addRow(new String[] { "Property '" + propname + "'", null, value });
@@ -4086,53 +4011,9 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		}
 	}
 
-	/**
-	 * string to GUID
-	 */
-	protected GUID stringToGUID(final String guids)
-	{
-		if (guids == null) { return null; }
-		if (guidPattern == null)
-		{
-			guidPattern = java.util.regex.Pattern
-					.compile("^\\[(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+):(\\d+)\\.(\\d+):(\\d+):(\\d+)\\]");
-		}
-		final java.util.regex.Matcher matcher = guidPattern.matcher(guids);
-		if (!matcher.matches())
-		{
-			System.err.println("WARNING: GUID string " + guids + " does not match GUID pattern");
-			return null;
-		}
-		try
-		{
-			final GUID guid = new equip.data.GUIDImpl();
-			guid.host_id = (new Integer(matcher.group(1)) << 24)
-					| (new Integer(matcher.group(2)) << 16)
-					| (new Integer(matcher.group(3)) << 8) | (new Integer(matcher.group(4)));
-			guid.proc_id = (new Integer(matcher.group(5)) << 16)
-					| (new Integer(matcher.group(6)));
-			guid.item_id = (new Integer(matcher.group(7)));
-			guid.time_s = (new Integer(matcher.group(8)));
-
-			// test/temp check
-			if (!guid.toString().equals(guids))
-			{
-				System.err.println("WARNING: GUID string " + guids + " -> GUID " + guid + " - reverse check failed");
-			}
-			return guid;
-		}
-		catch (final Exception e)
-		{
-			System.err.println("WARNING: GUID string " + guids + " raises exception: " + e);
-			e.printStackTrace(System.err);
-			// return null;
-		}
-		return null;
-	}
-
 	private boolean idExists(final Map<GUID, GUID> mapping, final String id)
 	{
-		return mapping.containsKey(stringToGUID(id));
+		return mapping.containsKey(DataspaceUtils.stringToGUID(id));
 	}
 
 	private void setComponentName(final GUID component, final String name)

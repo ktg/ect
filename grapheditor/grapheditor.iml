@@ -19,6 +19,7 @@
     <orderEntry type="library" exported="" name="Gradle: xml-apis-1.4.01" level="project" />
     <orderEntry type="library" exported="" name="Gradle: xercesImpl-2.10.0" level="project" />
     <orderEntry type="module" module-name="ect-core" exported="" />
+    <orderEntry type="library" exported="" name="Gradle: gson-2.3-SNAPSHOT" level="project" />
   </component>
 </module>
 

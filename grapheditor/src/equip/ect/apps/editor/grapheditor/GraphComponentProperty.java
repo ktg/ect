@@ -40,19 +40,18 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
-
 import equip.ect.BeanDescriptorHelper;
 import equip.ect.ComponentProperty;
 import equip.ect.apps.editor.BeanCanvasItem;
 import equip.ect.apps.editor.Connectable;
-import equip.ect.apps.editor.DataspaceUtils;
+import equip.ect.apps.editor.dataspace.DataspaceUtils;
 import equip.ect.apps.editor.Link;
+
+import java.awt.Component;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
 public class GraphComponentProperty extends BeanCanvasItem implements Connectable, Comparable<GraphComponentProperty>
 {
@@ -116,7 +115,10 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 	@Override
 	public int compareTo(final GraphComponentProperty other)
 	{
-		if (name != null) { return this.name.compareTo(other.getName()); }
+		if (name != null)
+		{
+			return this.name.compareTo(other.getName());
+		}
 		return -1;
 	}
 
@@ -124,13 +126,6 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 	{
 		updateValue(compProp);
 		repaint();
-	}
-
-	@Override
-	public Image createIconView()
-	{
-		// not implemented yet
-		return null;
 	}
 
 	public final ComponentProperty getComponentProperty()
@@ -217,9 +212,6 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 	public void repaint()
 	{
 		parent.repaint();
-		/*
-		 * Graphics g = canvas.getGraphics(); g.setClip(getClip()); paintComponent(g);
-		 */
 	}
 
 	@Override
@@ -228,7 +220,7 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 		super.setPosition(posX, posY);
 		if (outputLinks != null)
 		{
-			for(Link link: outputLinks)
+			for (Link link : outputLinks)
 			{
 				link.setStartPoint(getOutAnchorPoint());
 			}
@@ -236,7 +228,7 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 
 		if (inputLinks != null)
 		{
-			for(Link link: inputLinks)
+			for (Link link : inputLinks)
 			{
 				link.setEndPoint(getInAnchorPoint());
 			}
@@ -246,8 +238,8 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 	@Override
 	public void setSelected(final boolean selected)
 	{
-		this.parent.setSelected(selected);
 		super.setSelected(selected);
+		this.parent.setSelected(selected);
 	}
 
 	public void updateValue(final ComponentProperty prop)
@@ -260,5 +252,4 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 						.getAttributeValue(BeanDescriptorHelper.DISPLAY_NAME)).value : name);
 		((GraphComponentPropertyView) view).setValue(value);
 	}
-
 }

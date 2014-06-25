@@ -61,10 +61,10 @@ import equip.data.GUID;
 import equip.ect.ComponentAdvert;
 import equip.ect.ComponentProperty;
 import equip.ect.RDFStatement;
-import equip.ect.apps.editor.ComponentMetadataListener;
-import equip.ect.apps.editor.ComponentPropertyListener;
-import equip.ect.apps.editor.DataspaceMonitor;
-import equip.ect.apps.editor.DataspaceUtils;
+import equip.ect.apps.editor.dataspace.ComponentMetadataListener;
+import equip.ect.apps.editor.dataspace.ComponentPropertyListener;
+import equip.ect.apps.editor.dataspace.DataspaceMonitor;
+import equip.ect.apps.editor.dataspace.DataspaceUtils;
 
 public class ComponentSettingsPanel extends JPanel implements ComponentPropertyListener, ComponentMetadataListener
 {
@@ -84,7 +84,7 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 		public void actionPerformed(final ActionEvent ae)
 		{
 			final String value = tf.getText();
-			DataspaceMonitor.getMonitor().setPropertyValueFromString(prop, value);
+			DataspaceMonitor.getMonitor().setProperty(prop, value);
 		}
 	}
 

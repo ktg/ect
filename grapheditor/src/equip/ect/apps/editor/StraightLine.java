@@ -67,19 +67,17 @@ public class StraightLine extends RenderableLink
 	}
 
 	@Override
-	public void drawLink(final Graphics g)
+	public void drawLink(final Graphics2D g)
 	{
-		final Graphics2D g2 = (Graphics2D) g;
 		g.setColor(color);
-		g2.setStroke(stroke);
-		g2.draw(path);
+		g.setStroke(stroke);
+		g.draw(path);
 	}
 
 	@Override
 	public Rectangle getClip()
 	{
-		final Rectangle clip = path.getBounds();
-		return clip;
+		return path.getBounds();
 	}
 
 	@Override

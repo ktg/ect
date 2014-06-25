@@ -48,13 +48,12 @@ import equip.ect.ComponentProperty;
 import equip.ect.PropertyLinkRequest;
 import equip.ect.apps.editor.BeanCanvasItem;
 import equip.ect.apps.editor.Connectable;
-import equip.ect.apps.editor.DataspaceMonitor;
+import equip.ect.apps.editor.dataspace.DataspaceMonitor;
 import equip.ect.apps.editor.Info;
 import equip.ect.apps.editor.Link;
 import equip.ect.apps.editor.LinkGroup;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -169,9 +168,8 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 
 	private final Drawer drawer;
 
-	private transient final Map<String, GraphComponentProperty> graphCompProps;
-
-	private transient final List<GraphComponentProperty> renderableProps;
+	private transient final Map<String, GraphComponentProperty> graphCompProps = new HashMap<String, GraphComponentProperty>();
+	private transient final List<GraphComponentProperty> renderableProps = new ArrayList<GraphComponentProperty>();
 
 	private Map<GraphComponent, LinkGroup> outLinkGroups, inLinkGroups;
 
@@ -186,21 +184,16 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 
 	private boolean watchingLinks = false;
 
-	private boolean highlight;
-
-	Map<String, List<PropertyLinkRequest>> pendingToLinks = new HashMap<String, List<PropertyLinkRequest>>();
-
-	Map<String, List<PropertyLinkRequest>> pendingFromLinks = new HashMap<String, List<PropertyLinkRequest>>();
+	private final Map<String, List<PropertyLinkRequest>> pendingToLinks = new HashMap<String, List<PropertyLinkRequest>>();
+	private final Map<String, List<PropertyLinkRequest>> pendingFromLinks = new HashMap<String, List<PropertyLinkRequest>>();
 
 	public GraphComponent(final Component canvas, final String beanid, final String title, final String hostID)
 	{
-		super(canvas, new GraphComponentView(canvas, title, hostID, null), beanid, title);
+		super(canvas, new GraphComponentView(canvas, title, null), beanid, title);
 
 		System.out.println("new graph component created");
 
 		this.hostID = hostID;
-		this.graphCompProps = new HashMap<String, GraphComponentProperty>();
-		this.renderableProps = new Vector<GraphComponentProperty>();
 		final Map<String, ComponentProperty> props = DataspaceMonitor.getMonitor().getComponentProperties().get(beanid);
 		if (props != null)
 		{
@@ -338,9 +331,7 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 	@Override
 	public Object clone(final Component canvas)
 	{
-		final GraphComponent gc = new GraphComponent(canvas, beanid, name, hostID);
-		gc.setHighlighted(this.highlight);
-		return gc;
+		return new GraphComponent(canvas, beanid, name, hostID);
 	}
 
 	public void closeDrawer()
@@ -625,28 +616,28 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		}
 	}
 
-	public void setHighlighted(final boolean highlight)
-	{
-		this.highlight = highlight;
-		((GraphComponentView) view).setHighlighted(highlight);
-
-	}
-
-	public void setHostName(final String hostName)
-	{
-		if (view != null && view instanceof GraphComponentView)
-		{
-			((GraphComponentView) view).setHostID(hostName);
-			forceIconViewRepaint();
-		}
-	}
-
 	@Override
 	public void setName(final String name)
 	{
 		System.out.println("Set Name " + name);
 		super.setName(name);
 		((GraphComponentView) view).setName(name);
+	}
+
+	@Override
+	public void setSelected(boolean selected)
+	{
+		if(!selected)
+		{
+			for (GraphComponentProperty gcp : renderableProps)
+			{
+				if(gcp.isSelected())
+				{
+					gcp.setSelected(false);
+				}
+			}
+		}
+		super.setSelected(selected);
 	}
 
 	@Override
@@ -698,7 +689,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 	public void update()
 	{
 		calculateSize();
-		forceIconViewRepaint();
 	}
 
 	public void watchLinks(final boolean watch)
@@ -706,8 +696,7 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		Info.message(this, "Watch links? " + watch);
 		if (watch && showAllLinks && !watchingLinks)
 		{
-			final ComponentAdvert compAdv = (ComponentAdvert) DataspaceMonitor.getMonitor().getComponentAdverts()
-					.get(this.beanid);
+			final ComponentAdvert compAdv = DataspaceMonitor.getMonitor().getComponentAdverts().get(this.beanid);
 			final PropertyLinkRequest fromRequest = new PropertyLinkRequest((equip.data.GUID) null);
 			fromRequest.setSourceComponentID(compAdv.getComponentID());
 			equip.data.ItemData linkFromTemplate = fromRequest.tuple;
@@ -725,6 +714,7 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 			}
 			catch (final DataspaceInactiveException e)
 			{
+				// Do nothing?
 			}
 			watchingLinks = true;
 		}
@@ -745,6 +735,7 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 			}
 			catch (final DataspaceInactiveException e)
 			{
+				// Do nothing?
 			}
 			watchingLinks = false;
 		}
@@ -811,20 +802,10 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		int visibleCount = 0;
 		for (GraphComponentProperty gcp : graphCompProps.values())
 		{
-			if (gcp.keepVisible())
+			if (gcp.keepVisible() || gcp.isLinked())
 			{
 				visibleCount++;
-				continue;
 			}
-
-			if (gcp.isLinked())
-			{
-				visibleCount++;
-				continue;
-			}
-
-			// need to check also if linkGroups are available
-
 		}
 
 		return !(visibleCount == 0 || visibleCount == graphCompProps.size());
@@ -858,18 +839,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 				}
 			}
 		}
-	}
-
-	@Override
-	protected Image createIconView()
-	{
-		final GraphComponentView gcv = (GraphComponentView) view;
-		calculateSize();
-		final BufferedImage imageBuffer = new BufferedImage(gcv.getHeaderWidth(), gcv.getHeaderHeight(),
-				BufferedImage.TYPE_INT_ARGB);
-		final Graphics2D g2 = imageBuffer.createGraphics();
-		gcv.drawHeader(g2, true);
-		return imageBuffer;
 	}
 
 	protected void expandLinkGroups()

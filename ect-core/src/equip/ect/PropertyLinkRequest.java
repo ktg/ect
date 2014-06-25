@@ -43,6 +43,8 @@ package equip.ect;
 import equip.data.GUID;
 import equip.data.StringBoxImpl;
 import equip.data.TupleImpl;
+import equip.data.beans.DataspaceBean;
+import equip.data.beans.DataspaceInactiveException;
 
 public class PropertyLinkRequest extends CompInfo
 {
@@ -64,6 +66,27 @@ public class PropertyLinkRequest extends CompInfo
 	public PropertyLinkRequest(final TupleImpl tuple)
 	{
 		super(tuple);
+	}
+
+	public PropertyLinkRequest[] copyCollectAsPropertyLinkRequest(final DataspaceBean dataspace)
+			throws DataspaceInactiveException
+	{
+
+		final equip.data.ItemData[] ret = dataspace.copyCollect(this.tuple);
+		if (ret != null)
+		{
+			final PropertyLinkRequest[] returnvals = new PropertyLinkRequest[ret.length];
+
+			for (int i = 0; i < ret.length; i++)
+			{
+				returnvals[i] = new PropertyLinkRequest((TupleImpl) ret[i]);
+			}
+			return returnvals;
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	public GUID getDestComponentID()

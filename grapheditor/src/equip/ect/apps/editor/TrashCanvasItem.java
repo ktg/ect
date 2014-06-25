@@ -39,6 +39,8 @@ Contributors:
 
 package equip.ect.apps.editor;
 
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
+
 import java.awt.Component;
 
 /**
@@ -52,6 +54,11 @@ public class TrashCanvasItem extends InteractiveCanvasItem
 	public TrashCanvasItem(final Component canvas)
 	{
 		super(canvas, new TrashView(canvas));
+	}
+
+	public String getID()
+	{
+		return "trash";
 	}
 
 	/**

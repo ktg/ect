@@ -60,7 +60,7 @@ import equip.data.beans.DataspaceInactiveException;
 import equip.ect.ComponentAdvert;
 import equip.ect.ComponentProperty;
 import equip.ect.ConnectionPointTypeException;
-import equip.ect.apps.editor.DataspaceMonitor;
+import equip.ect.apps.editor.dataspace.DataspaceMonitor;
 
 /**
  * compound component editor - test/demo

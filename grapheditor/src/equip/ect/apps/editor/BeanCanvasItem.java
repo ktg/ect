@@ -39,11 +39,12 @@
 
 package equip.ect.apps.editor;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.util.Calendar;
-
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItemView;
 import equip.ect.apps.editor.state.EditorID;
+
+import java.awt.Component;
+import java.util.Calendar;
 
 /**
  * The class representing graphical icons for the bean canvas. Notice that origo for each icon is in
@@ -51,22 +52,15 @@ import equip.ect.apps.editor.state.EditorID;
  */
 public abstract class BeanCanvasItem extends InteractiveCanvasItem implements Cloneable
 {
-
 	protected boolean isAttached;
-
-	// private final transient ComponentAdvert comp;
-	protected String beanid = "";
-
-	// private Vector properties;
+	protected String beanid;
 	protected String name;
 
-	protected transient Image imageBuffer;
-
-	private EditorID editorID;
+	private final EditorID editorID;
 
 	public BeanCanvasItem(final Component canvas, final InteractiveCanvasItemView view)
 	{
-		super(canvas, view);
+		this(canvas, view, null, null);
 	}
 
 	public BeanCanvasItem(final Component canvas, final InteractiveCanvasItemView view, final String beanid,
@@ -75,10 +69,7 @@ public abstract class BeanCanvasItem extends InteractiveCanvasItem implements Cl
 		super(canvas, view);
 		this.beanid = beanid;
 		this.name = name;
-		if (editorID == null)
-		{
-			this.editorID = EditorID.createNew();
-		}
+		this.editorID = EditorID.createNew();
 	}
 
 	@Override
@@ -94,19 +85,12 @@ public abstract class BeanCanvasItem extends InteractiveCanvasItem implements Cl
 		return beanid;
 	}
 
-	public final Image getIconView()
-	{
-		if (imageBuffer == null)
-		{
-			imageBuffer = createIconView();
-		}
-		return imageBuffer;
-	}
-
-	public final EditorID getID()
+	public final EditorID getEditorID()
 	{
 		return this.editorID;
 	}
+
+	public String getID() { return beanid; }
 
 	public final String getName()
 	{
@@ -118,21 +102,9 @@ public abstract class BeanCanvasItem extends InteractiveCanvasItem implements Cl
 		this.isAttached = attached;
 	}
 
-	public final void setID(final EditorID id)
-	{
-		this.editorID = id;
-	}
-
 	public void setName(final String name)
 	{
 		this.name = name;
-	}
-
-	protected abstract Image createIconView();
-
-	protected void forceIconViewRepaint()
-	{
-		imageBuffer = createIconView();
 	}
 
 	/**
@@ -142,7 +114,7 @@ public abstract class BeanCanvasItem extends InteractiveCanvasItem implements Cl
 	@Override
 	protected long idleTime()
 	{
-		if (getSelectStatus() == InteractiveCanvasItem.SELECTED || isAttached) { return -1; }
+		if (isSelected() || isAttached) { return -1; }
 		return Calendar.getInstance().getTimeInMillis() - startIdleTime;
 	}
 
@@ -150,5 +122,4 @@ public abstract class BeanCanvasItem extends InteractiveCanvasItem implements Cl
 	{
 		return true;
 	}
-
 }

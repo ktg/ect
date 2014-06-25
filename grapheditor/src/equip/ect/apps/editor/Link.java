@@ -39,29 +39,28 @@
 
 package equip.ect.apps.editor;
 
+import equip.ect.PropertyLinkRequest;
+
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import equip.ect.PropertyLinkRequest;
-
 public abstract class Link extends BeanCanvasItem
 {
-
 	protected Connectable source, target;
 
 	protected PropertyLinkRequest linkReq;
 	protected boolean connected = false;
 
 	public Link(final Component canvas, final Point startPoint, final Point endPoint, final Connectable source,
-			final Connectable target, final RenderableLink linkView)
+	            final Connectable target, final RenderableLink linkView)
 	{
 		this(canvas, startPoint, endPoint, source, target, linkView, null);
 	}
 
 	public Link(final Component canvas, final Point startPoint, final Point endPoint, final Connectable source,
-			final Connectable target, final RenderableLink linkView, final PropertyLinkRequest link)
+	            final Connectable target, final RenderableLink linkView, final PropertyLinkRequest link)
 	{
 		super(canvas, linkView, link != null ? link.getID().toString() : null, "Link");
 		this.source = source;
@@ -81,15 +80,14 @@ public abstract class Link extends BeanCanvasItem
 		return null;
 	}
 
-	@Override
-	public Image createIconView()
-	{
-		return null;
-	}
-
 	public final Point getEndPoint()
 	{
 		return ((RenderableLink) view).getEndPoint();
+	}
+
+	public void setEndPoint(final Point endP)
+	{
+		setEndPoint((int) endP.getX(), (int) endP.getY());
 	}
 
 	public PropertyLinkRequest getLinkRequest()
@@ -97,9 +95,24 @@ public abstract class Link extends BeanCanvasItem
 		return this.linkReq;
 	}
 
+	public void setLinkRequest(final PropertyLinkRequest linkReq)
+	{
+		this.linkReq = linkReq;
+		this.name = "Link";
+		if (linkReq != null)
+		{
+			this.beanid = linkReq.getID().toString();
+		}
+	}
+
 	public Connectable getSource()
 	{
 		return source;
+	}
+
+	public void setSource(final Connectable source)
+	{
+		this.source = source;
 	}
 
 	/*
@@ -107,7 +120,7 @@ public abstract class Link extends BeanCanvasItem
 	 * DataspaceMonitor.getMonitor().getDataspace().delete(linkReq.getID()); } catch
 	 * (DataspaceInactiveException ex) { Info.message("Warning: Error removing link from
 	 * dataspace"); Info.message(ex.getMessage()); } }
-	 * 
+	 *
 	 * if (source != null) { ((GraphComponentProperty) source).getParent().removeOutputLink(this);
 	 * ((GraphComponentProperty) source).removeOutputLink(this); } if (target != null) {
 	 * ((GraphComponentProperty) target).getParent().removeInputLink(this);
@@ -118,9 +131,19 @@ public abstract class Link extends BeanCanvasItem
 		return ((RenderableLink) view).getStartPoint();
 	}
 
+	public void setStartPoint(final Point startP)
+	{
+		setStartPoint((int) startP.getX(), (int) startP.getY());
+	}
+
 	public Connectable getTarget()
 	{
 		return target;
+	}
+
+	public void setTarget(final Connectable target)
+	{
+		this.target = target;
 	}
 
 	@Override
@@ -151,26 +174,6 @@ public abstract class Link extends BeanCanvasItem
 		height = bounds.height;
 	}
 
-	public void setEndPoint(final Point endP)
-	{
-		setEndPoint((int) endP.getX(), (int) endP.getY());
-	}
-
-	public void setLinkRequest(final PropertyLinkRequest linkReq)
-	{
-		this.linkReq = linkReq;
-		this.name = "Link";
-		if (linkReq != null)
-		{
-			this.beanid = linkReq.getID().toString();
-		}
-	}
-
-	public void setSource(final Connectable source)
-	{
-		this.source = source;
-	}
-
 	public void setStartPoint(final int x, final int y)
 	{
 		((RenderableLink) view).setStartPoint(x, y);
@@ -183,16 +186,6 @@ public abstract class Link extends BeanCanvasItem
 		posY = bounds.y;
 		width = bounds.width;
 		height = bounds.height;
-	}
-
-	public void setStartPoint(final Point startP)
-	{
-		setStartPoint((int) startP.getX(), (int) startP.getY());
-	}
-
-	public void setTarget(final Connectable target)
-	{
-		this.target = target;
 	}
 
 	public void updateLinkBounds()

@@ -45,7 +45,7 @@ import java.util.List;
 
 import equip.ect.apps.editor.Connectable;
 import equip.ect.apps.editor.CurvedLine;
-import equip.ect.apps.editor.InteractiveCanvas;
+import equip.ect.apps.editor.interactive.InteractiveCanvas;
 import equip.ect.apps.editor.Link;
 import equip.ect.apps.editor.LinkGroup;
 import equip.ect.apps.editor.RenderableLink;

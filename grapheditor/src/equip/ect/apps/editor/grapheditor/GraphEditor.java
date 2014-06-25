@@ -39,31 +39,40 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import equip.data.beans.DataspaceBean;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import equip.ect.apps.configurationmgr.ConfigurationManager;
-import equip.ect.apps.editor.*;
-import equip.ect.apps.editor.PropertyLinkDialog;
-import equip.ect.apps.editor.state.EditorState;
-import equip.ect.apps.editor.state.EditorStateManager;
+import equip.ect.apps.editor.BeanGraphPanel;
+import equip.ect.apps.editor.ComponentBrowser;
+import equip.ect.apps.editor.EditorResources;
+import equip.ect.apps.editor.Info;
+import equip.ect.apps.editor.SelectionModel;
+import equip.ect.apps.editor.dataspace.DataspaceMonitor;
+import equip.ect.apps.editor.interactive.CleanerTask;
+import equip.ect.apps.editor.interactive.InteractiveCanvas;
+import equip.ect.apps.editor.interactive.InteractiveCanvasManager;
+import equip.ect.apps.editor.state.ProgressDialog;
+import equip.ect.apps.editor.state.State;
+import equip.ect.apps.editor.state.StateManager;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -77,7 +86,7 @@ public class GraphEditor extends JFrame
 		SettingsDialog(final GraphEditor parent)
 		{
 			super(parent, "Editor Settings", true);
-			final JPanel mainPanel = new BasicPanel("Settings");
+			final JPanel mainPanel = new JPanel();
 			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 
 			final JPanel panel = new JPanel(new GridLayout(3, 2));
@@ -88,12 +97,6 @@ public class GraphEditor extends JFrame
 			cb.addActionListener(this);
 			panel.add(cb);
 			cb = new JCheckBox("Allow self-connect", GraphEditorCanvas.allowComponentSelfConnect);
-			cb.addActionListener(this);
-			panel.add(cb);
-			cb = new JCheckBox("Audio effects", AudioManager.audioOn);
-			cb.addActionListener(this);
-			panel.add(cb);
-			cb = new JCheckBox("Show trash", false);
 			cb.addActionListener(this);
 			panel.add(cb);
 			final JPanel ttkP = new JPanel();
@@ -111,64 +114,7 @@ public class GraphEditor extends JFrame
 			ttkP.setAlignmentX(Component.LEFT_ALIGNMENT);
 			panel.add(ttkP);
 
-			final JPanel cosmeticPanel = new JPanel();
-			cosmeticPanel.setBorder(BorderFactory.createTitledBorder(new LineBorder(Color.black), "Look & Feek"));
-			final JPanel bgTexturePanel = new JPanel();
-			bgTexturePanel.add(new JLabel("Background Texture:"));
-			final JTextField bgTF = new JTextField();
-			bgTexturePanel.add(bgTF);
-			final JButton bgB = new JButton("Browse");
-			bgB.addActionListener(new ActionListener()
-			{
-
-				@Override
-				public void actionPerformed(final ActionEvent arg0)
-				{
-					final JFileChooser chooser = new JFileChooser("./")
-					{
-
-						@Override
-						public boolean accept(final File file)
-						{
-							return file.isDirectory() || file.getName().endsWith(".jpg") || file.getName().endsWith(".jpeg") || file.getName().endsWith(".gif");
-						}
-					};
-					final int returnVal = chooser.showOpenDialog(GraphEditor.this);
-					if (returnVal == JFileChooser.APPROVE_OPTION)
-					{
-						final File file = chooser.getSelectedFile();
-						if (file.exists())
-						{
-
-							try
-							{
-								final String path = file.getCanonicalPath();
-								final TexturePaint tp = getActiveCanvas().createImageTexture(path, false);
-								if (tp != null)
-								{
-									bgTF.setText(file.getAbsolutePath());
-									settings.setProperty("BACKGROUND_TEXTURE", path);
-								}
-								else
-								{
-									Info.message(this, "Could not load background texture file => " + path);
-								}
-							}
-							catch (final IOException e)
-							{
-								Info.message(this, e.getMessage());
-							}
-
-						}
-
-					}
-				}
-			});
-
-			bgTexturePanel.add(bgB);
-			cosmeticPanel.add(bgTexturePanel);
 			mainPanel.add(panel);
-			mainPanel.add(cosmeticPanel);
 			final JPanel dataspacePanel = new JPanel();
 			final JButton b = new JButton("Reconnect");
 			dataspacePanel.add(b);
@@ -201,17 +147,6 @@ public class GraphEditor extends JFrame
 				settings.setProperty("ALLOW_COMP_SELF_CONNECT",
 						String.valueOf(GraphEditorCanvas.allowComponentSelfConnect));
 			}
-			else if (command.equals("Audio effects"))
-			{
-				AudioManager.audioOn = ((AbstractButton) ae.getSource()).isSelected();
-				settings.setProperty("AUDIO", String.valueOf(AudioManager.audioOn));
-			}
-			else if (command.equals("Show trash"))
-			{
-				getActiveCanvas().showTrash(((AbstractButton) ae.getSource()).isSelected());
-				// settings.setProperty("SHOW_TRASH_ICON",
-				// String.valueOf(GraphEditorCanvas.allowComponentSelfConnect));
-			}
 			else if (command.equals("TIME_TO_KILL"))
 			{
 				final Long value = (Long) tf.getValue();
@@ -233,63 +168,7 @@ public class GraphEditor extends JFrame
 		}
 	}
 
-	class TabPopup extends JPopupMenu
-	{
-		TabPopup(final String tabName, final Component parent, final int x, final int y)
-		{
-			final JMenuItem renameItem = new JMenuItem(new AbstractAction("Rename view")
-			{
-				@Override
-				public void actionPerformed(final ActionEvent e)
-				{
-					final String canvasName = JOptionPane.showInputDialog(GraphEditor.this, "Enter new name for view:");
-
-					if (!(canvasName.equals(tabName)))
-					{
-						canvasManager.renameCanvas(canvasName, canvasManager.getCanvas(tabName));
-						updateCanvasPane();
-					}
-				}
-			});
-
-			final JMenuItem deleteItem = new JMenuItem(new AbstractAction("Close view")
-			{
-				@Override
-				public void actionPerformed(final ActionEvent e)
-				{
-					canvasManager.removeCanvas(canvasManager.getCanvas(tabName));
-					updateCanvasPane();
-				}
-			});
-
-			final JMenuItem saveItem = new JMenuItem(new AbstractAction("Save view")
-			{
-				@Override
-				public void actionPerformed(final ActionEvent e)
-				{
-					final File file = EditorStateManager.chooseSaveFile(GraphEditor.this);
-
-					if (file != null)
-					{
-						stateManager.saveState((GraphEditorCanvas) (canvasManager.getCanvas(tabName)), file);
-						if (!(file.getName().equals(tabName)))
-						{
-							canvasManager.renameCanvas(file.getName(), canvasManager.getCanvas(tabName));
-							updateCanvasPane();
-						}
-					}
-				}
-			});
-
-			add(renameItem);
-			add(deleteItem);
-			add(saveItem);
-			show(parent, x, y);
-		}
-	}
-
 	static GraphEditor instance;
-
 	static boolean fullscreen;
 
 	/**
@@ -320,11 +199,6 @@ public class GraphEditor extends JFrame
 					else if (arg.equals("-debug"))
 					{
 						Info.setDebug(true);
-					}
-					else if (arg.equals("-audio"))
-					{
-						AudioManager.audioOn(true);
-						// AudioManager.getAudioManager().playSoundResource("welcome");
 					}
 					else
 					{
@@ -363,17 +237,6 @@ public class GraphEditor extends JFrame
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			try
-			{
-				final File logFile = new File("grapheditor.log");
-				logFile.createNewFile();
-
-				e.printStackTrace(new PrintWriter(new FileWriter(logFile)));
-			}
-			catch (Exception e2)
-			{
-				e2.printStackTrace();
-			}
 		}
 	}
 
@@ -397,49 +260,36 @@ public class GraphEditor extends JFrame
 		return Long.parseLong(intString);
 	}
 
-	final BeanChoicePanel bcp;
-
-	private Window propertyLinkDialog, capabilityDialog;
-
 	private Properties settings = new Properties();
-
-	private final GraphEditorStateManager stateManager;
 
 	private ConfigurationManager configurationManager;
 
 	private final InteractiveCanvasManager canvasManager;
 
-	JTabbedPane pane;
+	private final SelectionModel selectionModel = new SelectionModel();
+
+	private JTabbedPane pane;
 
 	private GraphEditor()
 	{
 		super("ECT Graph Editor");
-		final JPanel mainPanel = new TexturedPanel(new BorderLayout());
+		final JToolBar toolbar = new JToolBar();
 
-		final TexturedPanel top = new TexturedPanel(new BorderLayout());
-		bcp = new GraphEditorChoicePanel();
-		top.add(BorderLayout.CENTER, bcp);
-
-		mainPanel.add(BorderLayout.NORTH, top);
-		getContentPane().add(mainPanel);
-
-		final JMenuBar menuBar = new JMenuBar();
-		final JMenu fileMenu = new JMenu("File");
-
-		fileMenu.add(new AbstractAction("Save")
+		toolbar.setFloatable(false);
+		toolbar.setBorderPainted(false);
+		toolbar.setRollover(true);
+		toolbar.add(new AbstractAction("Clear", EditorResources.createImageIcon(EditorResources.CLEAR_ICON, "Clear"))
 		{
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				final File file = configurationManager.chooseSaveFile(getActiveCanvas());
-				if (file != null)
+				if (clearConfiguration() == JOptionPane.YES_OPTION)
 				{
-					configurationManager.saveConfigurationAs(file);
+					configurationManager.clearConfiguration();
 				}
 			}
 		});
-
-		fileMenu.add(new AbstractAction("Load")
+		toolbar.add(new AbstractAction("Load", EditorResources.createImageIcon(EditorResources.LOAD_ICON, "Load"))
 		{
 			@Override
 			public void actionPerformed(final ActionEvent ae)
@@ -453,109 +303,66 @@ public class GraphEditor extends JFrame
 				final File file = configurationManager.chooseOpenFile(getActiveCanvas());
 				if (file != null)
 				{
-					configurationManager.clearConfiguration();
-					configurationManager.restoreConfiguration(file);
-
-				}
-			}
-		});
-
-		fileMenu.add(new AbstractAction("Clear")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				if (clearConfiguration() == JOptionPane.YES_OPTION)
-				{
-					configurationManager.clearConfiguration();
-				}
-			}
-		});
-
-		fileMenu.addSeparator();
-
-		fileMenu.add(new AbstractAction("Add new view")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				final String canvasName = JOptionPane.showInputDialog(GraphEditor.this, "Enter name for view:");
-				addCanvas(new GraphEditorCanvas(canvasName.trim()));
-			}
-		});
-
-		fileMenu.add(new AbstractAction("Load view...")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				// if (clearLayout() == JOptionPane.CANCEL_OPTION)
-				// return;
-				// getActiveCanvas().showTrash(false);
-				// getActiveCanvas().removeItems(
-				// (Vector) (getActiveCanvas().getItems().clone()));
-				// getActiveCanvas().showTrash(true);
-
-				final File file = EditorStateManager.chooseOpenFile(GraphEditor.this);
-				if (file != null)
-				{
-					final EditorState state = GraphEditorStateManager.loadState(file);
-					if (state != null)
+					try
 					{
-						final String fileName = file.getName();
-						final GraphEditorCanvas newCanvas = new GraphEditorCanvas(fileName);
+						configurationManager.clearConfiguration();
 
-						final String addedName = addCanvas(newCanvas);
-						pane.setSelectedIndex(pane.indexOfTab(addedName));
+						BufferedReader reader = new BufferedReader(new FileReader(file));
+						if(reader.readLine().startsWith("<?xml"))
+						{
+							reader.close();
+							configurationManager.restoreConfiguration(file);
+						}
+						else
+						{
+							reader.close();
 
-						stateManager.restoreState(newCanvas, state);
+							Gson gson = new GsonBuilder().create();
+							final State state = gson.fromJson(new FileReader(file), State.class);
+
+							new Thread(new Runnable() {
+								@Override
+								public void run()
+								{
+									StateManager.restoreState(state, getActiveCanvas(), new ProgressDialog());
+								}
+							}).start();
+						}
+					}
+					catch(Exception e)
+					{
+						e.printStackTrace();
 					}
 				}
 			}
 		});
+		toolbar.add(new AbstractAction("Save", EditorResources.createImageIcon(EditorResources.SAVE_ICON, "Save"))
+		{
+			@Override
+			public void actionPerformed(final ActionEvent ae)
+			{
+				final File file = configurationManager.chooseSaveFile(getActiveCanvas());
+				if (file != null)
+				{
+					try
+					{
+						State state = StateManager.createState(getActiveCanvas());
+						Gson gson = new GsonBuilder().create();
 
-		fileMenu.add(new AbstractAction("Clear all views")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				clearLayout();
+						FileWriter writer = new FileWriter(file);
+						gson.toJson(state, writer);
+						writer.flush();
+						writer.close();
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+				}
 			}
 		});
-
-		fileMenu.addSeparator();
-		fileMenu.add(new AbstractAction("Exit")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				System.exit(0);
-			}
-		});
-		menuBar.add(fileMenu);
-		final JMenu viewMenu = new JMenu("View");
-		viewMenu.add(new AbstractAction("Capability browser")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				showCapabilityBrowser();
-			}
-		});
-		viewMenu.add(new AbstractAction("Link browser")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				showPropertyLinkBrowser();
-			}
-		});
-		/*
-		 * viewMenu.add(new AbstractAction("Compound component editor") { public void
-		 * actionPerformed(ActionEvent ae) { showCompoundComponentEditor(); } });
-		 */
-		viewMenu.addSeparator();
-		viewMenu.add(new AbstractAction("Options ...")
+		toolbar.addSeparator();
+		toolbar.add(new AbstractAction("Settings...", EditorResources.createImageIcon(EditorResources.SETTINGS_ICON, "Settings..."))
 		{
 			@Override
 			public void actionPerformed(final ActionEvent ae)
@@ -563,49 +370,20 @@ public class GraphEditor extends JFrame
 				showSettingsDialog();
 			}
 		});
-		menuBar.add(viewMenu);
-		final JMenu editMenu = new JMenu("Edit");
-		editMenu.add(new AbstractAction("Add new compound component...")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				CompoundComponentEditor.handleAddNewCompoundComponent(GraphEditor.this);
-			}
-		});
 
-		menuBar.add(editMenu);
-		setJMenuBar(menuBar);
-		// panel.add(BorderLayout.CENTER, new JScrollPane(getActiveCanvas()));
+		final JSplitPane splitPane = new JSplitPane();
+		splitPane.setDividerLocation(300);
+		splitPane.setContinuousLayout(true);
+		splitPane.setBorder(null);
+		splitPane.setOneTouchExpandable(true);
 
-		this.canvasManager = new InteractiveCanvasManager(new GraphEditorCanvas("new_view"));
+		getContentPane().setLayout(new BorderLayout());
+		getContentPane().add(splitPane, BorderLayout.CENTER);
+		getContentPane().add(toolbar, BorderLayout.PAGE_START);
+
+		this.canvasManager = new InteractiveCanvasManager(new GraphEditorCanvas("Editor", selectionModel));
 
 		pane = new JTabbedPane();
-		pane.setBackground(mainPanel.getBackground());
-
-		pane.addMouseListener(new MouseAdapter()
-		{
-			@Override
-			public void mouseReleased(final MouseEvent e)
-			{
-				if (e.isPopupTrigger())
-				{
-					// loop through all tabs in the tabbed pane, seeing
-					// if user has clicked in one
-
-					for (int i = 0; i < pane.getTabCount(); i++)
-					{
-						final Rectangle r = pane.getBoundsAt(i);
-						if (r.contains(e.getPoint()))
-						{
-							new TabPopup(pane.getTitleAt(i), pane, e.getX(), e.getY());
-							break;
-						}
-					}
-				}
-			}
-		});
-
 		pane.addChangeListener(new ChangeListener()
 		{
 			@Override
@@ -632,21 +410,10 @@ public class GraphEditor extends JFrame
 		});
 
 		updateCanvasPane();
-		mainPanel.add(BorderLayout.CENTER, pane);
+		splitPane.setRightComponent(pane);
+		splitPane.setLeftComponent(new ComponentBrowser(selectionModel));
 
 		loadSettings();
-		showCapabilityBrowser();
-
-		stateManager = new GraphEditorStateManager(this);
-		restoreAllStates();
-	}
-
-	public String addCanvas(final BeanGraphPanel canvas)
-	{
-		final String name = canvas.getName();
-		final String addedName = canvasManager.addCanvas(name, canvas);
-		updateCanvasPane();
-		return addedName;
 	}
 
 	public void connect(final String url)
@@ -658,8 +425,6 @@ public class GraphEditor extends JFrame
 	public void exit()
 	{
 		System.out.println("Graph Editor shutting down ...");
-		// TODO fix this for all canvases
-		stateManager.saveState(getActiveCanvas());
 		storeSettings();
 		System.out.println("Goodbye.");
 	}
@@ -667,21 +432,6 @@ public class GraphEditor extends JFrame
 	public GraphEditorCanvas getActiveCanvas()
 	{
 		return (GraphEditorCanvas) canvasManager.getActiveCanvas();
-	}
-
-	public InteractiveCanvas[] getCanvases()
-	{
-		return canvasManager.getCanvases();
-	}
-
-	public InteractiveCanvasManager getCanvasManager()
-	{
-		return this.canvasManager;
-	}
-
-	public EditorStateManager getStateManager()
-	{
-		return this.stateManager;
 	}
 
 	public void loadSettings()
@@ -699,7 +449,6 @@ public class GraphEditor extends JFrame
 					settings);
 			BeanGraphPanel.animatePropertyUpdate = getBooleanProperty("ANIMATE_PROP_UPDATE",
 					BeanGraphPanel.animatePropertyUpdate, settings);
-			AudioManager.audioOn = getBooleanProperty("AUDIO", AudioManager.audioOn, settings);
 			CleanerTask.timeUntilKill = getLongProperty("TIME_UNTIL_ITEM_CLEAN", CleanerTask.timeUntilKill, settings);
 		}
 		catch (final FileNotFoundException fnfe)
@@ -712,77 +461,10 @@ public class GraphEditor extends JFrame
 		}
 	}
 
-	public void removeCanvas(final BeanGraphPanel canvas)
-	{
-		//final String name = canvas.getName();
-		canvasManager.removeCanvas(canvas);
-		updateCanvasPane();
-	}
-
 	public void setActiveCanvas(final GraphEditorCanvas canvas)
 	{
 		canvasManager.setActiveCanvas(canvas);
 		ToolTipManager.sharedInstance().registerComponent(canvas);
-	}
-
-	/**
-	 * added by Alastair Hampshire to allow the graph editor to be started by a replaytool viewer
-	 */
-	public void setConfigurationManager(final DataspaceBean dataspace)
-	{
-		configurationManager = new ConfigurationManager(dataspace);
-	}
-
-	/*
-	 * public void showCompoundComponentEditor() { if (compoundComponentDialog == null) {
-	 * compoundComponentDialog = new CompoundComponentEditor();
-	 * compoundComponentDialog.addWindowListener(new WindowAdapter() { public void
-	 * windowClosed(WindowEvent we) {
-	 * DataspaceMonitor.getMonitor().removeDataspaceConfigurationListener
-	 * ((DataspaceConfigurationListener) compoundComponentDialog);
-	 * compoundComponentDialog.dispose(); compoundComponentDialog = null; } }); }
-	 * compoundComponentDialog.setLocationRelativeTo(this); compoundComponentDialog.show(); }
-	 */
-	public void showCapabilityBrowser()
-	{
-		if (capabilityDialog == null)
-		{
-			capabilityDialog = new CapabilityDialog();
-			capabilityDialog.addWindowListener(new WindowAdapter()
-			{
-				@Override
-				public void windowClosed(final WindowEvent we)
-				{
-					DataspaceMonitor.getMonitor()
-							.removeDataspaceConfigurationListener((DataspaceConfigurationListener) capabilityDialog);
-					capabilityDialog.dispose();
-				}
-			});
-		}
-		capabilityDialog.setVisible(true);
-		capabilityDialog.toFront();
-	}
-
-	public void showPropertyLinkBrowser()
-	{
-		if (propertyLinkDialog == null)
-		{
-			propertyLinkDialog = new PropertyLinkDialog();
-			propertyLinkDialog.addWindowListener(new WindowAdapter()
-			{
-				@Override
-				public void windowClosed(final WindowEvent we)
-				{
-					DataspaceMonitor.getMonitor()
-							.removeDataspaceConfigurationListener((DataspaceConfigurationListener) propertyLinkDialog);
-					propertyLinkDialog.dispose();
-					propertyLinkDialog = null;
-				}
-			});
-		}
-		propertyLinkDialog.setLocationRelativeTo(this);
-		propertyLinkDialog.setVisible(true);
-
 	}
 
 	public void showSettingsDialog()
@@ -809,34 +491,9 @@ public class GraphEditor extends JFrame
 		}
 	}
 
-	// return JOptionPane option
 	protected int clearConfiguration()
 	{
-		return JOptionPane.showConfirmDialog(getActiveCanvas(), "Abandon current component configuration?");
-	}
-
-	// return JOptionPane option
-	protected int clearLayout()
-	{
-		final int option = JOptionPane.showConfirmDialog(getActiveCanvas(), "Remove all current views?");
-
-		canvasManager.removeAllCanvases();
-		updateCanvasPane();
-
-		return option;
-	}
-
-	protected void restoreAllStates()
-	{
-
-		final String fileName = stateManager.getDefaultFileName(getActiveCanvas());
-		final EditorState state = GraphEditorStateManager.loadState(new File(GraphEditorResources.CONFIG_PATH
-				+ fileName));
-		if (state != null)
-		{
-			Info.message(this, "Restoring state => " + fileName);
-			stateManager.restoreState(getActiveCanvas(), state);
-		}
+		return JOptionPane.showConfirmDialog(getActiveCanvas(), "Delete all components?");
 	}
 
 	protected void updateCanvasPane()

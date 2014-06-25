@@ -40,19 +40,17 @@ Contributors:
  */
 package equip.ect;
 
+import equip.data.GUID;
+import equip.data.StringBoxImpl;
+import equip.data.beans.DataspaceBean;
+import equip.data.beans.DataspaceEventListener;
+import equip.data.beans.DataspaceInactiveException;
+
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import equip.data.GUID;
-import equip.data.ItemData;
-import equip.data.StringBoxImpl;
-import equip.data.beans.DataspaceBean;
-import equip.data.beans.DataspaceEvent;
-import equip.data.beans.DataspaceEventListener;
-import equip.data.beans.DataspaceInactiveException;
 
 /**
  * <p>
@@ -171,7 +169,7 @@ public class ComponentLauncher implements DataspaceEventListener
 						{
 							if (this.conmanager.capabilityClasses.containsKey(compreq.getCapabilityID()))
 							{
-								Serializable comp = null;
+								Serializable comp;
 								final ComponentStartupData data = conmanager.getStartupData(compreq.getID());
 								if (data == null)
 								{
@@ -214,7 +212,7 @@ public class ComponentLauncher implements DataspaceEventListener
 					final GUID deleteId = event.getDeleteId();
 					if (deleteId == null) { return; }
 					// Should kill the component.
-					final Serializable comp = (Serializable) this.launchedComponents.get(deleteId);
+					final Serializable comp = this.launchedComponents.get(deleteId);
 					if (comp == null) { return; }
 					this.launchedComponents.remove(deleteId);
 
@@ -270,7 +268,7 @@ public class ComponentLauncher implements DataspaceEventListener
 	public void launch(final Class<?> componentClass, final String name, final GUID capId, final GUID compReqId,
 			final GUID compId, final ComponentProperty[] compProps)
 	{
-		Serializable newcomponent = null;
+		Serializable newcomponent;
 		try
 		{
 			newcomponent = (Serializable) componentClass.newInstance();
@@ -295,7 +293,7 @@ public class ComponentLauncher implements DataspaceEventListener
 	{
 
 		// Check we have the cabaility
-		Class<?> componentClass = null;
+		Class<?> componentClass;
 		try
 		{
 			componentClass = Class.forName(classname);
