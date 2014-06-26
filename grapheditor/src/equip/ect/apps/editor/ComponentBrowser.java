@@ -130,7 +130,7 @@ public class ComponentBrowser extends JPanel
 			String text = null;
 			if (dataspace != null && userValue instanceof GUID)
 			{
-				String display = treeNodeToString(value);
+				String display = "";
 				Icon icon = component;
 
 				try
@@ -141,8 +141,7 @@ public class ComponentBrowser extends JPanel
 						final TupleImpl tuple = (TupleImpl) item;
 						if (tuple.name.equals(Capability.TYPE))
 						{
-							Capability capability = new Capability(tuple);
-
+							display = DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
 						}
 						else if (tuple.name.equals(ComponentRequest.TYPE))
 						{
@@ -853,11 +852,39 @@ public class ComponentBrowser extends JPanel
 				.getUserObject() : null;
 		if (userValue instanceof GUID)
 		{
-			// String rval = RDFStatement.GUIDToUrl((GUID) userValue);
-			// String display = DataspaceUtils.getDisplayString(dataspace, rval);
-			// System.out.println("GUID "+userValue+" -> "+rval+" -> "+display);
-
-			return DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
+			try
+			{
+				final ItemData item = dataspace.getItem((GUID) userValue);
+				if (item instanceof TupleImpl)
+				{
+					final TupleImpl tuple = (TupleImpl) item;
+					if (tuple.name.equals(Capability.TYPE))
+					{
+						return DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
+					}
+					else if (tuple.name.equals(ComponentRequest.TYPE))
+					{
+						return new ComponentRequest(tuple).getRequestID();
+					}
+					else if (tuple.name.equals(ComponentAdvert.TYPE))
+					{
+						return DataspaceUtils.getCurrentName(new ComponentAdvert(tuple));
+					}
+					if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)
+					{
+						final DictionaryImpl d = (DictionaryImpl) tuple.fields[CompInfo.ATTRIBUTES_INDEX];
+						final Object val = d.get(BeanDescriptorHelper.SHORT_DESCRIPTION);
+						if (val instanceof StringBox)
+						{
+							return ((StringBox) val).value;
+						}
+					}
+				}
+			}
+			catch(Exception e)
+			{
+				// Do nothing
+			}
 		}
 		return value.toString();
 	}
