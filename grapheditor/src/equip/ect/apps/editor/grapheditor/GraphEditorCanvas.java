@@ -694,23 +694,27 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	private void doubleClickProperty(GraphComponentProperty property)
 	{
 		System.out.println(property.getComponentProperty().getPropertyClass());
-		if(property.getComponentProperty().getPropertyClass().equals("java.lang.Boolean") || property.getComponentProperty().getPropertyClass().equals("boolean"))
+		if(!property.getComponentProperty().isReadonly())
 		{
-			try
+			if (property.getComponentProperty().getPropertyClass().equals("java.lang.Boolean") || property.getComponentProperty().getPropertyClass().equals("boolean"))
 			{
-				boolean value = Boolean.valueOf(property.getComponentProperty().getPropertyValueAsString());
-				DataspaceMonitor.getMonitor().setProperty(property.getComponentProperty(), Boolean.toString(!value));
+				try
+				{
+					boolean value = Boolean.valueOf(property.getComponentProperty().getPropertyValueAsString());
+					DataspaceMonitor.getMonitor().setProperty(property.getComponentProperty(), Boolean.toString(!value));
+				}
+				catch (Exception e)
+				{
+					new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
+				}
 			}
-			catch(Exception e)
+			else
 			{
 				new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
 			}
+			mode = NORMAL_MODE;
+			selectionModel.set(property.getID().toString());
 		}
-		else
-		{
-			new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
-		}
-		selectionModel.clear();
 	}
 
 	@Override
