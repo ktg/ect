@@ -45,24 +45,20 @@ import equip.ect.DynamicPropertyDescriptor;
 import equip.ect.ECTComponent;
 import equip.ect.NoSuchPropertyException;
 
-import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Test input which is a toggle button generating true/false.
- * 
+ *
  * @author Chris Greenhalgh
  */
 @ECTComponent
@@ -93,7 +89,10 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		frame.setVisible(true);
 	}
 
-	public String getButtons() { return buttons; }
+	public String getButtons()
+	{
+		return buttons;
+	}
 
 	public void setButtons(String buttons)
 	{
@@ -108,7 +107,7 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		frame.getContentPane().removeAll();
 		radioButtons.clear();
 		final ButtonGroup group = new ButtonGroup();
-		for(DynamicPropertyDescriptor property: dynsup.dynGetProperties())
+		for (DynamicPropertyDescriptor property : dynsup.dynGetProperties())
 		{
 			try
 			{
@@ -121,32 +120,18 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		}
 
 		JPanel radioPanel = new JPanel(new GridLayout(0, 1));
-		for(String buttonName: buttons.split(" "))
+		for (String buttonName : buttons.split(" "))
 		{
 			final JRadioButton radioButton = new JRadioButton(buttonName);
-			radioButton.addChangeListener(new ChangeListener() {
+			radioButton.addChangeListener(new ChangeListener()
+			{
 				@Override
 				public void stateChanged(ChangeEvent e)
 				{
 					try
 					{
+						System.out.println(radioButton.getText() + " = " + radioButton.isSelected());
 						dynSetProperty(radioButton.getText(), radioButton.isSelected());
-						String oldSelected = selected;
-						for(AbstractButton button: Collections.list(group.getElements()))
-						{
-							if(button.isSelected())
-							{
-								if(!button.getText().equals(selected))
-								{
-									selected = button.getText();
-									propertyChangeListeners.firePropertyChange("selected", oldSelected, selected);
-								}
-								return;
-							}
-						}
-
-						selected = "";
-						propertyChangeListeners.firePropertyChange("selected", oldSelected, selected);
 					}
 					catch (NoSuchPropertyException e1)
 					{
@@ -168,12 +153,34 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		propertyChangeListeners.firePropertyChange("buttons", oldButtons, buttons);
 	}
 
+	private void selectionChanged()
+	{
+		String oldSelected = selected;
+		for (JRadioButton button : radioButtons.values())
+		{
+			System.out.println(button.getText() + " = " + button.isSelected());
+			if (button.isSelected())
+			{
+				System.out.println("Selected = " + button.getText());
+				if (!button.getText().equals(selected))
+				{
+					selected = button.getText();
+					propertyChangeListeners.firePropertyChange("selected", oldSelected, selected);
+				}
+				return;
+			}
+		}
+		System.out.println("None Selected");
+		selected = "";
+		propertyChangeListeners.firePropertyChange("selected", oldSelected, selected);
+	}
+
 	public void setSelected(String selected)
 	{
-		if(this.selected.equals(selected))
+		if (this.selected.equals(selected))
 		{
 			JRadioButton button = radioButtons.get(selected);
-			if(button != null)
+			if (button != null)
 			{
 				button.setEnabled(true);
 			}
@@ -210,10 +217,11 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
 		dynsup.dynSetProperty(name, value);
-		if(radioButtons.containsKey(name))
+		if (radioButtons.containsKey(name))
 		{
 			JRadioButton button = radioButtons.get(name);
-			button.setSelected((Boolean)value);
+			button.setSelected((Boolean) value);
+			selectionChanged();
 		}
 	}
 }

@@ -177,9 +177,11 @@ public class SetValuePopup extends JDialog
 		bottomPanel.add(BorderLayout.NORTH, ignoreEscCharCB);
 		bottomPanel.add(BorderLayout.SOUTH, buttons);
 		panel.add(bottomPanel, BorderLayout.SOUTH);
-		this.getContentPane().add(panel);
-		this.pack();
-		this.setVisible(true);
+		getContentPane().add(panel);
+		pack();
+		setLocationRelativeTo(null);
+		setVisible(true);
+
 		System.out.println("Dialog visible");
 	}
 

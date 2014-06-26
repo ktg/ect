@@ -613,7 +613,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 							{
 								if (me.getClickCount() == 2)
 								{
-									new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), gcp.getComponentProperty());
+									doubleClickProperty(gcp);
 								}
 								else
 								{
@@ -653,8 +653,15 @@ public class GraphEditorCanvas extends BeanGraphPanel
 						final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
 						if (gcp != null)
 						{
-							selectionModel.set(gcp.getBeanID());
-							currentTarget = gcp;
+							if (me.getClickCount() == 2)
+							{
+								doubleClickProperty(gcp);
+							}
+							else
+							{
+								selectionModel.set(gcp.getBeanID());
+								currentTarget = gcp;
+							}
 						}
 						else if (currentTarget != null)
 						{
@@ -681,6 +688,27 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				}
 				mode = MENU_MODE;
 				break;
+		}
+	}
+
+	private void doubleClickProperty(GraphComponentProperty property)
+	{
+		System.out.println(property.getComponentProperty().getPropertyClass());
+		if(property.getComponentProperty().getPropertyClass().equals("java.lang.Boolean"))
+		{
+			try
+			{
+				boolean value = Boolean.valueOf(property.getComponentProperty().getPropertyValueAsString());
+				DataspaceMonitor.getMonitor().setProperty(property.getComponentProperty(), Boolean.toString(!value));
+			}
+			catch(Exception e)
+			{
+				new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
+			}
+		}
+		else
+		{
+			new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
 		}
 	}
 
