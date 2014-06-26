@@ -81,6 +81,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -238,12 +240,12 @@ public class ComponentBrowser extends JPanel
 				@Override
 				public void valueChanged(TreeSelectionEvent e)
 				{
-					if(selectionModelChange)
+					if (selectionModelChange)
 					{
 						return;
 					}
 					Collection<String> selected = new HashSet<String>();
-					if(tree.getSelectionPaths() != null)
+					if (tree.getSelectionPaths() != null)
 					{
 						for (TreePath path : tree.getSelectionPaths())
 						{
@@ -673,10 +675,35 @@ public class ComponentBrowser extends JPanel
 		{
 			final String id = comp.getID().toString();
 			final DefaultMutableTreeNode node = nodeMap.get(id);
+			sortchildren(root);
+			//treeModel.nodeStructureChanged(root);
 			if (node != null)
 			{
 				treeModel.nodeChanged(node);
 			}
+		}
+
+		private void sortchildren(DefaultMutableTreeNode node)
+		{
+			List<DefaultMutableTreeNode> children = Collections.list(node.children());
+			//move the child to here so we can move them back
+
+			node.removeAllChildren();
+			Collections.sort(children, new Comparator<DefaultMutableTreeNode>()
+			{
+				@Override
+				public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
+				{
+					return treeNodeToString(o1).compareTo(treeNodeToString(o2));
+				}
+			});
+
+			for(DefaultMutableTreeNode child: children)
+			{
+				node.add(child);
+			}
+
+			treeModel.nodeStructureChanged(node);
 		}
 
 		@Override
@@ -881,7 +908,7 @@ public class ComponentBrowser extends JPanel
 					}
 				}
 			}
-			catch(Exception e)
+			catch (Exception e)
 			{
 				// Do nothing
 			}
@@ -895,7 +922,7 @@ public class ComponentBrowser extends JPanel
 		{
 			System.err.println("Delete ComponentRequest " + id);
 			ComponentAdvert component = DataspaceMonitor.getMonitor().getComponentAdvert(id.toString());
-			if(component != null)
+			if (component != null)
 			{
 				dataspace.delete(component.getComponentRequestID());
 			}

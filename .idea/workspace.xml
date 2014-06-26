@@ -78,15 +78,17 @@
       <file leaf-file-name="ComponentBrowser.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentBrowser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.0141733" vertical-offset="3020" max-vertical-offset="16488">
-              <caret line="132" column="35" selection-start-line="132" selection-start-column="35" selection-end-line="132" selection-end-column="35" />
+            <state vertical-scroll-proportion="0.9716535" vertical-offset="11605" max-vertical-offset="16974">
+              <caret line="705" column="49" selection-start-line="705" selection-start-column="49" selection-end-line="705" selection-end-column="49" />
               <folding>
-                <element signature="e#0#26891#0" expanded="true" />
+                <element signature="e#0#27620#0" expanded="true" />
                 <element signature="imports" expanded="true" />
-                <element signature="e#7055#7087#0" expanded="true" />
-                <element signature="e#8057#8065#0" expanded="true" />
-                <element signature="e#11752#11762#0" expanded="true" />
-                <element signature="e#19878#19897#0" expanded="true" />
+                <element signature="e#7114#7146#0" expanded="true" />
+                <element signature="e#8117#8125#0" expanded="true" />
+                <element signature="e#11813#11823#0" expanded="true" />
+                <element signature="e#19830#20049#0" expanded="true" />
+                <element signature="e#20043#20044#0" expanded="true" />
+                <element signature="e#20605#20624#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -2360,7 +2362,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1916" height="1058" extended-state="6" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32919255" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -2377,7 +2379,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19690502" sideWeight="0.3822314" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19690502" sideWeight="0.6177686" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31508264" sideWeight="0.49887976" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31508264" sideWeight="0.49887976" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15368196" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -2786,15 +2788,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentBrowser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.0141733" vertical-offset="3020" max-vertical-offset="16488">
-          <caret line="132" column="35" selection-start-line="132" selection-start-column="35" selection-end-line="132" selection-end-column="35" />
+        <state vertical-scroll-proportion="0.9716535" vertical-offset="11605" max-vertical-offset="16974">
+          <caret line="705" column="49" selection-start-line="705" selection-start-column="49" selection-end-line="705" selection-end-column="49" />
           <folding>
-            <element signature="e#0#26891#0" expanded="true" />
+            <element signature="e#0#27620#0" expanded="true" />
             <element signature="imports" expanded="true" />
-            <element signature="e#7055#7087#0" expanded="true" />
-            <element signature="e#8057#8065#0" expanded="true" />
-            <element signature="e#11752#11762#0" expanded="true" />
-            <element signature="e#19878#19897#0" expanded="true" />
+            <element signature="e#7114#7146#0" expanded="true" />
+            <element signature="e#8117#8125#0" expanded="true" />
+            <element signature="e#11813#11823#0" expanded="true" />
+            <element signature="e#19830#20049#0" expanded="true" />
+            <element signature="e#20043#20044#0" expanded="true" />
+            <element signature="e#20605#20624#0" expanded="true" />
           </folding>
         </state>
       </provider>
