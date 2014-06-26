@@ -694,7 +694,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	private void doubleClickProperty(GraphComponentProperty property)
 	{
 		System.out.println(property.getComponentProperty().getPropertyClass());
-		if(property.getComponentProperty().getPropertyClass().equals("java.lang.Boolean"))
+		if(property.getComponentProperty().getPropertyClass().equals("java.lang.Boolean") || property.getComponentProperty().getPropertyClass().equals("boolean"))
 		{
 			try
 			{
@@ -710,6 +710,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		{
 			new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
 		}
+		selectionModel.clear();
 	}
 
 	@Override

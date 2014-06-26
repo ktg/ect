@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="06879d14-d937-49ce-9774-b2b4330cfa22" name="Default" comment="Stuff">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/RadioButtonInput.java" afterPath="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/RadioButtonInput.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/SetValuePopup.java" afterPath="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/SetValuePopup.java" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -117,10 +115,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RadioButtonInput.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RadioButtonInput.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/RadioButtonInput.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6598425" vertical-offset="2515" max-vertical-offset="3240">
+            <state vertical-scroll-proportion="0.0" vertical-offset="2515" max-vertical-offset="3240">
               <caret line="216" column="30" selection-start-line="216" selection-start-column="30" selection-end-line="216" selection-end-column="30" />
               <folding>
                 <element signature="e#3005#3006#0" expanded="true" />
@@ -158,11 +156,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GraphEditorCanvas.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="GraphEditorCanvas.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="10643" max-vertical-offset="18900">
-              <caret line="697" column="9" selection-start-line="697" selection-start-column="9" selection-end-line="697" selection-end-column="9" />
+            <state vertical-scroll-proportion="0.94212216" vertical-offset="10664" max-vertical-offset="18918">
+              <caret line="712" column="31" selection-start-line="712" selection-start-column="31" selection-end-line="712" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -1769,9 +1767,9 @@
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/dataspace/DataspaceMonitor.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/ProgressDialog.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/ComponentBrowser.java" />
-        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/SetValuePopup.java" />
         <option value="$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/RadioButtonInput.java" />
+        <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java" />
       </list>
     </option>
   </component>
@@ -2696,14 +2694,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="10643" max-vertical-offset="18900">
-          <caret line="697" column="9" selection-start-line="697" selection-start-column="9" selection-end-line="697" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/grapheditor/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="635">
@@ -2738,7 +2728,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/ui/src/equip/ect/components/ui/RadioButtonInput.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6598425" vertical-offset="2515" max-vertical-offset="3240">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2515" max-vertical-offset="3240">
           <caret line="216" column="30" selection-start-line="216" selection-start-column="30" selection-end-line="216" selection-end-column="30" />
           <folding>
             <element signature="e#3005#3006#0" expanded="true" />
@@ -2752,6 +2742,14 @@
             <element signature="e#5657#5658#0" expanded="true" />
             <element signature="e#5679#5680#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditorCanvas.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.94212216" vertical-offset="10664" max-vertical-offset="18918">
+          <caret line="712" column="31" selection-start-line="712" selection-start-column="31" selection-end-line="712" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>
