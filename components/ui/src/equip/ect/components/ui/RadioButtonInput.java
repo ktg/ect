@@ -45,14 +45,18 @@ import equip.ect.DynamicPropertyDescriptor;
 import equip.ect.ECTComponent;
 import equip.ect.NoSuchPropertyException;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +70,7 @@ import java.util.Map;
 public class RadioButtonInput extends UIBase implements DynamicProperties
 {
 	private String buttons = "";
+	private String selected = "";
 
 	protected final DynamicPropertiesSupport dynsup;
 	private Map<String, JRadioButton> radioButtons = new HashMap<String, JRadioButton>();
@@ -102,7 +107,7 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 
 		frame.getContentPane().removeAll();
 		radioButtons.clear();
-		ButtonGroup group = new ButtonGroup();
+		final ButtonGroup group = new ButtonGroup();
 		for(DynamicPropertyDescriptor property: dynsup.dynGetProperties())
 		{
 			try
@@ -126,6 +131,22 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 					try
 					{
 						dynSetProperty(radioButton.getText(), radioButton.isSelected());
+						String oldSelected = selected;
+						for(AbstractButton button: Collections.list(group.getElements()))
+						{
+							if(button.isSelected())
+							{
+								if(!button.getText().equals(selected))
+								{
+									selected = button.getText();
+									propertyChangeListeners.firePropertyChange("selected", oldSelected, selected);
+								}
+								return;
+							}
+						}
+
+						selected = "";
+						propertyChangeListeners.firePropertyChange("selected", oldSelected, selected);
 					}
 					catch (NoSuchPropertyException e1)
 					{
@@ -147,6 +168,18 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		propertyChangeListeners.firePropertyChange("buttons", oldButtons, buttons);
 	}
 
+	public void setSelected(String selected)
+	{
+		if(this.selected.equals(selected))
+		{
+			JRadioButton button = radioButtons.get(selected);
+			if(button != null)
+			{
+				button.setEnabled(true);
+			}
+		}
+	}
+
 	/**
 	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
@@ -163,6 +196,11 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 	public Object dynGetProperty(final String name) throws NoSuchPropertyException
 	{
 		return dynsup.dynGetProperty(name);
+	}
+
+	public String getSelected()
+	{
+		return selected;
 	}
 
 	/**
