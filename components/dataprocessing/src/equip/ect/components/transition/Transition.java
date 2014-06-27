@@ -13,7 +13,7 @@ import java.util.Date;
  * Transitions between two values over a duration
  * 
  * @classification Behaviour/Timing
- * @defaultOutputValue outValue
+ * @defaultOutputValue result
  * @author ktg
  */
 @ECTComponent
@@ -31,9 +31,10 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 
 	private double ax = 0, bx = 0, cx = 0, ay = 0, by = 0, cy = 0;
 	private boolean running = false;
-	private double startValue = 0;
-	private double endValue = 10;
-	private double outValue = 0;
+	private double progress = 0;
+	private double start = 0;
+	private double end = 10;
+	private double result = 0;
 	private double range;
 	private long duration = 1000;
 
@@ -45,6 +46,8 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 	private double x2 = 0.25;
 	private double y1 = 0.1;
 	private double y2 = 0.9;
+
+	private long startTime;
 
 	public Transition()
 	{
@@ -61,9 +64,9 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 		return duration;
 	}
 
-	public double getEndValue()
+	public double getEnd()
 	{
-		return endValue;
+		return end;
 	}
 
 	public double getOutFreq()
@@ -71,9 +74,9 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 		return outFreq;
 	}
 
-	public double getOutValue()
+	public double getResult()
 	{
-		return outValue;
+		return result;
 	}
 
 	public boolean getRunning()
@@ -81,9 +84,9 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 		return running;
 	}
 
-	public double getStartValue()
+	public double getStart()
 	{
-		return startValue;
+		return start;
 	}
 
 	public double getX1()
@@ -119,10 +122,54 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 	@Override
 	public void run()
 	{
-		double startTime = new Date().getTime();
+		setProgress(0);
+		startTime = new Date().getTime();
 		while (running)
 		{
-			final double oldOut = outValue;
+			updateProgress();
+			try
+			{
+				Thread.sleep(sleep);
+			}
+			catch (final InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		setProgress(1);
+	}
+
+	public double getProgress()
+	{
+		return progress;
+	}
+
+	public void setProgress(double progress)
+	{
+		if(this.progress != progress)
+		{
+			double oldTransition = this.progress;
+			this.progress = progress;
+			propertyChangeListeners.firePropertyChange("progress", oldTransition, progress);
+
+			setResult((progress * range) + start);
+		}
+	}
+
+	private void setResult(double result)
+	{
+		if(this.result != result)
+		{
+			final double oldOut = this.result;
+			this.result = result;
+			propertyChangeListeners.firePropertyChange("result", oldOut, result);
+		}
+	}
+
+	private void updateProgress()
+	{
+		if(running && startTime > 0)
+		{
 			final double time = new Date().getTime() - startTime;
 			if (time > duration)
 			{
@@ -130,24 +177,9 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 			}
 			else
 			{
-				final double timing = (new Date().getTime() - startTime) / duration;
-				outValue = (solve(timing) * range) + startValue;
-				propertyChangeListeners.firePropertyChange("outValue", oldOut, outValue);
-			}
-			try
-			{
-				Thread.sleep(sleep);
-			}
-			catch (final InterruptedException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				setProgress(solve(time / duration));
 			}
 		}
-		setRunning(false);
-		final double oldOut = outValue;
-		outValue = endValue;
-		propertyChangeListeners.firePropertyChange("outValue", oldOut, outValue);
 	}
 
 	public void setDuration(final long duration)
@@ -157,15 +189,12 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 		propertyChangeListeners.firePropertyChange("duration", oldDuration, duration);
 	}
 
-	public void setEndValue(final double endValue)
+	public void setEnd(final double end)
 	{
-		if (!running)
-		{
-			final double oldEnd = this.endValue;
-			this.endValue = endValue;
-			propertyChangeListeners.firePropertyChange("endValue", oldEnd, endValue);
-			updateRange();
-		}
+		final double oldEnd = this.end;
+		this.end = end;
+		propertyChangeListeners.firePropertyChange("end", oldEnd, end);
+		updateRange();
 	}
 
 	public void setOutFreq(final double outFreq)
@@ -189,15 +218,12 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 		}
 	}
 
-	public void setStartValue(final double startValue)
+	public void setStart(final double start)
 	{
-		if (!running)
-		{
-			final double oldStart = this.startValue;
-			this.startValue = startValue;
-			propertyChangeListeners.firePropertyChange("startValue", oldStart, startValue);
-			updateRange();
-		}
+		final double oldStart = this.start;
+		this.start = start;
+		propertyChangeListeners.firePropertyChange("start", oldStart, start);
+		updateRange();
 	}
 
 	public void setX1(final double x1)
@@ -327,6 +353,7 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 
 	private void updateRange()
 	{
-		range = endValue - startValue;
+		range = end - start;
+		setResult((progress * range) + start);
 	}
 }

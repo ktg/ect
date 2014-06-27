@@ -53,7 +53,7 @@ arrangements, components, etc.<br>
 <h2>Infrastructure</h2>
 <h3>Bugs</h3>
 <ul>
-  <li>Per-component persistence...does not atomically transition from
+  <li>Per-component persistence...does not atomically progress from
 one backup to another, i.e. there
 is a period of time during the writing of persistence files in which a
 container or host failure will leave an unreadable (typically
@@ -368,7 +368,7 @@ components comparable to the C# version using the Phidget Java binding
   <li><span style="font-style: italic;"></span>We need an easy way to
 build the webstart verion(s). [2004-07-20 sxi]</li>
   <li>...per-container persistence
-does not atomically transition from one backup to another, i.e. there
+does not atomically progress from one backup to another, i.e. there
 is a period of time during the writing of persistence files in which a
 container or host failure will leave an unreadable (typically
 truncated, i.e. partially written) persistence file. [2004-07-20 sxi]</li>
