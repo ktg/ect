@@ -161,6 +161,9 @@ public class ComponentBrowser extends JPanel
 						else if (tuple.name.equals(PropertyLinkRequest.TYPE))
 						{
 							icon = link;
+							PropertyLinkRequest link = new PropertyLinkRequest(tuple);
+							ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
+							display = link.getSourcePropertyName() + " → " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
 						}
 
 						if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)
@@ -295,39 +298,43 @@ public class ComponentBrowser extends JPanel
 							}
 
 							final ItemData item = i;
-							if (item != null && ((TupleImpl) item).name.equals(Capability.TYPE))
+							if (item != null && item instanceof TupleImpl)
 							{
+								TupleImpl tuple = (TupleImpl) item;
+								if (tuple.name.equals(Capability.TYPE))
+								{
 
-								popup.add(new AbstractAction("Create request")
-								{
-									@Override
-									public void actionPerformed(final ActionEvent ae)
+									popup.add(new AbstractAction("Create request")
 									{
-										ComponentBrowser.this.requestComponent(item);
-									}
-								});
-							}
-							else if (item != null && ((TupleImpl) item).name.equals(ComponentRequest.TYPE))
-							{
-								popup.add(new AbstractAction("Delete request")
+										@Override
+										public void actionPerformed(final ActionEvent ae)
+										{
+											ComponentBrowser.this.requestComponent(item);
+										}
+									});
+								}
+								else if (tuple.name.equals(ComponentRequest.TYPE))
 								{
-									@Override
-									public void actionPerformed(final ActionEvent ae)
+									popup.add(new AbstractAction("Delete request")
 									{
-										deleteComponentRequest(id);
-									}
-								});
-							}
-							else if (item != null && ((TupleImpl) item).name.equals(ComponentAdvert.TYPE))
-							{
-								popup.add(new AbstractAction("Delete request")
+										@Override
+										public void actionPerformed(final ActionEvent ae)
+										{
+											deleteComponentRequest(id);
+										}
+									});
+								}
+								else if (tuple.name.equals(ComponentAdvert.TYPE))
 								{
-									@Override
-									public void actionPerformed(final ActionEvent ae)
+									popup.add(new AbstractAction("Delete request")
 									{
-										deleteComponent(id);
-									}
-								});
+										@Override
+										public void actionPerformed(final ActionEvent ae)
+										{
+											deleteComponent(id);
+										}
+									});
+								}
 							}
 							popup.show(tree, e.getX(), e.getY());
 						}
@@ -624,7 +631,7 @@ public class ComponentBrowser extends JPanel
 		}
 	}
 
-	private class ComponentView extends DataspaceTreeView implements ComponentListener
+	private class ComponentView extends DataspaceTreeView implements ComponentListener, DataspaceConfigurationListener
 	{
 		ComponentView()
 		{
@@ -633,8 +640,10 @@ public class ComponentBrowser extends JPanel
 
 			tree.setTransferHandler(new ComponentGUIDTransferHandler());
 			tree.setDragEnabled(true); // turn off automatic drag and drop
+			tree.setShowsRootHandles(true);
 
 			DataspaceMonitor.getMonitor().addComponentListener(this);
+			DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(this);
 		}
 
 		@Override
@@ -642,7 +651,6 @@ public class ComponentBrowser extends JPanel
 		{
 			final DefaultMutableTreeNode addNode = new DefaultMutableTreeNode(comp.getID());
 			nodeMap.put(comp.getID().toString(), addNode);
-			addNode.setUserObject(comp.getID());
 
 			// in order?!
 			try
@@ -668,6 +676,14 @@ public class ComponentBrowser extends JPanel
 			//checkComponentRequests(comp.getID(), true);
 			// make sure path is visible
 			tree.expandPath(new TreePath(root.getPath()));
+
+			for(PropertyLinkRequest link: DataspaceMonitor.getMonitor().getPropertyLinks())
+			{
+				if(link.getSourceComponentID().toString().equals(comp.getID()))
+				{
+					propertyLinkRequestAdded(link);
+				}
+			}
 		}
 
 		@Override
@@ -698,7 +714,7 @@ public class ComponentBrowser extends JPanel
 				}
 			});
 
-			for(DefaultMutableTreeNode child: children)
+			for (DefaultMutableTreeNode child : children)
 			{
 				node.add(child);
 			}
@@ -720,6 +736,91 @@ public class ComponentBrowser extends JPanel
 				nodeMap.remove(id);
 				treeModel.removeNodeFromParent(node);
 			}
+		}
+
+		@Override
+		public void capabilityAdded(Capability cap)
+		{
+			// Nothing
+		}
+
+		@Override
+		public void capabilityDeleted(Capability cap)
+		{
+			// Nothing
+		}
+
+		@Override
+		public void capabilityUpdated(Capability cap)
+		{
+			// Nothing
+		}
+
+		@Override
+		public void componentRequestAdded(ComponentRequest compReq)
+		{
+			// Nothing
+		}
+
+		@Override
+		public void componentRequestDeleted(ComponentRequest compReq)
+		{
+			// Nothing
+		}
+
+		@Override
+		public void propertyLinkRequestAdded(PropertyLinkRequest linkReq)
+		{
+			DefaultMutableTreeNode componentNode = nodeMap.get(linkReq.getSourceComponentID().toString());
+			if(componentNode != null)
+			{
+				final DefaultMutableTreeNode linkNode = new DefaultMutableTreeNode(linkReq.getID());
+				nodeMap.put(linkReq.getID().toString(), linkNode);
+
+				// in order?!
+				try
+				{
+					final String text = treeNodeToString(linkNode);
+					int i;
+					for (i = 0; i < componentNode.getChildCount(); i++)
+					{
+						final DefaultMutableTreeNode cn = (DefaultMutableTreeNode) componentNode.getChildAt(i);
+						final String text2 = treeNodeToString(cn);
+						if (text2 != null && text2.compareTo(text) > 0)
+						{
+							break;
+						}
+					}
+
+					treeModel.insertNodeInto(linkNode, componentNode, i);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+
+		@Override
+		public void propertyLinkRequestDeleted(PropertyLinkRequest linkReq)
+		{
+			final String id = linkReq.getID().toString();
+			final DefaultMutableTreeNode node = nodeMap.get(id);
+			if (node == null)
+			{
+				System.err.println("Unable to delete item" + id);
+			}
+			else
+			{
+				nodeMap.remove(id);
+				treeModel.removeNodeFromParent(node);
+			}
+		}
+
+		@Override
+		public void propertyLinkRequestUpdated(PropertyLinkRequest linkReq)
+		{
+
 		}
 	}
 

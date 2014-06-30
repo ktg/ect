@@ -63,6 +63,7 @@ public class Timer implements Serializable, ActionListener
 	private int delay = 1000;
 	private javax.swing.Timer timer = null;
 	private boolean repeat = false;
+	private boolean reset = false;
 
 	// DelayRunnable dr = null;
 
@@ -147,6 +148,22 @@ public class Timer implements Serializable, ActionListener
 		}
 	}
 
+	public boolean getReset()
+	{
+		return reset;
+	}
+
+	public void setReset(final boolean value)
+	{
+		if (value != reset)
+		{
+			final boolean oldValue = reset;
+			reset = value;
+
+			propertyChangeListeners.firePropertyChange("reset", oldValue, reset);
+		}
+	}
+
 	public void setRepeat(final boolean value)
 	{
 		if (value != repeat)
@@ -188,6 +205,10 @@ public class Timer implements Serializable, ActionListener
 
 	private void startTimer()
 	{
+		if(reset)
+		{
+			setOutput(false);
+		}
 		timer = new javax.swing.Timer(delay, this);
 		timer.setRepeats(repeat);
 		timer.start();
