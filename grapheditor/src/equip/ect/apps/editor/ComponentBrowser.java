@@ -679,7 +679,7 @@ public class ComponentBrowser extends JPanel
 
 			for(PropertyLinkRequest link: DataspaceMonitor.getMonitor().getPropertyLinks())
 			{
-				if(link.getSourceComponentID().toString().equals(comp.getID()))
+				if(link.getSourceComponentID().toString().equals(comp.getID().toString()))
 				{
 					propertyLinkRequestAdded(link);
 				}
@@ -702,8 +702,6 @@ public class ComponentBrowser extends JPanel
 		private void sortchildren(DefaultMutableTreeNode node)
 		{
 			List<DefaultMutableTreeNode> children = Collections.list(node.children());
-			//move the child to here so we can move them back
-
 			node.removeAllChildren();
 			Collections.sort(children, new Comparator<DefaultMutableTreeNode>()
 			{
@@ -771,6 +769,10 @@ public class ComponentBrowser extends JPanel
 		@Override
 		public void propertyLinkRequestAdded(PropertyLinkRequest linkReq)
 		{
+			if(nodeMap.containsKey(linkReq.getID().toString()))
+			{
+				return;
+			}
 			DefaultMutableTreeNode componentNode = nodeMap.get(linkReq.getSourceComponentID().toString());
 			if(componentNode != null)
 			{
@@ -998,6 +1000,13 @@ public class ComponentBrowser extends JPanel
 					{
 						return DataspaceUtils.getCurrentName(new ComponentAdvert(tuple));
 					}
+					else if (tuple.name.equals(PropertyLinkRequest.TYPE))
+					{
+						PropertyLinkRequest link = new PropertyLinkRequest(tuple);
+						ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
+						return link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
+					}
+
 					if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)
 					{
 						final DictionaryImpl d = (DictionaryImpl) tuple.fields[CompInfo.ATTRIBUTES_INDEX];
