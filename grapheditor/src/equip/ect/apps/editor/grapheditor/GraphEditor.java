@@ -324,7 +324,8 @@ public class GraphEditor extends JFrame
 								@Override
 								public void run()
 								{
-									StateManager.restoreState(state, getActiveCanvas(), new ProgressDialog());
+									StateManager.restoreState(state, GraphEditor.this, new ProgressDialog());
+									updateCanvasPane();
 								}
 							}).start();
 						}
@@ -346,7 +347,7 @@ public class GraphEditor extends JFrame
 				{
 					try
 					{
-						State state = StateManager.createState(getActiveCanvas());
+						State state = StateManager.createState(canvasManager);
 						Gson gson = new GsonBuilder().create();
 
 						FileWriter writer = new FileWriter(file);
@@ -362,6 +363,35 @@ public class GraphEditor extends JFrame
 			}
 		});
 		toolbar.addSeparator();
+		toolbar.add(new AbstractAction("New View", EditorResources.createImageIcon(EditorResources.ADD_TAG, "New View"))
+		{
+			@Override
+			public void actionPerformed(final ActionEvent ae)
+			{
+				addCanvas("New View");
+			}
+		});
+		toolbar.add(new AbstractAction("Rename View", EditorResources.createImageIcon(EditorResources.RENAME_TAG, "Rename View"))
+		{
+			@Override
+			public void actionPerformed(final ActionEvent ae)
+			{
+				final String canvasName = JOptionPane.showInputDialog(GraphEditor.this, "Enter new name for view:", getActiveCanvas().getName());
+				canvasManager.renameCanvas(canvasName, getActiveCanvas());
+				updateCanvasPane();
+			}
+		});
+		toolbar.add(new AbstractAction("Delete View", EditorResources.createImageIcon(EditorResources.DELETE_TAG, "Delete View"))
+		{
+			@Override
+			public void actionPerformed(final ActionEvent ae)
+			{
+				removeCanvas(getActiveCanvas());
+			}
+		});
+
+		toolbar.addSeparator();
+
 		toolbar.add(new AbstractAction("Settings...", EditorResources.createImageIcon(EditorResources.SETTINGS_ICON, "Settings..."))
 		{
 			@Override
@@ -416,10 +446,25 @@ public class GraphEditor extends JFrame
 		loadSettings();
 	}
 
+	public GraphEditorCanvas addCanvas(final String name)
+	{
+		final GraphEditorCanvas canvas = new GraphEditorCanvas(name, selectionModel);
+		canvasManager.addCanvas(name, canvas);
+		updateCanvasPane();
+		return canvas;
+	}
+
 	public void connect(final String url)
 	{
 		getActiveCanvas().startDaemon();
 		DataspaceMonitor.getMonitor().startListening(url);
+	}
+
+	public void removeCanvas(final BeanGraphPanel canvas)
+	{
+		//final String name = canvas.getName();
+		canvasManager.removeCanvas(canvas);
+		updateCanvasPane();
 	}
 
 	public void exit()
@@ -427,6 +472,11 @@ public class GraphEditor extends JFrame
 		System.out.println("Graph Editor shutting down ...");
 		storeSettings();
 		System.out.println("Goodbye.");
+	}
+
+	public GraphEditorCanvas getCanvas(String name)
+	{
+		return (GraphEditorCanvas)canvasManager.getCanvas(name);
 	}
 
 	public GraphEditorCanvas getActiveCanvas()

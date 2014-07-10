@@ -11,20 +11,26 @@ import equip.ect.ComponentAdvert;
 import equip.ect.ComponentProperty;
 import equip.ect.PropertyLinkRequest;
 import equip.ect.apps.editor.BeanCanvasItem;
-import equip.ect.apps.editor.BeanGraphPanel;
+import equip.ect.apps.editor.SelectionModel;
 import equip.ect.apps.editor.dataspace.DataspaceMonitor;
 import equip.ect.apps.editor.dataspace.DataspaceUtils;
 import equip.ect.apps.editor.grapheditor.GraphComponent;
 import equip.ect.apps.editor.grapheditor.GraphComponentProperty;
+import equip.ect.apps.editor.grapheditor.GraphEditor;
+import equip.ect.apps.editor.grapheditor.GraphEditorCanvas;
+import equip.ect.apps.editor.interactive.InteractiveCanvas;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
+import equip.ect.apps.editor.interactive.InteractiveCanvasManager;
 import equip.runtime.ValueBase;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class StateManager
 {
-	public static void restoreState(State state, BeanGraphPanel editor, ProgressDialog progress)
+	public static void restoreState(final State state, final GraphEditor graphEditor, final ProgressDialog progress)
 	{
 		try
 		{
@@ -85,19 +91,23 @@ public class StateManager
 						}
 					}
 
-					// Restore editor
-					final BeanCanvasItem item = editor.createItem(component.getID().toString(), componentState.getPosition().x, componentState.getPosition().y);
-					if (item instanceof GraphComponent)
+					if (componentState.getPosition() != null)
 					{
-						GraphComponent graphComponent = (GraphComponent) item;
-						graphComponent.getDrawer().setDrawerState(componentState.getState());
-						for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
+						GraphEditorCanvas editor = graphEditor.getActiveCanvas();
+						// Restore editor
+						final BeanCanvasItem item = editor.createItem(component.getID().toString(), componentState.getPosition().x, componentState.getPosition().y);
+						if (item instanceof GraphComponent)
 						{
-							for (PropertyState propertyState : componentState.getProperties())
+							GraphComponent graphComponent = (GraphComponent) item;
+							graphComponent.getDrawer().setDrawerState(componentState.getState());
+							for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
 							{
-								if (propertyState.getName().equals(property.getName()))
+								for (PropertyState propertyState : componentState.getProperties())
 								{
-									property.setKeepVisible(propertyState.isKeepVisible());
+									if (propertyState.getName().equals(property.getName()))
+									{
+										property.setKeepVisible(propertyState.isKeepVisible());
+									}
 								}
 							}
 						}
@@ -131,15 +141,48 @@ public class StateManager
 				progress.setStatus("Created Link " + linkState.getSourceProperty() + " -> " + linkState.getTargetProperty());
 			}
 
+
+			for (final String editor : state.getEditors().keySet())
+			{
+				GraphEditorCanvas canvas = graphEditor.getCanvas(editor);
+				if (canvas == null)
+				{
+					canvas = graphEditor.addCanvas(editor);
+				}
+
+				for (ComponentState componentState : state.getEditors().get(editor))
+				{
+					ComponentAdvert component = componentMap.get(componentState.getId());
+					// Restore editor
+					final BeanCanvasItem item = canvas.createItem(component.getID().toString(), componentState.getPosition().x, componentState.getPosition().y);
+					if (item instanceof GraphComponent)
+					{
+						GraphComponent graphComponent = (GraphComponent) item;
+						graphComponent.getDrawer().setDrawerState(componentState.getState());
+						for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
+						{
+							for (PropertyState propertyState : componentState.getProperties())
+							{
+								if (propertyState.getName().equals(property.getName()))
+								{
+									property.setKeepVisible(propertyState.isKeepVisible());
+								}
+							}
+						}
+					}
+				}
+			}
+
+
 			progress.finished();
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
 
-	public static State createState(BeanGraphPanel editor) throws DataspaceInactiveException
+	public static State createState(InteractiveCanvasManager editors) throws DataspaceInactiveException
 	{
 		final State state = new State();
 		final DataspaceMonitor monitor = DataspaceMonitor.getMonitor();
@@ -153,19 +196,6 @@ public class StateManager
 			final Capability capability = monitor.getComponentCapability(component);
 			componentState.setClassName(capability.getCapabilityClass());
 
-			final List<BeanCanvasItem> items = editor.getBeanInstances(component.getID().toString());
-			if(items.size() > 0)
-			{
-				BeanCanvasItem item = items.get(0);
-				componentState.setPosition(item.getPosition());
-				if(item instanceof GraphComponent)
-				{
-					componentState.setState(((GraphComponent) item).getDrawer().getDrawerState());
-				}
-			}
-
-			System.out.println("Items = " + items.size());
-
 			for (final ComponentProperty property : monitor.getComponentProperties(component.getComponentID().toString()))
 			{
 				final PropertyState propertyState = new PropertyState();
@@ -173,7 +203,7 @@ public class StateManager
 
 				boolean add = false;
 
-				if(!property.isReadonly())
+				if (!property.isReadonly())
 				{
 					add = true;
 					final ValueBase value = property.getAttributeValue("dynamic");
@@ -194,26 +224,7 @@ public class StateManager
 					}
 				}
 
-				if(items.size() > 0)
-				{
-					BeanCanvasItem item = items.get(0);
-					if(item instanceof GraphComponent)
-					{
-						for(GraphComponentProperty propertyItem: ((GraphComponent) item).getGraphComponentProperties().values())
-						{
-							if(propertyItem.getName().equals(property.getPropertyName()))
-							{
-								if(propertyItem.keepVisible())
-								{
-									propertyState.setKeepVisible(true);
-									add = true;
-								}
-							}
-						}
-					}
-				}
-
-				if(add)
+				if (add)
 				{
 					componentState.getProperties().add(propertyState);
 				}
@@ -237,6 +248,38 @@ public class StateManager
 			}
 
 			state.getLinks().add(linkState);
+		}
+
+		for (final InteractiveCanvas canvas : editors.getCanvases())
+		{
+			List<ComponentState> componentStates = new ArrayList<ComponentState>();
+			state.getEditors().put(canvas.getName(), componentStates);
+
+			for (InteractiveCanvasItem item : canvas.getItems())
+			{
+				if (item instanceof GraphComponent)
+				{
+					GraphComponent graphComponent = (GraphComponent) item;
+					ComponentState componentState = new ComponentState();
+					componentState.setId(graphComponent.getBeanID());
+					componentState.setPosition(graphComponent.getPosition());
+					componentState.setState(graphComponent.getDrawer().getDrawerState());
+
+					for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
+					{
+						if (property.keepVisible())
+						{
+							PropertyState propertyState = new PropertyState();
+							propertyState.setName(property.getName());
+							propertyState.setKeepVisible(true);
+							componentState.getProperties().add(propertyState);
+						}
+					}
+
+					componentStates.add(componentState);
+				}
+			}
+
 		}
 
 		return state;

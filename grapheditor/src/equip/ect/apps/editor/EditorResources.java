@@ -64,6 +64,12 @@ public abstract class EditorResources
 
 	public final static String LOAD_ICON = "/layer_open.png";
 
+	public final static String ADD_TAG = "/layer_add.png";
+
+	public final static String DELETE_TAG = "/layer_delete.png";
+
+	public final static String RENAME_TAG = "/layer_command.png";
+
 	public final static String SETTINGS_ICON = "/settings.png";
 
 	public static ImageIcon createImageIcon(String path, String description)
