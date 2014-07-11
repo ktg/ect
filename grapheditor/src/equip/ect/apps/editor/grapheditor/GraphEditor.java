@@ -49,18 +49,12 @@ import equip.ect.apps.editor.Info;
 import equip.ect.apps.editor.SelectionModel;
 import equip.ect.apps.editor.dataspace.DataspaceMonitor;
 import equip.ect.apps.editor.interactive.CleanerTask;
-import equip.ect.apps.editor.interactive.InteractiveCanvas;
-import equip.ect.apps.editor.interactive.InteractiveCanvasManager;
 import equip.ect.apps.editor.state.ProgressDialog;
 import equip.ect.apps.editor.state.State;
 import equip.ect.apps.editor.state.StateManager;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -79,6 +73,17 @@ import java.util.Properties;
 
 public class GraphEditor extends JFrame
 {
+	private class GraphEditorTab extends JScrollPane
+	{
+		private GraphEditorCanvas canvas;
+
+		public GraphEditorTab(GraphEditorCanvas canvas)
+		{
+			super(canvas);
+			this.canvas = canvas;
+		}
+	}
+
 	class SettingsDialog extends JDialog implements ActionListener
 	{
 		private final JFormattedTextField tf;
@@ -264,8 +269,6 @@ public class GraphEditor extends JFrame
 
 	private ConfigurationManager configurationManager;
 
-	private final InteractiveCanvasManager canvasManager;
-
 	private final SelectionModel selectionModel = new SelectionModel();
 
 	private JTabbedPane pane;
@@ -325,7 +328,6 @@ public class GraphEditor extends JFrame
 								public void run()
 								{
 									StateManager.restoreState(state, GraphEditor.this, new ProgressDialog());
-									updateCanvasPane();
 								}
 							}).start();
 						}
@@ -347,7 +349,7 @@ public class GraphEditor extends JFrame
 				{
 					try
 					{
-						State state = StateManager.createState(canvasManager);
+						State state = StateManager.createState(GraphEditor.this);
 						Gson gson = new GsonBuilder().create();
 
 						FileWriter writer = new FileWriter(file);
@@ -377,8 +379,7 @@ public class GraphEditor extends JFrame
 			public void actionPerformed(final ActionEvent ae)
 			{
 				final String canvasName = JOptionPane.showInputDialog(GraphEditor.this, "Enter new name for view:", getActiveCanvas().getName());
-				canvasManager.renameCanvas(canvasName, getActiveCanvas());
-				updateCanvasPane();
+				renameCanvas(canvasName);
 			}
 		});
 		toolbar.add(new AbstractAction("Delete View", EditorResources.createImageIcon(EditorResources.DELETE_TAG, "Delete View"))
@@ -386,7 +387,11 @@ public class GraphEditor extends JFrame
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				removeCanvas(getActiveCanvas());
+				int dialogResult = JOptionPane.showConfirmDialog (null, "Are you sure you want to delete" + getActiveCanvas().getName() +  "?","Warning",JOptionPane.YES_NO_OPTION);
+				if(dialogResult == JOptionPane.YES_OPTION)
+				{
+					removeCanvas();
+				}
 			}
 		});
 
@@ -411,35 +416,12 @@ public class GraphEditor extends JFrame
 		getContentPane().add(splitPane, BorderLayout.CENTER);
 		getContentPane().add(toolbar, BorderLayout.PAGE_START);
 
-		this.canvasManager = new InteractiveCanvasManager(new GraphEditorCanvas("Editor", selectionModel));
+
 
 		pane = new JTabbedPane();
-		pane.addChangeListener(new ChangeListener()
-		{
-			@Override
-			public void stateChanged(final ChangeEvent e)
-			{
-				if (pane.getSelectedIndex() > -1)
-				{
 
-					final String activeCanvasName = canvasManager.getActiveCanvas().getName();
+		addCanvas("Editor");
 
-					final String tabName = pane.getTitleAt(pane.getSelectedIndex());
-
-					if (!(activeCanvasName.equals(tabName)))
-					{
-						// find the canvas with the selected
-						// name and set it as being the active
-						// canvas
-
-						setActiveCanvas((GraphEditorCanvas) (canvasManager.getCanvas(tabName)));
-					}
-
-				}
-			}
-		});
-
-		updateCanvasPane();
 		splitPane.setRightComponent(pane);
 		splitPane.setLeftComponent(new ComponentBrowser(selectionModel));
 
@@ -448,10 +430,9 @@ public class GraphEditor extends JFrame
 
 	public GraphEditorCanvas addCanvas(final String name)
 	{
-		final GraphEditorCanvas canvas = new GraphEditorCanvas(name, selectionModel);
-		canvasManager.addCanvas(name, canvas);
-		updateCanvasPane();
-		return canvas;
+		final GraphEditorTab tab = new GraphEditorTab(new GraphEditorCanvas(name, selectionModel));
+		pane.addTab(name, tab);
+		return tab.canvas;
 	}
 
 	public void connect(final String url)
@@ -460,11 +441,15 @@ public class GraphEditor extends JFrame
 		DataspaceMonitor.getMonitor().startListening(url);
 	}
 
-	public void removeCanvas(final BeanGraphPanel canvas)
+	public void renameCanvas(final String newName)
 	{
-		//final String name = canvas.getName();
-		canvasManager.removeCanvas(canvas);
-		updateCanvasPane();
+		pane.setTitleAt(pane.getSelectedIndex(), newName);
+		getActiveCanvas().setName(newName);
+	}
+
+	public void removeCanvas()
+	{
+		pane.remove(pane.getSelectedIndex());
 	}
 
 	public void exit()
@@ -474,14 +459,14 @@ public class GraphEditor extends JFrame
 		System.out.println("Goodbye.");
 	}
 
-	public GraphEditorCanvas getCanvas(String name)
-	{
-		return (GraphEditorCanvas)canvasManager.getCanvas(name);
-	}
-
 	public GraphEditorCanvas getActiveCanvas()
 	{
-		return (GraphEditorCanvas) canvasManager.getActiveCanvas();
+		GraphEditorTab tab = (GraphEditorTab)pane.getSelectedComponent();
+		if(tab != null)
+		{
+			return tab.canvas;
+		}
+		return null;
 	}
 
 	public void loadSettings()
@@ -511,17 +496,25 @@ public class GraphEditor extends JFrame
 		}
 	}
 
-	public void setActiveCanvas(final GraphEditorCanvas canvas)
-	{
-		canvasManager.setActiveCanvas(canvas);
-		ToolTipManager.sharedInstance().registerComponent(canvas);
-	}
-
 	public void showSettingsDialog()
 	{
 		final SettingsDialog sd = new SettingsDialog(this);
 		sd.setLocationRelativeTo(this);
 		sd.setVisible(true);
+	}
+
+	public List<GraphEditorCanvas> getCanvases()
+	{
+		List<GraphEditorCanvas> canvases = new ArrayList<GraphEditorCanvas>();
+		for (int i = 0; i < pane.getTabCount(); i++)
+		{
+			GraphEditorTab tab = (GraphEditorTab)pane.getComponentAt(i);
+			if(tab != null)
+			{
+				canvases.add(tab.canvas);
+			}
+		}
+		return canvases;
 	}
 
 	public synchronized void storeSettings()
@@ -546,55 +539,8 @@ public class GraphEditor extends JFrame
 		return JOptionPane.showConfirmDialog(getActiveCanvas(), "Delete all components?");
 	}
 
-	protected void updateCanvasPane()
+	public void removeAllCanvases()
 	{
-
-		final InteractiveCanvas[] canvases = canvasManager.getCanvases();
-
-		// first, search through all of the current tabs to
-		// see if any are no longer required
-
-		final List<Component> componentsToRemove = new ArrayList<Component>();
-
-		for (int i = 0; i < pane.getTabCount(); i++)
-		{
-			final String tabName = pane.getTitleAt(i);
-			boolean found = false;
-
-			for (final InteractiveCanvas canvase : canvases)
-			{
-				if (canvase.getName().equals(tabName))
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				componentsToRemove.add(pane.getComponentAt(i));
-			}
-		}
-
-		for (Component aComponentsToRemove : componentsToRemove)
-		{
-			pane.remove(aComponentsToRemove);
-		}
-
-		for (int i = 0; i < canvases.length; i++)
-		{
-			// if canvas is not already in pane ...
-			if (pane.indexOfTab(canvases[i].getName()) < 0)
-			{
-				final JScrollPane scrollPane = new JScrollPane(canvases[i]);
-				scrollPane.setViewportView(canvases[i]);
-
-				pane.addTab(canvases[i].getName(), scrollPane);
-
-				if (canvases[i] == canvasManager.getActiveCanvas())
-				{
-					pane.setSelectedIndex(i);
-				}
-			}
-		}
+		pane.removeAll();
 	}
 }

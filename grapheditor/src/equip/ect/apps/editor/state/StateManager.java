@@ -11,21 +11,16 @@ import equip.ect.ComponentAdvert;
 import equip.ect.ComponentProperty;
 import equip.ect.PropertyLinkRequest;
 import equip.ect.apps.editor.BeanCanvasItem;
-import equip.ect.apps.editor.SelectionModel;
 import equip.ect.apps.editor.dataspace.DataspaceMonitor;
 import equip.ect.apps.editor.dataspace.DataspaceUtils;
 import equip.ect.apps.editor.grapheditor.GraphComponent;
 import equip.ect.apps.editor.grapheditor.GraphComponentProperty;
 import equip.ect.apps.editor.grapheditor.GraphEditor;
 import equip.ect.apps.editor.grapheditor.GraphEditorCanvas;
-import equip.ect.apps.editor.interactive.InteractiveCanvas;
 import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
-import equip.ect.apps.editor.interactive.InteractiveCanvasManager;
 import equip.runtime.ValueBase;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class StateManager
@@ -42,6 +37,8 @@ public class StateManager
 			progressLength += state.getLinks().size();
 			progress.setLength(progressLength);
 			progress.setVisible(true);
+
+			graphEditor.removeAllCanvases();
 
 			final DataspaceMonitor monitor = DataspaceMonitor.getMonitor();
 			final Map<String, ComponentAdvert> componentMap = new HashMap<String, ComponentAdvert>();
@@ -94,6 +91,10 @@ public class StateManager
 					if (componentState.getPosition() != null)
 					{
 						GraphEditorCanvas editor = graphEditor.getActiveCanvas();
+						if(editor == null)
+						{
+							editor = graphEditor.addCanvas("Editor");
+						}
 						// Restore editor
 						final BeanCanvasItem item = editor.createItem(component.getID().toString(), componentState.getPosition().x, componentState.getPosition().y);
 						if (item instanceof GraphComponent)
@@ -142,15 +143,10 @@ public class StateManager
 			}
 
 
-			for (final String editor : state.getEditors().keySet())
+			for (final EditorState editor : state.getEditors())
 			{
-				GraphEditorCanvas canvas = graphEditor.getCanvas(editor);
-				if (canvas == null)
-				{
-					canvas = graphEditor.addCanvas(editor);
-				}
-
-				for (ComponentState componentState : state.getEditors().get(editor))
+				GraphEditorCanvas canvas =  graphEditor.addCanvas(editor.getName());
+				for (ComponentState componentState : editor.getComponents())
 				{
 					ComponentAdvert component = componentMap.get(componentState.getId());
 					// Restore editor
@@ -182,7 +178,7 @@ public class StateManager
 		}
 	}
 
-	public static State createState(InteractiveCanvasManager editors) throws DataspaceInactiveException
+	public static State createState(GraphEditor editor) throws DataspaceInactiveException
 	{
 		final State state = new State();
 		final DataspaceMonitor monitor = DataspaceMonitor.getMonitor();
@@ -233,28 +229,29 @@ public class StateManager
 			state.getComponents().add(componentState);
 		}
 
-		for (final PropertyLinkRequest link : monitor.getPropertyLinks())
+		if(monitor.getPropertyLinks() != null)
 		{
-			final LinkState linkState = new LinkState();
-			linkState.setSourceProperty(link.getSourcePropertyName());
-			linkState.setTargetProperty(link.getDestinationPropertyName());
-			if (link.getSourceComponentID() != null)
+			for (final PropertyLinkRequest link : monitor.getPropertyLinks())
 			{
-				linkState.setSourceID(link.getSourceComponentID().toString());
-			}
-			if (link.getDestComponentID() != null)
-			{
-				linkState.setTargetID(link.getDestComponentID().toString());
-			}
+				final LinkState linkState = new LinkState();
+				linkState.setSourceProperty(link.getSourcePropertyName());
+				linkState.setTargetProperty(link.getDestinationPropertyName());
+				if (link.getSourceComponentID() != null)
+				{
+					linkState.setSourceID(link.getSourceComponentID().toString());
+				}
+				if (link.getDestComponentID() != null)
+				{
+					linkState.setTargetID(link.getDestComponentID().toString());
+				}
 
-			state.getLinks().add(linkState);
+				state.getLinks().add(linkState);
+			}
 		}
 
-		for (final InteractiveCanvas canvas : editors.getCanvases())
+		for (final GraphEditorCanvas canvas : editor.getCanvases())
 		{
-			List<ComponentState> componentStates = new ArrayList<ComponentState>();
-			state.getEditors().put(canvas.getName(), componentStates);
-
+			EditorState editorState = new EditorState(canvas.getName());
 			for (InteractiveCanvasItem item : canvas.getItems())
 			{
 				if (item instanceof GraphComponent)
@@ -276,9 +273,10 @@ public class StateManager
 						}
 					}
 
-					componentStates.add(componentState);
+					editorState.getComponents().add(componentState);
 				}
 			}
+			state.getEditors().add(editorState);
 
 		}
 

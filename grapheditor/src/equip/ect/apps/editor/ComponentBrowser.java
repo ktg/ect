@@ -163,7 +163,7 @@ public class ComponentBrowser extends JPanel
 							icon = link;
 							PropertyLinkRequest link = new PropertyLinkRequest(tuple);
 							ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
-							display = link.getSourcePropertyName() + " → " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
+							display = link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
 						}
 
 						if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)

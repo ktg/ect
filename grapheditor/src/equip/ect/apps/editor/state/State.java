@@ -9,14 +9,14 @@ public class State
 {
 	private final List<ComponentState> components = new ArrayList<ComponentState>();
 	private final List<LinkState> links = new ArrayList<LinkState>();
-	private final Map<String, List<ComponentState>> editors = new HashMap<String, List<ComponentState>>();
+	private final List<EditorState> editors = new ArrayList<EditorState>();
 
 	public List<LinkState> getLinks()
 	{
 		return links;
 	}
 
-	public Map<String, List<ComponentState>> getEditors() { return editors; }
+	public List<EditorState> getEditors() { return editors; }
 
 	public List<ComponentState> getComponents()
 	{
