@@ -46,24 +46,40 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Produces timing signal at specified intervals
  *
  * @author stef
- * @classification Behaviour/Timing
- * @defaultOutputValue output
  */
 @ECTComponent
 @Category("Timing")
-public class Timer implements Serializable, ActionListener
+public class Timer implements Runnable, Serializable
 {
+	private enum TimeSpan
+	{
+		day(86400000),
+		hour(3600000),
+		min(60000),
+		sec(1000);
+
+		private final long length;
+		TimeSpan(long length)
+		{
+			this.length = length;
+		}
+	}
+
 	private boolean output = false;
 	private boolean running = false;
 	private int delay = 1000;
-	private javax.swing.Timer timer = null;
 	private boolean repeat = false;
 	private boolean reset = false;
+
+	private String countdown;
+
+	private static final long sleep = 100;
 
 	// DelayRunnable dr = null;
 
@@ -77,10 +93,67 @@ public class Timer implements Serializable, ActionListener
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent e)
+	public void run()
 	{
-		setOutput(!getOutput());
-		setRunning(timer.isRunning());
+		long startTime = System.currentTimeMillis();
+		while (running)
+		{
+			long now = System.currentTimeMillis();
+			long difference = (now - startTime);
+			if(difference > delay)
+			{
+				// Do something
+				setOutput(!getOutput());
+				if(!repeat)
+				{
+					setRunning(false);
+				}
+			}
+
+			long remaining = delay - difference;
+
+			setCountdown(humanTimeSpan(remaining));
+
+			try
+			{
+				Thread.sleep(sleep);
+			}
+			catch (final InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private String humanTimeSpan(long duration)
+	{
+		for(TimeSpan timeSpan: TimeSpan.values())
+		{
+			if(duration<timeSpan.length)
+			{
+				continue;
+			}
+			long numberOfUnits = duration / timeSpan.length;
+			return numberOfUnits + " " + timeSpan.name() + ((numberOfUnits>1)?"s":"");
+		}
+
+		return "";
+	}
+
+	public String getCountdown()
+	{
+		return countdown;
+	}
+
+	public void setCountdown(final String countdown)
+	{
+		String oldCountdown = this.countdown;
+		if(oldCountdown == null || !oldCountdown.equals(countdown))
+		{
+			this.countdown = countdown;
+
+			propertyChangeListeners.firePropertyChange("countdown", oldCountdown, countdown);
+		}
 	}
 
 	/**
@@ -127,12 +200,6 @@ public class Timer implements Serializable, ActionListener
 
 			delay = newDelay;
 			propertyChangeListeners.firePropertyChange("delay", oldDelay, newDelay);
-
-			if (getRunning())
-			{
-				stopTimer();
-				startTimer();
-			}
 		}
 	}
 
@@ -190,17 +257,13 @@ public class Timer implements Serializable, ActionListener
 				// register this object as an action listener
 				startTimer();
 			}
-			else
-			{
-				stopTimer();
-			}
 		}
 	}
 
 	public void stop()
 	{
 		// called by ECT when component being destroyed
-		stopTimer();
+		running = false;
 	}
 
 	private void startTimer()
@@ -209,18 +272,7 @@ public class Timer implements Serializable, ActionListener
 		{
 			setOutput(false);
 		}
-		timer = new javax.swing.Timer(delay, this);
-		timer.setRepeats(repeat);
-		timer.start();
-	}
-
-	private void stopTimer()
-	{
-		if (timer != null)
-		{
-			timer.removeActionListener(this);
-			timer.stop();
-			timer = null;
-		}
+		Thread thread = new Thread(this);
+		thread.start();
 	}
 }

@@ -224,6 +224,10 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 		this.start = start;
 		propertyChangeListeners.firePropertyChange("start", oldStart, start);
 		updateRange();
+		if(!running)
+		{
+			setResult(start);
+		}
 	}
 
 	public void setX1(final double x1)
