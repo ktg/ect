@@ -224,38 +224,34 @@ public class Transition implements Runnable, Serializable, PropertyChangeListene
 		this.start = start;
 		propertyChangeListeners.firePropertyChange("start", oldStart, start);
 		updateRange();
-		if(!running)
-		{
-			setResult(start);
-		}
 	}
 
 	public void setX1(final double x1)
 	{
 		final double oldX1 = this.x1;
 		this.x1 = x1;
-		propertyChangeListeners.firePropertyChange("X1", oldX1, x1);
+		propertyChangeListeners.firePropertyChange("x1", oldX1, x1);
 	}
 
 	public void setX2(final double x2)
 	{
 		final double oldX2 = this.x2;
 		this.x2 = x2;
-		propertyChangeListeners.firePropertyChange("X2", oldX2, x2);
+		propertyChangeListeners.firePropertyChange("x2", oldX2, x2);
 	}
 
 	public void setY1(final double y1)
 	{
 		final double oldY1 = this.y1;
 		this.y1 = y1;
-		propertyChangeListeners.firePropertyChange("Y1", oldY1, y1);
+		propertyChangeListeners.firePropertyChange("y1", oldY1, y1);
 	}
 
 	public void setY2(final double y2)
 	{
 		final double oldY2 = this.y2;
 		this.y2 = y2;
-		propertyChangeListeners.firePropertyChange("Y2", oldY2, y2);
+		propertyChangeListeners.firePropertyChange("y2", oldY2, y2);
 	}
 
 	public void stop()

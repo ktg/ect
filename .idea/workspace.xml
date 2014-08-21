@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="06879d14-d937-49ce-9774-b2b4330cfa22" name="Default" comment="Stuff">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/behaviour/Timer.java" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/behaviour/Timer.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java" afterPath="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java" />
     </list>
     <ignored path="ect.iws" />
@@ -131,11 +130,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Timer.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Timer.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/behaviour/Timer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.29965156" vertical-offset="152" max-vertical-offset="4014">
-              <caret line="63" column="17" selection-start-line="63" selection-start-column="17" selection-end-line="63" selection-end-column="17" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="152" max-vertical-offset="4014">
+              <caret line="52" column="2" selection-start-line="52" selection-start-column="2" selection-end-line="52" selection-end-column="2" />
               <folding>
                 <element signature="e#2309#2310#0" expanded="true" />
                 <element signature="e#2338#2339#0" expanded="true" />
@@ -146,11 +145,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Transition.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="Transition.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5472">
-              <caret line="42" column="28" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.9721254" vertical-offset="3222" max-vertical-offset="5400">
+              <caret line="253" column="53" selection-start-line="253" selection-start-column="53" selection-end-line="253" selection-end-column="53" />
               <folding />
             </state>
           </provider>
@@ -1758,8 +1757,8 @@
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/EditorState.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/grapheditor/GraphEditor.java" />
         <option value="$PROJECT_DIR$/grapheditor/src/equip/ect/apps/editor/state/StateManager.java" />
-        <option value="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java" />
         <option value="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/behaviour/Timer.java" />
+        <option value="$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java" />
       </list>
     </option>
   </component>
@@ -2836,14 +2835,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5472">
-          <caret line="42" column="28" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_05.jdk/Contents/Home/src.zip!/javax/swing/Timer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-1.9354167" vertical-offset="4918" max-vertical-offset="10494">
@@ -2854,14 +2845,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/behaviour/Timer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.29965156" vertical-offset="152" max-vertical-offset="4014">
-          <caret line="63" column="17" selection-start-line="63" selection-start-column="17" selection-end-line="63" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="152" max-vertical-offset="4014">
+          <caret line="52" column="2" selection-start-line="52" selection-start-column="2" selection-end-line="52" selection-end-column="2" />
           <folding>
             <element signature="e#2309#2310#0" expanded="true" />
             <element signature="e#2338#2339#0" expanded="true" />
             <element signature="e#3634#3635#0" expanded="true" />
             <element signature="e#3657#3658#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/components/dataprocessing/src/equip/ect/components/transition/Transition.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.9721254" vertical-offset="3222" max-vertical-offset="5400">
+          <caret line="253" column="53" selection-start-line="253" selection-start-column="53" selection-end-line="253" selection-end-column="53" />
+          <folding />
         </state>
       </provider>
     </entry>
