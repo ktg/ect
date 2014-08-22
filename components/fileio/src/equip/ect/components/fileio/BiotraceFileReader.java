@@ -115,7 +115,6 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 										final String channelName = String.format("channel %03d", channel);
 										final double channelValue = readDouble(bytes);
 										dynamicProperties.addProperty(channelName, Double.class, channelValue);
-
 									}
 									channel++;
 								}
@@ -194,7 +193,17 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 		channelIDs.clear();
 		for (final String channelIDString : channelIDStrings)
 		{
-			channelIDs.add(new Integer(channelIDString));
+			Integer channelID = new Integer(channelIDString);
+			channelIDs.add(channelID);
+			String channelName = String.format("channel %03d", channelID);
+			try
+			{
+				dynamicProperties.dynGetProperty(channelName);
+			}
+			catch (NoSuchPropertyException e)
+			{
+				dynamicProperties.addProperty(channelName, Double.class, 0);
+			}
 		}
 
 		final DynamicPropertyDescriptor[] descriptors = dynamicProperties.dynGetProperties();

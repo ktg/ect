@@ -40,6 +40,10 @@ package equip.ect.components.behaviour;
 
 import equip.ect.Category;
 import equip.ect.ECTComponent;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -55,9 +59,17 @@ import java.util.concurrent.TimeUnit;
 @Category("Timing")
 public class Timer implements Runnable, Serializable
 {
+	PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
+			.appendMinutes()
+			.appendSeparatorIfFieldsBefore(":")
+			.minimumPrintedDigits(2)
+			.printZeroAlways()
+			.appendSeconds()
+			.toFormatter();
+
+	private Duration delay = new Duration(70000);
 	private boolean output = false;
 	private boolean running = false;
-	private int delay = 1000;
 	private boolean repeat = false;
 	private boolean reset = false;
 
@@ -79,12 +91,13 @@ public class Timer implements Runnable, Serializable
 	@Override
 	public void run()
 	{
-		long startTime = System.currentTimeMillis();
+		DateTime startTime = DateTime.now();
 		while (running)
 		{
-			long now = System.currentTimeMillis();
-			long difference = (now - startTime);
-			if (difference > delay)
+
+			DateTime now = DateTime.now();
+			Duration difference = new Duration(startTime, now);
+			if (difference.isLongerThan(delay))
 			{
 				// Do something
 				setOutput(!getOutput());
@@ -94,9 +107,8 @@ public class Timer implements Runnable, Serializable
 				}
 			}
 
-			long remaining = delay - difference;
-
-			setCountdown(humanTimeSpan(remaining));
+			Duration remaining = delay.minus(difference);
+			setCountdown(periodFormatter.print(remaining.toPeriod()));
 
 			try
 			{
@@ -142,9 +154,9 @@ public class Timer implements Runnable, Serializable
 		propertyChangeListeners.addPropertyChangeListener(l);
 	}
 
-	public int getDelay()
+	public String getDelay()
 	{
-		return delay;
+		return periodFormatter.print(delay.toPeriod());
 	}
 
 	public synchronized boolean getOutput()
@@ -170,15 +182,13 @@ public class Timer implements Runnable, Serializable
 		propertyChangeListeners.removePropertyChangeListener(l);
 	}
 
-	public synchronized void setDelay(final int newDelay)
+	public synchronized void setDelay(final String newDelay)
 	{
-		if (delay != newDelay)
-		{
-			final int oldDelay = delay;
+		final String oldDelay = getDelay();
 
-			delay = newDelay;
-			propertyChangeListeners.firePropertyChange("delay", oldDelay, newDelay);
-		}
+		delay = periodFormatter.parsePeriod(newDelay).toStandardDuration();
+
+		propertyChangeListeners.firePropertyChange("delay", oldDelay, newDelay);
 	}
 
 	public synchronized void setOutput(final boolean newValue)

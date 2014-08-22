@@ -2,4 +2,14 @@ version = '1.0'
 
 dependencies {
 	compile project(":ect-core")
+	compile "joda-time:joda-time:+"
 }
+
+task copyToLib(type: Copy) {
+	into "$buildDir/libs"
+	from configurations.runtime
+	exclude '**/ect-core*.jar'
+	exclude '**/equip*.jar'
+}
+
+build.dependsOn(copyToLib)
