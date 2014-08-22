@@ -41,12 +41,10 @@ package equip.ect.components.behaviour;
 import equip.ect.Category;
 import equip.ect.ECTComponent;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Produces timing signal at specified intervals
@@ -57,20 +55,6 @@ import java.util.Date;
 @Category("Timing")
 public class Timer implements Runnable, Serializable
 {
-	private enum TimeSpan
-	{
-		day(86400000),
-		hour(3600000),
-		min(60000),
-		sec(1000);
-
-		private final long length;
-		TimeSpan(long length)
-		{
-			this.length = length;
-		}
-	}
-
 	private boolean output = false;
 	private boolean running = false;
 	private int delay = 1000;
@@ -100,11 +84,11 @@ public class Timer implements Runnable, Serializable
 		{
 			long now = System.currentTimeMillis();
 			long difference = (now - startTime);
-			if(difference > delay)
+			if (difference > delay)
 			{
 				// Do something
 				setOutput(!getOutput());
-				if(!repeat)
+				if (!repeat)
 				{
 					setRunning(false);
 				}
@@ -125,19 +109,13 @@ public class Timer implements Runnable, Serializable
 		}
 	}
 
-	private String humanTimeSpan(long duration)
+	private String humanTimeSpan(long millis)
 	{
-		for(TimeSpan timeSpan: TimeSpan.values())
-		{
-			if(duration<timeSpan.length)
-			{
-				continue;
-			}
-			long numberOfUnits = duration / timeSpan.length;
-			return numberOfUnits + " " + timeSpan.name() + ((numberOfUnits>1)?"s":"");
-		}
-
-		return "";
+		return String.format("%d:%02d",
+				TimeUnit.MILLISECONDS.toMinutes(millis) -
+						TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+				TimeUnit.MILLISECONDS.toSeconds(millis) -
+						TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
 	}
 
 	public String getCountdown()
@@ -148,7 +126,7 @@ public class Timer implements Runnable, Serializable
 	public void setCountdown(final String countdown)
 	{
 		String oldCountdown = this.countdown;
-		if(oldCountdown == null || !oldCountdown.equals(countdown))
+		if (oldCountdown == null || !oldCountdown.equals(countdown))
 		{
 			this.countdown = countdown;
 
@@ -268,7 +246,7 @@ public class Timer implements Runnable, Serializable
 
 	private void startTimer()
 	{
-		if(reset)
+		if (reset)
 		{
 			setOutput(false);
 		}
