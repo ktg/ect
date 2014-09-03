@@ -1,8 +1,11 @@
 package equip.ect.apps.editor.state;
 
 import equip.data.BooleanBox;
+import equip.data.GUID;
+import equip.data.ItemData;
 import equip.data.StringBox;
 import equip.data.StringBoxImpl;
+import equip.data.TupleImpl;
 import equip.data.beans.DataspaceInactiveException;
 import equip.ect.BeanDescriptorHelper;
 import equip.ect.Capability;
@@ -67,7 +70,7 @@ public class StateManager
 						{
 							if (propertyState.getValue() != null && propertyState.getPriority() == stage)
 							{
-								ComponentProperty property = monitor.getComponentProperty(component.getID().toString(), propertyState.getName());
+								ComponentProperty property = getProperty(monitor, component.getID(), propertyState.getName());
 								if (property != null)
 								{
 									if (monitor.setProperty(property, propertyState.getValue()))
@@ -129,8 +132,8 @@ public class StateManager
 					continue;
 				}
 
-				ComponentProperty sourceProperty = monitor.getComponentProperty(sourceComponent.getID().toString(), linkState.getSourceProperty());
-				ComponentProperty targetProperty = monitor.getComponentProperty(targetComponent.getID().toString(), linkState.getTargetProperty());
+				ComponentProperty sourceProperty = getProperty(monitor, sourceComponent.getID(), linkState.getSourceProperty());
+				ComponentProperty targetProperty = getProperty(monitor, targetComponent.getID(), linkState.getTargetProperty());
 				if (sourceProperty == null || targetProperty == null)
 				{
 					continue;
@@ -176,6 +179,33 @@ public class StateManager
 		{
 			e.printStackTrace();
 		}
+	}
+
+	private static ComponentProperty getProperty(DataspaceMonitor monitor, GUID componentID, String name)
+	{
+		ComponentProperty property = monitor.getComponentProperty(componentID.toString(), name);
+		if(property != null)
+		{
+			return property;
+		}
+
+		final ComponentProperty template = new ComponentProperty((GUID) null);
+		template.setComponentID(componentID);
+		template.setPropertyName(name);
+
+		try
+		{
+			final ItemData[] items = monitor.getDataspace().copyCollect(template.tuple);
+			if (items != null && items.length != 0)
+			{
+				return new ComponentProperty((TupleImpl) items[0]);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static State createState(GraphEditor editor) throws DataspaceInactiveException
