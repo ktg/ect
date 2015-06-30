@@ -59,7 +59,7 @@ public class PhidgetMotor extends PhidgetBase
 
 	//static final int MAX_SERVO_VALUE = 180;
 
-	static final String ACCEL_PREFIX = "accel";
+	static final String VELOCITY_PREFIX = "velocity";
 
 	private float motorouts[];
 
@@ -83,18 +83,18 @@ public class PhidgetMotor extends PhidgetBase
 	@Override
 	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
-		if (name.startsWith(ACCEL_PREFIX))
+		if (name.startsWith(VELOCITY_PREFIX))
 		{
 			try
 			{
-				final int ix = Integer.parseInt(name.substring(ACCEL_PREFIX.length()));
+				final int ix = Integer.parseInt(name.substring(VELOCITY_PREFIX.length()));
 				final Float fval = Coerce.toClass(value, Float.class);
 				final float val = (fval == null) ? 0.0f : fval;
 				// System.out.println("Set servo output "+ix+" to "+val);
 				motorouts[ix] = val;
 				if (connected)
 				{
-					phid.setAcceleration(ix, val);
+					phid.setVelocity(ix, val);
 				}
 			}
 			catch (final Exception e)
@@ -122,10 +122,10 @@ public class PhidgetMotor extends PhidgetBase
 			// initial properties
 			for (int i = 0; i < numberOfServoOutputs; i++)
 			{
-				dynsup.addProperty(ACCEL_PREFIX + i, Float.class, new Float(0.0));
+				dynsup.addProperty(VELOCITY_PREFIX + i, Float.class, new Float(0.0));
 				motorouts[i] = 0.0f;
 
-				phid.setAcceleration(i, motorouts[i]);
+				phid.setVelocity(i, motorouts[i]);
 			}
 		}
 		catch (final PhidgetException e)
@@ -151,7 +151,7 @@ public class PhidgetMotor extends PhidgetBase
 			try
 			{
 				// System.out.println("Setting position: " + motorouts[i]);
-				phid.setAcceleration(i, (motorouts[i]));
+				phid.setVelocity(i, (motorouts[i]));
 
 				// I'm not convinced by the phidget libraries ability
 				// to deal with rapid request
