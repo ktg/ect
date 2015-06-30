@@ -144,7 +144,7 @@ public class PhidgetMotor extends PhidgetBase
 
 				phid.setVelocity(i, motorouts[i]);
 
-				dynsup.addProperty(POSITION_PREFIX + i, Integer.class, phid.getEncoderPosition(i), true);
+				dynsup.addProperty(POSITION_PREFIX + i, Integer.class, 0, true);
 			}
 		}
 		catch (final Exception e)
