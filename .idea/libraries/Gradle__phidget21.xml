@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: phidget21">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/components/phidget/lib/phidget21.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
