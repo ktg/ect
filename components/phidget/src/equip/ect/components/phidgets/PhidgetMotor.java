@@ -41,7 +41,8 @@ package equip.ect.components.phidgets;
 
 import com.phidgets.MotorControlPhidget;
 import com.phidgets.PhidgetException;
-
+import com.phidgets.event.EncoderPositionChangeEvent;
+import com.phidgets.event.EncoderPositionChangeListener;
 import equip.ect.Category;
 import equip.ect.Coerce;
 import equip.ect.ECTComponent;
@@ -60,8 +61,9 @@ public class PhidgetMotor extends PhidgetBase
 	//static final int MAX_SERVO_VALUE = 180;
 
 	static final String VELOCITY_PREFIX = "velocity";
+	static final String POSITION_PREFIX = "position";
 
-	private float motorouts[];
+	private double motorouts[];
 
 	private MotorControlPhidget phid;
 
@@ -73,6 +75,21 @@ public class PhidgetMotor extends PhidgetBase
 		{
 			phid = new MotorControlPhidget();
 			absphid = phid;
+
+			phid.addEncoderPositionChangeListener(new EncoderPositionChangeListener()
+			{
+				@Override
+				public void encoderPositionChanged(EncoderPositionChangeEvent event)
+				{
+					try
+					{
+						dynSetProperty(POSITION_PREFIX + event.getIndex(), event.getValue());
+					}
+					catch (final NoSuchPropertyException e)
+					{
+					}
+				}
+			});
 		}
 		catch (final PhidgetException e)
 		{
@@ -117,18 +134,20 @@ public class PhidgetMotor extends PhidgetBase
 		try
 		{
 			int numberOfServoOutputs = phid.getMotorCount();
-			motorouts = new float[numberOfServoOutputs];
+			motorouts = new double[numberOfServoOutputs];
 
 			// initial properties
 			for (int i = 0; i < numberOfServoOutputs; i++)
 			{
-				dynsup.addProperty(VELOCITY_PREFIX + i, Float.class, new Float(0.0));
-				motorouts[i] = 0.0f;
+				dynsup.addProperty(VELOCITY_PREFIX + i, Double.class, 0.0);
+				motorouts[i] = 0.0;
 
 				phid.setVelocity(i, motorouts[i]);
+
+				dynsup.addProperty(POSITION_PREFIX + i, Integer.class, phid.getEncoderPosition(i), true);
 			}
 		}
-		catch (final PhidgetException e)
+		catch (final Exception e)
 		{
 			e.printStackTrace();
 		}
