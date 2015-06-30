@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a3ea1359-3fde-4e3e-b70f-44716816e6fc" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -60,8 +60,8 @@
       <file leaf-file-name="PhidgetMotor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.3432835">
-              <caret line="118" column="12" selection-start-line="118" selection-start-column="12" selection-end-line="118" selection-end-column="12" />
+            <state vertical-scroll-proportion="0.32238805">
+              <caret line="61" column="29" selection-start-line="61" selection-start-column="29" selection-end-line="61" selection-end-column="29" />
               <folding />
             </state>
           </provider>
@@ -1770,8 +1770,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.3432835">
-          <caret line="118" column="12" selection-start-line="118" selection-start-column="12" selection-end-line="118" selection-end-column="12" />
+        <state vertical-scroll-proportion="0.32238805">
+          <caret line="61" column="29" selection-start-line="61" selection-start-column="29" selection-end-line="61" selection-end-column="29" />
           <folding />
         </state>
       </provider>
