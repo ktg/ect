@@ -43,6 +43,8 @@ import com.phidgets.MotorControlPhidget;
 import com.phidgets.PhidgetException;
 import com.phidgets.event.EncoderPositionChangeEvent;
 import com.phidgets.event.EncoderPositionChangeListener;
+import com.phidgets.event.EncoderPositionUpdateEvent;
+import com.phidgets.event.EncoderPositionUpdateListener;
 import equip.ect.Category;
 import equip.ect.Coerce;
 import equip.ect.ECTComponent;
@@ -81,6 +83,21 @@ public class PhidgetMotor extends PhidgetBase
 				@Override
 				public void encoderPositionChanged(EncoderPositionChangeEvent event)
 				{
+					System.out.print("position" + event.getIndex() + " = " + event.getValue());
+					try
+					{
+						dynSetProperty(POSITION_PREFIX + event.getIndex(), event.getValue());
+					}
+					catch (final NoSuchPropertyException e)
+					{
+					}
+				}
+			});
+			phid.addEncoderPositionUpdateListener(new EncoderPositionUpdateListener() {
+				@Override
+				public void encoderPositionUpdated(EncoderPositionUpdateEvent event)
+				{
+					System.out.print("Position" + event.getIndex() + " = " + event.getValue());
 					try
 					{
 						dynSetProperty(POSITION_PREFIX + event.getIndex(), event.getValue());
