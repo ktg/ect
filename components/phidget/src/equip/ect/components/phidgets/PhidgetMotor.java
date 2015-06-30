@@ -63,7 +63,6 @@ public class PhidgetMotor extends PhidgetBase
 	//static final int MAX_SERVO_VALUE = 180;
 
 	static final String VELOCITY_PREFIX = "velocity";
-	static final String POSITION_PREFIX = "position";
 
 	private double motorouts[];
 
@@ -77,36 +76,6 @@ public class PhidgetMotor extends PhidgetBase
 		{
 			phid = new MotorControlPhidget();
 			absphid = phid;
-
-			phid.addEncoderPositionChangeListener(new EncoderPositionChangeListener()
-			{
-				@Override
-				public void encoderPositionChanged(EncoderPositionChangeEvent event)
-				{
-					System.out.print("position" + event.getIndex() + " = " + event.getValue());
-					try
-					{
-						dynSetProperty(POSITION_PREFIX + event.getIndex(), event.getValue());
-					}
-					catch (final NoSuchPropertyException e)
-					{
-					}
-				}
-			});
-			phid.addEncoderPositionUpdateListener(new EncoderPositionUpdateListener() {
-				@Override
-				public void encoderPositionUpdated(EncoderPositionUpdateEvent event)
-				{
-					System.out.print("Position" + event.getIndex() + " = " + event.getValue());
-					try
-					{
-						dynSetProperty(POSITION_PREFIX + event.getIndex(), event.getValue());
-					}
-					catch (final NoSuchPropertyException e)
-					{
-					}
-				}
-			});
 		}
 		catch (final PhidgetException e)
 		{
@@ -160,8 +129,6 @@ public class PhidgetMotor extends PhidgetBase
 				motorouts[i] = 0.0;
 
 				phid.setVelocity(i, motorouts[i]);
-
-				dynsup.addProperty(POSITION_PREFIX + i, Integer.class, 0, true);
 			}
 		}
 		catch (final Exception e)
