@@ -81,6 +81,9 @@ public class PhidgetMotor extends PhidgetBase implements InputChangeListener, Se
 		{
 			phid = new MotorControlPhidget();
 			absphid = phid;
+
+			phid.addInputChangeListener(this);
+			phid.addSensorUpdateListener(this);
 		}
 		catch (final PhidgetException e)
 		{
