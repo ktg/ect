@@ -41,10 +41,6 @@ package equip.ect.components.phidgets;
 
 import com.phidgets.MotorControlPhidget;
 import com.phidgets.PhidgetException;
-import com.phidgets.event.EncoderPositionChangeEvent;
-import com.phidgets.event.EncoderPositionChangeListener;
-import com.phidgets.event.EncoderPositionUpdateEvent;
-import com.phidgets.event.EncoderPositionUpdateListener;
 import equip.ect.Category;
 import equip.ect.Coerce;
 import equip.ect.ECTComponent;
@@ -57,14 +53,16 @@ import equip.ect.NoSuchPropertyException;
  */
 @ECTComponent
 @Category("Hardware/Phidgets")
-public class PhidgetMotor extends PhidgetBase
+public class PhidgetMotor extends PhidgetInterfaceKit
 {
 
 	//static final int MAX_SERVO_VALUE = 180;
 
 	static final String VELOCITY_PREFIX = "velocity";
+	static final String ACCEL_PREFIX = "accel";
 
-	private double motorouts[];
+	private double velouts[];
+	private double accelouts[];
 
 	private MotorControlPhidget phid;
 
@@ -94,10 +92,30 @@ public class PhidgetMotor extends PhidgetBase
 				final Float fval = Coerce.toClass(value, Float.class);
 				final float val = (fval == null) ? 0.0f : fval;
 				// System.out.println("Set servo output "+ix+" to "+val);
-				motorouts[ix] = val;
+				velouts[ix] = val;
 				if (connected)
 				{
 					phid.setVelocity(ix, val);
+				}
+			}
+			catch (final Exception e)
+			{
+				System.err.println("ERROR: " + e);
+				e.printStackTrace(System.err);
+			}
+		}
+		else if(name.startsWith(ACCEL_PREFIX))
+		{
+			try
+			{
+				final int ix = Integer.parseInt(name.substring(ACCEL_PREFIX.length()));
+				final Float fval = Coerce.toClass(value, Float.class);
+				final float val = (fval == null) ? 0.0f : fval;
+				// System.out.println("Set servo output "+ix+" to "+val);
+				accelouts[ix] = val;
+				if (connected)
+				{
+					phid.setAcceleration(ix, val);
 				}
 			}
 			catch (final Exception e)
@@ -110,25 +128,23 @@ public class PhidgetMotor extends PhidgetBase
 	}
 
 	@Override
-	protected void detachment()
-	{
-	}
-
-	@Override
 	protected void firstAttachment()
 	{
+		super.firstAttachment();
 		try
 		{
 			int numberOfServoOutputs = phid.getMotorCount();
-			motorouts = new double[numberOfServoOutputs];
+			velouts = new double[numberOfServoOutputs];
+			accelouts = new double[numberOfServoOutputs];
 
 			// initial properties
 			for (int i = 0; i < numberOfServoOutputs; i++)
 			{
 				dynsup.addProperty(VELOCITY_PREFIX + i, Double.class, 0.0);
-				motorouts[i] = 0.0;
+				velouts[i] = 0.0;
 
-				phid.setVelocity(i, motorouts[i]);
+				phid.setVelocity(i, velouts[i]);
+				accelouts[i] = phid.getAcceleration(i);
 			}
 		}
 		catch (final Exception e)
@@ -140,6 +156,7 @@ public class PhidgetMotor extends PhidgetBase
 	@Override
 	protected void subsequentAttachment()
 	{
+		super.subsequentAttachment();
 		// if any servo positions have changed whilst
 		// the phidget has been disconnected, then resupply them to the phidget
 
@@ -149,12 +166,30 @@ public class PhidgetMotor extends PhidgetBase
 
 		waitForABit(CONNECTION_DELAY);
 
-		for (int i = 0; i < motorouts.length; i++)
+		for (int i = 0; i < velouts.length; i++)
 		{
 			try
 			{
 				// System.out.println("Setting position: " + motorouts[i]);
-				phid.setVelocity(i, (motorouts[i]));
+				phid.setVelocity(i, (velouts[i]));
+
+				// I'm not convinced by the phidget libraries ability
+				// to deal with rapid request
+
+				waitForABit(OPERATION_DELAY);
+			}
+			catch (final PhidgetException e)
+			{
+				System.out.println("phidget exception");
+				e.printStackTrace();
+			}
+		}
+		for (int i = 0; i < accelouts.length; i++)
+		{
+			try
+			{
+				// System.out.println("Setting position: " + motorouts[i]);
+				phid.setAcceleration(i, (accelouts[i]));
 
 				// I'm not convinced by the phidget libraries ability
 				// to deal with rapid request

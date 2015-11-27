@@ -17,7 +17,8 @@
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="ect-core" exported="" />
-    <orderEntry type="library" exported="" name="Gradle: org.beanshell:bsh:2.0b5" level="project" />
+    <orderEntry type="module" module-name="ect-core" />
+    <orderEntry type="module" module-name="equip" />
+    <orderEntry type="library" name="Gradle: org.beanshell:bsh:2.0b5" level="project" />
   </component>
 </module>

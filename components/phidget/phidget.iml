@@ -17,8 +17,9 @@
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="ect-core" exported="" />
-    <orderEntry type="module-library" exported="">
+    <orderEntry type="module" module-name="ect-core" />
+    <orderEntry type="module" module-name="equip" />
+    <orderEntry type="module-library">
       <library name="Gradle: phidget21">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/phidget21.jar!/" />
