@@ -145,6 +145,7 @@ public class PhidgetMotor extends PhidgetInterfaceKit
 
 				phid.setVelocity(i, velouts[i]);
 				accelouts[i] = phid.getAcceleration(i);
+				dynsup.addProperty(ACCEL_PREFIX + i, Double.class, accelouts[i]);
 			}
 		}
 		catch (final Exception e)

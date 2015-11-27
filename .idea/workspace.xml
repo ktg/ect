@@ -2,24 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="583f3738-28ac-4fa0-ab3f-52988a0d6c0c" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/gradle.xml" afterPath="$PROJECT_DIR$/.idea/gradle.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.gradle" afterPath="$PROJECT_DIR$/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/beanshell/beanshell.iml" afterPath="$PROJECT_DIR$/components/beanshell/beanshell.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/dataprocessing/dataprocessing.iml" afterPath="$PROJECT_DIR$/components/dataprocessing/dataprocessing.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/fileio/fileio.iml" afterPath="$PROJECT_DIR$/components/fileio/fileio.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/image/image.iml" afterPath="$PROJECT_DIR$/components/image/image.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/phidget.iml" afterPath="$PROJECT_DIR$/components/phidget/phidget.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/ui/ui.iml" afterPath="$PROJECT_DIR$/components/ui/ui.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/waves/waves.iml" afterPath="$PROJECT_DIR$/components/waves/waves.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ect-core/ect-core.iml" afterPath="$PROJECT_DIR$/ect-core/ect-core.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ect.iml" afterPath="$PROJECT_DIR$/ect.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/grapheditor/grapheditor.iml" afterPath="$PROJECT_DIR$/grapheditor/grapheditor.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/local.properties" afterPath="$PROJECT_DIR$/local.properties" />
     </list>
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -76,9 +59,11 @@
       <file leaf-file-name="PhidgetMotor.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.11724138">
-              <caret line="42" column="37" selection-start-line="42" selection-start-column="37" selection-end-line="42" selection-end-column="37" />
-              <folding />
+            <state vertical-scroll-proportion="-0.51586205">
+              <caret line="140" column="58" selection-start-line="140" selection-start-column="58" selection-end-line="140" selection-end-column="58" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -2601,9 +2586,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.11724138">
-          <caret line="42" column="37" selection-start-line="42" selection-start-column="37" selection-end-line="42" selection-end-column="37" />
-          <folding />
+        <state vertical-scroll-proportion="-0.51586205">
+          <caret line="140" column="58" selection-start-line="140" selection-start-column="58" selection-end-line="140" selection-end-column="58" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
