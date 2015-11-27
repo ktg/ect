@@ -55,11 +55,8 @@ import equip.ect.NoSuchPropertyException;
 @Category("Hardware/Phidgets")
 public class PhidgetMotor extends PhidgetInterfaceKit
 {
-
-	//static final int MAX_SERVO_VALUE = 180;
-
-	static final String VELOCITY_PREFIX = "velocity";
-	static final String ACCEL_PREFIX = "accel";
+	private static final String VELOCITY_PREFIX = "velocity";
+	private static final String ACCEL_PREFIX = "accel";
 
 	private double velouts[];
 	private double accelouts[];
