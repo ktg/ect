@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="583f3738-28ac-4fa0-ab3f-52988a0d6c0c" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java" afterPath="$PROJECT_DIR$/components/phidget/src/equip/ect/components/phidgets/PhidgetMotor.java" />
-    </list>
+    <list default="true" id="583f3738-28ac-4fa0-ab3f-52988a0d6c0c" name="Default" comment="" />
     <ignored path="ect.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/components/ui/.gradle/" />
