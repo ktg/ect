@@ -15,7 +15,9 @@ import gnu.io.SerialPort;
 /**
  * Reads ints from serial port
  *
- * @author kev
+ * @classification Data/Processing
+ * @defaultOutputValue out
+ * @author ktg
  */
 @ECTComponent
 @Category("Data/Processing")
@@ -27,6 +29,11 @@ public class SerialReader implements Serializable
 	private boolean running = false;
 
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
+
+	public SerialReader()
+	{
+
+	}
 
 	public synchronized void addPropertyChangeListener(final PropertyChangeListener listener)
 	{
