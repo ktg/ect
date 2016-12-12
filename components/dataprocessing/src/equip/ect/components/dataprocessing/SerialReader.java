@@ -8,9 +8,6 @@ import java.io.Serializable;
 
 import equip.ect.Category;
 import equip.ect.ECTComponent;
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
 
 /**
  * Reads ints from serial port
@@ -69,7 +66,6 @@ public class SerialReader implements Serializable
 	{
 		String oldPort = this.port;
 		this.port = port;
-		System.out.println("Change port " + oldPort + " -> " + port);
 		propertyChangeListeners.firePropertyChange("port", oldPort, port);
 	}
 
