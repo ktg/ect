@@ -15,7 +15,7 @@ import gnu.io.SerialPort;
 /**
  * Reads ints from serial port
  *
- * @author stef
+ * @author kev
  */
 @ECTComponent
 @Category("Data/Processing")
@@ -33,6 +33,11 @@ public class SerialReader implements Serializable
 		propertyChangeListeners.addPropertyChangeListener(listener);
 	}
 
+	public synchronized void removePropertyChangeListener(final PropertyChangeListener listener)
+	{
+		propertyChangeListeners.removePropertyChangeListener(listener);
+	}
+
 	public String getPort()
 	{
 		return port;
@@ -43,7 +48,7 @@ public class SerialReader implements Serializable
 		return value;
 	}
 
-	public boolean getRunning()
+	public boolean isRunning()
 	{
 		return running;
 	}
