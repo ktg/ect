@@ -2,18 +2,18 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/components/beanshell/beanshell.iml" filepath="$PROJECT_DIR$/components/beanshell/beanshell.iml" />
-      <module fileurl="file://$PROJECT_DIR$/components/components.iml" filepath="$PROJECT_DIR$/components/components.iml" />
-      <module fileurl="file://$PROJECT_DIR$/components/dataprocessing/dataprocessing.iml" filepath="$PROJECT_DIR$/components/dataprocessing/dataprocessing.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ect.iml" filepath="$PROJECT_DIR$/ect.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ect-core/ect-core.iml" filepath="$PROJECT_DIR$/ect-core/ect-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/equip/equip.iml" filepath="$PROJECT_DIR$/equip/equip.iml" />
-      <module fileurl="file://$PROJECT_DIR$/components/fileio/fileio.iml" filepath="$PROJECT_DIR$/components/fileio/fileio.iml" />
-      <module fileurl="file://$PROJECT_DIR$/grapheditor/grapheditor.iml" filepath="$PROJECT_DIR$/grapheditor/grapheditor.iml" />
-      <module fileurl="file://$PROJECT_DIR$/components/image/image.iml" filepath="$PROJECT_DIR$/components/image/image.iml" />
-      <module fileurl="file://$PROJECT_DIR$/components/phidget/phidget.iml" filepath="$PROJECT_DIR$/components/phidget/phidget.iml" />
-      <module fileurl="file://$PROJECT_DIR$/components/ui/ui.iml" filepath="$PROJECT_DIR$/components/ui/ui.iml" />
-      <module fileurl="file://$PROJECT_DIR$/components/waves/waves.iml" filepath="$PROJECT_DIR$/components/waves/waves.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/beanshell/beanshell.iml" filepath="$PROJECT_DIR$/.idea/modules/components/beanshell/beanshell.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/components.iml" filepath="$PROJECT_DIR$/.idea/modules/components/components.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/dataprocessing/dataprocessing.iml" filepath="$PROJECT_DIR$/.idea/modules/components/dataprocessing/dataprocessing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ect.iml" filepath="$PROJECT_DIR$/.idea/modules/ect.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ect-core/ect-core.iml" filepath="$PROJECT_DIR$/.idea/modules/ect-core/ect-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/equip/equip.iml" filepath="$PROJECT_DIR$/.idea/modules/equip/equip.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/fileio/fileio.iml" filepath="$PROJECT_DIR$/.idea/modules/components/fileio/fileio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/grapheditor/grapheditor.iml" filepath="$PROJECT_DIR$/.idea/modules/grapheditor/grapheditor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/image/image.iml" filepath="$PROJECT_DIR$/.idea/modules/components/image/image.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/phidget/phidget.iml" filepath="$PROJECT_DIR$/.idea/modules/components/phidget/phidget.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/ui/ui.iml" filepath="$PROJECT_DIR$/.idea/modules/components/ui/ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/components/waves/waves.iml" filepath="$PROJECT_DIR$/.idea/modules/components/waves/waves.iml" />
     </modules>
   </component>
 </project>
