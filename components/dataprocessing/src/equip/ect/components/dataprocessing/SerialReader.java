@@ -57,14 +57,14 @@ public class SerialReader implements Serializable
 	{
 		String oldPort = this.port;
 		this.port = port;
-		propertyChangeListeners.firePropertyChange("port", oldPort, port);
+		propertyChangeListeners.firePropertyChange("port", port, oldPort);
 	}
 
 	public void setRunning(boolean running)
 	{
 		boolean oldRunning = this.running;
 		this.running = running;
-		propertyChangeListeners.firePropertyChange("running", oldRunning, running);
+		propertyChangeListeners.firePropertyChange("running", running, oldRunning);
 		if (running)
 		{
 			connect();
@@ -75,7 +75,7 @@ public class SerialReader implements Serializable
 	{
 		String oldError = this.error;
 		this.error = error;
-		propertyChangeListeners.firePropertyChange("error", oldError, error);
+		propertyChangeListeners.firePropertyChange("error", error, oldError);
 	}
 
 	private void connect()
@@ -109,7 +109,7 @@ public class SerialReader implements Serializable
 							{
 								int oldValue = value;
 								value = dataInputStream.readInt();
-								propertyChangeListeners.firePropertyChange("value", oldValue, value);
+								propertyChangeListeners.firePropertyChange("value", value, oldValue);
 							}
 						}
 						else {
