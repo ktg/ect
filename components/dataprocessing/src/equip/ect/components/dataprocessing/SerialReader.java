@@ -8,6 +8,9 @@ import java.io.Serializable;
 
 import equip.ect.Category;
 import equip.ect.ECTComponent;
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
 
 /**
  * Reads ints from serial port
