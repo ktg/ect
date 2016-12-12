@@ -2,6 +2,8 @@ version = '1.0'
 
 dependencies {
 	compile project(":ect-core")
+
+    compile "org.rxtx:rxtx:+"
 	compile "joda-time:joda-time:+"
 }
 
