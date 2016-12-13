@@ -121,7 +121,6 @@ public class SerialReader implements Serializable
 				serialPort.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 				serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
 				serialPort.addEventListener(event -> {
-					System.out.println();
 					try
 					{
 						if (event.isRXCHAR() && event.getEventValue() > 0)
@@ -134,8 +133,16 @@ public class SerialReader implements Serializable
 									String input = message.toString();
 									message.setLength(0);
 									float oldValue = value;
-									float value = Float.parseFloat(input);
-									propertyChangeListeners.firePropertyChange("value", oldValue, value);
+									try
+									{
+										float value = Float.parseFloat(input);
+										System.out.println(input);
+										propertyChangeListeners.firePropertyChange("value", oldValue, value);
+									}
+									catch (Exception e)
+									{
+										// Do nothin'
+									}
 								}
 								else
 								{
