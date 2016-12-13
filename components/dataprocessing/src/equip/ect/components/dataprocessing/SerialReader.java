@@ -110,8 +110,23 @@ public class SerialReader implements Serializable
 							final String input = new String(buffer);
 							final String[] lines = input.split("\n");
 							float oldValue = value;
-							value = Float.parseFloat(lines[lines.length - 1]);
-							propertyChangeListeners.firePropertyChange("value", oldValue, value);
+							Float newValue = null;
+							for(String line: lines)
+							{
+								try
+								{
+									newValue = Float.parseFloat(line);
+								}
+								catch (Exception e)
+								{
+									// Ignore parse exceptions
+								}
+							}
+							if(newValue != null)
+							{
+								value = newValue;
+								propertyChangeListeners.firePropertyChange("value", oldValue, value);
+							}
 						}
 					}
 					catch (Exception e)
