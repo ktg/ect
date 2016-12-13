@@ -108,6 +108,8 @@ public class SerialReader implements Serializable
 						{
 							final byte[] buffer = serialPort.readBytes();
 							final String input = new String(buffer);
+							System.out.println("Input: " + input);
+							System.out.println("----------------");
 							final String[] lines = input.split("\n");
 							float oldValue = value;
 							Float newValue = null;
