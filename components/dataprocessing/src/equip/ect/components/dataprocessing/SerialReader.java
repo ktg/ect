@@ -102,6 +102,7 @@ public class SerialReader implements Serializable
 				try
 				{
 					serialPort = new SerialPort(port);
+					serialPort.openPort();
 					serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, 1, 0);
 					serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
 					serialPort.addEventListener(event -> {
