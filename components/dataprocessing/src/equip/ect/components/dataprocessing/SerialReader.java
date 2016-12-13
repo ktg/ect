@@ -119,24 +119,13 @@ public class SerialReader implements Serializable
 				serialPort.openPort();
 				serialPort.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 				serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
-				serialPort.addEventListener(event -> {
-					try
-					{
-						if (event.isRXCHAR() && event.getEventValue() > 0)
-						{
-							final byte[] buffer = serialPort.readBytes();
-							final String input = new String(buffer);
-							float oldValue = value;
-							float value = Float.parseFloat(input);
-							propertyChangeListeners.firePropertyChange("value", oldValue, value);
-						}
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-						setError("Error: " + e.getMessage());
-					}
-				}, SerialPort.MASK_RXCHAR);
+				while (running)
+				{
+					String input = serialPort.readString();
+					float oldValue = value;
+					float value = Float.parseFloat(input);
+					propertyChangeListeners.firePropertyChange("value", oldValue, value);
+				}
 			}
 			catch (Exception e)
 			{
@@ -153,7 +142,6 @@ public class SerialReader implements Serializable
 		{
 			if (serialPort != null)
 			{
-				serialPort.removeEventListener();
 				if (serialPort.isOpened())
 				{
 					serialPort.closePort();
