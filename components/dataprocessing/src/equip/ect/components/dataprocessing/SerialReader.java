@@ -7,6 +7,8 @@ import com.fazecast.jSerialComm.SerialPortPacketListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import equip.ect.Category;
 import equip.ect.ECTComponent;
@@ -108,7 +110,7 @@ public class SerialReader implements Serializable
 				@Override
 				public int getPacketSize()
 				{
-					return 8;
+					return 4;
 				}
 
 				@Override
@@ -120,9 +122,22 @@ public class SerialReader implements Serializable
 				@Override
 				public void serialEvent(SerialPortEvent event)
 				{
-					if (event.getEventType() == SerialPort.LISTENING_EVENT_DATA_RECEIVED)
+					try
 					{
-
+						if (event.getEventType() == SerialPort.LISTENING_EVENT_DATA_RECEIVED)
+						{
+							ByteBuffer byteBuffer = ByteBuffer.wrap(event.getReceivedData());
+							//byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+							int oldValue = value;
+							value = byteBuffer.getInt();
+							System.out.println("Value = " + value);
+							propertyChangeListeners.firePropertyChange("value", oldValue, value);
+						}
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+						setError("Error: " + e.getMessage());
 					}
 				}
 			});
