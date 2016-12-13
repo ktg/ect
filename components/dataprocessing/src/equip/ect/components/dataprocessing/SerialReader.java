@@ -122,6 +122,7 @@ public class SerialReader implements Serializable
 				while (running)
 				{
 					String input = serialPort.readString();
+					System.out.println(input);
 					float oldValue = value;
 					try
 					{
