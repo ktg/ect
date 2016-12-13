@@ -25,6 +25,7 @@ public class SerialReader implements Serializable
 	private int baudRate = SerialPort.BAUDRATE_9600;
 	private boolean running = false;
 	private SerialPort serialPort;
+	private StringBuilder message = new StringBuilder();
 
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 
@@ -126,12 +127,21 @@ public class SerialReader implements Serializable
 						if (event.isRXCHAR() && event.getEventValue() > 0)
 						{
 							final byte[] buffer = serialPort.readBytes();
-							final String input = new String(buffer);
-							System.out.println(input);
-							System.out.println("-------------");
-							float oldValue = value;
-							float value = Float.parseFloat(input);
-							propertyChangeListeners.firePropertyChange("value", oldValue, value);
+							for (byte b : buffer)
+							{
+								if ((b == '\r' || b == '\n') && message.length() > 0)
+								{
+									String input = message.toString();
+									message.setLength(0);
+									float oldValue = value;
+									float value = Float.parseFloat(input);
+									propertyChangeListeners.firePropertyChange("value", oldValue, value);
+								}
+								else
+								{
+									message.append((char) b);
+								}
+							}
 						}
 					}
 					catch (Exception e)
