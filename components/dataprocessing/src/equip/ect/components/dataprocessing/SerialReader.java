@@ -20,7 +20,7 @@ import jssc.SerialPort;
 public class SerialReader implements Serializable
 {
 	private String port = "COM1";
-	private int value = 0;
+	private float value = 0;
 	private String error = "";
 	private boolean running = false;
 	private SerialPort serialPort;
@@ -47,7 +47,7 @@ public class SerialReader implements Serializable
 		return port;
 	}
 
-	public int getValue()
+	public float getValue()
 	{
 		return value;
 	}
@@ -94,41 +94,37 @@ public class SerialReader implements Serializable
 
 	private void connect()
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-			public void run()
+		new Thread(() -> {
+			try
 			{
-				try
-				{
-					serialPort = new SerialPort(port);
-					serialPort.openPort();
-					serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, 1, 0);
-					serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
-					serialPort.addEventListener(event -> {
-						try
+				serialPort = new SerialPort(port);
+				serialPort.openPort();
+				serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, 1, 0);
+				serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
+				serialPort.addEventListener(event -> {
+					try
+					{
+						if (event.isRXCHAR() && event.getEventValue() > 0)
 						{
-							if (event.isRXCHAR() && event.getEventValue() > 0)
-							{
-								byte buffer[] = serialPort.readBytes();
-								String test = new String(buffer);
-								System.out.println(test);
-							}
+							byte buffer[] = serialPort.readBytes();
+							float oldValue = value;
+							value = Float.parseFloat(new String(buffer));
+							propertyChangeListeners.firePropertyChange("value", oldValue, value);
 						}
-						catch (Exception e)
-						{
-							e.printStackTrace();
-							setError("Error: " + e.getMessage());
-							setRunning(false);
-						}
-					});
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-					setError("Error: " + e.getMessage());
-					setRunning(false);
-				}
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+						setError("Error: " + e.getMessage());
+						setRunning(false);
+					}
+				});
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				setError("Error: " + e.getMessage());
+				setRunning(false);
 			}
 		}).start();
 	}
