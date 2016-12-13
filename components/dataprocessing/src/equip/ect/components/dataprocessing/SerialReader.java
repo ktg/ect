@@ -132,11 +132,11 @@ public class SerialReader implements Serializable
 								{
 									String input = message.toString();
 									message.setLength(0);
-									float oldValue = value;
 									try
 									{
-										float value = Float.parseFloat(input);
-										System.out.println(input);
+										float oldValue = value;
+										value = Float.parseFloat(input);
+										System.out.println(input + ":" + value);
 										propertyChangeListeners.firePropertyChange("value", oldValue, value);
 									}
 									catch (Exception e)
