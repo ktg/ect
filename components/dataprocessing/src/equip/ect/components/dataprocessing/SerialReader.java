@@ -139,7 +139,10 @@ public class SerialReader implements Serializable
 			if (serialPort != null)
 			{
 				serialPort.removeEventListener();
-				serialPort.closePort();
+				if(serialPort.isOpened())
+				{
+					serialPort.closePort();
+				}
 				serialPort = null;
 			}
 		}
