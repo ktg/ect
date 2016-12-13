@@ -32,7 +32,6 @@ public class SerialReader implements Serializable
 
 	public SerialReader()
 	{
-
 	}
 
 	public synchronized void addPropertyChangeListener(final PropertyChangeListener listener)
@@ -55,7 +54,7 @@ public class SerialReader implements Serializable
 		return value;
 	}
 
-	public boolean isRunning()
+	public boolean getRunning()
 	{
 		return running;
 	}
@@ -72,7 +71,7 @@ public class SerialReader implements Serializable
 		propertyChangeListeners.firePropertyChange("port", oldPort, port);
 	}
 
-	public void setRunning(boolean running)
+	public void setRunning(final boolean running)
 	{
 		boolean oldRunning = this.running;
 		this.running = running;

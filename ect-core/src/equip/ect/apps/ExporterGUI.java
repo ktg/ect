@@ -61,7 +61,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * GUI Application which is the main (current) Java container.
@@ -77,6 +79,14 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 	 */
 	public static void main(final String args[]) throws Exception
 	{
+		Properties p = System.getProperties();
+		Enumeration keys = p.keys();
+		while (keys.hasMoreElements()) {
+			String key = (String)keys.nextElement();
+			String value = (String)p.get(key);
+			System.out.println(key + ": " + value);
+		}
+
 		final JFrame f = new JFrame("ECT Java Container");
 		f.getContentPane().add(new JLabel("Starting up - please wait"));
 		f.addWindowListener(new WindowAdapter()

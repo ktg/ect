@@ -63,8 +63,6 @@ import equip.ect.apps.editor.dataspace.DataspaceUtils;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -82,7 +80,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,7 +102,7 @@ public class ComponentBrowser extends JPanel
 		/**
 		 * cons
 		 */
-		public DataspaceTreeCellRenderer(final DataspaceBean dataspace)
+		DataspaceTreeCellRenderer(final DataspaceBean dataspace)
 		{
 			super();
 			this.dataspace = dataspace;
@@ -141,29 +138,28 @@ public class ComponentBrowser extends JPanel
 					if (item instanceof TupleImpl)
 					{
 						final TupleImpl tuple = (TupleImpl) item;
-						if (tuple.name.equals(Capability.TYPE))
+						switch (tuple.name)
 						{
-							display = DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
-						}
-						else if (tuple.name.equals(ComponentRequest.TYPE))
-						{
-							ComponentRequest componentRequest = new ComponentRequest(tuple);
-							display = componentRequest.getRequestID();
-							icon = request;
+							case Capability.TYPE:
+								display = DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
+								break;
+							case ComponentRequest.TYPE:
+								ComponentRequest componentRequest = new ComponentRequest(tuple);
+								display = componentRequest.getRequestID();
+								icon = request;
 
-						}
-						else if (tuple.name.equals(ComponentAdvert.TYPE))
-						{
-							ComponentAdvert componentAdvert = new ComponentAdvert(tuple);
-							display = DataspaceUtils.getCurrentName(componentAdvert);
-							icon = component;
-						}
-						else if (tuple.name.equals(PropertyLinkRequest.TYPE))
-						{
-							icon = link;
-							PropertyLinkRequest link = new PropertyLinkRequest(tuple);
-							ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
-							display = link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
+								break;
+							case ComponentAdvert.TYPE:
+								ComponentAdvert componentAdvert = new ComponentAdvert(tuple);
+								display = DataspaceUtils.getCurrentName(componentAdvert);
+								icon = component;
+								break;
+							case PropertyLinkRequest.TYPE:
+								icon = link;
+								PropertyLinkRequest link = new PropertyLinkRequest(tuple);
+								ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
+								display = link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
+								break;
 						}
 
 						if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)
@@ -201,7 +197,7 @@ public class ComponentBrowser extends JPanel
 		/**
 		 * @param pattern The pattern to set.
 		 */
-		public void setPattern(final String pattern)
+		void setPattern(final String pattern)
 		{
 			this.pattern = pattern;
 		}
@@ -209,14 +205,14 @@ public class ComponentBrowser extends JPanel
 
 	private abstract class DataspaceTreeView extends JScrollPane implements SelectionModel.SelectionListener
 	{
-		protected final Map<String, DefaultMutableTreeNode> nodeMap = new HashMap<String, DefaultMutableTreeNode>();
-		protected final DefaultMutableTreeNode root;
-		protected final DefaultTreeModel treeModel;
-		protected final JTree tree;
+		final Map<String, DefaultMutableTreeNode> nodeMap = new HashMap<>();
+		final DefaultMutableTreeNode root;
+		final DefaultTreeModel treeModel;
+		final JTree tree;
 		private short clickCounter = 0;
 		private boolean selectionModelChange = false;
 
-		public DataspaceTreeView(String name)
+		DataspaceTreeView(String name)
 		{
 			setName(name);
 			root = new DefaultMutableTreeNode(name);
@@ -238,32 +234,27 @@ public class ComponentBrowser extends JPanel
 					handle(e);
 				}
 			});
-			tree.addTreeSelectionListener(new TreeSelectionListener()
-			{
-				@Override
-				public void valueChanged(TreeSelectionEvent e)
+			tree.addTreeSelectionListener(e -> {
+				if (selectionModelChange)
 				{
-					if (selectionModelChange)
+					return;
+				}
+				Collection<String> selected = new HashSet<>();
+				if (tree.getSelectionPaths() != null)
+				{
+					for (TreePath path : tree.getSelectionPaths())
 					{
-						return;
-					}
-					Collection<String> selected = new HashSet<String>();
-					if (tree.getSelectionPaths() != null)
-					{
-						for (TreePath path : tree.getSelectionPaths())
+						if (path.getLastPathComponent() instanceof DefaultMutableTreeNode)
 						{
-							if (path.getLastPathComponent() instanceof DefaultMutableTreeNode)
+							Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+							if (userObject instanceof GUID)
 							{
-								Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-								if (userObject instanceof GUID)
-								{
-									selected.add(userObject.toString());
-								}
+								selected.add(userObject.toString());
 							}
 						}
 					}
-					selectionModel.set(selected);
 				}
+				selectionModel.set(selected);
 			});
 			ToolTipManager.sharedInstance().registerComponent(tree);
 
@@ -301,39 +292,39 @@ public class ComponentBrowser extends JPanel
 							if (item != null && item instanceof TupleImpl)
 							{
 								TupleImpl tuple = (TupleImpl) item;
-								if (tuple.name.equals(Capability.TYPE))
+								switch (tuple.name)
 								{
+									case Capability.TYPE:
 
-									popup.add(new AbstractAction("Create request")
-									{
-										@Override
-										public void actionPerformed(final ActionEvent ae)
+										popup.add(new AbstractAction("Create request")
 										{
-											ComponentBrowser.this.requestComponent(item);
-										}
-									});
-								}
-								else if (tuple.name.equals(ComponentRequest.TYPE))
-								{
-									popup.add(new AbstractAction("Delete request")
-									{
-										@Override
-										public void actionPerformed(final ActionEvent ae)
+											@Override
+											public void actionPerformed(final ActionEvent ae)
+											{
+												ComponentBrowser.this.requestComponent(item);
+											}
+										});
+										break;
+									case ComponentRequest.TYPE:
+										popup.add(new AbstractAction("Delete request")
 										{
-											deleteComponentRequest(id);
-										}
-									});
-								}
-								else if (tuple.name.equals(ComponentAdvert.TYPE))
-								{
-									popup.add(new AbstractAction("Delete request")
-									{
-										@Override
-										public void actionPerformed(final ActionEvent ae)
+											@Override
+											public void actionPerformed(final ActionEvent ae)
+											{
+												deleteComponentRequest(id);
+											}
+										});
+										break;
+									case ComponentAdvert.TYPE:
+										popup.add(new AbstractAction("Delete request")
 										{
-											deleteComponent(id);
-										}
-									});
+											@Override
+											public void actionPerformed(final ActionEvent ae)
+											{
+												deleteComponent(id);
+											}
+										});
+										break;
 								}
 							}
 							popup.show(tree, e.getX(), e.getY());
@@ -382,7 +373,7 @@ public class ComponentBrowser extends JPanel
 			}
 		}
 
-		public JTree getMainTree()
+		JTree getMainTree()
 		{
 			return tree;
 		}
@@ -390,7 +381,7 @@ public class ComponentBrowser extends JPanel
 		@Override
 		public void selectionChanged(Collection<String> selection)
 		{
-			List<TreePath> treePaths = new ArrayList<TreePath>();
+			List<TreePath> treePaths = new ArrayList<>();
 			for (String item : selection)
 			{
 				DefaultMutableTreeNode node = nodeMap.get(item);
@@ -414,10 +405,7 @@ public class ComponentBrowser extends JPanel
 			final Collection<Capability> currentCapabilities = DataspaceMonitor.getMonitor().getCapabilities();
 			if (currentCapabilities != null)
 			{
-				for (Capability cap : currentCapabilities)
-				{
-					capabilityAdded(cap);
-				}
+				currentCapabilities.forEach(this::capabilityAdded);
 			}
 
 			DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(this);
@@ -444,7 +432,7 @@ public class ComponentBrowser extends JPanel
 		/**
 		 * check for ComponentRequests against Capability still present and add/remove
 		 */
-		protected void checkComponentRequests(final GUID capId, final boolean addFlag)
+		void checkComponentRequests(final GUID capId, final boolean addFlag)
 		{
 			final ComponentRequest template = new ComponentRequest((GUID) null);
 			template.setCapabilityID(capId);
@@ -677,13 +665,7 @@ public class ComponentBrowser extends JPanel
 			// make sure path is visible
 			tree.expandPath(new TreePath(root.getPath()));
 
-			for(PropertyLinkRequest link: DataspaceMonitor.getMonitor().getPropertyLinks())
-			{
-				if(link.getSourceComponentID().toString().equals(comp.getID().toString()))
-				{
-					propertyLinkRequestAdded(link);
-				}
-			}
+			DataspaceMonitor.getMonitor().getPropertyLinks().stream().filter(link -> link.getSourceComponentID().toString().equals(comp.getID().toString())).forEach(this::propertyLinkRequestAdded);
 		}
 
 		@Override
@@ -703,19 +685,8 @@ public class ComponentBrowser extends JPanel
 		{
 			List<DefaultMutableTreeNode> children = Collections.list(node.children());
 			node.removeAllChildren();
-			Collections.sort(children, new Comparator<DefaultMutableTreeNode>()
-			{
-				@Override
-				public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2)
-				{
-					return treeNodeToString(o1).compareTo(treeNodeToString(o2));
-				}
-			});
-
-			for (DefaultMutableTreeNode child : children)
-			{
-				node.add(child);
-			}
+			Collections.sort(children, (o1, o2) -> treeNodeToString(o1).compareTo(treeNodeToString(o2)));
+			children.forEach(node::add);
 
 			treeModel.nodeStructureChanged(node);
 		}
@@ -826,7 +797,7 @@ public class ComponentBrowser extends JPanel
 		}
 	}
 
-	private final List<DataspaceTreeView> dataspaceTreeViews = new ArrayList<DataspaceTreeView>();
+	private final List<DataspaceTreeView> dataspaceTreeViews = new ArrayList<>();
 	private final DataspaceBean dataspace = DataspaceMonitor.getMonitor().getDataspace();
 	private final SelectionModel selectionModel;
 
@@ -854,43 +825,38 @@ public class ComponentBrowser extends JPanel
 		final JTextField searchField = new JTextField();
 		searchField.setMaximumSize(new Dimension(100, 20));
 
-		final ActionListener searchAction = new ActionListener()
-		{
-			@Override
-			public void actionPerformed(final ActionEvent e)
+		final ActionListener searchAction = e -> {
+			final String regexString = ".*" + searchField.getText().toLowerCase() + ".*";
+			for (final DataspaceTreeView capabilityView : dataspaceTreeViews)
 			{
-				final String regexString = ".*" + searchField.getText().toLowerCase() + ".*";
-				for (final DataspaceTreeView capabilityView : dataspaceTreeViews)
+				final JTree mainCapTree = capabilityView.getMainTree();
+
+				final DataspaceTreeCellRenderer renderer = (DataspaceTreeCellRenderer) mainCapTree.getCellRenderer();
+				renderer.setPattern(regexString);
+
+				final DefaultTreeModel treeModel = (DefaultTreeModel) mainCapTree.getModel();
+				final DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
+				final Enumeration<?> en = rootNode.depthFirstEnumeration();
+				while (en.hasMoreElements())
 				{
-					final JTree mainCapTree = capabilityView.getMainTree();
-
-					final DataspaceTreeCellRenderer renderer = (DataspaceTreeCellRenderer) mainCapTree.getCellRenderer();
-					renderer.setPattern(regexString);
-
-					final DefaultTreeModel treeModel = (DefaultTreeModel) mainCapTree.getModel();
-					final DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
-					final Enumeration<?> en = rootNode.depthFirstEnumeration();
-					while (en.hasMoreElements())
+					final DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) en.nextElement();
+					final Object obj = theNode.getUserObject();
+					String nodeString;
+					if (dataspace != null && obj instanceof GUID)
 					{
-						final DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) en.nextElement();
-						final Object obj = theNode.getUserObject();
-						String nodeString;
-						if (dataspace != null && obj instanceof GUID)
-						{
-							final String rval = RDFStatement.GUIDToUrl((GUID) obj);
-							nodeString = DataspaceUtils.getDisplayString(dataspace, rval);
-						}
-						else
-						{
-							nodeString = theNode.toString();
-						}
-						// System.out.println("Matching " +
-						// obj.getClass().getName());
-						if (nodeString.toLowerCase().matches(regexString))
-						{
-							final TreePath path = new TreePath(treeModel.getPathToRoot(theNode));
-							mainCapTree.scrollPathToVisible(path);
-						}
+						final String rval = RDFStatement.GUIDToUrl((GUID) obj);
+						nodeString = DataspaceUtils.getDisplayString(dataspace, rval);
+					}
+					else
+					{
+						nodeString = theNode.toString();
+					}
+					// System.out.println("Matching " +
+					// obj.getClass().getName());
+					if (nodeString.toLowerCase().matches(regexString))
+					{
+						final TreePath path = new TreePath(treeModel.getPathToRoot(theNode));
+						mainCapTree.scrollPathToVisible(path);
 					}
 				}
 			}
@@ -976,7 +942,7 @@ public class ComponentBrowser extends JPanel
 	 * tree node to text
 	 */
 
-	public String treeNodeToString(final Object value)
+	private String treeNodeToString(final Object value)
 	{
 		final Object userValue = (value instanceof DefaultMutableTreeNode) ? ((DefaultMutableTreeNode) value)
 				.getUserObject() : null;
@@ -988,23 +954,18 @@ public class ComponentBrowser extends JPanel
 				if (item instanceof TupleImpl)
 				{
 					final TupleImpl tuple = (TupleImpl) item;
-					if (tuple.name.equals(Capability.TYPE))
+					switch (tuple.name)
 					{
-						return DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
-					}
-					else if (tuple.name.equals(ComponentRequest.TYPE))
-					{
-						return new ComponentRequest(tuple).getRequestID();
-					}
-					else if (tuple.name.equals(ComponentAdvert.TYPE))
-					{
-						return DataspaceUtils.getCurrentName(new ComponentAdvert(tuple));
-					}
-					else if (tuple.name.equals(PropertyLinkRequest.TYPE))
-					{
-						PropertyLinkRequest link = new PropertyLinkRequest(tuple);
-						ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
-						return link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
+						case Capability.TYPE:
+							return DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
+						case ComponentRequest.TYPE:
+							return new ComponentRequest(tuple).getRequestID();
+						case ComponentAdvert.TYPE:
+							return DataspaceUtils.getCurrentName(new ComponentAdvert(tuple));
+						case PropertyLinkRequest.TYPE:
+							PropertyLinkRequest link = new PropertyLinkRequest(tuple);
+							ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
+							return link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
 					}
 
 					if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)

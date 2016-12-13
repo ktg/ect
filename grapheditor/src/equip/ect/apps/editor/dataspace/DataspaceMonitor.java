@@ -55,8 +55,10 @@ import equip.ect.*;
 import equip.ect.apps.editor.Info;
 import equip.ect.discovery.DataspaceDiscover;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +93,7 @@ public class DataspaceMonitor
 		return monitor;
 	}
 
-	class MyCapabilityListener extends MyDSListener
+	private class MyCapabilityListener extends MyDSListener
 	{
 		@Override
 		void handleEvent(final DataspaceEvent dsEvent, final Event event)
@@ -127,7 +129,7 @@ public class DataspaceMonitor
 	/*
 	 * Listen for Component Adverts
 	 */
-	class MyComponentAdvertListener extends MyDSListener
+	private class MyComponentAdvertListener extends MyDSListener
 	{
 
 		@Override
@@ -178,7 +180,7 @@ public class DataspaceMonitor
 		}
 	}
 
-	class MyComponentPropertyListener extends MyDSListener
+	private class MyComponentPropertyListener extends MyDSListener
 	{
 
 		private boolean includeUpdateEvents;
@@ -203,7 +205,7 @@ public class DataspaceMonitor
 				Map<String, ComponentProperty> props = properties.get(compProp.getComponentID().toString());
 				if (props == null)
 				{
-					props = new HashMap<String, ComponentProperty>();
+					props = new HashMap<>();
 					properties.put(compProp.getComponentID().toString(), props);
 				}
 				props.put(compProp.getID().toString(), compProp);
@@ -221,7 +223,7 @@ public class DataspaceMonitor
 							List<GUID> v = sourcePropertyReferencedBy.get(ref);
 							if (v == null)
 							{
-								v = new ArrayList<GUID>();
+								v = new ArrayList<>();
 								sourcePropertyReferencedBy.put(ref, v);
 							}
 							v.add(compProp.getID());
@@ -307,7 +309,7 @@ public class DataspaceMonitor
 		/**
 		 * check refering properties on change
 		 */
-		protected void checkReferringProperties(final GUID id)
+		void checkReferringProperties(final GUID id)
 		{
 			final List<GUID> v = sourcePropertyReferencedBy.get(id);
 			if (v == null)
@@ -353,7 +355,7 @@ public class DataspaceMonitor
 	/*
 	 * Listen for Component Adverts
 	 */
-	class MyComponentRequestListener extends MyDSListener
+	private class MyComponentRequestListener extends MyDSListener
 	{
 
 		@Override
@@ -387,7 +389,7 @@ public class DataspaceMonitor
 	/*
 	 * RDFStatement Listener
 	 */
-	class MyContainerListener extends MyDSListener
+	private class MyContainerListener extends MyDSListener
 	{
 		@Override
 		void handleEvent(final DataspaceEvent dsEvent, final Event event)
@@ -411,9 +413,9 @@ public class DataspaceMonitor
 
 		static final int POLL_TIME_MS = 100;
 		static final int MAX_WORK_TIME_MS = 100;
-		protected List<DataspaceEvent> events = new ArrayList<DataspaceEvent>();
+		List<DataspaceEvent> events = new ArrayList<>();
 
-		public MyDSListener()
+		MyDSListener()
 		{
 			final javax.swing.Timer t = new javax.swing.Timer(POLL_TIME_MS, new java.awt.event.ActionListener()
 			{
@@ -531,17 +533,9 @@ public class DataspaceMonitor
 					}
 				}
 			}
-			catch (final NoSuchMethodException nsme)
+			catch (final NoSuchMethodException | IllegalAccessException | InvocationTargetException nsme)
 			{
 				nsme.printStackTrace();
-			}
-			catch (final IllegalAccessException iae)
-			{
-				iae.printStackTrace();
-			}
-			catch (final java.lang.reflect.InvocationTargetException ite)
-			{
-				ite.printStackTrace();
 			}
 		}
 
@@ -551,7 +545,7 @@ public class DataspaceMonitor
 	/*
 	 * Listen for Property Link Requests
 	 */
-	class MyPropertyLinkRequestListener extends MyDSListener
+	private class MyPropertyLinkRequestListener extends MyDSListener
 	{
 		@Override
 		void handleEvent(final DataspaceEvent dsEvent, final Event event)
@@ -637,14 +631,14 @@ public class DataspaceMonitor
 		}
 	}
 
-	private final Map<String, Capability> capabilities = new HashMap<String, Capability>();
-	private final Map<String, ComponentAdvert> components = new HashMap<String, ComponentAdvert>();
-	private final Map<String, Map<String, ComponentProperty>> properties = new HashMap<String, Map<String, ComponentProperty>>();
-	private final Map<String, PropertyLinkRequest> links = new HashMap<String, PropertyLinkRequest>();
-	private final List<ComponentListener> compListeners = new ArrayList<ComponentListener>();
-	private final List<ComponentPropertyListener> compPropListeners = new ArrayList<ComponentPropertyListener>();
-	private final List<ComponentMetadataListener> metadataListeners = new ArrayList<ComponentMetadataListener>();
-	private final List<DataspaceConfigurationListener> configurationListeners = new ArrayList<DataspaceConfigurationListener>();
+	private final Map<String, Capability> capabilities = new HashMap<>();
+	private final Map<String, ComponentAdvert> components = new HashMap<>();
+	private final Map<String, Map<String, ComponentProperty>> properties = new HashMap<>();
+	private final Map<String, PropertyLinkRequest> links = new HashMap<>();
+	private final List<ComponentListener> compListeners = new ArrayList<>();
+	private final List<ComponentPropertyListener> compPropListeners = new ArrayList<>();
+	private final List<ComponentMetadataListener> metadataListeners = new ArrayList<>();
+	private final List<DataspaceConfigurationListener> configurationListeners = new ArrayList<>();
 	// Equip
 	private DataspaceBean dataspace = new DataspaceBean();
 	private String url;
@@ -1105,11 +1099,10 @@ public class DataspaceMonitor
 			final ItemData[] items = dataspace.copyCollect(item);
 			if (items == null || items.length < 1)
 			{
-				return null;
+				return Collections.emptyList();
 			}
-			final java.lang.reflect.Constructor<T> constructor = itemClass
-					.getConstructor(new Class[]{equip.data.TupleImpl.class});
-			final List<T> results = new ArrayList<T>(items.length);
+			final java.lang.reflect.Constructor<T> constructor = itemClass.getConstructor(TupleImpl.class);
+			final List<T> results = new ArrayList<>(items.length);
 			for (final ItemData item2 : items)
 			{
 				try
@@ -1126,12 +1119,12 @@ public class DataspaceMonitor
 		catch (final NoSuchMethodException nsme)
 		{
 			nsme.printStackTrace();
-			return null;
+			return Collections.emptyList();
 		}
 		catch (final DataspaceInactiveException ex)
 		{
 			Info.message("Warning: Doing copy collect on inactive dataspace");
-			return null;
+			return Collections.emptyList();
 		}
 	}
 }
