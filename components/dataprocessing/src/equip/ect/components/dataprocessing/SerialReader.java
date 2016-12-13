@@ -150,7 +150,6 @@ public class SerialReader implements Serializable
 		{
 			e.printStackTrace();
 			setError("Error: " + e.getMessage());
-			setRunning(false);
 		}
 	}
 }
