@@ -122,17 +122,20 @@ public class SerialReader implements Serializable
 				while (running)
 				{
 					String input = serialPort.readString();
-					System.out.println(input);
-					float oldValue = value;
-					try
+					if(input != null)
 					{
-						float value = Float.parseFloat(input);
-						propertyChangeListeners.firePropertyChange("value", oldValue, value);
-					}
-					catch (Exception e)
-					{
-						setError("Error: " + e.getMessage());
-						e.printStackTrace();
+						System.out.println(input);
+						float oldValue = value;
+						try
+						{
+							float value = Float.parseFloat(input);
+							propertyChangeListeners.firePropertyChange("value", oldValue, value);
+						}
+						catch (Exception e)
+						{
+							setError("Error: " + e.getMessage());
+							e.printStackTrace();
+						}
 					}
 				}
 			}
