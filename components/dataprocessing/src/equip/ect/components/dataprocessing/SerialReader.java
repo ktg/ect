@@ -120,6 +120,7 @@ public class SerialReader implements Serializable
 				serialPort.openPort();
 				serialPort.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 				serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
+				setError("");
 				serialPort.addEventListener(event -> {
 					try
 					{
@@ -136,7 +137,6 @@ public class SerialReader implements Serializable
 									{
 										float oldValue = value;
 										value = Float.parseFloat(input);
-										System.out.println(input + ":" + value);
 										propertyChangeListeners.firePropertyChange("value", oldValue, value);
 									}
 									catch (Exception e)
