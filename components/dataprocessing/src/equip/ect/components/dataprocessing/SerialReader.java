@@ -106,9 +106,11 @@ public class SerialReader implements Serializable
 					{
 						if (event.isRXCHAR() && event.getEventValue() > 0)
 						{
-							byte buffer[] = serialPort.readBytes();
+							final byte[] buffer = serialPort.readBytes();
+							final String input = new String(buffer);
+							final String[] lines = input.split("\n");
 							float oldValue = value;
-							value = Float.parseFloat(new String(buffer));
+							value = Float.parseFloat(lines[lines.length - 1]);
 							propertyChangeListeners.firePropertyChange("value", oldValue, value);
 						}
 					}
@@ -116,7 +118,6 @@ public class SerialReader implements Serializable
 					{
 						e.printStackTrace();
 						setError("Error: " + e.getMessage());
-						setRunning(false);
 					}
 				});
 			}
