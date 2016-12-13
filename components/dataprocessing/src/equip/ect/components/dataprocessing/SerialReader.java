@@ -1,5 +1,7 @@
 package equip.ect.components.dataprocessing;
 
+import com.fazecast.jSerialComm.SerialPort;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.DataInputStream;
@@ -8,16 +10,13 @@ import java.io.Serializable;
 
 import equip.ect.Category;
 import equip.ect.ECTComponent;
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
 
 /**
  * Reads ints from serial port
  *
+ * @author ktg
  * @classification Data/Processing
  * @defaultOutputValue out
- * @author ktg
  */
 @ECTComponent
 @Category("Data/Processing")
@@ -91,50 +90,31 @@ public class SerialReader implements Serializable
 
 	private void connect()
 	{
-		new Thread(new Runnable()
-		{
-			@Override
-			public void run()
+		new Thread(() -> {
+			try
 			{
-				try
-				{
-					final CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(port);
-					if (portIdentifier.isCurrentlyOwned())
-					{
-						setError("Error: Port is currently in use");
-						setRunning(false);
-					}
-					else
-					{
-						final CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
-						if (commPort instanceof SerialPort)
-						{
-							final SerialPort serialPort = (SerialPort) commPort;
-							serialPort.setSerialPortParams(57600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+				final SerialPort serialPort = SerialPort.getCommPort(port);
+				serialPort.setBaudRate(57600);
+				serialPort.setParity(SerialPort.NO_PARITY);
+				serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
+				serialPort.setNumDataBits(8);
 
-							final InputStream in = serialPort.getInputStream();
-							final DataInputStream dataInputStream = new DataInputStream(in);
+				final InputStream in = serialPort.getInputStream();
+				final DataInputStream dataInputStream = new DataInputStream(in);
 
-							setError("");
-							while (running)
-							{
-								int oldValue = value;
-								value = dataInputStream.readInt();
-								propertyChangeListeners.firePropertyChange("value", oldValue, value);
-							}
-						}
-						else {
-							setError("Error: Not a serial port");
-							setRunning(false);
-						}
-					}
-				}
-				catch (Exception e)
+				setError("");
+				while (running)
 				{
-					e.printStackTrace();
-					setError("Error: " + e.getMessage());
-					setRunning(false);
+					int oldValue = value;
+					value = dataInputStream.readInt();
+					propertyChangeListeners.firePropertyChange("value", oldValue, value);
 				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				setError("Error: " + e.getMessage());
+				setRunning(false);
 			}
 		}).start();
 	}

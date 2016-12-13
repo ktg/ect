@@ -3,7 +3,7 @@ version = '1.0'
 dependencies {
 	compile project(":ect-core")
 
-    compile "org.rxtx:rxtx:+"
+    compile 'com.fazecast:jSerialComm:+'
 	compile "joda-time:joda-time:+"
 }
 
