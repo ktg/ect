@@ -22,6 +22,7 @@ public class SerialReader implements Serializable
 	private String port = "COM1";
 	private float value = 0;
 	private String error = "";
+	private int baudRate = SerialPort.BAUDRATE_9600;
 	private boolean running = false;
 	private SerialPort serialPort;
 
@@ -62,6 +63,23 @@ public class SerialReader implements Serializable
 		return error;
 	}
 
+	public int getBaudRate()
+	{
+		return baudRate;
+	}
+
+	public void setBaudRate(int baudRate)
+	{
+		int oldBaud = this.baudRate;
+		this.baudRate = baudRate;
+		propertyChangeListeners.firePropertyChange("baudRate", oldBaud, baudRate);
+		if(running)
+		{
+			setRunning(false);
+			setRunning(true);
+		}
+	}
+
 	public void setPort(String port)
 	{
 		setRunning(false);
@@ -99,8 +117,8 @@ public class SerialReader implements Serializable
 			{
 				serialPort = new SerialPort(port);
 				serialPort.openPort();
-				serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, 1, 0);
-				serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
+				serialPort.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+				serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_XONXOFF_IN | SerialPort.FLOWCONTROL_XONXOFF_OUT);
 				serialPort.addEventListener(event -> {
 					try
 					{
@@ -136,7 +154,7 @@ public class SerialReader implements Serializable
 						e.printStackTrace();
 						setError("Error: " + e.getMessage());
 					}
-				});
+				}, SerialPort.MASK_RXCHAR);
 			}
 			catch (Exception e)
 			{
