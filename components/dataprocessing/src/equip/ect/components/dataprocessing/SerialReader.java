@@ -73,7 +73,7 @@ public class SerialReader implements Serializable
 		int oldBaud = this.baudRate;
 		this.baudRate = baudRate;
 		propertyChangeListeners.firePropertyChange("baudRate", oldBaud, baudRate);
-		if(running)
+		if (running)
 		{
 			setRunning(false);
 			setRunning(true);
@@ -118,7 +118,7 @@ public class SerialReader implements Serializable
 				serialPort = new SerialPort(port);
 				serialPort.openPort();
 				serialPort.setParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-				serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_XONXOFF_IN | SerialPort.FLOWCONTROL_XONXOFF_OUT);
+				serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN | SerialPort.FLOWCONTROL_RTSCTS_OUT);
 				serialPort.addEventListener(event -> {
 					try
 					{
@@ -126,27 +126,9 @@ public class SerialReader implements Serializable
 						{
 							final byte[] buffer = serialPort.readBytes();
 							final String input = new String(buffer);
-							System.out.println("Input: " + input);
-							System.out.println("----------------");
-							final String[] lines = input.split("\n");
 							float oldValue = value;
-							Float newValue = null;
-							for(String line: lines)
-							{
-								try
-								{
-									newValue = Float.parseFloat(line);
-								}
-								catch (Exception e)
-								{
-									// Ignore parse exceptions
-								}
-							}
-							if(newValue != null)
-							{
-								value = newValue;
-								propertyChangeListeners.firePropertyChange("value", oldValue, value);
-							}
+							float value = Float.parseFloat(input);
+							propertyChangeListeners.firePropertyChange("value", oldValue, value);
 						}
 					}
 					catch (Exception e)
@@ -172,7 +154,7 @@ public class SerialReader implements Serializable
 			if (serialPort != null)
 			{
 				serialPort.removeEventListener();
-				if(serialPort.isOpened())
+				if (serialPort.isOpened())
 				{
 					serialPort.closePort();
 				}
