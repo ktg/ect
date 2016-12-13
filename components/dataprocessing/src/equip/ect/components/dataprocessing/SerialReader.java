@@ -1,17 +1,12 @@
 package equip.ect.components.dataprocessing;
 
-import com.fazecast.jSerialComm.SerialPort;
-import com.fazecast.jSerialComm.SerialPortEvent;
-import com.fazecast.jSerialComm.SerialPortPacketListener;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import equip.ect.Category;
 import equip.ect.ECTComponent;
+import jssc.SerialPort;
 
 /**
  * Reads ints from serial port
@@ -34,6 +29,7 @@ public class SerialReader implements Serializable
 
 	public SerialReader()
 	{
+
 	}
 
 	public synchronized void addPropertyChangeListener(final PropertyChangeListener listener)
@@ -56,7 +52,7 @@ public class SerialReader implements Serializable
 		return value;
 	}
 
-	public boolean getRunning()
+	public boolean isRunning()
 	{
 		return running;
 	}
@@ -68,12 +64,13 @@ public class SerialReader implements Serializable
 
 	public void setPort(String port)
 	{
+		setRunning(false);
 		String oldPort = this.port;
 		this.port = port;
 		propertyChangeListeners.firePropertyChange("port", oldPort, port);
 	}
 
-	public void setRunning(final boolean running)
+	public void setRunning(boolean running)
 	{
 		boolean oldRunning = this.running;
 		this.running = running;
@@ -97,68 +94,60 @@ public class SerialReader implements Serializable
 
 	private void connect()
 	{
+		new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				try
+				{
+					serialPort = new SerialPort(port);
+					serialPort.setParams(SerialPort.BAUDRATE_9600, SerialPort.DATABITS_8, 1, 0);
+					serialPort.setEventsMask(SerialPort.MASK_RXCHAR);
+					serialPort.addEventListener(event -> {
+						try
+						{
+							if (event.isRXCHAR() && event.getEventValue() > 0)
+							{
+								byte buffer[] = serialPort.readBytes();
+								String test = new String(buffer);
+								System.out.println(test);
+							}
+						}
+						catch (Exception e)
+						{
+							e.printStackTrace();
+							setError("Error: " + e.getMessage());
+							setRunning(false);
+						}
+					});
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					setError("Error: " + e.getMessage());
+					setRunning(false);
+				}
+			}
+		}).start();
+	}
+
+	private void disconnect()
+	{
 		try
 		{
-			serialPort = SerialPort.getCommPort(port);
-			serialPort.setBaudRate(57600);
-			serialPort.setParity(SerialPort.NO_PARITY);
-			serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
-			serialPort.setNumDataBits(8);
-
-			serialPort.addDataListener(new SerialPortPacketListener()
+			if (serialPort != null)
 			{
-				@Override
-				public int getPacketSize()
-				{
-					return 4;
-				}
-
-				@Override
-				public int getListeningEvents()
-				{
-					return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
-				}
-
-				@Override
-				public void serialEvent(SerialPortEvent event)
-				{
-					try
-					{
-						if (event.getEventType() == SerialPort.LISTENING_EVENT_DATA_RECEIVED)
-						{
-							ByteBuffer byteBuffer = ByteBuffer.wrap(event.getReceivedData());
-							//byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-							int oldValue = value;
-							value = byteBuffer.getInt();
-							System.out.println("Value = " + value);
-							propertyChangeListeners.firePropertyChange("value", oldValue, value);
-						}
-					}
-					catch (Exception e)
-					{
-						e.printStackTrace();
-						setError("Error: " + e.getMessage());
-					}
-				}
-			});
-
-			setError("");
+				serialPort.removeEventListener();
+				serialPort.closePort();
+				serialPort = null;
+			}
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 			setError("Error: " + e.getMessage());
 			setRunning(false);
-		}
-	}
-
-	private void disconnect()
-	{
-		if (serialPort != null)
-		{
-			serialPort.removeDataListener();
-			serialPort.closePort();
-			serialPort = null;
 		}
 	}
 }
