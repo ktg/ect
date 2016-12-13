@@ -123,8 +123,16 @@ public class SerialReader implements Serializable
 				{
 					String input = serialPort.readString();
 					float oldValue = value;
-					float value = Float.parseFloat(input);
-					propertyChangeListeners.firePropertyChange("value", oldValue, value);
+					try
+					{
+						float value = Float.parseFloat(input);
+						propertyChangeListeners.firePropertyChange("value", oldValue, value);
+					}
+					catch (Exception e)
+					{
+						setError("Error: " + e.getMessage());
+						e.printStackTrace();
+					}
 				}
 			}
 			catch (Exception e)
