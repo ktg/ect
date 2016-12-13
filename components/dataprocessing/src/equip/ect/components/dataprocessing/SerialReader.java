@@ -1,11 +1,11 @@
 package equip.ect.components.dataprocessing;
 
 import com.fazecast.jSerialComm.SerialPort;
+import com.fazecast.jSerialComm.SerialPortEvent;
+import com.fazecast.jSerialComm.SerialPortPacketListener;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.DataInputStream;
-import java.io.InputStream;
 import java.io.Serializable;
 
 import equip.ect.Category;
@@ -26,6 +26,7 @@ public class SerialReader implements Serializable
 	private int value = 0;
 	private String error = "";
 	private boolean running = false;
+	private SerialPort serialPort;
 
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 
@@ -79,6 +80,10 @@ public class SerialReader implements Serializable
 		{
 			connect();
 		}
+		else
+		{
+			disconnect();
+		}
 	}
 
 	private void setError(String error)
@@ -90,32 +95,55 @@ public class SerialReader implements Serializable
 
 	private void connect()
 	{
-		new Thread(() -> {
-			try
+		try
+		{
+			serialPort = SerialPort.getCommPort(port);
+			serialPort.setBaudRate(57600);
+			serialPort.setParity(SerialPort.NO_PARITY);
+			serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
+			serialPort.setNumDataBits(8);
+
+			serialPort.addDataListener(new SerialPortPacketListener()
 			{
-				final SerialPort serialPort = SerialPort.getCommPort(port);
-				serialPort.setBaudRate(57600);
-				serialPort.setParity(SerialPort.NO_PARITY);
-				serialPort.setNumStopBits(SerialPort.ONE_STOP_BIT);
-				serialPort.setNumDataBits(8);
-
-				final InputStream in = serialPort.getInputStream();
-				final DataInputStream dataInputStream = new DataInputStream(in);
-
-				setError("");
-				while (running)
+				@Override
+				public int getPacketSize()
 				{
-					int oldValue = value;
-					value = dataInputStream.readInt();
-					propertyChangeListeners.firePropertyChange("value", oldValue, value);
+					return 8;
 				}
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-				setError("Error: " + e.getMessage());
-				setRunning(false);
-			}
-		}).start();
+
+				@Override
+				public int getListeningEvents()
+				{
+					return SerialPort.LISTENING_EVENT_DATA_RECEIVED;
+				}
+
+				@Override
+				public void serialEvent(SerialPortEvent event)
+				{
+					if (event.getEventType() == SerialPort.LISTENING_EVENT_DATA_RECEIVED)
+					{
+
+					}
+				}
+			});
+
+			setError("");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			setError("Error: " + e.getMessage());
+			setRunning(false);
+		}
+	}
+
+	private void disconnect()
+	{
+		if (serialPort != null)
+		{
+			serialPort.removeDataListener();
+			serialPort.closePort();
+			serialPort = null;
+		}
 	}
 }
