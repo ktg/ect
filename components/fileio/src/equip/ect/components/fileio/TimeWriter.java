@@ -62,7 +62,7 @@ import equip.ect.NoSuchPropertyException;
 
 /**
  * Writes or concatenates string inputs to a file.
- * 
+ * <p>
  * <H3>Description</H3> <B>FileWriter</B> is designed to easily write any string value to a file.
  * You can specify to append or overwrite to the file. You may also specify a delimiter to write
  * between inputs. Note that 'newline' delimeters such as "\n" are currently invisible.<BR>
@@ -73,31 +73,29 @@ import equip.ect.NoSuchPropertyException;
  * <B>\r</B> carriage return<BR>
  * <B>\t</B> tab<BR>
  * etc ...
- * 
+ * <p>
  * <H3>Usage</H3> Set the 'file' to the desired output file (full file path).<BR>
  * Set 'append' to true, to concatenate to the file, otherwise the specified file will be written
  * over.<BR>
  * Set 'delimeter' to use. This is any string to be written between each input. Note that 'newline'
  * delimeters such as "\n" are currently invisible.<BR>
  * Set 'input' to any string value. This will be written to the file.<BR>
- * 
+ * <p>
  * <H3>Technical Details</H3> Uses the java.io.FileWriter
- * 
- * @classification Local Services
- * 
+ *
  * @author humble
- * 
+ * @classification Local Services
  */
 @ECTComponent
 @Category("File")
 public class TimeWriter implements Serializable, PropertyChangeListener, DynamicProperties
 {
-	public enum State
+	private enum State
 	{
 		CLOSED, OPENED, WRITING, FAILED
 	}
 
-	public static String getParameterNamesString(final TimeParameter[] outputs)
+	private static String getParameterNamesString(final TimeParameter[] outputs)
 	{
 		final StringBuilder buffer = new StringBuilder();
 
@@ -118,6 +116,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 	private String file = "";
 
 	private boolean newFile;
+	private boolean logAll;
 
 	private State state = State.CLOSED;
 
@@ -209,14 +208,24 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 	public void propertyChange(final PropertyChangeEvent event)
 	{
 		final String name = event.getPropertyName();
-		if (name.equals("state") || name.equals("file") || name.equals("statusNames") || name.equals("dateFormat")) { return; }
-		try
+		if (name.equals("state") || name.equals("file") || name.equals("statusNames") || name.equals("dateFormat"))
 		{
-			writeTimestamp(name + "," + Coerce.toClass(event.getNewValue(), String.class));
+			return;
 		}
-		catch (final Exception e)
+		if (logAll)
 		{
-			writeTimestamp(name + "," + event.getNewValue());
+			writeTimestamp();
+		}
+		else
+		{
+			try
+			{
+				writeTimestamp(name + "," + Coerce.toClass(event.getNewValue(), String.class));
+			}
+			catch (final Exception e)
+			{
+				writeTimestamp(name + "," + event.getNewValue());
+			}
 		}
 	}
 
@@ -327,6 +336,18 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 		setStatuses(names);
 	}
 
+	public boolean getLogAll()
+	{
+		return logAll;
+	}
+
+	public void setLogAll(boolean logAll)
+	{
+		final boolean old = this.logAll;
+		this.logAll = logAll;
+		propertyChangeListeners.firePropertyChange("state", old, logAll);
+	}
+
 	private void setState(final State state)
 	{
 		final State old = this.state;
@@ -367,7 +388,10 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 		}
 
 		// Bail out if any of the names were invalid
-		if (!namesAreLegal) { return; }
+		if (!namesAreLegal)
+		{
+			return;
+		}
 
 		newStatuses = new TimeParameter[names.length];
 
@@ -418,19 +442,53 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			}
 
 			// Bail if nothing has actually changed
-			if (!outputsWereChanged) { return; }
+			if (!outputsWereChanged)
+			{
+				return;
+			}
 
 			// Get the new list of output names
 			statuses = newStatuses.clone();
 		}
 
-		propertyChangeListeners.firePropertyChange(	"statusNames", getParameterNamesString(oldStatuses),
-													getParameterNamesString(newStatuses));
+		propertyChangeListeners.firePropertyChange("statusNames", getParameterNamesString(oldStatuses),
+				getParameterNamesString(newStatuses));
+	}
+
+	private void writeTimestamp()
+	{
+		if (writer != null && state == State.OPENED)
+		{
+			try
+			{
+				setState(State.WRITING);
+				writer.append(formatter.format(new Date()));
+				writer.append(",");
+				for (TimeParameter parameter : statuses)
+				{
+					try
+					{
+						writer.append(Coerce.toClass(parameter.getValue(), String.class));
+					}
+					catch (Exception e)
+					{
+						writer.append(parameter.getValue().toString());
+					}
+				}
+				writer.newLine();
+				writer.flush();
+				setState(State.OPENED);
+			}
+			catch (final Exception e)
+			{
+				e.printStackTrace();
+				setState(State.FAILED);
+			}
+		}
 	}
 
 	/**
-	 * @param newInput
-	 *            The input to set.
+	 * @param newInput The input to set.
 	 */
 	private void writeTimestamp(final String newInput)
 	{
