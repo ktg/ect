@@ -345,7 +345,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 	{
 		final boolean old = this.logAll;
 		this.logAll = logAll;
-		propertyChangeListeners.firePropertyChange("state", old, logAll);
+		propertyChangeListeners.firePropertyChange("logAll", old, logAll);
 	}
 
 	private void setState(final State state)
