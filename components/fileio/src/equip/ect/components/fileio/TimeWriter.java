@@ -468,12 +468,13 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 				{
 					try
 					{
-						writer.append(Coerce.toClass(parameter.getValue(), String.class));
+						writer.append(Coerce.toClass(dynamicProperties.dynGetProperty(parameter.getName()), String.class));
 					}
 					catch (Exception e)
 					{
-						writer.append(parameter.getValue().toString());
+						writer.append(dynamicProperties.dynGetProperty(parameter.getName()).toString());
 					}
+					writer.append(",");
 				}
 				writer.newLine();
 				writer.flush();

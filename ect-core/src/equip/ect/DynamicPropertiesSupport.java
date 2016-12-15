@@ -55,12 +55,12 @@ public class DynamicPropertiesSupport implements DynamicProperties
 	/**
 	 * properties
 	 */
-	protected Map<String, Object> properties = new HashMap<String, Object>();
+	protected Map<String, Object> properties = new HashMap<>();
 
 	/**
 	 * descriptors
 	 */
-	protected Map<String, DynamicPropertyDescriptor> descriptors = new HashMap<String, DynamicPropertyDescriptor>();
+	protected Map<String, DynamicPropertyDescriptor> descriptors = new HashMap<>();
 
 	/**
 	 * cons
@@ -94,7 +94,7 @@ public class DynamicPropertiesSupport implements DynamicProperties
 			System.err.println("ERROR creating DynamicPropertyDescriptor \"" + name + "\": " + e);
 			e.printStackTrace(System.err);
 		}
-		Object old = null;
+		Object old;
 		if (value == null)
 		{
 			old = properties.remove(name);
@@ -113,8 +113,7 @@ public class DynamicPropertiesSupport implements DynamicProperties
 	@Override
 	public synchronized DynamicPropertyDescriptor[] dynGetProperties()
 	{
-		return (DynamicPropertyDescriptor[]) descriptors.values().toArray(	new DynamicPropertyDescriptor[descriptors
-																					.size()]);
+		return descriptors.values().toArray(new DynamicPropertyDescriptor[descriptors.size()]);
 	}
 
 	/**
