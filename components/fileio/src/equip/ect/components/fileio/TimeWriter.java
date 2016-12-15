@@ -84,7 +84,6 @@ import equip.ect.NoSuchPropertyException;
  * <H3>Technical Details</H3> Uses the java.io.FileWriter
  *
  * @author humble
- * @classification Local Services
  */
 @ECTComponent
 @Category("File")
@@ -95,7 +94,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 		CLOSED, OPENED, WRITING, FAILED
 	}
 
-	private static String getParameterNamesString(final TimeParameter[] outputs)
+	private static String getParameterNamesString(final String[] outputs)
 	{
 		final StringBuilder buffer = new StringBuilder();
 
@@ -105,7 +104,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			{
 				buffer.append(' ');
 			}
-			buffer.append(outputs[i].getName());
+			buffer.append(outputs[i]);
 		}
 
 		return buffer.toString();
@@ -123,7 +122,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 	private transient java.io.FileWriter fileWriter;
 	private transient BufferedWriter writer;
 
-	private TimeParameter[] statuses = new TimeParameter[0];
+	private String[] statuses = new String[0];
 
 	// Property Change
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
@@ -357,8 +356,8 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 
 	private void setStatuses(final String[] names)
 	{
-		final Map<String, Integer> indicesByName = new HashMap<String, Integer>();
-		TimeParameter[] oldStatuses, newStatuses;
+		final Map<String, Integer> indicesByName = new HashMap<>();
+		String[] oldStatuses, newStatuses;
 		boolean namesAreLegal;
 		boolean outputsWereChanged;
 		Integer indexObject;
@@ -393,7 +392,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			return;
 		}
 
-		newStatuses = new TimeParameter[names.length];
+		newStatuses = new String[names.length];
 
 		// Update the list of names
 		outputsWereChanged = false;
@@ -404,17 +403,17 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			// Reuse the old outputs that appear in the new list and discard those that don't
 			for (int i = 0; i < oldStatuses.length; i++)
 			{
-				indexObject = indicesByName.get(oldStatuses[i].getName());
+				indexObject = indicesByName.get(oldStatuses[i]);
 				if (indexObject == null)
 				{
 					// remove oldStatuses[i]....
 					try
 					{
-						dynamicProperties.removeProperty(oldStatuses[i].getName());
+						dynamicProperties.removeProperty(oldStatuses[i]);
 					}
 					catch (final NoSuchPropertyException e)
 					{
-						System.err.println("ERROR removing dyn property " + oldStatuses[i].getName() + ": " + e);
+						System.err.println("ERROR removing dyn property " + oldStatuses[i] + ": " + e);
 						e.printStackTrace(System.err);
 					}
 					outputsWereChanged = true;
@@ -435,9 +434,9 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			{
 				if (newStatuses[i] == null)
 				{
-					newStatuses[i] = new TimeParameter(names[i]);
+					newStatuses[i] = names[i];
 					outputsWereChanged = true;
-					dynamicProperties.addProperty(newStatuses[i].getName(), Object.class, null);
+					dynamicProperties.addProperty(newStatuses[i], Object.class, null);
 				}
 			}
 
@@ -464,15 +463,15 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 				setState(State.WRITING);
 				writer.append(formatter.format(new Date()));
 				writer.append(",");
-				for (TimeParameter parameter : statuses)
+				for (String parameter : statuses)
 				{
 					try
 					{
-						writer.append(Coerce.toClass(dynamicProperties.dynGetProperty(parameter.getName()), String.class));
+						writer.append(Coerce.toClass(dynamicProperties.dynGetProperty(parameter), String.class));
 					}
 					catch (Exception e)
 					{
-						writer.append(dynamicProperties.dynGetProperty(parameter.getName()).toString());
+						writer.append(dynamicProperties.dynGetProperty(parameter).toString());
 					}
 					writer.append(",");
 				}
@@ -498,8 +497,6 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			try
 			{
 				setState(State.WRITING);
-				// should use FileWriter.append
-				// but it's only available in 1.5
 				writer.append(formatter.format(new Date()));
 				writer.append(",");
 				writer.append(newInput);
@@ -509,7 +506,6 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			}
 			catch (final Exception e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				setState(State.FAILED);
 			}

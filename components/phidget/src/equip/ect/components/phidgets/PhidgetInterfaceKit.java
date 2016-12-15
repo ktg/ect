@@ -130,9 +130,9 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 		{
 			try
 			{
-				final int ix = new Integer(name.substring(DIGITAL_OUT_PREFIX.length())).intValue();
-				final Boolean bval = (Boolean) Coerce.toClass(value, Boolean.class);
-				final boolean val = (bval != null) && bval.booleanValue();
+				final int ix = new Integer(name.substring(DIGITAL_OUT_PREFIX.length()));
+				final Boolean bval = Coerce.toClass(value, Boolean.class);
+				final boolean val = (bval != null) && bval;
 				// System.out.println("Set output "+ix+" to "+val);
 				digitalouts[ix] = val;
 				if (connected)
@@ -154,7 +154,7 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 	{
 		try
 		{
-			dynSetProperty(DIGITAL_IN_PREFIX + oe.getIndex(), new Boolean(oe.getState()));
+			dynSetProperty(DIGITAL_IN_PREFIX + oe.getIndex(), oe.getState());
 		}
 		catch (final NoSuchPropertyException e)
 		{
@@ -184,7 +184,7 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 
 	Float getModifiedSensorValue(final int originalSensorValue)
 	{
-		return new Float((1.0f * originalSensorValue) / MAX_SENSOR_VALUE);
+		return (1.0f * originalSensorValue) / MAX_SENSOR_VALUE;
 	}
 
 	@Override
@@ -208,27 +208,23 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 
 			for (int i = 0; i < numDigitalOut; i++)
 			{
-				dynsup.addProperty(DIGITAL_OUT_PREFIX + i, Boolean.class, new Boolean(false), false);
+				dynsup.addProperty(DIGITAL_OUT_PREFIX + i, Boolean.class, false, false);
 				phid.setOutputState(i, digitalouts[i]);
 			}
 
 			for (int i = 0; i < numDigitalIn; i++)
 			{
-				dynsup.addProperty(DIGITAL_IN_PREFIX + i, Boolean.class, new Boolean(false), true);
-				dynSetProperty(DIGITAL_IN_PREFIX + i, new Boolean(phid.getInputState(i)));
+				dynsup.addProperty(DIGITAL_IN_PREFIX + i, Boolean.class, false, true);
+				dynSetProperty(DIGITAL_IN_PREFIX + i, phid.getInputState(i));
 			}
 
 			for (int i = 0; i < numAnalogIn; i++)
 			{
-				dynsup.addProperty(ANALOG_IN_PREFIX + i, Float.class, new Float(0.0f), true);
+				dynsup.addProperty(ANALOG_IN_PREFIX + i, Float.class, 0.0f, true);
 				dynSetProperty(ANALOG_IN_PREFIX + i, getModifiedSensorValue(phid.getSensorValue(i)));
 			}
 		}
-		catch (final PhidgetException e)
-		{
-			// ?
-		}
-		catch (final NoSuchPropertyException e)
+		catch (final PhidgetException | NoSuchPropertyException e)
 		{
 			// ?
 		}

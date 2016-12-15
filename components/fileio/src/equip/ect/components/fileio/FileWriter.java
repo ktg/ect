@@ -69,9 +69,7 @@ import java.io.Serializable;
  * Set 'input' to any string value. This will be written to the file.<BR>
  * 
  * <H3>Technical Details</H3> Uses the java.io.FileWriter
- * 
- * @classification Local Services
- * 
+ *
  * @author humble
  * 
  */
@@ -79,22 +77,9 @@ import java.io.Serializable;
 @Category("File")
 public class FileWriter implements Serializable
 {
-
-	public static final String CLOSED_STATE = "CLOSED";
-
-	public static final String OPENED_STATE = "OPENED";
-
-	public static final String WRITING_STATE = "WRITING";
-
-	public static final String FAILED_STATE = "FAILED";
-
-	/**
-	 * @param args
-	 */
-	public static void main(final String[] args)
+	private enum State
 	{
-		// TODO Auto-generated method stub
-
+		CLOSED, OPENED, WRITING, FAILED
 	}
 
 	private String outFile = "./file_writer_output.txt";
@@ -103,9 +88,9 @@ public class FileWriter implements Serializable
 
 	private boolean open = false;
 
-	private String input = new String();
+	private String input;
 
-	private String state = CLOSED_STATE;
+	private State state = State.CLOSED;
 
 	private transient java.io.FileWriter fileWriter = null;
 
@@ -143,7 +128,7 @@ public class FileWriter implements Serializable
 	/**
 	 * @return Returns the write state.
 	 */
-	public String getState()
+	public State getState()
 	{
 		return state;
 	}
@@ -199,16 +184,16 @@ public class FileWriter implements Serializable
 		if (append)
 		{
 			this.input = newInput;
-			if (fileWriter != null && getState() == OPENED_STATE)
+			if (fileWriter != null && getState() == State.OPENED)
 			{
 				try
 				{
-					setState(WRITING_STATE);
+					setState(State.WRITING);
 					// should use FileWriter.append
 					// but it's only available in 1.5
 					fileWriter.write(this.input + delimiter);
 					fileWriter.flush();
-					setState(OPENED_STATE);
+					setState(State.OPENED);
 				}
 				catch (final IOException e)
 				{
@@ -220,14 +205,14 @@ public class FileWriter implements Serializable
 		else
 		{ // no appending, just dump all
 			this.input = newInput;
-			if (fileWriter != null && getState() == OPENED_STATE)
+			if (fileWriter != null && getState() == State.OPENED)
 			{
 				try
 				{
-					setState(WRITING_STATE);
+					setState(State.WRITING);
 					fileWriter.write(input);
 					fileWriter.flush();
-					setState(OPENED_STATE);
+					setState(State.OPENED);
 				}
 				catch (final IOException e)
 				{
@@ -255,13 +240,13 @@ public class FileWriter implements Serializable
 				{
 					final File file = new File(outFile);
 					fileWriter = new java.io.FileWriter(file, append);
-					setState(OPENED_STATE);
+					setState(State.OPENED);
 					propertyChangeListeners.firePropertyChange("open", false, true);
 				}
 				catch (final IOException e)
 				{
 					e.printStackTrace();
-					setState(FAILED_STATE);
+					setState(State.FAILED);
 					propertyChangeListeners.firePropertyChange("open", true, false);
 				}
 			}
@@ -275,14 +260,14 @@ public class FileWriter implements Serializable
 					fileWriter.flush();
 					fileWriter.close();
 					fileWriter = null;
-					setState(CLOSED_STATE);
+					setState(State.CLOSED);
 					propertyChangeListeners.firePropertyChange("open", true, false);
 				}
 				catch (final IOException e)
 				{
 
 					e.printStackTrace();
-					setState(FAILED_STATE);
+					setState(State.FAILED);
 					propertyChangeListeners.firePropertyChange("open", false, true);
 				}
 
@@ -302,9 +287,9 @@ public class FileWriter implements Serializable
 		propertyChangeListeners.firePropertyChange("outFile", old, outFile);
 	}
 
-	protected void setState(final String state)
+	protected void setState(final State state)
 	{
-		final String old = this.state;
+		final State old = this.state;
 		this.state = state;
 		propertyChangeListeners.firePropertyChange("state", old, state);
 	}

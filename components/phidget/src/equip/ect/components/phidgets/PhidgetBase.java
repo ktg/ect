@@ -211,22 +211,12 @@ public abstract class PhidgetBase implements Serializable, DynamicProperties, At
 
 	public synchronized void setConfigured(final boolean newValue)
 	{
-
 		if (!newValue) { return; }
-
-		if (newValue == configured) { return; }
+		if (configured) { return; }
 
 		propertyChangeListeners.firePropertyChange("configured", false, true);
 
-		new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				startConnection();
-			}
-		}).start();
-
+		new Thread(this::startConnection).start();
 	}
 
 	public void stop()
@@ -264,7 +254,7 @@ public abstract class PhidgetBase implements Serializable, DynamicProperties, At
 		final long oldValue = this.serialNumber;
 		this.serialNumber = newValue;
 
-		propertyChangeListeners.firePropertyChange("serialNumber", new Long(oldValue), new Long(newValue));
+		propertyChangeListeners.firePropertyChange("serialNumber", oldValue, newValue);
 	}
 
 	protected void startConnection()

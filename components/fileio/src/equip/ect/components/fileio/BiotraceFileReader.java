@@ -57,8 +57,6 @@ import java.util.Set;
 
 /**
  * @author Kevin Glover
- * @classification Local Services
- * @displayName BiotraceFileReader
  */
 @ECTComponent
 @Category("File")
@@ -109,7 +107,7 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 										break;
 									}
 
-									if (channelIDs.isEmpty() || channelIDs.contains(new Integer(channel)))
+									if (channelIDs.isEmpty() || channelIDs.contains(channel))
 									{
 
 										final String channelName = String.format("channel %03d", channel);
