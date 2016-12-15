@@ -161,7 +161,14 @@ public class StateManager
 					if (item instanceof GraphComponent)
 					{
 						GraphComponent graphComponent = (GraphComponent) item;
-						graphComponent.getDrawer().setDrawerState(componentState.getState());
+						if(componentState.getState() != null)
+						{
+							graphComponent.getDrawer().setDrawerState(componentState.getState());
+						}
+						else
+						{
+							graphComponent.getDrawer().setDrawerState(Drawer.State.OPEN);
+						}
 						for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
 						{
 							componentState.getProperties().stream()
