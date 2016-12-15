@@ -52,7 +52,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -248,25 +247,20 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 	@Override
 	public void filesAdded(final List<File> files)
 	{
-		final List<File> jars = new ArrayList<File>();
-		for (File file : files)
-		{
-			if (containerHelper.canImport(file))
+		final List<File> jars = new ArrayList<>();
+		files.stream().filter(file -> containerHelper.canImport(file)).forEach(file -> {
+			try
 			{
-				try
-				{
-					containerHelper.loadJar(file);
-					jars.add(file);
-				}
-				catch (Throwable e)
-				{
-					e.printStackTrace();
-				}
+				containerHelper.loadJar(file);
+				jars.add(file);
 			}
-		}
+			catch (Throwable e)
+			{
+				e.printStackTrace();
+			}
+		});
 
-		for (File file : jars)
-		{
+		jars.forEach(file -> {
 			try
 			{
 				containerHelper.exportFromJarFile(file);
@@ -275,18 +269,13 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 			{
 				e.printStackTrace();
 			}
-		}
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
+		});
+		SwingUtilities.invokeLater(() -> {
+			synchronized (listModel)
 			{
-				synchronized (listModel)
+				for (File file : jars)
 				{
-					for (File file : jars)
-					{
-						listModel.addElement(file);
-					}
+					listModel.addElement(file);
 				}
 			}
 		});
@@ -295,14 +284,7 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 	@Override
 	public void fileDeleted(final File file)
 	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				listModel.removeElement(file);
-			}
-		});
+		SwingUtilities.invokeLater(() -> listModel.removeElement(file));
 	}
 
 	@Override
@@ -319,25 +301,20 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 		final JPanel toolbar = new JPanel(new FlowLayout());
 		final JButton exportButton = new JButton("export capabilities");
 		panel.add(toolbar, BorderLayout.SOUTH);
-		exportButton.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
+		exportButton.addActionListener(ae -> {
+			final Object selected = compList.getSelectedValue();
+			if (selected != null)
 			{
-				final Object selected = compList.getSelectedValue();
-				if (selected != null)
+				try
 				{
-					try
+					synchronized (ContainerManager.class)
 					{
-						synchronized (ContainerManager.class)
-						{
-							containerHelper.exportFromJarFile((File) selected);
-						}
+						containerHelper.exportFromJarFile((File) selected);
 					}
-					catch (final IOException ioe)
-					{
-						ioe.printStackTrace();
-					}
+				}
+				catch (final IOException ioe)
+				{
+					ioe.printStackTrace();
 				}
 			}
 		});

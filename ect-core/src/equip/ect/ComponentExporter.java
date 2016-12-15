@@ -69,7 +69,7 @@ public class ComponentExporter
 	public ComponentExporter(final DataspaceBean ds)
 	{
 		dataspace = ds;
-		this.objectMappers = new HashMap<Object, MappingObject>();
+		this.objectMappers = new HashMap<>();
 	}
 
 	public ComponentExporter(final String dataspaceUrl)
@@ -108,9 +108,8 @@ public class ComponentExporter
 	public GUID getBeanID(final Serializable bean)
 	{
 		// find MappingObject for this bean
-		for(final Object key: objectMappers.keySet())
+		for(final MappingObject map: objectMappers.values())
 		{
-			final MappingObject map = objectMappers.get(key);
 			if (map.getBean() == bean) { return map.getBeanID(); }
 		}
 		return null;
@@ -125,7 +124,7 @@ public class ComponentExporter
 			System.err.println("No such FROM component.");
 			return;
 		}
-		final MappingObject mapObj1 = (MappingObject) objectMappers.get(bean1);
+		final MappingObject mapObj1 = objectMappers.get(bean1);
 		final ComponentProperty prop1ID = mapObj1.getPropImpl(prop1);
 
 		if (prop1ID == null)
@@ -139,7 +138,7 @@ public class ComponentExporter
 			return;
 		}
 
-		final MappingObject mapObj2 = (MappingObject) objectMappers.get(bean2);
+		final MappingObject mapObj2 = objectMappers.get(bean2);
 		final ComponentProperty prop2ID = mapObj2.getPropImpl(prop2);
 
 		if (prop2ID == null)
@@ -182,7 +181,5 @@ public class ComponentExporter
 			}
 		}
 		System.err.println("ERROR: ComponentExporter.unexport unknown bean " + bean);
-		return;
 	}
-
 }
