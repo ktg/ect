@@ -16,6 +16,7 @@ import equip.ect.PropertyLinkRequest;
 import equip.ect.apps.editor.BeanCanvasItem;
 import equip.ect.apps.editor.dataspace.DataspaceMonitor;
 import equip.ect.apps.editor.dataspace.DataspaceUtils;
+import equip.ect.apps.editor.grapheditor.Drawer;
 import equip.ect.apps.editor.grapheditor.GraphComponent;
 import equip.ect.apps.editor.grapheditor.GraphComponentProperty;
 import equip.ect.apps.editor.grapheditor.GraphEditor;
@@ -103,7 +104,14 @@ public class StateManager
 						if (item instanceof GraphComponent)
 						{
 							GraphComponent graphComponent = (GraphComponent) item;
-							graphComponent.getDrawer().setDrawerState(componentState.getState());
+							if(componentState.getState() != null)
+							{
+								graphComponent.getDrawer().setDrawerState(componentState.getState());
+							}
+							else
+							{
+								graphComponent.getDrawer().setDrawerState(Drawer.State.OPEN);
+							}
 							for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
 							{
 								componentState.getProperties().stream()
