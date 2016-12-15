@@ -1,17 +1,27 @@
 package equip.ect.apps.editor.state;
 
-import javax.swing.*;
-import javax.swing.text.BadLocationException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.WindowConstants;
+import javax.swing.text.BadLocationException;
+
 public class ProgressDialog extends JFrame
 {
 	private final JLabel progressStatus = new JLabel();
-	private final JProgressBar progress = new JProgressBar(0,100);
+	private final JProgressBar progress = new JProgressBar(0, 100);
 	private final JTextArea progressLog = new JTextArea();
 	private final JButton doneButton;
 
@@ -59,7 +69,14 @@ public class ProgressDialog extends JFrame
 		setLocationRelativeTo(null);
 	}
 
-	public void setStatus(String status)
+	public void setLength(int length)
+	{
+		progress.setValue(0);
+		progress.setMinimum(0);
+		progress.setMaximum(length);
+	}
+
+	void setStatus(String status)
 	{
 		System.out.println(status);
 		progressStatus.setText(status);
@@ -73,19 +90,12 @@ public class ProgressDialog extends JFrame
 		}
 	}
 
-	public void increment()
+	void increment()
 	{
 		progress.setValue(progress.getValue() + 1);
 	}
 
-	public void setLength(int length)
-	{
-		progress.setValue(0);
-		progress.setMinimum(0);
-		progress.setMaximum(length);
-	}
-
-	public void finished()
+	void finished()
 	{
 		setStatus("Finished");
 		progress.setValue(progress.getMaximum());

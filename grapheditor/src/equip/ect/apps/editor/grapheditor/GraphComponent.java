@@ -71,7 +71,7 @@ import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
 
 public class GraphComponent extends BeanCanvasItem implements Connectable
 {
-	protected class MyLinkWatcher implements DataspaceEventListener
+	private class MyLinkWatcher implements DataspaceEventListener
 	{
 		@Override
 		public void dataspaceEvent(final DataspaceEvent de)
@@ -164,29 +164,20 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 			javax.swing.SwingUtilities.invokeLater(task);
 		}
 	}
-
-	private final Drawer drawer;
-
-	private transient final Map<String, GraphComponentProperty> graphCompProps = new HashMap<>();
-	private transient final List<GraphComponentProperty> renderableProps = new ArrayList<>();
-
-	private Map<GraphComponent, LinkGroup> outLinkGroups, inLinkGroups;
-
-	private String hostID;
-
 	// links from me - template
 	public static boolean showAllLinks = true;
-
-	private equip.data.DataSession linkFromSession;
-
-	private equip.data.DataSession linkToSession;
-
-	private boolean watchingLinks = false;
-
+	private final Drawer drawer;
+	private transient final Map<String, GraphComponentProperty> graphCompProps = new HashMap<>();
+	private transient final List<GraphComponentProperty> renderableProps = new ArrayList<>();
 	private final Map<String, List<PropertyLinkRequest>> pendingToLinks = new HashMap<>();
 	private final Map<String, List<PropertyLinkRequest>> pendingFromLinks = new HashMap<>();
+	private Map<GraphComponent, LinkGroup> outLinkGroups, inLinkGroups;
+	private String hostID;
+	private equip.data.DataSession linkFromSession;
+	private equip.data.DataSession linkToSession;
+	private boolean watchingLinks = false;
 
-	public GraphComponent(final Component canvas, final String beanid, final String title, final String hostID)
+	GraphComponent(final Component canvas, final String beanid, final String title, final String hostID)
 	{
 		super(canvas, new GraphComponentView(canvas, title, null), beanid, title);
 
@@ -201,112 +192,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		((GraphComponentView) view).setGraphComponentProperties(renderableProps);
 		this.drawer = new Drawer(this, Drawer.Type.UP, Drawer.State.OPEN);
 		((GraphComponentView) view).setDrawer(drawer);
-	}
-
-	public void addGraphComponentProperty(final ComponentProperty compProp)
-	{
-		final GraphComponentProperty gcp = new GraphComponentProperty(this, compProp);
-		graphCompProps.put(compProp.getID().toString(), gcp);
-		renderableProps.add(gcp);
-		Collections.sort(renderableProps);
-		height += gcp.getHeight();
-
-		// check for pending links
-		List<PropertyLinkRequest> pendingReqs = pendingFromLinks.get(compProp.getID().toString());
-		if (pendingReqs != null)
-		{
-			for (PropertyLinkRequest req : pendingReqs)
-			{
-				final List<GraphComponentProperty> props = ((GraphEditorCanvas) canvas).getGraphComponentProperties(req
-						.getDestinationPropID().toString());
-				if (props != null && props.size() > 0)
-				{
-					final GraphComponentProperty toProp = props.get(0);
-					((GraphEditorCanvas) canvas).connect(gcp, toProp, req);
-					gcp.getParent().revalidate();
-				}
-			}
-			if (pendingReqs.size() < 1)
-			{
-				pendingFromLinks.remove(compProp.getID().toString());
-			}
-		}
-
-		pendingReqs = pendingToLinks.get(compProp.getID().toString());
-		if (pendingReqs != null)
-		{
-			for (PropertyLinkRequest req : pendingReqs)
-			{
-				final List<GraphComponentProperty> props = ((GraphEditorCanvas) canvas).getGraphComponentProperties(req.getSourcePropID()
-						.toString());
-				if (props != null && props.size() > 0)
-				{
-					final GraphComponentProperty fromProp = props.get(0);
-					((GraphEditorCanvas) canvas).connect(fromProp, gcp, req);
-				}
-			}
-			if (pendingReqs.size() < 1)
-			{
-				pendingToLinks.remove(compProp.getID().toString());
-			}
-		}
-
-	}
-
-	public LinkGroup addInputLink(final Link link)
-	{
-		if (inLinkGroups == null)
-		{
-			inLinkGroups = new HashMap<>();
-		}
-
-		final GraphComponent source = ((GraphComponentProperty) link.getSource()).getParent();
-		final GraphComponent target = ((GraphComponentProperty) link.getTarget()).getParent();
-
-		// get all the links that have the same source
-		LinkGroup linkGroup = getInLinkGroup(source);
-		if (linkGroup == null)
-		{
-			linkGroup = source.getOutLinkGroup(this);
-		}
-
-		if (linkGroup == null)
-		{
-			// create new one
-			linkGroup = new GraphEditorLinkGroup(canvas, source.getOutAnchorPoint(), target.getInAnchorPoint(), source,
-					target);
-		}
-		linkGroup.addLink(link);
-		inLinkGroups.put(source, linkGroup);
-		return linkGroup;
-	}
-
-	public LinkGroup addOutputLink(final Link link)
-	{
-		if (outLinkGroups == null)
-		{
-			outLinkGroups = new HashMap<>();
-		}
-
-		final GraphComponent source = ((GraphComponentProperty) link.getSource()).getParent();
-		final GraphComponent target = ((GraphComponentProperty) link.getTarget()).getParent();
-
-		// get all the links that have the same target
-		LinkGroup linkGroup = getOutLinkGroup(target);
-		if (linkGroup == null)
-		{
-			linkGroup = target.getInLinkGroup(this);
-		}
-
-		if (linkGroup == null)
-		{
-			// create new one
-			linkGroup = new GraphEditorLinkGroup(canvas, source.getOutAnchorPoint(), target.getInAnchorPoint(), source,
-					target, null);
-		}
-		linkGroup.addLink(link);
-		outLinkGroups.put(target, linkGroup);
-		return linkGroup;
 	}
 
 	@Override
@@ -327,32 +212,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		return new GraphComponent(canvas, beanid, name, hostID);
 	}
 
-	public void closeDrawer()
-	{
-		compactLinkGroups();
-		calculateSize();
-		repaint();
-	}
-
-	public void compactDrawer()
-	{
-		if (drawer.getPreviousDrawerState() == Drawer.State.CLOSED)
-		{
-			expandLinkGroups();
-		}
-		else
-		{
-			compactLinkGroups();
-		}
-		calculateSize();
-		repaint();
-	}
-
-	public ComponentAdvert getComponentAdvert()
-	{
-		return DataspaceMonitor.getMonitor().getComponentAdverts().get(beanid);
-	}
-
 	public final Drawer getDrawer()
 	{
 		return drawer;
@@ -363,33 +222,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		return graphCompProps;
 	}
 
-	public GraphComponentProperty getGraphComponentProperty(final int x, final int y)
-	{
-		if (drawer.getDrawerState() != Drawer.State.CLOSED)
-		{
-			if (graphCompProps != null)
-			{
-				for (GraphComponentProperty current : graphCompProps.values())
-				{
-					if (current.isVisible() && current.isInside(x, y))
-					{
-						return current;
-					}
-				}
-			}
-		}
-		return null;
-	}
-
-	public GraphComponentProperty getGraphComponentProperty(final String beanid)
-	{
-		if (graphCompProps != null)
-		{
-			return graphCompProps.get(beanid);
-		}
-		return null;
-	}
-
 	@Override
 	public Point getInAnchorPoint()
 	{
@@ -397,78 +229,11 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		return new Point(posX, (int) (posY + 0.5 * headerHeight));
 	}
 
-	/**
-	 * Returns the LinkGroup where the given component is a source.
-	 */
-	public LinkGroup getInLinkGroup(final Connectable source)
-	{
-		if (inLinkGroups != null)
-		{
-			return inLinkGroups.get(source);
-		}
-		return null;
-	}
-
-	public Map<GraphComponent, LinkGroup> getInLinkGroups()
-	{
-		return inLinkGroups;
-	}
-
 	@Override
 	public Point getOutAnchorPoint()
 	{
 		final int headerHeight = ((GraphComponentView) view).getHeaderHeight();
 		return new Point(posX + width, (int) (posY + 0.5 * headerHeight));
-	}
-
-	/**
-	 * Returns the LinkGroup where the given component is a target.
-	 */
-	public LinkGroup getOutLinkGroup(final Connectable target)
-	{
-		if (outLinkGroups != null)
-		{
-			return outLinkGroups.get(target);
-		}
-		return null;
-	}
-
-	public Map<GraphComponent, LinkGroup> getOutLinkGroups()
-	{
-		return outLinkGroups;
-	}
-
-	public void openDrawer()
-	{
-		expandLinkGroups();
-		calculateSize();
-		repaint();
-	}
-
-	public void removeGraphComponentProperty(final ComponentProperty compProp)
-	{
-		final GraphComponentProperty gcp = graphCompProps.remove(compProp.getID().toString());
-		renderableProps.remove(gcp);
-		if (gcp != null)
-		{
-			height -= gcp.getHeight();
-		}
-		pendingToLinks.remove(compProp.getID().toString());
-		pendingFromLinks.remove(compProp.getID().toString());
-
-		if (canvas instanceof GraphEditorCanvas)
-		{
-			List<Link> links = gcp.getOutputLinks();
-			if (links != null)
-			{
-				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
-			}
-			links = gcp.getInputLinks();
-			if (links != null)
-			{
-				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
-			}
-		}
 	}
 
 	public void removeInputLink(final Link link)
@@ -716,6 +481,180 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		}
 	}
 
+	void addGraphComponentProperty(final ComponentProperty compProp)
+	{
+		final GraphComponentProperty gcp = new GraphComponentProperty(this, compProp);
+		graphCompProps.put(compProp.getID().toString(), gcp);
+		renderableProps.add(gcp);
+		Collections.sort(renderableProps);
+		height += gcp.getHeight();
+
+		// check for pending links
+		List<PropertyLinkRequest> pendingReqs = pendingFromLinks.get(compProp.getID().toString());
+		if (pendingReqs != null)
+		{
+			for (PropertyLinkRequest req : pendingReqs)
+			{
+				final List<GraphComponentProperty> props = ((GraphEditorCanvas) canvas).getGraphComponentProperties(req
+						.getDestinationPropID().toString());
+				if (props != null && props.size() > 0)
+				{
+					final GraphComponentProperty toProp = props.get(0);
+					((GraphEditorCanvas) canvas).connect(gcp, toProp, req);
+					gcp.getParent().revalidate();
+				}
+			}
+			if (pendingReqs.size() < 1)
+			{
+				pendingFromLinks.remove(compProp.getID().toString());
+			}
+		}
+
+		pendingReqs = pendingToLinks.get(compProp.getID().toString());
+		if (pendingReqs != null)
+		{
+			for (PropertyLinkRequest req : pendingReqs)
+			{
+				final List<GraphComponentProperty> props = ((GraphEditorCanvas) canvas).getGraphComponentProperties(req.getSourcePropID()
+						.toString());
+				if (props != null && props.size() > 0)
+				{
+					final GraphComponentProperty fromProp = props.get(0);
+					((GraphEditorCanvas) canvas).connect(fromProp, gcp, req);
+				}
+			}
+			if (pendingReqs.size() < 1)
+			{
+				pendingToLinks.remove(compProp.getID().toString());
+			}
+		}
+
+	}
+
+	LinkGroup addInputLink(final Link link)
+	{
+		if (inLinkGroups == null)
+		{
+			inLinkGroups = new HashMap<>();
+		}
+
+		final GraphComponent source = ((GraphComponentProperty) link.getSource()).getParent();
+		final GraphComponent target = ((GraphComponentProperty) link.getTarget()).getParent();
+
+		// get all the links that have the same source
+		LinkGroup linkGroup = getInLinkGroup(source);
+		if (linkGroup == null)
+		{
+			linkGroup = source.getOutLinkGroup(this);
+		}
+
+		if (linkGroup == null)
+		{
+			// create new one
+			linkGroup = new GraphEditorLinkGroup(canvas, source.getOutAnchorPoint(), target.getInAnchorPoint(), source,
+					target);
+		}
+		linkGroup.addLink(link);
+		inLinkGroups.put(source, linkGroup);
+		return linkGroup;
+	}
+
+	LinkGroup addOutputLink(final Link link)
+	{
+		if (outLinkGroups == null)
+		{
+			outLinkGroups = new HashMap<>();
+		}
+
+		final GraphComponent source = ((GraphComponentProperty) link.getSource()).getParent();
+		final GraphComponent target = ((GraphComponentProperty) link.getTarget()).getParent();
+
+		// get all the links that have the same target
+		LinkGroup linkGroup = getOutLinkGroup(target);
+		if (linkGroup == null)
+		{
+			linkGroup = target.getInLinkGroup(this);
+		}
+
+		if (linkGroup == null)
+		{
+			// create new one
+			linkGroup = new GraphEditorLinkGroup(canvas, source.getOutAnchorPoint(), target.getInAnchorPoint(), source,
+					target, null);
+		}
+		linkGroup.addLink(link);
+		outLinkGroups.put(target, linkGroup);
+		return linkGroup;
+	}
+
+	ComponentAdvert getComponentAdvert()
+	{
+		return DataspaceMonitor.getMonitor().getComponentAdverts().get(beanid);
+	}
+
+	GraphComponentProperty getGraphComponentProperty(final int x, final int y)
+	{
+		if (drawer.getDrawerState() != Drawer.State.CLOSED)
+		{
+			if (graphCompProps != null)
+			{
+				for (GraphComponentProperty current : graphCompProps.values())
+				{
+					if (current.isVisible() && current.isInside(x, y))
+					{
+						return current;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	GraphComponentProperty getGraphComponentProperty(final String beanid)
+	{
+		if (graphCompProps != null)
+		{
+			return graphCompProps.get(beanid);
+		}
+		return null;
+	}
+
+	Map<GraphComponent, LinkGroup> getInLinkGroups()
+	{
+		return inLinkGroups;
+	}
+
+	Map<GraphComponent, LinkGroup> getOutLinkGroups()
+	{
+		return outLinkGroups;
+	}
+
+	void removeGraphComponentProperty(final ComponentProperty compProp)
+	{
+		final GraphComponentProperty gcp = graphCompProps.remove(compProp.getID().toString());
+		renderableProps.remove(gcp);
+		if (gcp != null)
+		{
+			height -= gcp.getHeight();
+		}
+		pendingToLinks.remove(compProp.getID().toString());
+		pendingFromLinks.remove(compProp.getID().toString());
+
+		if (canvas instanceof GraphEditorCanvas)
+		{
+			List<Link> links = gcp.getOutputLinks();
+			if (links != null)
+			{
+				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
+			}
+			links = gcp.getInputLinks();
+			if (links != null)
+			{
+				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
+			}
+		}
+	}
+
 	/**
 	 * Calculate the size for component, adjusting to font metrics. Different sizes for different
 	 * fonts and targets canvases.
@@ -842,5 +781,57 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 				}
 			}
 		}
+	}
+
+	private void closeDrawer()
+	{
+		compactLinkGroups();
+		calculateSize();
+		repaint();
+	}
+
+	private void compactDrawer()
+	{
+		if (drawer.getPreviousDrawerState() == Drawer.State.CLOSED)
+		{
+			expandLinkGroups();
+		}
+		else
+		{
+			compactLinkGroups();
+		}
+		calculateSize();
+		repaint();
+	}
+
+	/**
+	 * Returns the LinkGroup where the given component is a source.
+	 */
+	private LinkGroup getInLinkGroup(final Connectable source)
+	{
+		if (inLinkGroups != null)
+		{
+			return inLinkGroups.get(source);
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the LinkGroup where the given component is a target.
+	 */
+	private LinkGroup getOutLinkGroup(final Connectable target)
+	{
+		if (outLinkGroups != null)
+		{
+			return outLinkGroups.get(target);
+		}
+		return null;
+	}
+
+	private void openDrawer()
+	{
+		expandLinkGroups();
+		calculateSize();
+		repaint();
 	}
 }

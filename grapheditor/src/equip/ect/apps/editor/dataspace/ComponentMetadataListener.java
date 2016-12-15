@@ -43,10 +43,9 @@ import java.util.EventListener;
 
 public interface ComponentMetadataListener extends EventListener
 {
+	void componentMetadataAdded(Object metadata);
 
-	public abstract void componentMetadataAdded(Object metadata);
+	void componentMetadataDeleted(Object metadata);
 
-	public abstract void componentMetadataDeleted(Object metadata);
-
-	public abstract void componentMetadataUpdated(Object metadata);
+	void componentMetadataUpdated(Object metadata);
 }

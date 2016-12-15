@@ -50,31 +50,31 @@ import equip.ect.apps.editor.Link;
 import equip.ect.apps.editor.LinkGroup;
 import equip.ect.apps.editor.RenderableLink;
 
-public class GraphEditorLinkGroup extends LinkGroup
+class GraphEditorLinkGroup extends LinkGroup
 {
 
-	public GraphEditorLinkGroup(final Component canvas, final Point startPoint, final Point endPoint,
+	GraphEditorLinkGroup(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target)
 	{
 		this(canvas, startPoint, endPoint, source, target, null);
 
 	}
 
-	public GraphEditorLinkGroup(final Component canvas, final Point startPoint, final Point endPoint,
+	GraphEditorLinkGroup(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target, final List<Link> links)
 	{
 		super(canvas, startPoint, endPoint, source, target, new CurvedLine(startPoint, endPoint), links);
 		((RenderableLink) view).setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
 	}
 
-	public void compact()
+	void compact()
 	{
 		// System.out.println("Compacting");
 		((GraphEditorCanvas) canvas).removeItems(getLinks(), false);
 		((InteractiveCanvas) canvas).addItem(this);
 	}
 
-	public void expand()
+	void expand()
 	{
 		((GraphEditorCanvas) canvas).removeItem(this, false);
 		// we need to add the links to the canvas again,

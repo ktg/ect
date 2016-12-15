@@ -94,7 +94,10 @@ public class Capability extends CompInfo
 	{
 
 		final equip.runtime.ValueBase v = getAttributeValue(CLASSIFICATION);
-		if (v != null && (v instanceof StringBox)) { return ((StringBox) v).value; }
+		if (v != null && (v instanceof StringBox))
+		{
+			return ((StringBox) v).value;
+		}
 		return null;
 	}
 

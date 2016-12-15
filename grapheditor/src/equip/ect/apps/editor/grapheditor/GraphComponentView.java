@@ -35,6 +35,7 @@
 
 package equip.ect.apps.editor.grapheditor;
 
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
 import equip.ect.apps.editor.interactive.InteractiveCanvasItemView;
 
 import java.awt.Color;
@@ -50,7 +51,7 @@ import java.util.List;
 /**
  * The default view (or rendering strategy) for a GraphComponent.
  */
-public class GraphComponentView extends InteractiveCanvasItemView
+class GraphComponentView extends InteractiveCanvasItemView
 {
 	private static final Font headerFont = new Font("Arial", Font.PLAIN, 11);
 	private static final Color SELECTED_COLOR = new Color(95, 175, 239);
@@ -60,80 +61,11 @@ public class GraphComponentView extends InteractiveCanvasItemView
 	private int headerWidth, headerHeight;
 	private transient List<GraphComponentProperty> graphCompProps;
 
-	public GraphComponentView(final Component canvas, final String name, final List<GraphComponentProperty> renderableProps)
+	GraphComponentView(final Component canvas, final String name, final List<GraphComponentProperty> renderableProps)
 	{
 		super(canvas);
 		this.name = name;
 		this.graphCompProps = renderableProps;
-	}
-
-	public void drawHeader(final Graphics2D g2, final boolean collapsed, final boolean selected)
-	{
-		g2.setFont(headerFont);
-		FontMetrics fontMetrics = g2.getFontMetrics();
-		Rectangle2D r2d = fontMetrics.getStringBounds(name, g2);
-		g2.setColor(selected ? SELECTED_COLOR : UNSELECTED_COLOR);
-
-		int height = headerHeight;
-		if (!collapsed && (drawer.getDrawerState() == Drawer.State.OPEN || drawer.getDrawerState() == Drawer.State.COMPACT))
-		{
-			height += 10;
-		}
-
-		g2.fillRoundRect(posX, posY, headerWidth, height, 10, 10);
-		g2.setColor(Color.black);
-		g2.drawRoundRect(posX, posY, headerWidth - 1, height - 1, 10, 10);
-		//g2.setColor(Color.white);
-		g2.drawString(name, (int) (posX + 0.5 * (headerWidth - r2d.getWidth())), // center
-				posY + 1 + (int) r2d.getHeight());
-	}
-
-	public void drawProps(final Graphics2D g)
-	{
-		if (graphCompProps != null)
-		{
-			Rectangle2D rect = null;
-			for (GraphComponentProperty gcp : graphCompProps)
-			{
-				if (gcp.isVisible())
-				{
-					if (rect == null)
-					{
-						rect = gcp.getBounds();
-					}
-					else
-					{
-						rect = rect.createUnion(gcp.getBounds());
-					}
-				}
-			}
-
-			if (rect != null)
-			{
-				g.setColor(Color.white);
-				g.fillRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth() - 1, (int) rect.getHeight() - 1);
-				g.setColor(Color.black);
-				g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth() - 1, (int) rect.getHeight() - 1);
-			}
-
-			for (GraphComponentProperty gcp : graphCompProps)
-			{
-				if (gcp.isVisible())
-				{
-					gcp.paintComponent(g);
-				}
-			}
-		}
-	}
-
-	public final int getHeaderHeight()
-	{
-		return this.headerHeight;
-	}
-
-	public final int getHeaderWidth()
-	{
-		return this.headerWidth;
 	}
 
 	@Override
@@ -183,19 +115,29 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		paintNormal(g);
 	}
 
-	public void setDrawer(final Drawer drawer)
+	public void setName(final String name)
+	{
+		this.name = name;
+	}
+
+	final int getHeaderHeight()
+	{
+		return this.headerHeight;
+	}
+
+	final int getHeaderWidth()
+	{
+		return this.headerWidth;
+	}
+
+	void setDrawer(final Drawer drawer)
 	{
 		this.drawer = drawer;
 	}
 
-	public void setGraphComponentProperties(final List<GraphComponentProperty> graphCompProps)
+	void setGraphComponentProperties(final List<GraphComponentProperty> graphCompProps)
 	{
 		this.graphCompProps = graphCompProps;
-	}
-
-	public void setName(final String name)
-	{
-		this.name = name;
 	}
 
 	/**
@@ -268,5 +210,60 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		height += drawer.getHeight();
 		final int ddx = (int) (0.5 * (headerWidth - drawer.getWidth()));
 		drawer.setPosition(posX + ddx, posY + height - drawer.getHeight());
+	}
+
+	private void drawHeader(final Graphics2D g2, final boolean collapsed, final boolean selected)
+	{
+		g2.setFont(headerFont);
+		FontMetrics fontMetrics = g2.getFontMetrics();
+		Rectangle2D r2d = fontMetrics.getStringBounds(name, g2);
+		g2.setColor(selected ? SELECTED_COLOR : UNSELECTED_COLOR);
+
+		int height = headerHeight;
+		if (!collapsed && (drawer.getDrawerState() == Drawer.State.OPEN || drawer.getDrawerState() == Drawer.State.COMPACT))
+		{
+			height += 10;
+		}
+
+		g2.fillRoundRect(posX, posY, headerWidth, height, 10, 10);
+		g2.setColor(Color.black);
+		g2.drawRoundRect(posX, posY, headerWidth - 1, height - 1, 10, 10);
+		//g2.setColor(Color.white);
+		g2.drawString(name, (int) (posX + 0.5 * (headerWidth - r2d.getWidth())), // center
+				posY + 1 + (int) r2d.getHeight());
+	}
+
+	private void drawProps(final Graphics2D g)
+	{
+		if (graphCompProps != null)
+		{
+			Rectangle2D rect = null;
+			for (GraphComponentProperty gcp : graphCompProps)
+			{
+				if (gcp.isVisible())
+				{
+					if (rect == null)
+					{
+						rect = gcp.getBounds();
+					}
+					else
+					{
+						rect = rect.createUnion(gcp.getBounds());
+					}
+				}
+			}
+
+			if (rect != null)
+			{
+				g.setColor(Color.white);
+				g.fillRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth() - 1, (int) rect.getHeight() - 1);
+				g.setColor(Color.black);
+				g.drawRect((int) rect.getX(), (int) rect.getY(), (int) rect.getWidth() - 1, (int) rect.getHeight() - 1);
+			}
+
+			graphCompProps.stream()
+					.filter(InteractiveCanvasItem::isVisible)
+					.forEach(gcp -> gcp.paintComponent(g));
+		}
 	}
 }

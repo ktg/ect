@@ -44,9 +44,9 @@ import java.awt.geom.Rectangle2D;
 
 import equip.ect.apps.editor.interactive.InteractiveCanvasItemView;
 
-public class GraphComponentPropertyView extends InteractiveCanvasItemView
+class GraphComponentPropertyView extends InteractiveCanvasItemView
 {
-	public static boolean renderPropValue = true;
+	static boolean renderPropValue = true;
 	private static final Color normalColor = Color.white;
 	private static final Color selectedColor = Color.green.darker();
 	private static final Color valueColor = Color.blue.darker();
@@ -59,7 +59,7 @@ public class GraphComponentPropertyView extends InteractiveCanvasItemView
 		setValue(value);
 	}
 
-	public void paint(final Graphics2D g)
+	void paint(final Graphics2D g)
 	{
 		// g.setClip(posX, posY, width, height);
 		g.setFont(propertyFont);

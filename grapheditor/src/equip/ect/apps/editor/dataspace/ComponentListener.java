@@ -53,11 +53,9 @@ import equip.ect.ComponentAdvert;
 
 public interface ComponentListener extends EventListener
 {
+	void componentAdvertAdded(ComponentAdvert compAd);
 
-	public abstract void componentAdvertAdded(ComponentAdvert compAd);
-
-	public void componentAdvertUpdated(ComponentAdvert compAd);
+	void componentAdvertUpdated(ComponentAdvert compAd);
 	
-	public abstract void componentAdvertDeleted(ComponentAdvert compAd);
-
+	void componentAdvertDeleted(ComponentAdvert compAd);
 }

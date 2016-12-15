@@ -96,7 +96,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 						{
 							if (results == null)
 							{
-								results = new ArrayList<BeanCanvasItem>();
+								results = new ArrayList<>();
 							}
 							results.add(item);
 						}
@@ -107,8 +107,8 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		return results;
 	}
 
-	protected transient List<BeanCanvasItem> unattachableItems = new ArrayList<BeanCanvasItem>();
-	protected transient List<BeanCanvasItem> attachableItems = new ArrayList<BeanCanvasItem>();
+	protected transient List<BeanCanvasItem> unattachableItems = new ArrayList<>();
+	protected transient List<BeanCanvasItem> attachableItems = new ArrayList<>();
 	private int dragging = 0;
 
 	private static final boolean singleInstance = true;
@@ -120,7 +120,6 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 	public BeanGraphPanel(final String title, final SelectionModel selectionModel)
 	{
 		super(title, Color.white, selectionModel);
-		// create the trash icon
 
 		// initiate drag and drop
 		dropTarget = new DropTarget(this, this);
@@ -179,11 +178,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		final Collection<Capability> caps = DataspaceMonitor.getMonitor().getCapabilities();
 		if (caps != null)
 		{
-			for (final Capability cap : caps)
-			{
-				capabilityAdded(cap);
-
-			}
+			caps.forEach(this::capabilityAdded);
 		}
 		DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(this);
 	}
@@ -386,14 +381,9 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 				event.rejectDrop();
 			}
 		}
-		catch (final IOException exception)
+		catch (final IOException | UnsupportedFlavorException exception)
 		{
 			exception.printStackTrace();
-			event.rejectDrop();
-		}
-		catch (final UnsupportedFlavorException ufException)
-		{
-			ufException.printStackTrace();
 			event.rejectDrop();
 		}
 	}
@@ -495,7 +485,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 				{
 					if (possible == null)
 					{
-						possible = new ArrayList<BeanCanvasItem>();
+						possible = new ArrayList<>();
 					}
 					attachableItems.add(foreignBit);
 				}

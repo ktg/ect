@@ -12,11 +12,10 @@ class BeanJarContent
 	public static final String DEFAULT_OUTPUT_PROPERTY_KEY = "DEFAULT_OUTPUT_PROPERTY";
 	public static final String ICON_KEY = "ICON";
 
-	protected final Map<String, Map<String, String>> maps;
+	private final Map<String, Map<String, String>> maps = new HashMap<>();
 
-	public BeanJarContent()
+	BeanJarContent()
 	{
-		maps = new HashMap<String, Map<String, String>>();
 	}
 
 	public final String get(final String beanClass, final String key)
@@ -47,6 +46,6 @@ class BeanJarContent
 
 	private Map<String, String> createMap()
 	{
-		return new HashMap<String, String>(6);
+		return new HashMap<>(6);
 	}
 }

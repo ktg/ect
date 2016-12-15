@@ -673,7 +673,7 @@ public class ComponentBrowser extends JPanel
 		{
 			final String id = comp.getID().toString();
 			final DefaultMutableTreeNode node = nodeMap.get(id);
-			sortchildren(root);
+			sortChildren(root);
 			//treeModel.nodeStructureChanged(root);
 			if (node != null)
 			{
@@ -682,7 +682,7 @@ public class ComponentBrowser extends JPanel
 		}
 
 		@SuppressWarnings("unchecked")
-		private void sortchildren(DefaultMutableTreeNode node)
+		private void sortChildren(DefaultMutableTreeNode node)
 		{
 			List<DefaultMutableTreeNode> children = Collections.list(node.children());
 			node.removeAllChildren();

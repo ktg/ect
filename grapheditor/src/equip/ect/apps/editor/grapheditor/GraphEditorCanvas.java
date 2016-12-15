@@ -67,7 +67,6 @@ import javax.swing.JPopupMenu;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -89,7 +88,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 	/**
 	 * ************* INNER CLASSES *******************************
 	 */
-	class CanvasPopupMenu extends JPopupMenu
+	private class CanvasPopupMenu extends JPopupMenu
 	{
 
 		CanvasPopupMenu()
@@ -107,7 +106,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		}
 	}
 
-	class ComponentPopupMenu extends JPopupMenu
+	private class ComponentPopupMenu extends JPopupMenu
 	{
 
 		//private final InteractiveCanvasItem component;
@@ -197,7 +196,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		}
 	}
 
-	class LinkPopupMenu extends JPopupMenu
+	private class LinkPopupMenu extends JPopupMenu
 	{
 
 		//private final Link link;
@@ -263,7 +262,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 		}
 	}
 
-	class PropertyPopupMenu extends JPopupMenu
+	private class PropertyPopupMenu extends JPopupMenu
 	{
 
 		private final GraphComponentProperty prop;
@@ -366,7 +365,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 
 	private Map<String, Component> componentDialogs = new HashMap<>();
 
-	public GraphEditorCanvas(final String title, SelectionModel selectionModel)
+	GraphEditorCanvas(final String title, SelectionModel selectionModel)
 	{
 		super(title, selectionModel);
 		// need to call this to enable tooltips

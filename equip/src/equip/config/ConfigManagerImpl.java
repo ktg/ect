@@ -45,285 +45,360 @@ Contributors:
 
 package equip.config;
 
-import equip.runtime.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 
-/** Implementation of {@link equip.config.ConfigManager} */
-public class ConfigManagerImpl extends ConfigManager {
-  /* lifecycle */
-  public ConfigManagerImpl() {
-    //....
-  }
+import equip.runtime.StatusValues;
 
-  /* API */
-  private String defaultPath = null;
-  private String pathSeparator = null, fileSeparator = null;
-  private boolean reported = false;
-
-  public synchronized int 
-      readConfigFile(String filename1, int rating, String extraPath) {
-      
-      if (defaultPath==null) {	  
-	  defaultPath = System.getProperty("EQUIP_PATH");
-	  if (defaultPath==null) {
-	      if (!reported) {
-		  System.err.println("Warning(ConfigManager): EQUIP_PATH not set "
-				     + "(using '.' as default path)");
-		  defaultPath = ".";
-		  reported = true;
-	      }
-	  }
-      }
-      if (pathSeparator==null) {
-	  try {
-	      pathSeparator = System.getProperty("path.separator",";");
-	  } catch (Exception e) {
-	      System.err.println("Error getting property path.separator:"+e);
-	      pathSeparator = ";";
-	  }
-      }
-      if (fileSeparator==null) {
-	  try {
-	      fileSeparator = System.getProperty("file.separator",";");
-	  } catch (Exception e) {
-	      System.err.println("Error getting property file.separator:"+e);
-	      fileSeparator = "/";
-	  }
-      }
-      String searchPath;
-      if (extraPath==null) {
-	  searchPath = defaultPath;
-      } else {
-	  searchPath = extraPath+pathSeparator+defaultPath;
-      }
-      String filename = filename1;
-
-      // try named file
-      String dest = null;
-      String curfile = filename;
-      BufferedReader infile = null;
-      try {
-	  infile = new BufferedReader(new InputStreamReader
-	      (new FileInputStream(filename)));
-      } catch (Exception e) {
-	  infile = null;
-      }
-      if (infile==null) {
-	  System.err.println("WARNING: unable to open config file directly as " + filename
-			     + " - trying search path " + searchPath + "...");
-	  // check no /, \ or : in filename
-	  int p;
-	  if ((p=filename.lastIndexOf('/'))>=0) {
-	      filename = filename.substring(p+1);
-	  }
-	  if ((p=filename.lastIndexOf('\\'))>=0) {
-	      filename = filename.substring(p+1);
-	  }
-	  if ((p=filename.lastIndexOf(':'))>=0) {
-	      filename = filename.substring(p+1);
-	  }
-	  /* First check current directory                                         */
-	  boolean found = false;
-	  if (new File(filename).canRead()) {
-	      dest = filename;
-	      System.err.println("- found as " + filename + "");
-	      found = true;
-	  } else {
-	      
-	      String path = searchPath;
-	      int path_ptr;
-	      /* OK, current dir was no good, search the specified path   */
-	      while (path.length()>0) {
-		  if ((path_ptr = 
-		       path.lastIndexOf(pathSeparator.charAt(0))) < 0) { 
-		      /* We have reached the last entry in the search path                 */
-		      dest = path;
-		      path = "";
-		  } else {
-		      dest = path.substring(0,path_ptr);
-		      path = path.substring(path_ptr+1);
-		  }
-		  dest = dest + fileSeparator + filename;
-		  
-		  if (new File(dest).canRead()) {
-		      System.err.println("- found as " + dest + "");
-		      found = true;
-		      break;
-		  }
-	      }
-	  }
-	  
-	  if (!found) { 
-	      System.err.println("ERROR: unable to find config file "
-				 + filename + " using path " + searchPath + "");
-	      return StatusValues.STATUS_ERROR;
-	  }
-    
-	  curfile = dest;
-	  
-	  try {
-	      infile = new BufferedReader(new InputStreamReader
-		  (new FileInputStream(dest)));
-	  } catch (Exception e) {
-	      System.err.println("ERROR: unable to open config file " + dest
-				 + " for reading");
-	      return StatusValues.STATUS_ERROR;
-	  }
-      } // ifstream
-
-      String line;
-      int num=0;
-
-      try {
-	while ((line=infile.readLine())!=null) {
-	  num++;
-	  if (line.charAt(0)==0 || line.charAt(0)=='#') {
-	      // comment
-	      continue;
-	  }
-    
-	  int p, p2;
-	  
-	  p = line.indexOf(':');
-	  if (p<0) {
-	      System.err.println("WARNING: line " + num + " of config file "
-				 + curfile + " malformed - no \':\' found: " + line + "");
-	      continue;
-	  }
-	  
-	  // remove white space and split
-	  while (line.length()>0 && 
-		 (line.charAt(line.length()-1)==' ' ||
-		  line.charAt(line.length()-1)=='\n'))
-	      line = line.substring(0,line.length()-1);
-	  while (line.length()>0 && 
-		 (line.charAt(0)==' ' ||
-		  line.charAt(0)=='\t'))
-	      line = line.substring(1);
-		  
-	  p = line.indexOf(':');
-	  String name = line.substring(0,p);
-	  for (p++; p<line.length() && 
-		   (line.charAt(p)==' ' || line.charAt(p)=='\t');
-	       p++);
-	  String value = line.substring(p);
-
-	  int ei = entries.length;
-	  NameValuePair olde []  = entries;
-	  entries = new NameValuePair[ei+1];
-	  if (ei>0)
-	      System.arraycopy(olde, 0, entries, 0, ei);
-
-	  entries[ei] = new NameValuePairImpl();
-	  entries[ei].name = name;
-	  entries[ei].value = value;
-	  entries[ei].rating = rating;
-      
+/**
+ * Implementation of {@link equip.config.ConfigManager}
+ */
+public class ConfigManagerImpl extends ConfigManager
+{
+	/* lifecycle */
+	public ConfigManagerImpl()
+	{
+		//....
 	}
-      } catch (Exception e) {
-	  System.err.println("ERROR: reading config file "
-			     + curfile + " at line " + num + ":" +e);
-	  return StatusValues.STATUS_ERROR;
-      }
-	  
-      System.err.println("Note: read config file " + curfile + ": ok ("
-			 + num + " lines)");
 
-      
-      return StatusValues.STATUS_OK;
-  }
-  public boolean getBooleanValue(String name, boolean defaultValue) {
-      String buf = ""+defaultValue;
-      String svalue = getStringValue(name, buf);
-      boolean value = false;
-      if (svalue.length()>0 && 
-	  (svalue.charAt(0)=='y' || svalue.charAt(0)=='1' || svalue.charAt(0)=='Y' ||
-	   svalue.charAt(0)=='T' || svalue.charAt(0)=='t'))
-	  value = true;
-      else if (svalue.length()>0 &&
-	       (svalue.charAt(0)=='n' || svalue.charAt(0)=='0' || 
-		svalue.charAt(0)=='N' ||
-		svalue.charAt(0)=='F' || svalue.charAt(0)=='f'))
-	  value = false;
-      else {
-	  System.err.println("ConfigManagerImpl::getBooleanValue parse error for "
-			     + svalue + ": defaults to " + defaultValue + "");
-	  value = defaultValue;
-      }
-      return value;
-  }
-  public char getCharValue(String name, char defaultValue) {
-      String buf = ""+defaultValue;
-      String svalue = getStringValue(name, buf);
-      if (svalue.length()>0)
-	  return svalue.charAt(0);
-      return '\0';
-  }
-  public int getLongValue(String name, int defaultValue) {
-      String buf = ""+defaultValue;
-      String svalue = getStringValue(name, buf);
-      int value = 0;
-      try {
-	  value = Integer.valueOf(svalue).intValue();
-      } catch (Exception e) {
-	  System.err.println("ConfigManagerImpl::getLongValue parse error for "
-			     + svalue + ": defaults to " + defaultValue + "");
-	  value = defaultValue;
-      }
-      return value;
-  }
-  public synchronized String 
-	getStringValue(String name, String defaultValue) {
-      
-      int ei, besti;
-      for (besti=(-1), ei=0; ei<entries.length; ei++) {
-	  if (name.equals(entries[ei].name) && 
-	      (besti<0 || entries[besti].rating < entries[ei].rating))
-	      besti = ei;
-      }
-      if (besti>=0 && besti<entries.length) {
-	  String value = entries[besti].value;
-	  System.err.println("ConfigManager: get " + name + " => " 
-			     + (value==null ? "null" : value) + "");
-	  return value;
-      } else {
-	  String value = defaultValue;
-	  System.err.println("ConfigManager: get " + name + " defaults to " 
-			     + (value==null ? "null" : value) + "");
-	  return value;
-      }
-  }
-  public float getFloatValue(String name, float defaultValue) {
-      String buf = ""+defaultValue;
-      String svalue = getStringValue(name, buf);
-      float value = 0;
-      try {
-	  value = Float.valueOf(svalue).floatValue();
-      } catch (Exception e) {
-	  System.err.println("ConfigManagerImpl::getFloatValue parse error for "
-			     + svalue + ": defaults to " + defaultValue + "");
-	  value = defaultValue;
-      }
-      return value;
-  }
-  public double getDoubleValue(String name, double defaultValue) {
-      String buf = ""+defaultValue;
-      String svalue = getStringValue(name, buf);
-      double value = 0;
-      try {
-	  value = Double.valueOf(svalue).doubleValue();
-      } catch (Exception e) {
-	  System.err.println("ConfigManagerImpl::getDoubleValue parse error for "
-			     + svalue + ": defaults to " + defaultValue + "");
-	  value = defaultValue;
-      }
-      return value;
-  }
-  public equip.runtime.ValueBase getObjectValue(String name, equip.runtime.ValueBase defaultValue) {
-      System.err.println("ConfigManagerImpl::getObjectValue not implemented");
-      //....
-      return null;
-  }
+	/* API */
+	private String defaultPath = null;
+	private String pathSeparator = null, fileSeparator = null;
+	private boolean reported = false;
+
+	public synchronized int readConfigFile(String filename1, int rating, String extraPath)
+	{
+
+		if (defaultPath == null)
+		{
+			defaultPath = System.getProperty("EQUIP_PATH");
+			if (defaultPath == null)
+			{
+				if (!reported)
+				{
+					System.err.println("Warning(ConfigManager): EQUIP_PATH not set "
+							+ "(using '.' as default path)");
+					defaultPath = ".";
+					reported = true;
+				}
+			}
+		}
+		if (pathSeparator == null)
+		{
+			try
+			{
+				pathSeparator = System.getProperty("path.separator", ";");
+			}
+			catch (Exception e)
+			{
+				System.err.println("Error getting property path.separator:" + e);
+				pathSeparator = ";";
+			}
+		}
+		if (fileSeparator == null)
+		{
+			try
+			{
+				fileSeparator = System.getProperty("file.separator", ";");
+			}
+			catch (Exception e)
+			{
+				System.err.println("Error getting property file.separator:" + e);
+				fileSeparator = "/";
+			}
+		}
+		String searchPath;
+		if (extraPath == null)
+		{
+			searchPath = defaultPath;
+		}
+		else
+		{
+			searchPath = extraPath + pathSeparator + defaultPath;
+		}
+		String filename = filename1;
+
+		// try named file
+		String dest = null;
+		String curfile = filename;
+		BufferedReader infile = null;
+		try
+		{
+			infile = new BufferedReader(new InputStreamReader
+					(new FileInputStream(filename)));
+		}
+		catch (Exception e)
+		{
+			infile = null;
+		}
+		if (infile == null)
+		{
+			System.err.println("WARNING: unable to open config file directly as " + filename
+					+ " - trying search path " + searchPath + "...");
+			// check no /, \ or : in filename
+			int p;
+			if ((p = filename.lastIndexOf('/')) >= 0)
+			{
+				filename = filename.substring(p + 1);
+			}
+			if ((p = filename.lastIndexOf('\\')) >= 0)
+			{
+				filename = filename.substring(p + 1);
+			}
+			if ((p = filename.lastIndexOf(':')) >= 0)
+			{
+				filename = filename.substring(p + 1);
+			}
+	  /* First check current directory                                         */
+			boolean found = false;
+			if (new File(filename).canRead())
+			{
+				dest = filename;
+				System.err.println("- found as " + filename + "");
+				found = true;
+			}
+			else
+			{
+
+				String path = searchPath;
+				int path_ptr;
+		  /* OK, current dir was no good, search the specified path   */
+				while (path.length() > 0)
+				{
+					if ((path_ptr =
+							path.lastIndexOf(pathSeparator.charAt(0))) < 0)
+					{
+			  /* We have reached the last entry in the search path                 */
+						dest = path;
+						path = "";
+					}
+					else
+					{
+						dest = path.substring(0, path_ptr);
+						path = path.substring(path_ptr + 1);
+					}
+					dest = dest + fileSeparator + filename;
+
+					if (new File(dest).canRead())
+					{
+						System.err.println("- found as " + dest + "");
+						found = true;
+						break;
+					}
+				}
+			}
+
+			if (!found)
+			{
+				System.err.println("ERROR: unable to find config file "
+						+ filename + " using path " + searchPath + "");
+				return StatusValues.STATUS_ERROR;
+			}
+
+			curfile = dest;
+
+			try
+			{
+				infile = new BufferedReader(new InputStreamReader
+						(new FileInputStream(dest)));
+			}
+			catch (Exception e)
+			{
+				System.err.println("ERROR: unable to open config file " + dest
+						+ " for reading");
+				return StatusValues.STATUS_ERROR;
+			}
+		} // ifstream
+
+		String line;
+		int num = 0;
+
+		try
+		{
+			while ((line = infile.readLine()) != null)
+			{
+				num++;
+				if (line.charAt(0) == 0 || line.charAt(0) == '#')
+				{
+					// comment
+					continue;
+				}
+
+				int p, p2;
+
+				p = line.indexOf(':');
+				if (p < 0)
+				{
+					System.err.println("WARNING: line " + num + " of config file "
+							+ curfile + " malformed - no \':\' found: " + line + "");
+					continue;
+				}
+
+				// remove white space and split
+				while (line.length() > 0 &&
+						(line.charAt(line.length() - 1) == ' ' ||
+								line.charAt(line.length() - 1) == '\n'))
+					line = line.substring(0, line.length() - 1);
+				while (line.length() > 0 &&
+						(line.charAt(0) == ' ' ||
+								line.charAt(0) == '\t'))
+					line = line.substring(1);
+
+				p = line.indexOf(':');
+				String name = line.substring(0, p);
+				for (p++; p < line.length() &&
+						(line.charAt(p) == ' ' || line.charAt(p) == '\t');
+				     p++)
+					;
+				String value = line.substring(p);
+
+				int ei = entries.length;
+				NameValuePair olde[] = entries;
+				entries = new NameValuePair[ei + 1];
+				if (ei > 0)
+					System.arraycopy(olde, 0, entries, 0, ei);
+
+				entries[ei] = new NameValuePair();
+				entries[ei].name = name;
+				entries[ei].value = value;
+				entries[ei].rating = rating;
+
+			}
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR: reading config file "
+					+ curfile + " at line " + num + ":" + e);
+			return StatusValues.STATUS_ERROR;
+		}
+
+		System.err.println("Note: read config file " + curfile + ": ok ("
+				+ num + " lines)");
+
+
+		return StatusValues.STATUS_OK;
+	}
+
+	public boolean getBooleanValue(String name, boolean defaultValue)
+	{
+		String buf = "" + defaultValue;
+		String svalue = getStringValue(name, buf);
+		boolean value = false;
+		if (svalue.length() > 0 &&
+				(svalue.charAt(0) == 'y' || svalue.charAt(0) == '1' || svalue.charAt(0) == 'Y' ||
+						svalue.charAt(0) == 'T' || svalue.charAt(0) == 't'))
+			value = true;
+		else if (svalue.length() > 0 &&
+				(svalue.charAt(0) == 'n' || svalue.charAt(0) == '0' ||
+						svalue.charAt(0) == 'N' ||
+						svalue.charAt(0) == 'F' || svalue.charAt(0) == 'f'))
+			value = false;
+		else
+		{
+			System.err.println("ConfigManagerImpl::getBooleanValue parse error for "
+					+ svalue + ": defaults to " + defaultValue + "");
+			value = defaultValue;
+		}
+		return value;
+	}
+
+	public char getCharValue(String name, char defaultValue)
+	{
+		String buf = "" + defaultValue;
+		String svalue = getStringValue(name, buf);
+		if (svalue.length() > 0)
+			return svalue.charAt(0);
+		return '\0';
+	}
+
+	public int getLongValue(String name, int defaultValue)
+	{
+		String buf = "" + defaultValue;
+		String svalue = getStringValue(name, buf);
+		int value = 0;
+		try
+		{
+			value = Integer.valueOf(svalue);
+		}
+		catch (Exception e)
+		{
+			System.err.println("ConfigManagerImpl::getLongValue parse error for "
+					+ svalue + ": defaults to " + defaultValue + "");
+			value = defaultValue;
+		}
+		return value;
+	}
+
+	public synchronized String
+	getStringValue(String name, String defaultValue)
+	{
+
+		int ei, besti;
+		for (besti = (-1), ei = 0; ei < entries.length; ei++)
+		{
+			if (name.equals(entries[ei].name) &&
+					(besti < 0 || entries[besti].rating < entries[ei].rating))
+				besti = ei;
+		}
+		if (besti >= 0 && besti < entries.length)
+		{
+			String value = entries[besti].value;
+			System.err.println("ConfigManager: get " + name + " => "
+					+ (value == null ? "null" : value) + "");
+			return value;
+		}
+		else
+		{
+			System.err.println("ConfigManager: get " + name + " defaults to "
+					+ (defaultValue == null ? "null" : defaultValue) + "");
+			return defaultValue;
+		}
+	}
+
+	public float getFloatValue(String name, float defaultValue)
+	{
+		String buf = "" + defaultValue;
+		String svalue = getStringValue(name, buf);
+		float value = 0;
+		try
+		{
+			value = Float.valueOf(svalue);
+		}
+		catch (Exception e)
+		{
+			System.err.println("ConfigManagerImpl::getFloatValue parse error for "
+					+ svalue + ": defaults to " + defaultValue + "");
+			value = defaultValue;
+		}
+		return value;
+	}
+
+	public double getDoubleValue(String name, double defaultValue)
+	{
+		String buf = "" + defaultValue;
+		String svalue = getStringValue(name, buf);
+		double value = 0;
+		try
+		{
+			value = Double.valueOf(svalue);
+		}
+		catch (Exception e)
+		{
+			System.err.println("ConfigManagerImpl::getDoubleValue parse error for "
+					+ svalue + ": defaults to " + defaultValue + "");
+			value = defaultValue;
+		}
+		return value;
+	}
+
+	public equip.runtime.ValueBase getObjectValue(String name, equip.runtime.ValueBase defaultValue)
+	{
+		System.err.println("ConfigManagerImpl::getObjectValue not implemented");
+		//....
+		return null;
+	}
   /* subclasses....*/
 
 

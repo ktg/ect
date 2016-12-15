@@ -125,7 +125,7 @@ public class BeanDescriptorHelper
 		final Enumeration<String> names = fd.attributeNames();
 		while (names.hasMoreElements())
 		{
-			final String name = (String) names.nextElement();
+			final String name = names.nextElement();
 			final Object value = fd.getValue(name);
 			if (value != null)
 			{

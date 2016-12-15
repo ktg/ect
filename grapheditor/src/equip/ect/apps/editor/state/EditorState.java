@@ -3,20 +3,12 @@ package equip.ect.apps.editor.state;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Kevin on 11 Jul 2014.
- */
-public class EditorState
+class EditorState
 {
 	private String name;
-	private final List<ComponentState> components = new ArrayList<ComponentState>();
+	private final List<ComponentState> components = new ArrayList<>();
 
-	public EditorState()
-	{
-
-	}
-
-	public EditorState(final String name)
+	EditorState(final String name)
 	{
 		this.name = name;
 	}
@@ -26,7 +18,7 @@ public class EditorState
 		return name;
 	}
 
-	public List<ComponentState> getComponents()
+	List<ComponentState> getComponents()
 	{
 		return components;
 	}

@@ -47,21 +47,19 @@ import equip.ect.PropertyLinkRequest;
 
 public interface DataspaceConfigurationListener extends EventListener
 {
+	void capabilityAdded(Capability cap);
 
-	public abstract void capabilityAdded(Capability cap);
+	void capabilityDeleted(Capability cap);
 
-	public abstract void capabilityDeleted(Capability cap);
+	void capabilityUpdated(Capability cap);
 
-	public abstract void capabilityUpdated(Capability cap);
+	void componentRequestAdded(ComponentRequest compReq);
 
-	public abstract void componentRequestAdded(ComponentRequest compReq);
+	void componentRequestDeleted(ComponentRequest compReq);
 
-	public abstract void componentRequestDeleted(ComponentRequest compReq);
+	void propertyLinkRequestAdded(PropertyLinkRequest linkReq);
 
-	public abstract void propertyLinkRequestAdded(PropertyLinkRequest linkReq);
+	void propertyLinkRequestDeleted(PropertyLinkRequest linkReq);
 
-	public abstract void propertyLinkRequestDeleted(PropertyLinkRequest linkReq);
-
-	public abstract void propertyLinkRequestUpdated(PropertyLinkRequest linkReq);
-
+	void propertyLinkRequestUpdated(PropertyLinkRequest linkReq);
 }

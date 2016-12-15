@@ -41,6 +41,11 @@
  */
 package equip.ect;
 
+import java.beans.BeanDescriptor;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.util.Map;
+
 import equip.data.ByteArrayBoxImpl;
 import equip.data.DictionaryImpl;
 import equip.data.GUID;
@@ -48,29 +53,24 @@ import equip.data.StringBoxImpl;
 import equip.data.beans.DataspaceBean;
 import equip.data.beans.DataspaceInactiveException;
 
-import java.beans.BeanDescriptor;
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.util.Map;
-
-public class CapabilityExporter
+class CapabilityExporter
 {
 	private ContainerManager containerManager = null;
 	private GUID containerID = null;
 
-	public CapabilityExporter()
+	CapabilityExporter()
 	{
 	}
 
-	public CapabilityExporter(final ContainerManager cm)
+	CapabilityExporter(final ContainerManager cm)
 	{
 		containerManager = cm;
 		this.containerID = cm.id;
 	}
 
 	// export capability using specified ids
-	public Capability exportCapability(final Class<?> beanClass, final GUID capabilityGUID, final GUID containerGUID,
-	                                   final String hostname, final DataspaceBean dataSpace, final Map<String, String> beanContent)
+	Capability exportCapability(final Class<?> beanClass, final GUID capabilityGUID, final GUID containerGUID,
+	                            final String hostname, final DataspaceBean dataSpace, final Map<String, String> beanContent)
 	{
 
 		if (dataSpace == null || beanClass == null)
@@ -101,7 +101,7 @@ public class CapabilityExporter
 		BeanDescriptorHelper.copyInformation(beaninfo, capability, true);
 
 		Category category = beanClass.getAnnotation(Category.class);
-		if(category != null)
+		if (category != null)
 		{
 			capability.setClassification(category.value());
 		}
@@ -188,7 +188,7 @@ public class CapabilityExporter
 	}
 
 	// export capability allocate new ids
-	public Capability exportCapability(final Class<?> beanClass, final Map<String, String> beanContent)
+	Capability exportCapability(final Class<?> beanClass, final Map<String, String> beanContent)
 	{
 		if (containerManager != null)
 		{

@@ -58,14 +58,12 @@ public class Drawer extends InteractiveCanvasItem
 		OPEN, CLOSED, COMPACT
 	}
 
-	private State drawerState;
-	private State previousState;
-
 	public enum Type
 	{
 		NONE, UP, DOWN, BOTH
 	}
-
+	private State drawerState;
+	private State previousState;
 	private Type type;
 
 	Drawer(final GraphComponent parent, final Type type, final State initialState)
@@ -78,41 +76,11 @@ public class Drawer extends InteractiveCanvasItem
 		setSize(50, 10);
 	}
 
-	public Type getAction(final int x, final int y)
-	{
-		if (isInside(x, y))
-		{
-			if (type == Type.BOTH)
-			{
-				final Point c = getCenter();
-				return (x < c.x ? Type.UP : Type.DOWN);
-			}
-			else
-			{
-				return type;
-			}
-		}
-		else
-		{
-			return Type.NONE;
-		}
-	}
-
 	public String getID() { return null; }
 
 	public final State getDrawerState()
 	{
 		return this.drawerState;
-	}
-
-	public final State getPreviousDrawerState()
-	{
-		return this.previousState;
-	}
-
-	public final Type getType()
-	{
-		return type;
 	}
 
 	public final void setDrawerState(final State drawerState)
@@ -135,8 +103,38 @@ public class Drawer extends InteractiveCanvasItem
 		}
 	}
 
+	public final Type getType()
+	{
+		return type;
+	}
+
 	public void setType(final Type type)
 	{
 		this.type = type;
+	}
+
+	Type getAction(final int x, final int y)
+	{
+		if (isInside(x, y))
+		{
+			if (type == Type.BOTH)
+			{
+				final Point c = getCenter();
+				return (x < c.x ? Type.UP : Type.DOWN);
+			}
+			else
+			{
+				return type;
+			}
+		}
+		else
+		{
+			return Type.NONE;
+		}
+	}
+
+	final State getPreviousDrawerState()
+	{
+		return this.previousState;
 	}
 }

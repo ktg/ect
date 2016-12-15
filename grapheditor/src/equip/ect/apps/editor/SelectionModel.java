@@ -18,11 +18,11 @@ public class SelectionModel
 
 	public interface SelectionListener
 	{
-		public void selectionChanged(Collection<String> selection);
+		void selectionChanged(Collection<String> selection);
 	}
 
-	private final Set<SelectionListener> listeners = new HashSet<SelectionListener>();
-	private Set<String> selected = new HashSet<String>();
+	private final Set<SelectionListener> listeners = new HashSet<>();
+	private Set<String> selected = new HashSet<>();
 
 	public Collection<String> getSelected()
 	{

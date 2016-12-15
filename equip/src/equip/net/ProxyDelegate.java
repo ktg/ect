@@ -96,16 +96,16 @@ Contributors:
 
 package equip.net;
 
+import java.io.InterruptedIOException;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+
 import equip.runtime.Mbuf;
 import equip.runtime.MbufInputStream;
 import equip.runtime.MbufOutputStream;
 import equip.runtime.StatusValues;
 import equip.runtime.ValueBase;
-
-import java.io.InterruptedIOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 
 /**
  * Generic implementation of {@link ServiceProxy}, for use by
@@ -120,11 +120,9 @@ public class ProxyDelegate
 	/**
 	 * callback/strategy function for {@link ProxyDelegate}
 	 */
-	public static interface Handler
+	interface Handler
 	{
-		public void handleProxyMessage(ProxyDelegate delegate,
-		                               ValueBase object,
-		                               java.lang.Object closure);
+		void handleProxyMessage(ProxyDelegate delegate, ValueBase object, java.lang.Object closure);
 	}
 
 	/**
@@ -152,8 +150,7 @@ public class ProxyDelegate
 	/**
 	 * true = ok; handler!=null => create new thread for replies
 	 */
-	public boolean init(ServiceProxy proxy, Handler handler,
-	                    java.lang.Object closure)
+	public boolean init(ServiceProxy proxy, Handler handler, java.lang.Object closure)
 	{
 		deactivate();
 		this.proxy = proxy;
@@ -221,8 +218,7 @@ public class ProxyDelegate
 			SimpleUDPMoniker udp = (SimpleUDPMoniker) resolved;
 			if (udp.encoding != Encoding.EQENCODE_EQ_OBJECT_PACKET)
 			{
-				System.err.println("ERROR: ProxyDelegate::activate resolved " +
-						"to unsupported tcp encoding: " +
+				System.err.println("ERROR: ProxyDelegate::activate resolved to unsupported tcp encoding: " +
 						udp.encoding);
 				return false;
 			}
@@ -230,21 +226,19 @@ public class ProxyDelegate
 			connection = new ConnectionSapJcp(udp.addr, udp.port);
 			if (connection.getStatus() != StatusValues.STATUS_OK)
 			{
-				System.err.println("ERROR: ProxyDelegate::activate failed " +
-						"to connect to server");
+				System.err.println("ERROR: ProxyDelegate::activate failed to connect to server");
 				connection = null;
 				return false;
 			}
 
 			System.err.println("ProxyDelegate::activate() ok");
 		}
-		else if ((resolved instanceof MulticastUDPMoniker))
+		else if (resolved instanceof MulticastUDPMoniker)
 		{
 			MulticastUDPMoniker mc = (MulticastUDPMoniker) resolved;
 			if (mc.encoding != Encoding.EQENCODE_EQ_OBJECT_PACKET)
 			{
-				System.err.println("ERROR: ProxyDelegate::activate resolved " +
-						"to unsupported multicast udp encoding: " +
+				System.err.println("ERROR: ProxyDelegate::activate resolved to unsupported multicast udp encoding: " +
 						mc.encoding);
 
 				return false;
@@ -257,8 +251,7 @@ public class ProxyDelegate
 			}
 			catch (Exception e)
 			{
-				System.err.println("ERROR: ProxyDelegate::activate failed to " +
-						"create multicast socket: " + e);
+				System.err.println("ERROR: ProxyDelegate::activate failed to create multicast socket: " + e);
 				mc_socket = null;
 				return false;
 			}
@@ -348,10 +341,9 @@ public class ProxyDelegate
 			notifyDeactivate();
 			return null;
 		}
-		ValueBase result = null;
 		try
 		{
-			result = connection.readObject();
+			return connection.readObject();
 		}
 		catch (Exception e)
 		{
@@ -361,14 +353,6 @@ public class ProxyDelegate
 			notifyDeactivate();
 			return null;
 		}
-		if (result == null)
-		{
-			System.err.println("Warning: ProxyDelegate::doSimpleRpc " +
-					"returned null");
-			notifyDeactivate();
-			return null;
-		}
-		return result;
 	}
 
 	/* send an object, receive a reply object */
@@ -458,13 +442,14 @@ public class ProxyDelegate
 											"." + ((mc_group) & 0xff)),
 									((int) mc_port) & 0xffff);
 
-					mc_socket.send(packet, (byte) 1);
+					int ttl = mc_socket.getTimeToLive();
+					mc_socket.setTimeToLive(1);
+					mc_socket.send(packet);
+					mc_socket.setTimeToLive(ttl);
 				}
 				catch (Exception e)
 				{
-					System.err.println("ERROR: sending packet in " +
-							"ProxyDelegate::doSimpleRpcMulticast:" +
-							e);
+					System.err.println("ERROR: sending packet in ProxyDelegate::doSimpleRpcMulticast:" + e);
 				}
 
 				mbuf = next;

@@ -38,11 +38,6 @@ Contributors:
  */
 package equip.ect;
 
-import equip.data.DictionaryImpl;
-import equip.data.StringBox;
-import equip.data.StringBoxImpl;
-import equip.runtime.ValueBase;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Array;
@@ -54,6 +49,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import equip.data.DictionaryImpl;
+import equip.data.StringBox;
+import equip.data.StringBoxImpl;
+import equip.runtime.ValueBase;
 
 /**
  * Utilities to coerce between types, esp for setting properties from source properties of another
@@ -78,7 +78,10 @@ public class Coerce
 	public static boolean isStringifiedArray(final String s)
 	{
 		final String st = s.trim();
-		if (!st.startsWith("{") || !st.endsWith("}")) { return false; }
+		if (!st.startsWith("{") || !st.endsWith("}"))
+		{
+			return false;
+		}
 		// but first, check it isn't a stringified dictionary (look for name=...)
 		final int iequals = st.indexOf('=');
 		boolean isDictionary = iequals >= 0;
@@ -99,7 +102,10 @@ public class Coerce
 	public static boolean isStringifiedDictionary(final String s)
 	{
 		final String st = s.trim();
-		if (!st.startsWith("{") || !st.endsWith("}")) { return false; }
+		if (!st.startsWith("{") || !st.endsWith("}"))
+		{
+			return false;
+		}
 		// but first, check it isn't a stringified dictionary (look for name=...)
 		final int iequals = st.indexOf('=');
 		boolean isDictionary = iequals >= 0;
@@ -177,7 +183,7 @@ public class Coerce
 		boolean inQuote = false, hadComma = false;
 		int brackets = 0;
 		StringBuffer buf = new StringBuffer();
-		final List<String> rv = new ArrayList<String>();
+		final List<String> rv = new ArrayList<>();
 		for (i = 0; i < st2.length(); i++)
 		{
 			boolean handle = false;
@@ -264,7 +270,7 @@ public class Coerce
 				handle = false;
 			}
 		}
-		return (String[]) rv.toArray(new String[rv.size()]);
+		return rv.toArray(new String[rv.size()]);
 	}
 
 	/**
@@ -290,7 +296,10 @@ public class Coerce
 		}
 		Class<?> cls2 = cls;
 		// ok already?
-		if (o != null && cls.isAssignableFrom(o.getClass())) { return (T)o; }
+		if (o != null && cls.isAssignableFrom(o.getClass()))
+		{
+			return (T) o;
+		}
 		java.lang.reflect.Field valuef = null;
 		// special handling for ValueBase subclasses - our own container/transport classes
 		if (o instanceof Map)
@@ -300,9 +309,12 @@ public class Coerce
 		if (cls.equals(Map.class))
 		{
 			// convert via dictionary
-			final DictionaryImpl d = (DictionaryImpl) toClass(o, DictionaryImpl.class);
-			if (d == null) { return null; }
-			return (T)toHashtable(d);
+			final DictionaryImpl d = toClass(o, DictionaryImpl.class);
+			if (d == null)
+			{
+				return null;
+			}
+			return (T) toHashtable(d);
 		}
 		if (o instanceof ValueBase)
 		{
@@ -332,7 +344,10 @@ public class Coerce
 		if (ValueBase.class.equals(cls))
 		{
 			// just the abstract base class implies do our best!!
-			if (o == null) { return null; }
+			if (o == null)
+			{
+				return null;
+			}
 			String arraySuffix = "", suffix = "BoxImpl";
 			Class<?> c2 = o.getClass();
 			if (c2.isArray())
@@ -459,7 +474,10 @@ public class Coerce
 
 		if (mapValuebase)
 		{
-			if (r == null) { return null; }
+			if (r == null)
+			{
+				return null;
+			}
 			if (valuef != null)
 			{
 				try
@@ -475,18 +493,23 @@ public class Coerce
 				}
 			}
 		}
-		return (T)r;
+		return (T) r;
 	}
 
 	public static Object toClass2(Object o, Class<?> cls, final boolean escapeStrings) throws ClassNotFoundException,
 			IOException
 	{
 		// repeat in case of ValueBase Box
-		if (o != null && cls.isAssignableFrom(o.getClass())) { return o; }
+		if (o != null && cls.isAssignableFrom(o.getClass()))
+		{
+			return o;
+		}
 
 		if (cls.isArray())
 		{
-			if (o == null) { return null; // or zero-size array??
+			if (o == null)
+			{
+				return null; // or zero-size array??
 			}
 			if (o.getClass().isArray())
 			{
@@ -596,7 +619,7 @@ public class Coerce
 			if (o == null)
 			{
 				// not null
-				o = new Boolean(false);
+				o = false;
 			}
 		}
 		else if (o == null)
@@ -620,7 +643,7 @@ public class Coerce
 			}
 			else if (o instanceof Boolean)
 			{
-				asNumber = new Integer(((Boolean) o).booleanValue() ? 1 : 0);
+				asNumber = (Boolean) o ? 1 : 0;
 			}
 			else
 			{
@@ -644,35 +667,38 @@ public class Coerce
 					if (asString.length() == 0 || asString.charAt(0) == '-' || asString.charAt(0) == 'n'
 							|| asString.charAt(0) == 'f' || asString.charAt(0) == 'N' || asString.charAt(0) == 'F')
 					{
-						asNumber = new Integer(0);
+						asNumber = 0;
 					}
 					else
 					{
-						asNumber = new Integer(1);
+						asNumber = 1;
 					}
 				}
 			}
 			if (cls.equals(Integer.class))
 			{
-				return new Integer(asNumber.intValue());
+				return asNumber.intValue();
 			}
 			else if (cls.equals(Long.class))
 			{
-				return new Long(asNumber.longValue());
+				return asNumber.longValue();
 			}
 			else if (cls.equals(Short.class))
 			{
-				return new Short(asNumber.shortValue());
+				return asNumber.shortValue();
 			}
 			else if (cls.equals(Byte.class))
 			{
-				return new Byte(asNumber.byteValue());
+				return asNumber.byteValue();
 			}
 			else if (cls.equals(Float.class))
 			{
-				return new Float(asNumber.floatValue());
+				return asNumber.floatValue();
 			}
-			else if (cls.equals(Double.class)) { return new Double(asNumber.doubleValue()); }
+			else if (cls.equals(Double.class))
+			{
+				return asNumber.doubleValue();
+			}
 		}
 		else if (cls.equals(Boolean.class))
 		{
@@ -693,18 +719,18 @@ public class Coerce
 					|| asString.charAt(0) == 'f' || asString.charAt(0) == 'N' || asString.charAt(0) == 'F'
 					|| asString.charAt(0) == '0')
 			{
-				return new Boolean(false);
+				return false;
 			}
 			else
 			{
-				return new Boolean(true);
+				return true;
 			}
 		}
 		else if (cls.equals(String.class))
 		{
 			if (o.getClass().isArray())
 			{
-				final StringBuffer buf = new StringBuffer();
+				final StringBuilder buf = new StringBuilder();
 				buf.append("{");
 				for (int i = 0; i < Array.getLength(o); i++)
 				{
@@ -726,11 +752,14 @@ public class Coerce
 			{
 				final DictionaryImpl d = (DictionaryImpl) o;
 				// special case of single element "value"
-				if (d.entries != null && d.entries.length == 1 && d.entries[0].name.equals("value")) { return toClass(	d.entries[0].value,
-																														cls); }
+				if (d.entries != null && d.entries.length == 1 && d.entries[0].name.equals("value"))
+				{
+					return toClass(d.entries[0].value,
+							cls);
+				}
 
 				// dictionary to string
-				final StringBuffer res = new StringBuffer();
+				final StringBuilder res = new StringBuilder();
 				res.append("{");
 				// class should be first (if present)
 				final StringBox cb = (StringBox) d.get("class");
@@ -755,7 +784,7 @@ public class Coerce
 					}
 					res.append(d.entries[i].name);
 					res.append("=");
-					final String sv = (String) toClass(d.entries[i].value, String.class, true);
+					final String sv = toClass(d.entries[i].value, String.class, true);
 					if (sv != null)
 					{
 						res.append(sv);
@@ -782,7 +811,7 @@ public class Coerce
 			if (o instanceof Serializable)
 			{
 				// default introspection -> properties string
-				final StringBuffer res = new StringBuffer();
+				final StringBuilder res = new StringBuilder();
 				res.append("{");
 				res.append("class=\"");
 				res.append(o.getClass().getName());
@@ -803,7 +832,7 @@ public class Coerce
 						res.append(element.getName());
 						res.append("=");
 						final Object v = element.get(o);
-						final String sv = (String) toClass(v, String.class, true);
+						final String sv = toClass(v, String.class, true);
 						if (sv != null)
 						{
 							res.append(sv);
@@ -825,11 +854,11 @@ public class Coerce
 			final String asString = o.toString();
 			if (asString.length() == 0)
 			{
-				return new Character('?');
+				return '?';
 			}
 			else
 			{
-				return new Character(asString.charAt(0));
+				return asString.charAt(0);
 			}
 		}
 		else if (cls.equals(DictionaryImpl.class) && o instanceof String)
@@ -853,7 +882,7 @@ public class Coerce
 					{
 						final String name = el.substring(0, iequals);
 						final String vs = el.substring(iequals + 1);
-						final ValueBase vb = (ValueBase) toClass(vs, ValueBase.class);
+						final ValueBase vb = toClass(vs, ValueBase.class);
 						d.put(name, vb);
 					}
 					// ignore els with no name
@@ -870,7 +899,7 @@ public class Coerce
 			if (isSimpleClass(o.getClass()))
 			{
 				final DictionaryImpl d = new DictionaryImpl();
-				d.put("value", (ValueBase) toClass(o, ValueBase.class));
+				d.put("value", toClass(o, ValueBase.class));
 				return d;
 			}
 
@@ -889,7 +918,7 @@ public class Coerce
 						continue;
 					}
 					final Object v = element.get(o);
-					final ValueBase sv = (ValueBase) toClass(v, ValueBase.class);
+					final ValueBase sv = toClass(v, ValueBase.class);
 					d.put(element.getName(), sv);
 				}
 			}
@@ -904,8 +933,11 @@ public class Coerce
 		{
 			final DictionaryImpl d = (DictionaryImpl) o;
 			// special case of single element "value"
-			if (d.entries != null && d.entries.length == 1 && d.entries[0].name.equals("value")) { return toClass(	d.entries[0].value,
-																													cls); }
+			if (d.entries != null && d.entries.length == 1 && d.entries[0].name.equals("value"))
+			{
+				return toClass(d.entries[0].value,
+						cls);
+			}
 			// reverse default introspection -> properties
 			// named class is subclass of proposed class??
 			final StringBox cb = (StringBox) d.get("class");
@@ -964,7 +996,7 @@ public class Coerce
 		else if (Serializable.class.isAssignableFrom(cls) && o instanceof String)
 		{
 			// convert via Dictionary
-			final DictionaryImpl d = (DictionaryImpl) toClass(o, DictionaryImpl.class);
+			final DictionaryImpl d = toClass(o, DictionaryImpl.class);
 			return toClass(d, cls);
 		}
 		// ???
@@ -978,9 +1010,9 @@ public class Coerce
 	public static DictionaryImpl toDictionary(final Map h) throws ClassNotFoundException, IOException
 	{
 		final DictionaryImpl d = new DictionaryImpl();
-		for(Object key: h.keySet())
+		for (Object key : h.keySet())
 		{
-			final ValueBase value = (ValueBase) toClass(h.get(key), ValueBase.class);
+			final ValueBase value = toClass(h.get(key), ValueBase.class);
 			d.put(key.toString(), value);
 		}
 		return d;

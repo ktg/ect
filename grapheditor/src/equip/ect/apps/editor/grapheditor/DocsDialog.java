@@ -58,18 +58,17 @@ import equip.ect.apps.editor.HTMLDescriptionHelper;
 import equip.ect.apps.editor.HTMLException;
 
 /**
- * <P>
+ * <p>
  * Displays htmlDescription from component bean info in a dialog
  * </P>
- * <P>
+ * <p>
  * An instance of this class is constructed when the user selects the "view docs" option on the
  * context menu for a component in the the capability browser.
  * </P>
  */
-
-public class DocsDialog extends JDialog
+class DocsDialog extends JDialog
 {
-	public DocsDialog(final JFrame parent, final Capability cap)
+	DocsDialog(final JFrame parent, final Capability cap)
 	{
 		super(parent, "Documentation for " + cap.getCapabilityName(), false);
 		getContentPane().setLayout(new BorderLayout());

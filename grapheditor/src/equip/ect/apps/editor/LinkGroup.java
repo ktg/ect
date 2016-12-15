@@ -55,7 +55,7 @@ public abstract class LinkGroup extends Link
 	{
 		super(canvas, startPoint, endPoint, source, target, linkView, null);
 
-		this.links = new HashMap<String, Link>();
+		this.links = new HashMap<>();
 		addLinks(links);
 	}
 
@@ -71,20 +71,14 @@ public abstract class LinkGroup extends Link
 	{
 		if (links != null)
 		{
-			for (Link link: links)
-			{
-				addLink(link);
-			}
+			links.forEach(this::addLink);
 		}
 	}
 
 	@Override
 	public void cleanUp()
 	{
-		for (Link link: links.values())
-		{
-			link.cleanUp();
-		}
+		links.values().forEach(Link::cleanUp);
 	}
 
 	public final Link getLink(final String beanid)

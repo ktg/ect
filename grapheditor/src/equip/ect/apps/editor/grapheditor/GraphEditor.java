@@ -77,14 +77,14 @@ public class GraphEditor extends JFrame
 	{
 		private GraphEditorCanvas canvas;
 
-		public GraphEditorTab(GraphEditorCanvas canvas)
+		GraphEditorTab(GraphEditorCanvas canvas)
 		{
 			super(canvas);
 			this.canvas = canvas;
 		}
 	}
 
-	class SettingsDialog extends JDialog implements ActionListener
+	private class SettingsDialog extends JDialog implements ActionListener
 	{
 		private final JFormattedTextField tf;
 
@@ -501,7 +501,7 @@ public class GraphEditor extends JFrame
 
 	public List<GraphEditorCanvas> getCanvases()
 	{
-		List<GraphEditorCanvas> canvases = new ArrayList<GraphEditorCanvas>();
+		List<GraphEditorCanvas> canvases = new ArrayList<>();
 		for (int i = 0; i < pane.getTabCount(); i++)
 		{
 			GraphEditorTab tab = (GraphEditorTab)pane.getComponentAt(i);

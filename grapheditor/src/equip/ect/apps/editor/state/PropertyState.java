@@ -1,6 +1,6 @@
 package equip.ect.apps.editor.state;
 
-public class PropertyState
+class PropertyState
 {
 	private String name;
 	//private String className;
@@ -8,7 +8,7 @@ public class PropertyState
 	private Boolean keepVisible;
 	private Boolean dynamic = null;
 
-	public int getPriority()
+	int getPriority()
 	{
 		if(isDynamic())
 		{
@@ -38,16 +38,6 @@ public class PropertyState
 		this.name = name;
 	}
 
-//	public String getClassName()
-//	{
-//		return className;
-//	}
-//
-//	public void setClassName(String className)
-//	{
-//		this.className = className;
-//	}
-
 	public String getValue()
 	{
 		return value;
@@ -58,12 +48,12 @@ public class PropertyState
 		this.value = value;
 	}
 
-	public boolean isKeepVisible()
+	boolean isKeepVisible()
 	{
 		return keepVisible != null && keepVisible;
 	}
 
-	public void setKeepVisible(boolean keepVisible)
+	void setKeepVisible(boolean keepVisible)
 	{
 		this.keepVisible = keepVisible;
 	}
@@ -73,7 +63,7 @@ public class PropertyState
 		return dynamic != null && dynamic;
 	}
 
-	public void setDynamic(boolean dynamic)
+	void setDynamic(boolean dynamic)
 	{
 		this.dynamic = dynamic;
 	}

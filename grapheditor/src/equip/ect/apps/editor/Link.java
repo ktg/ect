@@ -42,7 +42,6 @@ package equip.ect.apps.editor;
 import equip.ect.PropertyLinkRequest;
 
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -149,7 +148,7 @@ public abstract class Link extends BeanCanvasItem
 	@Override
 	public boolean isInside(final int x, final int y)
 	{
-		return ((RenderableLink) view).getBounds().contains(x, y);
+		return view.getBounds().contains(x, y);
 	}
 
 	public void setConnected(final boolean conn)

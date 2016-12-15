@@ -78,7 +78,7 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 	protected boolean inSelection;
 	protected int mode;
 	protected int xPos, yPos, xPosPrev, yPosPrev, xPosAnchor, yPosAnchor;
-	protected final List<InteractiveCanvasItem> items = new ArrayList<InteractiveCanvasItem>();
+	protected final List<InteractiveCanvasItem> items = new ArrayList<>();
 	private int[] marker;
 
 	public InteractiveCanvas(final String name, final Color backgroundColor, final SelectionModel selectionModel)
@@ -380,27 +380,21 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 
 	public void sortItemsByDrawPriority()
 	{
-		Collections.sort(this.items, new Comparator<InteractiveCanvasItem>()
-		{
-			@Override
-			public int compare(final InteractiveCanvasItem item1, final InteractiveCanvasItem item2)
+		Collections.sort(this.items, (item1, item2) -> {
+			final int drawPrior1 = item1.drawPriority;
+			final int drawPrior2 = item2.drawPriority;
+			if (drawPrior1 == drawPrior2)
 			{
-				final int drawPrior1 = item1.drawPriority;
-				final int drawPrior2 = item2.drawPriority;
-				if (drawPrior1 == drawPrior2)
-				{
-					return 0;
-				}
-				else if (drawPrior1 > drawPrior2)
-				{
-					return 1;
-				}
-				else
-				{
-					return -1;
-				}
+				return 0;
 			}
-
+			else if (drawPrior1 > drawPrior2)
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
 		});
 	}
 
@@ -409,7 +403,7 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		new InteractiveCanvasDaemon(this);
 	}
 
-	final void calculateMarker()
+	private void calculateMarker()
 	{
 		if (marker == null)
 		{

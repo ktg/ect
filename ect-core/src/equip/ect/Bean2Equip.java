@@ -42,12 +42,13 @@ package equip.ect;
 /**
  * @author imt
  */
-import equip.data.beans.DataspaceInactiveException;
 
 import java.beans.EventSetDescriptor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
+
+import equip.data.beans.DataspaceInactiveException;
 
 class Bean2Equip implements PropertyChangeListener
 {
@@ -58,19 +59,15 @@ class Bean2Equip implements PropertyChangeListener
 		{
 			final java.beans.EventSetDescriptor[] foo = java.beans.Introspector.getBeanInfo(bean.getClass())
 					.getEventSetDescriptors();
-			for (int i = 0; i < foo.length; i++)
+			for (EventSetDescriptor aFoo : foo)
 			{
-				if (!(foo[i].getListenerType().equals(java.beans.PropertyChangeListener.class)))
+				if (!(aFoo.getListenerType().equals(PropertyChangeListener.class)))
 				{
 					continue;
 				}
 				// System.out.println("*** Bean2Equip: Adding property listener");
-				foo[i].getAddListenerMethod().invoke(bean, new Object[]{listener});
+				aFoo.getAddListenerMethod().invoke(bean, listener);
 			}
-		}
-		catch (final java.beans.IntrospectionException e)
-		{
-			e.printStackTrace();
 		}
 		catch (final Exception e)
 		{
@@ -87,17 +84,11 @@ class Bean2Equip implements PropertyChangeListener
 					.getEventSetDescriptors();
 			for (EventSetDescriptor aFoo : foo)
 			{
-				if (!(aFoo.getListenerType().equals(PropertyChangeListener.class)))
+				if (aFoo.getListenerType().equals(PropertyChangeListener.class))
 				{
-					continue;
+					aFoo.getRemoveListenerMethod().invoke(bean, listener);
 				}
-				// System.out.println("*** Bean2Equip: Removing property listener");
-				aFoo.getRemoveListenerMethod().invoke(bean, new Object[]{listener});
 			}
-		}
-		catch (final java.beans.IntrospectionException e)
-		{
-			e.printStackTrace();
 		}
 		catch (final Exception e)
 		{
@@ -108,16 +99,13 @@ class Bean2Equip implements PropertyChangeListener
 	// Mapping variables
 	// private HashMap propVals = null;
 	private equip.data.beans.DataspaceBean dataspace = null;
-
 	private Serializable bean = null;
-
 	private MappingObject parent = null;
-
 	private equip.data.GUID beanid = null;
 
 	//private HashMap links = new HashMap();
 
-	public Bean2Equip(final MappingObject parent, final equip.data.beans.DataspaceBean dataspace)
+	Bean2Equip(final MappingObject parent, final equip.data.beans.DataspaceBean dataspace)
 	{
 		this.dataspace = dataspace;
 		this.bean = parent.getBean();

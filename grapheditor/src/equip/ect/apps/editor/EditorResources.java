@@ -45,8 +45,6 @@ public abstract class EditorResources
 {
 	public final static java.awt.Color BACKGROUND_COLOR = java.awt.Color.gray.brighter();
 
-	public final static String TRASH_ICON = "/bin.png";
-
 	public final static String FOLDER_ICON = "/folder.png";
 
 	public final static String COMPONENT_ICON = "/component.png";

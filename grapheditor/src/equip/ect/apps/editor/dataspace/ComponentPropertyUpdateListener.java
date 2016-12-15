@@ -44,7 +44,5 @@ import equip.ect.apps.editor.dataspace.ComponentPropertyListener;
 
 public interface ComponentPropertyUpdateListener extends ComponentPropertyListener
 {
-
-	public abstract void componentPropertyUpdated(ComponentProperty compProp);
-
+	void componentPropertyUpdated(ComponentProperty compProp);
 }

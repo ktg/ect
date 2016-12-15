@@ -86,7 +86,7 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 		}
 	}
 
-	private Map<String, JTextField> propFields = new HashMap<String, JTextField>();
+	private Map<String, JTextField> propFields = new HashMap<>();
 
 	private final ComponentAdvert compAdv;
 

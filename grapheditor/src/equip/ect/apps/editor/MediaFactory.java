@@ -97,25 +97,10 @@ public abstract class MediaFactory
 		}
 
 		int delay = 200;
-		int[] indexes = null;
+		int[] indexes;
 
-		final FilenameFilter filter = new FilenameFilter()
-		{
-			@Override
-			public boolean accept(final File dir, final String name)
-			{
-				return name.endsWith(".jpg") || name.endsWith(".gif");
-			}
-		};
-
-		final FilenameFilter propFilter = new FilenameFilter()
-		{
-			@Override
-			public boolean accept(final File dir, final String name)
-			{
-				return name.endsWith(".prop");
-			}
-		};
+		final FilenameFilter filter = (dir, name) -> name.endsWith(".jpg") || name.endsWith(".gif");
+		final FilenameFilter propFilter = (dir, name) -> name.endsWith(".prop");
 
 		final File[] imageFiles = directory.listFiles(filter);
 		final String[] names = new String[imageFiles.length];

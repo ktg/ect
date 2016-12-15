@@ -194,10 +194,7 @@ public class HTMLDescriptionHelper
 				// construct document fragment containing nodes
 				// within heading
 				final DocumentFragment df = doc.createDocumentFragment();
-				for (Node aVec : vec)
-				{
-					df.appendChild(aVec);
-				}
+				vec.forEach(df::appendChild);
 
 				// write doc frag to string, then reload through
 				// neko parser to generate valid html
@@ -210,15 +207,7 @@ public class HTMLDescriptionHelper
 			}
 		}
 
-		catch (final SAXException e)
-		{
-			caught = e;
-		}
-		catch (final TransformerException e)
-		{
-			caught = e;
-		}
-		catch (final IOException e)
+		catch (final SAXException | TransformerException | IOException e)
 		{
 			caught = e;
 		}
@@ -274,8 +263,7 @@ public class HTMLDescriptionHelper
 		}
 	}
 
-	protected String correctHTMLString(final String htmlDesc) throws SAXException, IOException, TransformerException,
-			TransformerConfigurationException
+	protected String correctHTMLString(final String htmlDesc) throws SAXException, IOException, TransformerException
 	{
 		return getHTMLString(parseHTML(htmlDesc));
 	}

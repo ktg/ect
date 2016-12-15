@@ -51,7 +51,6 @@ import java.awt.Component;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class GraphComponentProperty extends BeanCanvasItem implements Connectable, Comparable<GraphComponentProperty>
 {
@@ -80,7 +79,7 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 	{
 		if (inputLinks == null)
 		{
-			inputLinks = new ArrayList<Link>();
+			inputLinks = new ArrayList<>();
 		}
 		if (!inputLinks.contains(link))
 		{
@@ -92,7 +91,7 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 	{
 		if (outputLinks == null)
 		{
-			outputLinks = new Vector<Link>();
+			outputLinks = new ArrayList<>();
 		}
 		if (!outputLinks.contains(link))
 		{

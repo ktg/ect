@@ -45,7 +45,6 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -64,12 +63,12 @@ import equip.ect.apps.editor.dataspace.DataspaceUtils;
 /**
  * popup dialog allowing (attempt) to set a property value by making a temporary pseudo-property,
  * and temporarily linking it to the property to be set.
- * 
+ *
  * @author Chris Greenhalgh, Jan Humble
  */
-public class SetValuePopup extends JDialog
+class SetValuePopup extends JDialog
 {
-	class PropertyInfoPanel extends JPanel
+	private class PropertyInfoPanel extends JPanel
 	{
 
 		PropertyInfoPanel(final ComponentProperty targetProperty)
@@ -117,7 +116,7 @@ public class SetValuePopup extends JDialog
 
 	private boolean ignoreEscChar = false;
 
-	public SetValuePopup(final Frame owner, final DataspaceBean dataspace, final ComponentProperty targetProperty)
+	SetValuePopup(final Frame owner, final DataspaceBean dataspace, final ComponentProperty targetProperty)
 	{
 		super(owner, "Property: " + targetProperty.getPropertyName());
 		this.targetProperty = targetProperty;
@@ -164,16 +163,7 @@ public class SetValuePopup extends JDialog
 		final JPanel bottomPanel = new JPanel(new BorderLayout());
 
 		final JCheckBox ignoreEscCharCB = new JCheckBox("Ignore escape characters", ignoreEscChar);
-		ignoreEscCharCB.addActionListener(new ActionListener()
-		{
-
-			@Override
-			public void actionPerformed(final ActionEvent arg0)
-			{
-				ignoreEscChar = ignoreEscCharCB.isSelected();
-			}
-
-		});
+		ignoreEscCharCB.addActionListener(arg0 -> ignoreEscChar = ignoreEscCharCB.isSelected());
 		bottomPanel.add(BorderLayout.NORTH, ignoreEscCharCB);
 		bottomPanel.add(BorderLayout.SOUTH, buttons);
 		panel.add(bottomPanel, BorderLayout.SOUTH);

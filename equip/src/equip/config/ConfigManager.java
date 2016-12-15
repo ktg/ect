@@ -45,114 +45,175 @@ Contributors:
 
 package equip.config;
 
-import equip.runtime.*;
+import equip.runtime.ObjectInputStream;
+import equip.runtime.ObjectOutputStream;
+import equip.runtime.ValueBase;
 
-/** Configuration manager for providing an application's
-     * configuration information, normally from property files (IDL'd
-     * in equip_config_types.idl).
-     *
-     * <b>Note:</b> always use a single creating with 
-     * {@link equip.runtime.SingletonManager}. */
-public abstract class ConfigManager extends ValueBase {
+/**
+ * Configuration manager for providing an application's
+ * configuration information, normally from property files (IDL'd
+ * in equip_config_types.idl).
+ * <p>
+ * <b>Note:</b> always use a single creating with
+ * {@link equip.runtime.SingletonManager}.
+ */
+public abstract class ConfigManager extends ValueBase
+{
 
-  /** Default no-arg constructor */
-  public ConfigManager() {}
+	/**
+	 * Default no-arg constructor
+	 */
+	public ConfigManager() {}
 
   /* member variables */
-/** the configuration manager's internal name,value pairs */
-  public equip.config.NameValuePair entries[] = new equip.config.NameValuePair [0];
-/** Finds and reads name':'value pairs, one per line.
-       * Also allows name '{' ... '}' as prepending 'name.' to 
-       * enclosed names.
-       * default search path is (to effect of) '.:${EQUIP_PATH}'
-       */
-  public abstract int readConfigFile(String filename, int rating, String extraPath);
-/** get a boolean configuration value (true = 'y', 't', '1') */
-  public abstract boolean getBooleanValue(String name, boolean defaultValue);
-/** get a character configuration value */
-  public abstract char getCharValue(String name, char defaultValue);
-/** get a IDL long (Java int) configuration value */
-  public abstract int getLongValue(String name, int defaultValue);
-/** get a short configuration value */
-  public abstract String getStringValue(String name, String defaultValue);
-/** get a float configuration value */
-  public abstract float getFloatValue(String name, float defaultValue);
-/** get a double configuration value */
-  public abstract double getDoubleValue(String name, double defaultValue);
-/** get a configuration value as a {@link
-          equip.runtime.ValueBase} */
-  public abstract equip.runtime.ValueBase getObjectValue(String name, equip.runtime.ValueBase defaultValue);
-  /** IDL-generated helper routine to get module name (currently <b>unimplemented</b>).
-  * @return name of this class's module
-  */
-  public String getModuleName() { return null; }
-  /** Standard IDL-generated equality test.
-  * @param c The object to be compared against this.
-  * @return true if this is equal to <code>c</code>
-  */
-  public boolean equals(java.lang.Object c) {
-    if (c==null) return false;
-    if (!c.getClass().equals(getClass())) return false;
-    return _equals_helper((ConfigManager)c);
-  }
-  /** Internal IDL-generated equality test helper */
-  public boolean _equals_helper(ConfigManager c) {
-    if (c==null) return false;
-    if (!super._equals_helper(c)) return false;
-    if (c.entries==null || entries==null || c.entries.length!=entries.length) return false;
-    int i1;
-    for (i1=0; i1<entries.length; i1++) {
-      if (entries[i1]!=c.entries[i1] && (entries[i1]==null || !entries[i1].equals(c.entries[i1]))) return false;
-    }
-    return true;
-  }
-  /** Standard IDL-generated template match test. 
-  * @param c The object to be checked against this template.
-  * @return true if <code>this</code> (as a template) matches the argument
-  */
-  public boolean matches(java.lang.Object c) {
-    if (c==null || !(c instanceof ConfigManager)) return false;
-    return _matches_helper((ConfigManager)c);
-  }
-  /** Internal IDL-generated match test helper */
-  public boolean _matches_helper(ConfigManager c) {
-    if (c==null) return false;
-    if (!super._matches_helper(c)) return false;
-    if (entries!=null && entries.length!=0 && (c.entries==null || c.entries.length!=entries.length)) return false;
-    int i1;
-    for (i1=0; i1<entries.length; i1++) {
-      if (entries[i1]!=null && !entries[i1].matches(c.entries[i1])) return false;
-    }
-    return true;
-  }
-  /** Internal IDL-generated serialisation helper. Used by {@link equip.runtime.ObjectInputStream} and {@link equip.runtime.ObjectOutputStream} only. */
-  public void writeObject(ObjectOutputStream out)
-    throws java.io.IOException {
-    out.writeObjectStart();
-    out.writeInt(entries.length);
-    int i1;
-    for (i1=0; i1<entries.length; i1++) {
-      out.writeObject(entries[i1]);
-    }
-    out.writeObjectEnd();
-  }
-  /** Internal IDL-generated serialisation helper. Used by {@link ObjectInputStream} and {@link ObjectOutputStream} only. */
-  public void readObject(ObjectInputStream in)
-    throws java.io.IOException, ClassNotFoundException, 
-      InstantiationException {
-    in.readObjectStart();
-    { int len=0;
-      len = in.readInt();
-      entries = new equip.config.NameValuePair [len];
-    }
-    int i1;
-    for (i1=0; i1<entries.length; i1++) {
-      entries[i1] = (equip.config.NameValuePair )in.readObject();
-    }
-    in.readObjectEnd();
-  }
+	/**
+	 * the configuration manager's internal name,value pairs
+	 */
+	public equip.config.NameValuePair entries[] = new equip.config.NameValuePair[0];
+
+	/**
+	 * Finds and reads name':'value pairs, one per line.
+	 * Also allows name '{' ... '}' as prepending 'name.' to
+	 * enclosed names.
+	 * default search path is (to effect of) '.:${EQUIP_PATH}'
+	 */
+	public abstract int readConfigFile(String filename, int rating, String extraPath);
+
+	/**
+	 * get a boolean configuration value (true = 'y', 't', '1')
+	 */
+	public abstract boolean getBooleanValue(String name, boolean defaultValue);
+
+	/**
+	 * get a character configuration value
+	 */
+	public abstract char getCharValue(String name, char defaultValue);
+
+	/**
+	 * get a IDL long (Java int) configuration value
+	 */
+	public abstract int getLongValue(String name, int defaultValue);
+
+	/**
+	 * get a short configuration value
+	 */
+	public abstract String getStringValue(String name, String defaultValue);
+
+	/**
+	 * get a float configuration value
+	 */
+	public abstract float getFloatValue(String name, float defaultValue);
+
+	/**
+	 * get a double configuration value
+	 */
+	public abstract double getDoubleValue(String name, double defaultValue);
+
+	/**
+	 * get a configuration value as a {@link
+	 * equip.runtime.ValueBase}
+	 */
+	public abstract equip.runtime.ValueBase getObjectValue(String name, equip.runtime.ValueBase defaultValue);
+
+	/**
+	 * IDL-generated helper routine to get module name (currently <b>unimplemented</b>).
+	 *
+	 * @return name of this class's module
+	 */
+	public String getModuleName() { return null; }
+
+	/**
+	 * Standard IDL-generated equality test.
+	 *
+	 * @param c The object to be compared against this.
+	 * @return true if this is equal to <code>c</code>
+	 */
+	public boolean equals(java.lang.Object c)
+	{
+		return c != null && c.getClass().equals(getClass()) && _equals_helper((ConfigManager) c);
+	}
+
+	/**
+	 * Internal IDL-generated equality test helper
+	 */
+	public boolean _equals_helper(ConfigManager c)
+	{
+		if (c == null) return false;
+		if (!super._equals_helper(c)) return false;
+		if (c.entries == null || entries == null || c.entries.length != entries.length)
+			return false;
+		int i1;
+		for (i1 = 0; i1 < entries.length; i1++)
+		{
+			if (entries[i1] != c.entries[i1] && (entries[i1] == null || !entries[i1].equals(c.entries[i1])))
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Standard IDL-generated template match test.
+	 *
+	 * @param c The object to be checked against this template.
+	 * @return true if <code>this</code> (as a template) matches the argument
+	 */
+	public boolean matches(java.lang.Object c)
+	{
+		return c != null && c instanceof ConfigManager && _matches_helper((ConfigManager) c);
+	}
+
+	/**
+	 * Internal IDL-generated match test helper
+	 */
+	public boolean _matches_helper(ConfigManager c)
+	{
+		if (c == null) return false;
+		if (!super._matches_helper(c)) return false;
+		if (entries != null && entries.length != 0 && (c.entries == null || c.entries.length != entries.length))
+			return false;
+		int i1;
+		for (i1 = 0; i1 < entries.length; i1++)
+		{
+			if (entries[i1] != null && !entries[i1].matches(c.entries[i1])) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Internal IDL-generated serialisation helper. Used by {@link equip.runtime.ObjectInputStream} and {@link equip.runtime.ObjectOutputStream} only.
+	 */
+	public void writeObject(ObjectOutputStream out)
+			throws java.io.IOException
+	{
+		out.writeObjectStart();
+		out.writeInt(entries.length);
+		int i1;
+		for (i1 = 0; i1 < entries.length; i1++)
+		{
+			out.writeObject(entries[i1]);
+		}
+		out.writeObjectEnd();
+	}
+
+	/**
+	 * Internal IDL-generated serialisation helper. Used by {@link ObjectInputStream} and {@link ObjectOutputStream} only.
+	 */
+	public void readObject(ObjectInputStream in)
+			throws java.io.IOException, ClassNotFoundException,
+			InstantiationException
+	{
+		in.readObjectStart();
+		{
+			int len = in.readInt();
+			entries = new equip.config.NameValuePair[len];
+		}
+		int i1;
+		for (i1 = 0; i1 < entries.length; i1++)
+		{
+			entries[i1] = (equip.config.NameValuePair) in.readObject();
+		}
+		in.readObjectEnd();
+	}
 
 
-} /* class ConfigManager */
-
-/* EOF */
+}

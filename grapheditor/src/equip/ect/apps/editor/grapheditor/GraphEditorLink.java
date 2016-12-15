@@ -48,15 +48,15 @@ import equip.ect.apps.editor.RenderableLink;
  * @author humble
  * 
  */
-public class GraphEditorLink extends Link
+class GraphEditorLink extends Link
 {
-	public GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
+	GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target)
 	{
 		super(canvas, startPoint, endPoint, source, target, new CurvedLine(startPoint, endPoint), null);
 	}
 
-	public GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
+	GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target, final RenderableLink linkView,
 			final PropertyLinkRequest link)
 	{

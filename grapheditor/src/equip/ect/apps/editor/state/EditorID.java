@@ -51,13 +51,6 @@ public class EditorID implements Serializable
 		return newID;
 	}
 
-	public static EditorID parseID(final String id)
-	{
-		final EditorID newID = new EditorID();
-		newID.internal = id;
-		return newID;
-	}
-
 	private String internal;
 
 	private EditorID()
@@ -79,7 +72,7 @@ public class EditorID implements Serializable
 	@Override
 	public String toString()
 	{
-		return internal.toString();
+		return internal;
 	}
 
 }
