@@ -4,13 +4,15 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import equip.ect.apps.editor.grapheditor.Drawer;
+
 public class ComponentState
 {
 	private String id;
 	private String name;
 	private String className;
 	private Point position;
-	private int state;
+	private Drawer.State state;
 	private final List<PropertyState> properties = new ArrayList<PropertyState>();
 
 	public List<PropertyState> getProperties()
@@ -18,12 +20,12 @@ public class ComponentState
 		return properties;
 	}
 
-	public int getState()
+	public Drawer.State getState()
 	{
 		return state;
 	}
 
-	public void setState(int state)
+	public void setState(Drawer.State  state)
 	{
 		this.state = state;
 	}

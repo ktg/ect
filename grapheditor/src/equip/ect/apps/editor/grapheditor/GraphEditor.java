@@ -323,12 +323,8 @@ public class GraphEditor extends JFrame
 							Gson gson = new GsonBuilder().create();
 							final State state = gson.fromJson(new FileReader(file), State.class);
 
-							new Thread(new Runnable() {
-								@Override
-								public void run()
-								{
-									StateManager.restoreState(state, GraphEditor.this, new ProgressDialog());
-								}
+							new Thread(() -> {
+								StateManager.restoreState(state, GraphEditor.this, new ProgressDialog());
 							}).start();
 						}
 					}

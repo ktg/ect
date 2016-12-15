@@ -38,40 +38,11 @@ Contributors:
  */
 package equip.ect.apps.configurationmgr;
 
-import equip.data.BooleanBox;
-import equip.data.DataSession;
-import equip.data.GUID;
-import equip.data.ItemBinding;
-import equip.data.ItemData;
-import equip.data.StringBox;
-import equip.data.StringBoxImpl;
-import equip.data.TupleImpl;
-import equip.data.beans.DataspaceBean;
-import equip.data.beans.DataspaceEvent;
-import equip.data.beans.DataspaceEventListener;
-import equip.data.beans.DataspaceInactiveException;
-import equip.ect.*;
-import equip.ect.apps.AppsResources;
-import equip.ect.apps.editor.dataspace.DataspaceUtils;
-import equip.ect.util.DirectoryEventListener;
-import equip.ect.util.DirectoryMonitor;
-import equip.runtime.ValueBase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -86,6 +57,66 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import equip.data.BooleanBox;
+import equip.data.DataSession;
+import equip.data.GUID;
+import equip.data.ItemBinding;
+import equip.data.ItemData;
+import equip.data.StringBox;
+import equip.data.StringBoxImpl;
+import equip.data.TupleImpl;
+import equip.data.beans.DataspaceBean;
+import equip.data.beans.DataspaceEvent;
+import equip.data.beans.DataspaceEventListener;
+import equip.data.beans.DataspaceInactiveException;
+import equip.ect.BeanDescriptorHelper;
+import equip.ect.Capability;
+import equip.ect.Coerce;
+import equip.ect.CompInfo;
+import equip.ect.ComponentAdvert;
+import equip.ect.ComponentProperty;
+import equip.ect.ComponentRequest;
+import equip.ect.ConnectionPointTypeException;
+import equip.ect.ContainerManagerHelper;
+import equip.ect.PropertyLinkRequest;
+import equip.ect.RDFStatement;
+import equip.ect.apps.AppsResources;
+import equip.ect.apps.editor.dataspace.DataspaceUtils;
+import equip.ect.util.DirectoryEventListener;
+import equip.ect.util.DirectoryMonitor;
+import equip.runtime.ValueBase;
 
 /**
  * Configuration manager tool for ECT that allows persistent dataspace state to be saved and
@@ -696,7 +727,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					boolean parent = true;
 					{
 						final Element props[] = getNamedChildElements(getNamedChildElement(component[ci],
-										ELproperties),
+								ELproperties),
 								ELproperty);
 						for (int pi = 0; parent && props != null && pi < props.length; pi++)
 						{
@@ -1480,7 +1511,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			System.out.println("Done");
 			return true;
 		}
-		catch(Exception e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -1960,14 +1991,14 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		// SpringLayout.EAST, p);
 
 		p.add(new JLabel("Select action"));
-		componentAction = new JComboBox<String>(new String[] { ACTION_IGNORE, ACTION_USE_ORIGINAL,
-														ACTION_USE_EXISTING_SAME_CLASS,
-														// ACTION_USE_EXISTING_ANY_CLASS,
-														ACTION_CREATE_NEW_DYNAMIC_SAME_CLASS // ,
+		componentAction = new JComboBox<String>(new String[]{ACTION_IGNORE, ACTION_USE_ORIGINAL,
+				ACTION_USE_EXISTING_SAME_CLASS,
+				// ACTION_USE_EXISTING_ANY_CLASS,
+				ACTION_CREATE_NEW_DYNAMIC_SAME_CLASS // ,
 				// ACTION_CREATE_NEW_DYNAMIC_ANY_CLASS,
 				// ACTION_CREATE_NEW_SUBCOMPONENT,
 				// ACTION_CREATE_NEW_BY_HAND
-				});
+		});
 		componentAction.setEditable(false);
 		componentAction.addActionListener(new ActionListener()
 		{
@@ -2044,7 +2075,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 		p.add(new JLabel("Component comparison"));
 
-		componentTableModel = new MyDefaultTableModel(new String[] { "Attribute", "Old", "New" }, 0);
+		componentTableModel = new MyDefaultTableModel(new String[]{"Attribute", "Old", "New"}, 0);
 		componentTable = new JTable(componentTableModel);
 		JScrollPane tableScroll = new JScrollPane(componentTable);
 		// p.add(tableScroll);
@@ -2097,9 +2128,9 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 		p.add(new JLabel("Component's Properties..."));
 
-		propertiesAction = new JComboBox<String>(new String[] { ACTION_LEAVE, ACTION_SET_MATCHING // ,
+		propertiesAction = new JComboBox<String>(new String[]{ACTION_LEAVE, ACTION_SET_MATCHING // ,
 				// ACTION_SET_SELECTED
-				});
+		});
 		propertiesAction.setEditable(false);
 		propertiesAction.addActionListener(new ActionListener()
 		{
@@ -2131,7 +2162,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		p.add(propertiesProgress);
 		p.add(new JLabel("Property comparison"));
 
-		propertiesTableModel = new MyDefaultTableModel(new String[] { "Attribute", "Before", "Now" }, 0);
+		propertiesTableModel = new MyDefaultTableModel(new String[]{"Attribute", "Before", "Now"}, 0);
 		propertiesTable = new JTable(propertiesTableModel);
 		tableScroll = new JScrollPane(propertiesTable);
 
@@ -2149,7 +2180,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
 		p.add(new JLabel("Re-create Link..."));
 
-		linksAction = new JComboBox<String>(new String[] { ACTION_OMIT, ACTION_CREATE_EXACT, ACTION_CREATE_ALTERNATIVE });
+		linksAction = new JComboBox<String>(new String[]{ACTION_OMIT, ACTION_CREATE_EXACT, ACTION_CREATE_ALTERNATIVE});
 		linksAction.setEditable(false);
 		linksAction.addActionListener(new ActionListener()
 		{
@@ -2180,7 +2211,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 		p.add(new JLabel("Link properties"));
 
-		linksTableModel = new MyDefaultTableModel(new String[] { "Attribute", "From", "To" }, 0);
+		linksTableModel = new MyDefaultTableModel(new String[]{"Attribute", "From", "To"}, 0);
 		linksTable = new JTable(linksTableModel);
 		tableScroll = new JScrollPane(linksTable);
 
@@ -2454,7 +2485,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				{
 					linksDone.wait();
 				}
-				if (giveup) { throw new GiveUpException(); }
+				if (giveup)
+				{
+					throw new GiveUpException();
+				}
 			}
 			if (srcprop != null && dstprop != null)
 			{
@@ -2527,7 +2561,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				{
 					wait();
 				}
-				if (giveup) { throw new GiveUpException(); }
+				if (giveup)
+				{
+					throw new GiveUpException();
+				}
 			}
 
 			System.out.println("Properties action: " + propertiesActionChosen);
@@ -2541,8 +2578,8 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				final Map<GUID, String> targetValues = new HashMap<GUID, String>();
 
 				// matching are...
-				final Element[] properties = getNamedChildElements(	getNamedChildElement(component, ELproperties),
-																	ELproperty);
+				final Element[] properties = getNamedChildElements(getNamedChildElement(component, ELproperties),
+						ELproperty);
 				final ComponentProperty propTemplate = new ComponentProperty((GUID) null);
 				propTemplate.setComponentID(currentComponentId);
 
@@ -2712,60 +2749,60 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			final int updates[] = new int[1];
 			// local only
 			final DataSession session = dataspace.addDataspaceEventListener(template.tuple, false,
-																			new DataspaceEventListener()
-																			{
-																				/**
-																				 * notify of event
-																				 * (cf
-																				 * DataCallbackPost)
-																				 */
-																				@Override
-																				public void dataspaceEvent(
-																						final DataspaceEvent event)
-																				{
-																					try
-																					{
-																						if (event.getAddItem() != null)
-																						{
-																							final ComponentProperty p = new ComponentProperty(
-																									(TupleImpl) event
-																											.getAddItem());
-																							synchronized (value)
-																							{
-																								value[0] = (String) Coerce.toClass(	p.getPropertyValue(),
-																																	String.class);
-																								System.out
-																										.println("Add target property: "
-																												+ value[0]);
-																								value.notify();
-																							}
-																						}
-																						else if (event.getUpdateItem() != null)
-																						{
-																							final ComponentProperty p = new ComponentProperty(
-																									(TupleImpl) event
-																											.getUpdateItem());
-																							synchronized (value)
-																							{
-																								value[0] = (String) Coerce.toClass(	p.getPropertyValue(),
-																																	String.class);
-																								System.out
-																										.println("Update target property: "
-																												+ value[0]);
-																								value.notify();
-																								updates[0]++;
-																							}
-																						}
-																					}
-																					catch (final Exception e)
-																					{
-																						System.err
-																								.println("ERROR handling target property event: "
-																										+ e);
-																						e.printStackTrace(System.err);
-																					}
-																				}
-																			});
+					new DataspaceEventListener()
+					{
+						/**
+						 * notify of event
+						 * (cf
+						 * DataCallbackPost)
+						 */
+						@Override
+						public void dataspaceEvent(
+								final DataspaceEvent event)
+						{
+							try
+							{
+								if (event.getAddItem() != null)
+								{
+									final ComponentProperty p = new ComponentProperty(
+											(TupleImpl) event
+													.getAddItem());
+									synchronized (value)
+									{
+										value[0] = (String) Coerce.toClass(p.getPropertyValue(),
+												String.class);
+										System.out
+												.println("Add target property: "
+														+ value[0]);
+										value.notify();
+									}
+								}
+								else if (event.getUpdateItem() != null)
+								{
+									final ComponentProperty p = new ComponentProperty(
+											(TupleImpl) event
+													.getUpdateItem());
+									synchronized (value)
+									{
+										value[0] = (String) Coerce.toClass(p.getPropertyValue(),
+												String.class);
+										System.out
+												.println("Update target property: "
+														+ value[0]);
+										value.notify();
+										updates[0]++;
+									}
+								}
+							}
+							catch (final Exception e)
+							{
+								System.err
+										.println("ERROR handling target property event: "
+												+ e);
+								e.printStackTrace(System.err);
+							}
+						}
+					});
 
 			// already set?
 			synchronized (value)
@@ -2873,59 +2910,59 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		final int updates[] = new int[1];
 		// local only
 		final DataSession session = dataspace.addDataspaceEventListener(template.tuple, false,
-																		new DataspaceEventListener()
-																		{
-																			/**
-																			 * notify of event (cf
-																			 * DataCallbackPost)
-																			 */
-																			@Override
-																			public void dataspaceEvent(
-																					final DataspaceEvent event)
-																			{
-																				try
-																				{
-																					if (event.getAddItem() != null)
-																					{
-																						final ComponentProperty p = new ComponentProperty(
-																								(TupleImpl) event
-																										.getAddItem());
-																						synchronized (value)
-																						{
-																							value[0] = Coerce.toClass(p.getPropertyValue(),
-																																String.class);
-																							System.out
-																									.println("Add target property: "
-																											+ value[0]);
-																							value.notify();
-																						}
-																					}
-																					else if (event.getUpdateItem() != null)
-																					{
-																						final ComponentProperty p = new ComponentProperty(
-																								(TupleImpl) event
-																										.getUpdateItem());
-																						synchronized (value)
-																						{
-																							value[0] = Coerce.toClass(	p.getPropertyValue(),
-																																String.class);
-																							System.out
-																									.println("Update target property: "
-																											+ value[0]);
-																							value.notify();
-																							updates[0]++;
-																						}
-																					}
-																				}
-																				catch (final Exception e)
-																				{
-																					System.err
-																							.println("ERROR handling target property event: "
-																									+ e);
-																					e.printStackTrace(System.err);
-																				}
-																			}
-																		});
+				new DataspaceEventListener()
+				{
+					/**
+					 * notify of event (cf
+					 * DataCallbackPost)
+					 */
+					@Override
+					public void dataspaceEvent(
+							final DataspaceEvent event)
+					{
+						try
+						{
+							if (event.getAddItem() != null)
+							{
+								final ComponentProperty p = new ComponentProperty(
+										(TupleImpl) event
+												.getAddItem());
+								synchronized (value)
+								{
+									value[0] = Coerce.toClass(p.getPropertyValue(),
+											String.class);
+									System.out
+											.println("Add target property: "
+													+ value[0]);
+									value.notify();
+								}
+							}
+							else if (event.getUpdateItem() != null)
+							{
+								final ComponentProperty p = new ComponentProperty(
+										(TupleImpl) event
+												.getUpdateItem());
+								synchronized (value)
+								{
+									value[0] = Coerce.toClass(p.getPropertyValue(),
+											String.class);
+									System.out
+											.println("Update target property: "
+													+ value[0]);
+									value.notify();
+									updates[0]++;
+								}
+							}
+						}
+						catch (final Exception e)
+						{
+							System.err
+									.println("ERROR handling target property event: "
+											+ e);
+							e.printStackTrace(System.err);
+						}
+					}
+				});
 
 		// already set?
 		synchronized (value)
@@ -2986,7 +3023,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 */
 	protected String getElementText(final Element el)
 	{
-		if (el == null) { return null; }
+		if (el == null)
+		{
+			return null;
+		}
 		final StringBuilder builder = new StringBuilder();
 		final NodeList children = el.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++)
@@ -3004,12 +3044,18 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 */
 	protected Element getNamedChildElement(final Element el, final String name)
 	{
-		if (el == null) { return null; }
+		if (el == null)
+		{
+			return null;
+		}
 		final NodeList children = el.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++)
 		{
-			if (children.item(i).getNodeType() == Node.ELEMENT_NODE && children.item(i).getNodeName().equals(name)) { return (Element) children
-					.item(i); }
+			if (children.item(i).getNodeType() == Node.ELEMENT_NODE && children.item(i).getNodeName().equals(name))
+			{
+				return (Element) children
+						.item(i);
+			}
 		}
 		return null;
 	}
@@ -3019,14 +3065,20 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 */
 	protected Element getNamedChildElementById(final Element el, final String name, final String id)
 	{
-		if (el == null) { return null; }
+		if (el == null)
+		{
+			return null;
+		}
 		final NodeList children = el.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++)
 		{
 			if (children.item(i).getNodeType() == Node.ELEMENT_NODE && children.item(i).getNodeName().equals(name)
 					&& ((Element) (children.item(i))).hasAttribute(ATid)
-					&& ((Element) (children.item(i))).getAttribute(ATid).equals(id)) { return (Element) (children
-					.item(i)); }
+					&& ((Element) (children.item(i))).getAttribute(ATid).equals(id))
+			{
+				return (Element) (children
+						.item(i));
+			}
 		}
 		return null;
 	}
@@ -3036,7 +3088,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 */
 	protected Element[] getNamedChildElements(final Element el, final String name)
 	{
-		if (el == null) { return null; }
+		if (el == null)
+		{
+			return null;
+		}
 		final List<Element> res = new ArrayList<Element>();
 		final NodeList children = el.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++)
@@ -3193,13 +3248,13 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					}
 					if (compname.equals(compname2)
 							|| (capabilityname != null && capabilityname2 != null && capabilityname
-									.equals(capabilityname2))
+							.equals(capabilityname2))
 							|| (capabilityclass != null && capabilityclass2 != null && capabilityclass
-									.equals(capabilityclass2)))
+							.equals(capabilityclass2)))
 					{
 						final String key = compname2
 								+ (capabilityname2 != null && !compname2.equals(capabilityname2) ? " ("
-										+ capabilityname2 + ")" : "") + (host2 != null ? " on " + host2 : "")
+								+ capabilityname2 + ")" : "") + (host2 != null ? " on " + host2 : "")
 								+ (capabilityclass2 != null ? " (" + capabilityclass2 + ")" : "") + " " + comp.getID();
 						candidates.put(key, comp.getID());
 						if (host != null && host2 != null && host.equals(host2) && firstRank < 1)
@@ -3283,9 +3338,9 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 					if (compname.equals(capabilityname2)
 							|| (capabilityname != null && capabilityname2 != null && capabilityname
-									.equals(capabilityname2))
+							.equals(capabilityname2))
 							|| (capabilityclass != null && capabilityclass2 != null && capabilityclass
-									.equals(capabilityclass2)))
+							.equals(capabilityclass2)))
 					{
 						final String key = (capabilityname2 != null ? capabilityname2 : "unnamed")
 								+ (host2 != null ? " on " + host2 : "")
@@ -3510,8 +3565,8 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		try
 		{
 			// matching are...
-			final Element[] properties = getNamedChildElements(	getNamedChildElement(component, ELproperties),
-																ELproperty);
+			final Element[] properties = getNamedChildElements(getNamedChildElement(component, ELproperties),
+					ELproperty);
 			final ComponentProperty propTemplate = new ComponentProperty((GUID) null);
 			propTemplate.setComponentID(currentComponentId);
 
@@ -3520,7 +3575,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			for (int i = 0; properties != null && i < properties.length; i++)
 			{
 				final String propname = getElementText(getNamedChildElement(properties[i], ELname));
-				for(ComponentProperty prop: props)
+				for (ComponentProperty prop : props)
 				{
 					if (prop.getPropertyName().equals(propname))
 					{
@@ -3541,7 +3596,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 * load frame, links panel, populate table from current properties/components
 	 */
 	protected void populateLinkTableModel(final DefaultTableModel model, final ComponentProperty srcprop,
-			final ComponentProperty dstprop)
+	                                      final ComponentProperty dstprop)
 	{
 		try
 		{
@@ -3554,7 +3609,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 			String name = srccomp.getComponentName();
 			String name2 = dstcomp.getComponentName();
-			model.addRow(new String[] { "Component name", name, name2 });
+			model.addRow(new String[]{"Component name", name, name2});
 
 			StringBuffer otherNames = new StringBuffer();
 			RDFStatement rdfTemplate = new RDFStatement(null, RDFStatement.GUIDToUrl(srccomp.getID()), RDFStatement.DC_TITLE, null);
@@ -3579,16 +3634,16 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				}
 				otherNames2.append(rdfstatements[i].getObject());
 			}
-			model.addRow(new String[] { "Other names", otherNames.toString(), otherNames2.toString() });
-			model.addRow(new String[] { "Container (ID)", srccomp.getContainerID().toString(),
-										dstcomp.getContainerID().toString(), });
-			model.addRow(new String[] { "Host (ID)", srccomp.getHostID(), dstcomp.getHostID() });
+			model.addRow(new String[]{"Other names", otherNames.toString(), otherNames2.toString()});
+			model.addRow(new String[]{"Container (ID)", srccomp.getContainerID().toString(),
+					dstcomp.getContainerID().toString(),});
+			model.addRow(new String[]{"Host (ID)", srccomp.getHostID(), dstcomp.getHostID()});
 			final GUID capabilityid = srccomp.getCapabilityID();
 			final GUID capabilityid2 = dstcomp.getCapabilityID();
 			final GUID componentrequestid = srccomp.getComponentRequestID();
 			final GUID componentrequestid2 = dstcomp.getComponentRequestID();
-			model.addRow(new String[] { "Explicitly requested", componentrequestid != null ? "Yes" : "No",
-										componentrequestid2 != null ? "Yes" : "No" });
+			model.addRow(new String[]{"Explicitly requested", componentrequestid != null ? "Yes" : "No",
+					componentrequestid2 != null ? "Yes" : "No"});
 
 			Capability cap = null;
 			if (capabilityid != null)
@@ -3609,11 +3664,11 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				}
 			}
 
-			model.addRow(new String[] { "Capability ID", cap != null ? cap.getID().toString() : null,
-										cap2 != null ? cap2.getID().toString() : null });
+			model.addRow(new String[]{"Capability ID", cap != null ? cap.getID().toString() : null,
+					cap2 != null ? cap2.getID().toString() : null});
 			name = cap != null ? cap.getCapabilityName() : null;
 			name2 = cap2 != null ? cap2.getCapabilityName() : null;
-			model.addRow(new String[] { "Capability name", name, name2 });
+			model.addRow(new String[]{"Capability name", name, name2});
 			otherNames = new StringBuffer();
 			if (capabilityid != null)
 			{
@@ -3642,13 +3697,13 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					otherNames2.append(rdfstatements[i].getObject());
 				}
 			}
-			model.addRow(new String[] { "Other capability names", otherNames.toString(), otherNames2.toString() });
-			model.addRow(new String[] { "Capability container (ID)",
-										cap != null ? cap.getContainerID().toString() : null,
-										cap2 != null ? cap2.getContainerID().toString() : null });
-			model.addRow(new String[] { "Capability host", cap != null ? cap.getHostID() : null,
-										cap2 != null ? cap2.getHostID() : null, });
-			model.addRow(new String[] { "Property name", srcprop.getPropertyName(), dstprop.getPropertyName() });
+			model.addRow(new String[]{"Other capability names", otherNames.toString(), otherNames2.toString()});
+			model.addRow(new String[]{"Capability container (ID)",
+					cap != null ? cap.getContainerID().toString() : null,
+					cap2 != null ? cap2.getContainerID().toString() : null});
+			model.addRow(new String[]{"Capability host", cap != null ? cap.getHostID() : null,
+					cap2 != null ? cap2.getHostID() : null,});
+			model.addRow(new String[]{"Property name", srcprop.getPropertyName(), dstprop.getPropertyName()});
 			String otherValue = null;
 			String otherValue2 = null;
 			try
@@ -3665,7 +3720,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 				// Do nothing?
 			}
 
-			model.addRow(new String[] { "Property value", otherValue, otherValue2 });
+			model.addRow(new String[]{"Property value", otherValue, otherValue2});
 		}
 		catch (final Exception e)
 		{
@@ -3706,11 +3761,11 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 
 			final String name = getElementText(getNamedChildElement(srccomp, ELname));
 			final String name2 = getElementText(getNamedChildElement(dstcomp, ELname));
-			model.addRow(new String[] { "Component name", name, name2 });
-			model.addRow(new String[] { "Container (ID)", getElementText(getNamedChildElement(srccomp, ELcontainer)),
-										getElementText(getNamedChildElement(dstcomp, ELcontainer)) });
-			model.addRow(new String[] { "Host (ID)", getElementText(getNamedChildElement(srccomp, ELhost)),
-										getElementText(getNamedChildElement(dstcomp, ELhost)) });
+			model.addRow(new String[]{"Component name", name, name2});
+			model.addRow(new String[]{"Container (ID)", getElementText(getNamedChildElement(srccomp, ELcontainer)),
+					getElementText(getNamedChildElement(dstcomp, ELcontainer))});
+			model.addRow(new String[]{"Host (ID)", getElementText(getNamedChildElement(srccomp, ELhost)),
+					getElementText(getNamedChildElement(dstcomp, ELhost))});
 			final String capabilityref = component.hasAttribute(ATcapabilityref) ? srccomp
 					.getAttribute(ATcapabilityref) : null;
 			final String componentrequestref = component.hasAttribute(ATcomponentrequestref) ? srccomp
@@ -3719,39 +3774,39 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					.getAttribute(ATcapabilityref) : null;
 			final String componentrequestref2 = component.hasAttribute(ATcomponentrequestref) ? dstcomp
 					.getAttribute(ATcomponentrequestref) : null;
-			model.addRow(new String[] { "Explicitly requested", componentrequestref != null ? "Yes" : "No",
-										componentrequestref2 != null ? "Yes" : "No" });
+			model.addRow(new String[]{"Explicitly requested", componentrequestref != null ? "Yes" : "No",
+					componentrequestref2 != null ? "Yes" : "No"});
 			final Element capability = capabilityref != null ? getNamedChildElementById(capabilities, ELcapability,
-																						capabilityref) : null;
-			final Element capability2 = capabilityref2 != null ? getNamedChildElementById(	capabilities, ELcapability,
-																							capabilityref2) : null;
-			model.addRow(new String[] { "Capability ID", capability != null ? capability.getAttribute(ATid) : null,
-										capability2 != null ? capability2.getAttribute(ATid) : null });
-			model.addRow(new String[] {
-										"Capability name",
-										capability != null ? getElementText(getNamedChildElement(capability, ELname))
-												: null,
-										capability2 != null ? getElementText(getNamedChildElement(capability2, ELname))
-												: null });
-			model.addRow(new String[] {
-										"Capability container (ID)",
-										capability != null ? getElementText(getNamedChildElement(	capability,
-																									ELcontainer))
-												: null,
-										capability2 != null ? getElementText(getNamedChildElement(	capability2,
-																									ELcontainer))
-												: null });
-			model.addRow(new String[] {
-										"Capability host",
-										capability != null ? getElementText(getNamedChildElement(capability, ELhost))
-												: null,
-										capability2 != null ? getElementText(getNamedChildElement(capability2, ELhost))
-												: null });
+					capabilityref) : null;
+			final Element capability2 = capabilityref2 != null ? getNamedChildElementById(capabilities, ELcapability,
+					capabilityref2) : null;
+			model.addRow(new String[]{"Capability ID", capability != null ? capability.getAttribute(ATid) : null,
+					capability2 != null ? capability2.getAttribute(ATid) : null});
+			model.addRow(new String[]{
+					"Capability name",
+					capability != null ? getElementText(getNamedChildElement(capability, ELname))
+							: null,
+					capability2 != null ? getElementText(getNamedChildElement(capability2, ELname))
+							: null});
+			model.addRow(new String[]{
+					"Capability container (ID)",
+					capability != null ? getElementText(getNamedChildElement(capability,
+							ELcontainer))
+							: null,
+					capability2 != null ? getElementText(getNamedChildElement(capability2,
+							ELcontainer))
+							: null});
+			model.addRow(new String[]{
+					"Capability host",
+					capability != null ? getElementText(getNamedChildElement(capability, ELhost))
+							: null,
+					capability2 != null ? getElementText(getNamedChildElement(capability2, ELhost))
+							: null});
 
-			model.addRow(new String[] { "Property name", getElementText(getNamedChildElement(srcprop, ELname)),
-										getElementText(getNamedChildElement(dstprop, ELname)) });
-			model.addRow(new String[] { "Property value", getElementText(getNamedChildElement(srcprop, ELvalue)),
-										getElementText(getNamedChildElement(dstprop, ELvalue)) });
+			model.addRow(new String[]{"Property name", getElementText(getNamedChildElement(srcprop, ELname)),
+					getElementText(getNamedChildElement(dstprop, ELname))});
+			model.addRow(new String[]{"Property value", getElementText(getNamedChildElement(srcprop, ELvalue)),
+					getElementText(getNamedChildElement(dstprop, ELvalue))});
 
 		}
 		catch (final Exception e)
@@ -3765,38 +3820,38 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 * load frame, component choice panel, populate component table from xml only
 	 */
 	protected void populateTableModel1(final DefaultTableModel model, final Element component,
-			final Element capabilities)
+	                                   final Element capabilities)
 	{
 		final String name = getElementText(getNamedChildElement(component, ELname));
-		model.addRow(new String[] { "Component name", name });
-		model.addRow(new String[] { "Container (ID)", getElementText(getNamedChildElement(component, ELcontainer)) });
-		model.addRow(new String[] { "Host (ID)", getElementText(getNamedChildElement(component, ELhost)) });
+		model.addRow(new String[]{"Component name", name});
+		model.addRow(new String[]{"Container (ID)", getElementText(getNamedChildElement(component, ELcontainer))});
+		model.addRow(new String[]{"Host (ID)", getElementText(getNamedChildElement(component, ELhost))});
 		final String capabilityref = component.hasAttribute(ATcapabilityref) ? component.getAttribute(ATcapabilityref)
 				: null;
 		final String componentrequestref = component.hasAttribute(ATcomponentrequestref) ? component
 				.getAttribute(ATcomponentrequestref) : null;
-		model.addRow(new String[] { "Explicitly requested", componentrequestref != null ? "Yes" : "No" });
+		model.addRow(new String[]{"Explicitly requested", componentrequestref != null ? "Yes" : "No"});
 		final Element capability = capabilityref != null ? getNamedChildElementById(capabilities, ELcapability,
-																					capabilityref) : null;
-		model.addRow(new String[] { "Capability ID", capability != null ? capability.getAttribute(ATid) : null });
-		model.addRow(new String[] {
-									"Capability name",
-									capability != null ? getElementText(getNamedChildElement(capability, ELname))
-											: null });
-		model.addRow(new String[] {
-									"Capability container (ID)",
-									capability != null ? getElementText(getNamedChildElement(capability, ELcontainer))
-											: null });
-		model.addRow(new String[] {
-									"Capability host",
-									capability != null ? getElementText(getNamedChildElement(capability, ELhost))
-											: null });
+				capabilityref) : null;
+		model.addRow(new String[]{"Capability ID", capability != null ? capability.getAttribute(ATid) : null});
+		model.addRow(new String[]{
+				"Capability name",
+				capability != null ? getElementText(getNamedChildElement(capability, ELname))
+						: null});
+		model.addRow(new String[]{
+				"Capability container (ID)",
+				capability != null ? getElementText(getNamedChildElement(capability, ELcontainer))
+						: null});
+		model.addRow(new String[]{
+				"Capability host",
+				capability != null ? getElementText(getNamedChildElement(capability, ELhost))
+						: null});
 		final Element[] properties = getNamedChildElements(getNamedChildElement(component, ELproperties), ELproperty);
 		for (int i = 0; properties != null && i < properties.length; i++)
 		{
-			model.addRow(new String[] {
-										"Property '" + getElementText(getNamedChildElement(properties[i], ELname))
-												+ "'", getElementText(getNamedChildElement(properties[i], ELvalue)) });
+			model.addRow(new String[]{
+					"Property '" + getElementText(getNamedChildElement(properties[i], ELname))
+							+ "'", getElementText(getNamedChildElement(properties[i], ELvalue))});
 			// parents??
 			// ....
 		}
@@ -3807,7 +3862,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	 * component or capability (iff capabilityOnly true)
 	 */
 	protected boolean populateTableModel2(final DefaultTableModel model, final Element component,
-			final Element capabilities, final GUID id, final boolean capabilityOnly) throws DataspaceInactiveException
+	                                      final Element capabilities, final GUID id, final boolean capabilityOnly) throws DataspaceInactiveException
 	{
 		final ItemData compitem = dataspace.getItem(id);
 		if (compitem == null)
@@ -3824,21 +3879,21 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 		final ComponentAdvert comp = !capabilityOnly ? new ComponentAdvert((TupleImpl) compitem) : null;
 		String name = getElementText(getNamedChildElement(component, ELname));
 		String name2 = comp != null ? comp.getComponentName() : null;
-		model.addRow(new String[] { "Component name", name, name2 });
-		model.addRow(new String[] { "Container (ID)", getElementText(getNamedChildElement(component, ELcontainer)),
-									comp != null ? comp.getContainerID().toString() : null });
-		model.addRow(new String[] { "Host (ID)", getElementText(getNamedChildElement(component, ELhost)),
-									comp != null ? comp.getHostID() : null });
+		model.addRow(new String[]{"Component name", name, name2});
+		model.addRow(new String[]{"Container (ID)", getElementText(getNamedChildElement(component, ELcontainer)),
+				comp != null ? comp.getContainerID().toString() : null});
+		model.addRow(new String[]{"Host (ID)", getElementText(getNamedChildElement(component, ELhost)),
+				comp != null ? comp.getHostID() : null});
 		final String capabilityref = component.hasAttribute(ATcapabilityref) ? component.getAttribute(ATcapabilityref)
 				: null;
 		final GUID capabilityid = capabilityOnly ? id : comp.getCapabilityID();
 		final String componentrequestref = component.hasAttribute(ATcomponentrequestref) ? component
 				.getAttribute(ATcomponentrequestref) : null;
 		final GUID componentrequestid = comp != null ? comp.getComponentRequestID() : null;
-		model.addRow(new String[] { "Explicitly requested", componentrequestref != null ? "Yes" : "No",
-									!capabilityOnly && componentrequestid != null ? "Yes" : "No" });
+		model.addRow(new String[]{"Explicitly requested", componentrequestref != null ? "Yes" : "No",
+				!capabilityOnly && componentrequestid != null ? "Yes" : "No"});
 		final Element capability = capabilityref != null ? getNamedChildElementById(capabilities, ELcapability,
-																					capabilityref) : null;
+				capabilityref) : null;
 
 		Capability cap = null;
 		if (capabilityid != null)
@@ -3850,19 +3905,19 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 			}
 		}
 
-		model.addRow(new String[] { "Capability ID", capability != null ? capability.getAttribute(ATid) : null,
-									cap != null ? cap.getID().toString() : null });
+		model.addRow(new String[]{"Capability ID", capability != null ? capability.getAttribute(ATid) : null,
+				cap != null ? cap.getID().toString() : null});
 		name = getElementText(getNamedChildElement(capability, ELname));
 		name2 = cap != null ? cap.getCapabilityName() : null;
-		model.addRow(new String[] { "Capability name", name, name2 });
-		model.addRow(new String[] {
-									"Capability container (ID)",
-									capability != null ? getElementText(getNamedChildElement(capability, ELcontainer))
-											: null, cap != null ? cap.getContainerID().toString() : null });
-		model.addRow(new String[] {
-									"Capability host",
-									capability != null ? getElementText(getNamedChildElement(capability, ELhost))
-											: null, cap != null ? cap.getHostID() : null });
+		model.addRow(new String[]{"Capability name", name, name2});
+		model.addRow(new String[]{
+				"Capability container (ID)",
+				capability != null ? getElementText(getNamedChildElement(capability, ELcontainer))
+						: null, cap != null ? cap.getContainerID().toString() : null});
+		model.addRow(new String[]{
+				"Capability host",
+				capability != null ? getElementText(getNamedChildElement(capability, ELhost))
+						: null, cap != null ? cap.getHostID() : null});
 		final Element[] properties = getNamedChildElements(getNamedChildElement(component, ELproperties), ELproperty);
 		ComponentProperty props[] = null;
 		if (!capabilityOnly && id != null)
@@ -3898,8 +3953,8 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					}
 				}
 			}
-			model.addRow(new String[] { "Property '" + propname + "'",
-										getElementText(getNamedChildElement(properties[i], ELvalue)), otherValue });
+			model.addRow(new String[]{"Property '" + propname + "'",
+					getElementText(getNamedChildElement(properties[i], ELvalue)), otherValue});
 		}
 		// any remaining properties
 		for (int j = 0; props != null && j < props.length; j++)
@@ -3934,7 +3989,7 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 					// Do nothing?
 				}
 
-				model.addRow(new String[] { "Property '" + propname + "'", null, value });
+				model.addRow(new String[]{"Property '" + propname + "'", null, value});
 			}
 		}
 		// parents??
@@ -4019,7 +4074,10 @@ public class ConfigurationManager extends JPanel implements DirectoryEventListen
 	private void setComponentName(final GUID component, final String name)
 	{
 		System.out.println("Set component name to " + name);
-		if (name == null) { return; }
+		if (name == null)
+		{
+			return;
+		}
 		try
 		{
 			final ItemData data = dataspace.getItem(component);

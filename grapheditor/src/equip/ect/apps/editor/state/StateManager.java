@@ -44,7 +44,7 @@ public class StateManager
 			graphEditor.removeAllCanvases();
 
 			final DataspaceMonitor monitor = DataspaceMonitor.getMonitor();
-			final Map<String, ComponentAdvert> componentMap = new HashMap<String, ComponentAdvert>();
+			final Map<String, ComponentAdvert> componentMap = new HashMap<>();
 			for (final ComponentState componentState : state.getComponents())
 			{
 				ComponentAdvert component = monitor.getComponentAdvert(componentState.getId());
@@ -106,13 +106,9 @@ public class StateManager
 							graphComponent.getDrawer().setDrawerState(componentState.getState());
 							for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
 							{
-								for (PropertyState propertyState : componentState.getProperties())
-								{
-									if (propertyState.getName().equals(property.getName()))
-									{
-										property.setKeepVisible(propertyState.isKeepVisible());
-									}
-								}
+								componentState.getProperties().stream()
+										.filter(propertyState -> propertyState.getName().equals(property.getName()))
+										.forEach(propertyState -> property.setKeepVisible(propertyState.isKeepVisible()));
 							}
 						}
 					}
@@ -160,13 +156,9 @@ public class StateManager
 						graphComponent.getDrawer().setDrawerState(componentState.getState());
 						for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
 						{
-							for (PropertyState propertyState : componentState.getProperties())
-							{
-								if (propertyState.getName().equals(property.getName()))
-								{
-									property.setKeepVisible(propertyState.isKeepVisible());
-								}
-							}
+							componentState.getProperties().stream()
+									.filter(propertyState -> propertyState.getName().equals(property.getName()))
+									.forEach(propertyState -> property.setKeepVisible(propertyState.isKeepVisible()));
 						}
 					}
 				}
@@ -281,31 +273,25 @@ public class StateManager
 
 		for (final GraphEditorCanvas canvas : editor.getCanvases())
 		{
-			EditorState editorState = new EditorState(canvas.getName());
-			for (InteractiveCanvasItem item : canvas.getItems())
-			{
-				if (item instanceof GraphComponent)
-				{
-					GraphComponent graphComponent = (GraphComponent) item;
-					ComponentState componentState = new ComponentState();
-					componentState.setId(graphComponent.getBeanID());
-					componentState.setPosition(graphComponent.getPosition());
-					componentState.setState(graphComponent.getDrawer().getDrawerState());
+			final EditorState editorState = new EditorState(canvas.getName());
+			canvas.getItems().stream().filter(item -> item instanceof GraphComponent).forEach(item -> {
+				GraphComponent graphComponent = (GraphComponent) item;
+				ComponentState componentState = new ComponentState();
+				componentState.setId(graphComponent.getBeanID());
+				componentState.setPosition(graphComponent.getPosition());
+				componentState.setState(graphComponent.getDrawer().getDrawerState());
 
-					for (GraphComponentProperty property : graphComponent.getGraphComponentProperties().values())
-					{
-						if (property.keepVisible())
-						{
-							PropertyState propertyState = new PropertyState();
-							propertyState.setName(property.getName());
-							propertyState.setKeepVisible(true);
-							componentState.getProperties().add(propertyState);
-						}
-					}
+				graphComponent.getGraphComponentProperties().values().stream()
+						.filter(InteractiveCanvasItem::keepVisible)
+						.forEach(property -> {
+					PropertyState propertyState = new PropertyState();
+					propertyState.setName(property.getName());
+					propertyState.setKeepVisible(true);
+					componentState.getProperties().add(propertyState);
+				});
 
-					editorState.getComponents().add(componentState);
-				}
-			}
+				editorState.getComponents().add(componentState);
+			});
 			state.getEditors().add(editorState);
 
 		}

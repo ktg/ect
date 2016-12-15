@@ -208,7 +208,7 @@ public class CompoundComponentEditor extends JFrame
 				JOptionPane.showMessageDialog(GraphEditor.instance, "No compound components found");
 				return;
 			}
-			final Vector<String> names = new Vector<String>();
+			final Vector<String> names = new Vector<>();
 			for (final ItemData item : items)
 			{
 				final ComponentAdvert a = new ComponentAdvert((TupleImpl) item);
@@ -219,7 +219,7 @@ public class CompoundComponentEditor extends JFrame
 			final JPanel p = new JPanel();
 			p.setLayout(new GridLayout(5, 1));
 			p.add(new JLabel("Compound Component:"));
-			final JComboBox choice = new JComboBox(names);
+			final JComboBox<String> choice = new JComboBox<>(names);
 			choice.setEditable(false);
 			p.add(choice);
 			p.add(new JLabel("Property Name:"));

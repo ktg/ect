@@ -58,8 +58,7 @@ public class StartManager implements Runnable
 
 	public StartManager(final String componentPath)
 	{
-
-		this.componentPath = new String(componentPath);
+		this.componentPath = componentPath;
 		final Thread myThread = new Thread(this);
 		myThread.start();
 	}

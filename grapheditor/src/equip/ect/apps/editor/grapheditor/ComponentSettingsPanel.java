@@ -42,9 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -123,15 +121,7 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 
 		if (props != null)
 		{
-
-			Arrays.sort(props, new Comparator<ComponentProperty>()
-			{
-				@Override
-				public int compare(final ComponentProperty cp1, final ComponentProperty cp2)
-				{
-					return cp1.getPropertyName().compareTo(cp2.getPropertyName());
-				}
-			});
+			Arrays.sort(props, (cp1, cp2) -> cp1.getPropertyName().compareTo(cp2.getPropertyName()));
 
 			final JPanel propNamesPanel = new JPanel(new GridLayout(props.length, 1));
 			// JPanel propsPanel = new JPanel(new GridLayout(props.size(), 2));
@@ -158,14 +148,7 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 
 				final GraphComponentProperty gcp = graphComponent.getGraphComponentProperty(cp.getID().toString());
 				final JCheckBox cb = new JCheckBox("Keep visible", gcp.keepVisible());
-				cb.addActionListener(new ActionListener()
-				{
-					@Override
-					public void actionPerformed(final ActionEvent ae)
-					{
-						gcp.setKeepVisible(cb.isSelected());
-					}
-				});
+				cb.addActionListener(ae -> gcp.setKeepVisible(cb.isSelected()));
 				p.add(cb);
 
 				propFieldsPanel.add(p);

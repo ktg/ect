@@ -75,7 +75,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 		g2.setColor(selected ? SELECTED_COLOR : UNSELECTED_COLOR);
 
 		int height = headerHeight;
-		if (!collapsed && (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT))
+		if (!collapsed && (drawer.getDrawerState() == Drawer.State.OPEN || drawer.getDrawerState() == Drawer.State.COMPACT))
 		{
 			height += 10;
 		}
@@ -151,7 +151,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		drawer.paintComponent(g);
 		drawHeader(g, false, false);
-		if (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT)
+		if (drawer.getDrawerState() == Drawer.State.OPEN || drawer.getDrawerState() == Drawer.State.COMPACT)
 		{
 			drawProps(g);
 		}
@@ -165,7 +165,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		drawer.paintComponent(g);
 		drawHeader(g, false, true);
-		if (drawer.getDrawerState() == Drawer.OPEN || drawer.getDrawerState() == Drawer.COMPACT)
+		if (drawer.getDrawerState() == Drawer.State.OPEN || drawer.getDrawerState() == Drawer.State.COMPACT)
 		{
 			drawProps(g);
 		}
@@ -235,11 +235,11 @@ public class GraphComponentView extends InteractiveCanvasItemView
 			int y = posY + headerHeight - 1;
 			for (GraphComponentProperty gcp : graphCompProps)
 			{
-				if (drawer.getDrawerState() == Drawer.OPEN)
+				if (drawer.getDrawerState() == Drawer.State.OPEN)
 				{
 					gcp.setVisible(true);
 				}
-				else if (drawer.getDrawerState() == Drawer.COMPACT)
+				else if (drawer.getDrawerState() == Drawer.State.COMPACT)
 				{
 					if (gcp.keepVisible() || gcp.isLinked())
 					{
@@ -250,7 +250,7 @@ public class GraphComponentView extends InteractiveCanvasItemView
 						gcp.setVisible(false);
 					}
 				}
-				else if (drawer.getDrawerState() == Drawer.CLOSED)
+				else if (drawer.getDrawerState() == Drawer.State.CLOSED)
 				{
 					gcp.setVisible(false);
 				}

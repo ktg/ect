@@ -69,7 +69,7 @@ public class AbstractHttpServer
 			}
 			else
 			{
-				final int port = new Integer(args[0]).intValue();
+				final int port = new Integer(args[0]);
 				new AbstractHttpServer(port);
 			}
 		}

@@ -31,13 +31,13 @@ class DrawerView extends InteractiveCanvasItemView
 		final int arrowHeight = 7;
 		switch (drawer.getType())
 		{
-			case Drawer.UP:
+			case UP:
 				drawUpArrow(g, center.x, posY + height - 2, arrowWidth, arrowHeight);
 				break;
-			case Drawer.DOWN:
+			case DOWN:
 				drawDownArrow(g, center.x, posY + height - 2, arrowWidth, arrowHeight);
 				break;
-			case Drawer.BOTH:
+			case BOTH:
 				drawUpArrow(g, center.x - 10, posY + height - 2, arrowWidth, arrowHeight);
 				drawDownArrow(g, center.x + 10, posY + height - 2, arrowWidth, arrowHeight);
 				break;

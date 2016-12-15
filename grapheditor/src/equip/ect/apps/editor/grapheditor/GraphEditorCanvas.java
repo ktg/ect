@@ -321,14 +321,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 			addSeparator();
 
 			final JCheckBox cb = new JCheckBox("Keep visible", prop.keepVisible());
-			cb.addActionListener(new ActionListener()
-			{
-				@Override
-				public void actionPerformed(final ActionEvent ae)
-				{
-					prop.setKeepVisible(cb.isSelected());
-				}
-			});
+			cb.addActionListener(ae -> prop.setKeepVisible(cb.isSelected()));
 
 			add(cb);
 			addSeparator();
@@ -371,7 +364,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 
 	public static boolean allowComponentSelfConnect = false;
 
-	private Map<String, Component> componentDialogs = new HashMap<String, Component>();
+	private Map<String, Component> componentDialogs = new HashMap<>();
 
 	public GraphEditorCanvas(final String title, SelectionModel selectionModel)
 	{
@@ -496,7 +489,7 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				{
 					if (results == null)
 					{
-						results = new ArrayList<GraphComponentProperty>();
+						results = new ArrayList<>();
 					}
 					results.add(gcp);
 				}
@@ -631,8 +624,8 @@ public class GraphEditorCanvas extends BeanGraphPanel
 							}
 							else
 							{
-								final int drawerAction = gc.getDrawer().getAction(xPos, yPos);
-								if (drawerAction != Drawer.NONE)
+								final Drawer.Type drawerAction = gc.getDrawer().getAction(xPos, yPos);
+								if (drawerAction != Drawer.Type.NONE)
 								{
 									gc.handleDrawerAction(drawerAction);
 									mode = DRAWER_MODE;
@@ -934,13 +927,13 @@ public class GraphEditorCanvas extends BeanGraphPanel
 
 			if (outLinkGroups != null)
 			{
-				removeItems(new ArrayList<LinkGroup>(outLinkGroups.values()), false);
+				removeItems(new ArrayList<>(outLinkGroups.values()), false);
 			}
 
 			final Map<GraphComponent, LinkGroup> inLinkGroups = gc.getInLinkGroups();
 			if (inLinkGroups != null)
 			{
-				removeItems(new ArrayList<LinkGroup>(inLinkGroups.values()), false);
+				removeItems(new ArrayList<>(inLinkGroups.values()), false);
 			}
 
 			if (props != null)
@@ -952,12 +945,12 @@ public class GraphEditorCanvas extends BeanGraphPanel
 						List<Link> links = gcp.getInputLinks();
 						if (links != null)
 						{
-							removeItems(new ArrayList<Link>(links), cleanUp);
+							removeItems(new ArrayList<>(links), cleanUp);
 						}
 						links = gcp.getOutputLinks();
 						if (links != null)
 						{
-							removeItems(new ArrayList<Link>(links), cleanUp);
+							removeItems(new ArrayList<>(links), cleanUp);
 						}
 					}
 				}

@@ -681,6 +681,7 @@ public class ComponentBrowser extends JPanel
 			}
 		}
 
+		@SuppressWarnings("unchecked")
 		private void sortchildren(DefaultMutableTreeNode node)
 		{
 			List<DefaultMutableTreeNode> children = Collections.list(node.children());

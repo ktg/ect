@@ -39,9 +39,9 @@
 
 package equip.ect.apps.editor.grapheditor;
 
-import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
+import java.awt.Point;
 
-import java.awt.*;
+import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
 
 /**
  * The Drawer is designed to accomodate subcomponents, and includes features to hide or bring these
@@ -53,20 +53,22 @@ import java.awt.*;
 
 public class Drawer extends InteractiveCanvasItem
 {
-	public final static int OPEN = 1;
-	public final static int CLOSED = 2;
-	public final static int COMPACT = 3;
+	public enum State
+	{
+		OPEN, CLOSED, COMPACT
+	}
 
-	private int drawerState, previousState;
+	private State drawerState;
+	private State previousState;
 
-	public final static int NONE = -1;
-	public final static int UP = 0;
-	public final static int DOWN = 1;
-	public final static int BOTH = 2;
+	public enum Type
+	{
+		NONE, UP, DOWN, BOTH
+	}
 
-	private int type;
+	private Type type;
 
-	Drawer(final GraphComponent parent, final int type, final int initialState)
+	Drawer(final GraphComponent parent, final Type type, final State initialState)
 	{
 		super(parent.getTargetCanvas(), null);
 		this.type = type;
@@ -76,14 +78,14 @@ public class Drawer extends InteractiveCanvasItem
 		setSize(50, 10);
 	}
 
-	public int getAction(final int x, final int y)
+	public Type getAction(final int x, final int y)
 	{
 		if (isInside(x, y))
 		{
-			if (type == BOTH)
+			if (type == Type.BOTH)
 			{
 				final Point c = getCenter();
-				return (x < c.x ? UP : DOWN);
+				return (x < c.x ? Type.UP : Type.DOWN);
 			}
 			else
 			{
@@ -92,48 +94,48 @@ public class Drawer extends InteractiveCanvasItem
 		}
 		else
 		{
-			return NONE;
+			return Type.NONE;
 		}
 	}
 
 	public String getID() { return null; }
 
-	public final int getDrawerState()
+	public final State getDrawerState()
 	{
 		return this.drawerState;
 	}
 
-	public final int getPreviousDrawerState()
+	public final State getPreviousDrawerState()
 	{
 		return this.previousState;
 	}
 
-	public final int getType()
+	public final Type getType()
 	{
 		return type;
 	}
 
-	public final void setDrawerState(final int drawerState)
+	public final void setDrawerState(final State drawerState)
 	{
 		this.previousState = this.drawerState;
 		this.drawerState = drawerState;
 		switch (drawerState)
 		{
 			case OPEN:
-				setType(UP);
+				setType(Type.UP);
 				break;
 			case COMPACT:
-				setType(BOTH);
+				setType(Type.BOTH);
 				break;
 			case CLOSED:
-				setType(DOWN);
+				setType(Type.DOWN);
 				break;
 			default:
-				setType(NONE);
+				setType(Type.NONE);
 		}
 	}
 
-	public void setType(final int type)
+	public void setType(final Type type)
 	{
 		this.type = type;
 	}
