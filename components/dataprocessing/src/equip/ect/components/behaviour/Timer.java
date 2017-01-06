@@ -105,6 +105,10 @@ public class Timer implements Runnable, Serializable
 				{
 					setRunning(false);
 				}
+				else
+				{
+					startTime = DateTime.now();
+				}
 			}
 
 			Duration remaining = delay.minus(difference);
