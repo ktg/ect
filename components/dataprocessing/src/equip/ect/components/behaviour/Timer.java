@@ -60,6 +60,8 @@ import java.util.concurrent.TimeUnit;
 public class Timer implements Runnable, Serializable
 {
 	PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
+			.appendHours()
+			.appendSeparatorIfFieldsBefore(":")
 			.appendMinutes()
 			.appendSeparatorIfFieldsBefore(":")
 			.minimumPrintedDigits(2)
