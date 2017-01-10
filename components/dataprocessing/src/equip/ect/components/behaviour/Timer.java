@@ -42,13 +42,13 @@ import equip.ect.Category;
 import equip.ect.ECTComponent;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Produces timing signal at specified intervals
@@ -59,13 +59,25 @@ import java.util.concurrent.TimeUnit;
 @Category("Timing")
 public class Timer implements Runnable, Serializable
 {
-	PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
+	private static final PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
 			.appendHours()
-			.appendSeparatorIfFieldsBefore(":")
-			.appendMinutes()
 			.appendSeparatorIfFieldsBefore(":")
 			.minimumPrintedDigits(2)
 			.printZeroAlways()
+			.appendMinutes()
+			.appendSeparatorIfFieldsBefore(":")
+			.appendSeconds()
+			.toFormatter();
+
+	private static final PeriodFormatter hourFormatter = new PeriodFormatterBuilder()
+			.appendHours()
+			.toFormatter();
+
+	private static final PeriodFormatter minuteFormatter = new PeriodFormatterBuilder()
+			.appendMinutes()
+			.toFormatter();
+
+	private static final PeriodFormatter secondFormatter = new PeriodFormatterBuilder()
 			.appendSeconds()
 			.toFormatter();
 
@@ -127,15 +139,6 @@ public class Timer implements Runnable, Serializable
 		}
 	}
 
-	private String humanTimeSpan(long millis)
-	{
-		return String.format("%d:%02d",
-				TimeUnit.MILLISECONDS.toMinutes(millis) -
-						TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-				TimeUnit.MILLISECONDS.toSeconds(millis) -
-						TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
-	}
-
 	public String getCountdown()
 	{
 		return countdown;
@@ -192,16 +195,38 @@ public class Timer implements Runnable, Serializable
 	{
 		final String oldDelay = getDelay();
 
-		delay = periodFormatter.parsePeriod(newDelay).toStandardDuration();
+		final String[] split =  newDelay.split(":");
+		if(split.length == 3)
+		{
+			Period period = hourFormatter.parsePeriod(split[0].trim());
+			period = period.plus(minuteFormatter.parsePeriod(split[1].trim()));
+			period = period.plus(secondFormatter.parsePeriod(split[2].trim()));
 
-		propertyChangeListeners.firePropertyChange("delay", oldDelay, newDelay);
+			delay = period.toStandardDuration();
+		}
+		else if(split.length == 2)
+		{
+			Period period = minuteFormatter.parsePeriod(split[0].trim());
+			period = period.plus(secondFormatter.parsePeriod(split[1].trim()));
+
+			delay = period.toStandardDuration();
+		}
+		else if(split.length == 1)
+		{
+			Period period = secondFormatter.parsePeriod(split[0].trim());
+			delay = period.toStandardDuration();
+		}
+
+		//delay = periodFormatter.parsePeriod(newDelay).toStandardDuration();
+		String delayString = getDelay();
+
+		propertyChangeListeners.firePropertyChange("delay", oldDelay, delayString);
 	}
 
 	public synchronized void setOutput(final boolean newValue)
 	{
 		if (output != newValue)
 		{
-
 			final boolean oldValue = output;
 			output = newValue;
 
