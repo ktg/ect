@@ -20,12 +20,6 @@ import java.util.Date;
 @Category("Data/Processing")
 public class Transition implements Runnable, Serializable, PropertyChangeListener
 {
-	public static void main(final String args[])
-	{
-		final Transition transition = new Transition();
-		transition.setRunning(true);
-	}
-
 	// Property Change
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 

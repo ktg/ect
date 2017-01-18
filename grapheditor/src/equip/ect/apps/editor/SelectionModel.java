@@ -22,7 +22,7 @@ public class SelectionModel
 	}
 
 	private final Set<SelectionListener> listeners = new HashSet<>();
-	private Set<String> selected = new HashSet<>();
+	private final Set<String> selected = new HashSet<>();
 
 	public Collection<String> getSelected()
 	{

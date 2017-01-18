@@ -63,7 +63,7 @@ class GraphEditorLinkGroup extends LinkGroup
 	GraphEditorLinkGroup(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target, final List<Link> links)
 	{
-		super(canvas, startPoint, endPoint, source, target, new CurvedLine(startPoint, endPoint), links);
+		super(canvas, source, target, new CurvedLine(startPoint, endPoint), links);
 		((RenderableLink) view).setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
 	}
 

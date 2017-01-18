@@ -48,7 +48,6 @@ import equip.data.beans.DataspaceInactiveException;
 
 public class PropertyLinkRequest extends CompInfo
 {
-
 	public static final String TYPE = "PropertyLinkRequest2";
 	public static final int NO_OF_FIELDS = 6;
 	public static final int SOURCEPROPNAME_INDEX = 2;

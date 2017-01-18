@@ -46,6 +46,5 @@ import equip.data.GUID;
 // issued into the dataspace
 public interface InstantiateListener
 {
-
-	public void instantiated(GUID requestID, ComponentAdvert advert);
+	void instantiated(GUID requestID, ComponentAdvert advert);
 }

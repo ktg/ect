@@ -43,12 +43,7 @@ import equip.data.GUID;
 import equip.data.StringBox;
 import equip.data.StringBoxImpl;
 import equip.data.beans.DataspaceInactiveException;
-import equip.ect.BeanDescriptorHelper;
-import equip.ect.Capability;
-import equip.ect.ComponentAdvert;
-import equip.ect.ComponentProperty;
-import equip.ect.PropertyLinkRequest;
-import equip.ect.RDFStatement;
+import equip.ect.*;
 import equip.ect.apps.editor.BeanCanvasItem;
 import equip.ect.apps.editor.BeanGraphPanel;
 import equip.ect.apps.editor.Info;
@@ -84,6 +79,782 @@ import java.util.Map;
  */
 public class GraphEditorCanvas extends BeanGraphPanel
 {
+
+	private final static int LINK_MODE = 1;
+	private final static int LINK_DRAG_MODE = 2;
+	private final static int DRAWER_MODE = 3;
+	private final static int MENU_MODE = 4;
+	static boolean allowComponentSelfConnect = false;
+	private Link currentLink;
+	private GraphComponentProperty currentAnchor, currentTarget;
+	private Map<String, Component> componentDialogs = new HashMap<>();
+
+	GraphEditorCanvas(final String title, SelectionModel selectionModel)
+	{
+		super(title, selectionModel);
+		// need to call this to enable tooltips
+		this.setToolTipText("");
+	}
+
+	@Override
+	public void componentMetadataChanged(final Object metadata)
+	{
+		if (metadata instanceof RDFStatement)
+		{
+			final RDFStatement rdf = (RDFStatement) metadata;
+			if (rdf.getPredicate().equals(RDFStatement.ECT_ACTIVE_TITLE))
+			{
+				processActiveNameChange(rdf);
+			}
+		}
+	}
+
+	@Override
+	public void componentPropertyAdded(final ComponentProperty compProp)
+	{
+		final String beanid = compProp.getComponentID().toString();
+		final List<BeanCanvasItem> comps = getBeanInstances(beanid);
+
+		if (comps != null)
+		{
+			synchronized (comps)
+			{
+
+				for (BeanCanvasItem item : comps)
+				{
+					final GraphComponent gc = (GraphComponent) item;
+					gc.addGraphComponentProperty(compProp);
+
+					gc.update();
+					gc.repaint();
+				}
+			}
+		}
+	}
+
+	@Override
+	public void componentPropertyDeleted(final ComponentProperty compProp)
+	{
+		final String beanid = compProp.getComponentID().toString();
+		final List<BeanCanvasItem> comps = getBeanInstances(beanid);
+		if (comps != null)
+		{
+			for (BeanCanvasItem item : comps)
+			{
+				final GraphComponent gc = (GraphComponent) item;
+				gc.removeGraphComponentProperty(compProp);
+				gc.update();
+				gc.repaint();
+			}
+		}
+	}
+
+	@Override
+	public void componentPropertyUpdated(final ComponentProperty compProp)
+	{
+		if (animatePropertyUpdate)
+		{
+			final List<GraphComponentProperty> graphProps = getGraphComponentProperties(compProp);
+			if (graphProps != null)
+			{
+				synchronized (graphProps)
+				{
+					for (GraphComponentProperty gcp : graphProps)
+					{
+						gcp.componentPropertyUpdated(compProp);
+						gcp.repaint();
+					}
+				}
+				animateActiveItems(graphProps);
+			}
+		}
+	}
+
+	/**
+	 * custom tooltip
+	 */
+	@Override
+	public String getToolTipText(final MouseEvent event)
+	{
+		final int xPos = event.getX();
+		final int yPos = event.getY();
+		final InteractiveCanvasItem item = getItem(xPos, yPos);
+		// System.out.println("Get tooltip for "+event+" at
+		// "+event.getX()+","+event.getY()+" ("+selectedItem+")...");
+		if (item instanceof GraphComponent)
+		{
+			final GraphComponent gc = (GraphComponent) item;
+			final GraphComponentProperty gcp = gc.getGraphComponentProperty(xPos, yPos);
+			if (gcp == null)
+			{
+				// component
+				final ComponentAdvert ad = gc.getComponentAdvert();
+				final java.lang.Object val = ad.getAttributeValue(BeanDescriptorHelper.SHORT_DESCRIPTION);
+				String text = null;
+				if (val instanceof StringBox)
+				{
+					text = ((StringBox) val).value;
+				}
+				return text;
+			}
+			else
+			{
+				/*
+				 * ComponentProperty p = gcp.getComponentProperty(); java.lang.Object val = p
+				 * .getAttributeValue(ect.BeanDescriptorHelper.SHORT_DESCRIPTION); String text
+				 * = null; if (val instanceof StringBox) text = ((StringBox) val).value;
+				 *
+				 * return text;
+				 */
+				return gcp.getDisplayValue();
+			}
+		}
+		return getToolTipText();
+	}
+
+	@Override
+	public void mouseDragged(final MouseEvent me)
+	{
+		super.mouseDragged(me);
+		final Point end = new Point(xPos, yPos);
+		switch (me.getModifiers())
+		{
+			case MouseEvent.BUTTON1_MASK: // left
+				switch (mode)
+				{
+
+					case LINK_MODE:
+						mode = LINK_DRAG_MODE;
+						final Point start = currentAnchor.getOutAnchorPoint();
+						currentLink = new GraphEditorLink(this, start, end, currentAnchor, null);
+						addItem(currentLink);
+						currentLink.repaint();
+						break;
+
+					case LINK_DRAG_MODE:
+						currentLink.setEndPoint(end);
+						final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
+						if (gcp != null && gcp != currentAnchor && checkIfCanConnect(currentAnchor, gcp))
+						{
+							currentTarget = gcp;
+							selectionModel.set(currentAnchor.getBeanID(), currentTarget.getBeanID());
+						}
+						else
+						{
+							currentTarget = null;
+							selectionModel.set(currentAnchor.getBeanID());
+						}
+
+						currentLink.repaint(); // optimize
+						break;
+				}
+				break;
+
+			case MouseEvent.BUTTON2_MASK:
+				break;
+
+			case MouseEvent.BUTTON3_MASK:
+
+				break;
+		}
+	}
+
+	@Override
+	public void mousePressed(final MouseEvent me)
+	{
+		xPos = me.getX();
+		yPos = me.getY();
+		switch (me.getButton())
+		{
+			case MouseEvent.BUTTON1: // left
+				switch (mode)
+				{
+					case NORMAL_MODE:
+						final GraphComponent gc = getGraphComponent(xPos, yPos);
+						if (gc != null)
+						{
+							final GraphComponentProperty gcp = gc.getGraphComponentProperty(xPos, yPos);
+							if (gcp != null)
+							{
+								if (me.getClickCount() == 2)
+								{
+									doubleClickProperty(gcp);
+								}
+								else
+								{
+									currentAnchor = gcp;
+									if (me.isShiftDown())
+									{
+										selectionModel.add(gcp.getBeanID());
+									}
+									else
+									{
+										selectionModel.set(gcp.getBeanID());
+									}
+									mode = LINK_MODE;
+								}
+							}
+							else
+							{
+								final Drawer.Type drawerAction = gc.getDrawer().getAction(xPos, yPos);
+								if (drawerAction != Drawer.Type.NONE)
+								{
+									gc.handleDrawerAction(drawerAction);
+									mode = DRAWER_MODE;
+								}
+								else
+								{
+									super.mousePressed(me);
+								}
+							}
+						}
+						else
+						{ // no property selected
+							super.mousePressed(me);
+						}
+						break;
+
+					case LINK_MODE:
+						final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
+						if (gcp != null)
+						{
+							if (me.getClickCount() == 2)
+							{
+								doubleClickProperty(gcp);
+							}
+							else
+							{
+								selectionModel.set(gcp.getBeanID());
+								currentTarget = gcp;
+							}
+						}
+						else if (currentTarget != null)
+						{
+							selectionModel.set(currentTarget.getBeanID());
+							//currentTarget.setSelected(false);
+							currentTarget = null;
+						}
+						break;
+				}
+
+				break;
+			case MouseEvent.BUTTON2: // middle
+				break;
+
+			case MouseEvent.BUTTON3: // right
+				if (mode == LINK_MODE)
+				{
+					if (currentAnchor != null)
+					{
+						selectionModel.set(currentAnchor.getBeanID());
+						//currentAnchor.setSelected(false);
+						currentAnchor = null;
+					}
+				}
+				mode = MENU_MODE;
+				break;
+		}
+	}
+
+	@Override
+	public void mouseReleased(final MouseEvent me)
+	{
+		xPos = me.getX();
+		yPos = me.getY();
+		switch (me.getButton())
+		{
+			case MouseEvent.BUTTON1:
+				switch (mode)
+				{
+					case LINK_MODE:
+						if (currentAnchor != null)
+						{
+							// Check if within another component
+							final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
+							if (gcp != null)
+							{ // some property selected
+								if (currentTarget != null)
+								{ // target already
+									// selected on mouse
+									// pressed
+									if (currentTarget == gcp)
+									{ // same as when clicked
+										if (checkIfCanConnect(currentAnchor, gcp))
+										{
+											final Point start = currentAnchor.getOutAnchorPoint();
+											final Point end = gcp.getInAnchorPoint();
+											final Link link = new GraphEditorLink(this, start, end, currentAnchor, gcp);
+											addItem(link);
+											link.repaint();
+											connect(currentAnchor, gcp, link);
+										}
+									}
+
+									selectionModel.clear();
+									currentTarget = null;
+									currentAnchor = null;
+									mode = NORMAL_MODE;
+								}
+							}
+							else
+							{
+								selectionModel.clear();
+								currentAnchor = null;
+								mode = NORMAL_MODE;
+							}
+						}
+						break;
+					case LINK_DRAG_MODE:
+						if (currentAnchor != null)
+						{
+							if (currentLink != null)
+							{
+								// Check if within another component
+								final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
+								if (gcp != null)
+								{
+									if (checkIfCanConnect(currentAnchor, gcp))
+									{
+										currentLink.setEndPoint(gcp.getInAnchorPoint());
+										currentTarget = gcp;
+										if (connect(currentAnchor, currentTarget, currentLink))
+										{
+											// TODO selectItem(currentTarget, me.isShiftDown());
+											currentLink = null;
+										}
+										currentTarget = null;
+									}
+									else
+									{
+										removeItem(currentLink);
+										currentLink = null;
+									}
+								}
+								else
+								{ // nothing to attach to, so remove
+									removeItem(currentLink);
+									currentLink = null;
+								}
+							}
+							selectionModel.clear();
+							currentAnchor = null;
+						}
+
+						mode = NORMAL_MODE;
+						repaint();
+						break;
+
+					case DRAWER_MODE:
+						mode = NORMAL_MODE;
+						repaint();
+						break;
+					default:
+						super.mouseReleased(me);
+				}
+				break;
+
+			case MouseEvent.BUTTON2:
+				mode = NORMAL_MODE;
+				super.mouseReleased(me);
+				break;
+
+			case MouseEvent.BUTTON3:
+
+				if (mode == MENU_MODE)
+				{
+					final BeanCanvasItem item = (BeanCanvasItem) getItem(xPos, yPos, BeanCanvasItem.class);
+					if (item instanceof Link)
+					{
+						final Link link = (Link) item;
+						selectionModel.set(link.getBeanID());
+						final LinkPopupMenu popup = new LinkPopupMenu(link);
+						popup.show(this, xPos, yPos);
+					}
+					else if (item instanceof GraphComponent)
+					{
+						final GraphComponent gc = (GraphComponent) item;
+						final GraphComponentProperty gcp = gc.getGraphComponentProperty(xPos, yPos);
+						// check first if the selection is a property
+						if (gcp != null)
+						{
+							selectionModel.set(gcp.getBeanID());
+							final PropertyPopupMenu popup = new PropertyPopupMenu(gcp);
+							popup.show(this, xPos, yPos);
+
+						}
+						else
+						{
+							// if not then just show the common settings for
+							// component
+							final ComponentPopupMenu popup = new ComponentPopupMenu(gc);
+							selectionModel.set(item.getBeanID());
+							popup.show(this, xPos, yPos);
+						}
+					}
+					else
+					{
+						final CanvasPopupMenu popup = new CanvasPopupMenu();
+						selectionModel.clear();
+						popup.show(this, xPos, yPos);
+					}
+				}
+				else
+				{
+					super.mouseReleased(me);
+				}
+				mode = NORMAL_MODE;
+
+				break;
+		}
+	}
+
+	@Override
+	public void propertyLinkRequestDeleted(final PropertyLinkRequest linkReq)
+	{
+		System.out.println("Proerty link request deleted");
+		final String beanid = linkReq.getID().toString();
+
+		final List<LinkGroup> allLinkGroups = getItems(LinkGroup.class);
+		if (allLinkGroups != null)
+		{
+			for (LinkGroup linkGroup : allLinkGroups)
+			{
+				final Link link = linkGroup.getLink(beanid);
+				if (link != null)
+				{
+					// link request now non existent,
+					// so remove to avoid double cleanup
+					link.setLinkRequest(null);
+					link.cleanUp();
+					linkGroup.removeLink(link);
+					if (linkGroup.nrLinks() < 1)
+					{ // just one item, remove
+						// System.out.println("Removing the link group");
+						removeItem(linkGroup, false); // this should call the
+						// links cleanUp as well
+					}
+				}
+			}
+		}
+		removeBeans(beanid, true);
+	}
+
+	@Override
+	public void removeItem(final InteractiveCanvasItem item, final boolean cleanUp)
+	{
+		if (item instanceof GraphComponent)
+		{
+			final GraphComponent gc = (GraphComponent) item;
+			// Links are canvas items, so we need to remove these first
+
+			final Map<String, GraphComponentProperty> props = gc.getGraphComponentProperties();
+			final Map<GraphComponent, LinkGroup> outLinkGroups = gc.getOutLinkGroups();
+
+			if (outLinkGroups != null)
+			{
+				removeItems(new ArrayList<>(outLinkGroups.values()), false);
+			}
+
+			final Map<GraphComponent, LinkGroup> inLinkGroups = gc.getInLinkGroups();
+			if (inLinkGroups != null)
+			{
+				removeItems(new ArrayList<>(inLinkGroups.values()), false);
+			}
+
+			if (props != null)
+			{
+				synchronized (props)
+				{
+					for (GraphComponentProperty gcp : props.values())
+					{
+						List<Link> links = gcp.getInputLinks();
+						if (links != null)
+						{
+							removeItems(new ArrayList<>(links), cleanUp);
+						}
+						links = gcp.getOutputLinks();
+						if (links != null)
+						{
+							removeItems(new ArrayList<>(links), cleanUp);
+						}
+					}
+				}
+			}
+
+			gc.watchLinks(false);
+
+			final JFrame f = (JFrame) componentDialogs.remove(gc.getBeanID());
+			if (f != null)
+			{
+				f.setVisible(false);
+			}
+		}
+		super.removeItem(item, cleanUp);
+	}
+
+	@Override
+	public void selectionChanged(Collection<String> selection)
+	{
+		super.selectionChanged(selection);
+		for (InteractiveCanvasItem item : items)
+		{
+			if (item instanceof GraphComponent)
+			{
+				GraphComponent component = (GraphComponent) item;
+				for (GraphComponentProperty property : component.getGraphComponentProperties().values())
+				{
+					String id = property.getBeanID();
+					if (selection.contains(id))
+					{
+						property.setSelected(true);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	protected BeanCanvasItem createFromGUID(String guid)
+	{
+		final ComponentAdvert component = DataspaceMonitor.getMonitor().getComponentAdvert(guid);
+		final String currentName = DataspaceUtils.getCurrentName(component);
+
+		final String beanID = component.getID().toString();
+		final String hostName = DataspaceUtils.getHostID(component, DataspaceMonitor.getMonitor().getDataspace());
+
+		GraphComponent gc = new GraphComponent(this, beanID, currentName, hostName);
+		gc.watchLinks(true);
+
+		if(selectionModel.getSelected().contains(guid))
+		{
+			gc.setSelected(true);
+		}
+
+		return gc;
+	}
+
+	// override to show all links
+	@Override
+	protected BeanCanvasItem createFromTemplate(final BeanCanvasItem template)
+	{
+		final BeanCanvasItem newBean = super.createFromTemplate(template);
+		if (newBean instanceof GraphComponent)
+		{
+			((GraphComponent) newBean).watchLinks(true);
+		}
+		return newBean;
+	}
+
+	boolean connect(final GraphComponentProperty source, final GraphComponentProperty target,
+	                final PropertyLinkRequest req)
+	{
+
+		final Point start = source.getOutAnchorPoint();
+		final Point end = target.getInAnchorPoint();
+		final Link link = new GraphEditorLink(this, start, end, source, target);
+		link.setLinkRequest(req);
+		// addItem(link);
+		return connect(source, target, link, false);
+
+	}
+
+	List<GraphComponentProperty> getGraphComponentProperties(final String compPropID)
+	{
+		List<GraphComponentProperty> results = null;
+		for (InteractiveCanvasItem item : items)
+		{
+			if (item instanceof GraphComponent)
+			{
+				final GraphComponentProperty gcp = ((GraphComponent) item)
+						.getGraphComponentProperties().get(compPropID);
+				if (gcp != null)
+				{
+					if (results == null)
+					{
+						results = new ArrayList<>();
+					}
+					results.add(gcp);
+				}
+			}
+		}
+		return results;
+	}
+
+	List<GraphComponentProperty> getGraphComponentProperties(final ComponentProperty compProp)
+	{
+		if (compProp == null || compProp.getID() == null)
+		{
+			return null;
+		}
+		return getGraphComponentProperties(compProp.getID().toString());
+	}
+
+	/**
+	 * Rules for allowing connections
+	 */
+	private boolean checkIfCanConnect(final GraphComponentProperty source, final GraphComponentProperty target)
+	{
+		if (source == target)
+		{ // no self connect
+			return false;
+		}
+
+		// check if connect within same component allowed
+		if (!allowComponentSelfConnect && source.getParent().getBeanID().equals(target.getParent().getBeanID()))
+		{
+			return false;
+		}
+
+		// check whether target is read-only
+		return !target.getComponentProperty().isReadonly();
+	}
+
+	private boolean connect(final GraphComponentProperty source, final GraphComponentProperty target, final Link link)
+	{
+		return connect(source, target, link, true);
+	}
+
+	private boolean connect(final GraphComponentProperty source, final GraphComponentProperty target, final Link link,
+	                final boolean publish)
+	{
+		synchronized (link)
+		{
+			if (publish)
+			{
+				final PropertyLinkRequest plr = DataspaceMonitor.getMonitor()
+						.createLink(source.getComponentProperty(), target.getComponentProperty());
+				if (plr != null)
+				{
+					link.setLinkRequest(plr);
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			final GraphComponent parentSource = source.getParent();
+			final GraphComponent parentTarget = target.getParent();
+			parentSource.setAttached(true);
+			parentTarget.setAttached(true);
+
+			link.setSource(source);
+			link.setTarget(target);
+
+			source.addOutputLink(link);
+			target.addInputLink(link);
+
+			parentTarget.addInputLink(link);
+			parentSource.addOutputLink(link);
+
+			return true;
+		}
+	}
+
+	private void doubleClickProperty(GraphComponentProperty property)
+	{
+		System.out.println(property.getComponentProperty().getPropertyClass());
+		if(!property.getComponentProperty().isReadonly())
+		{
+			if (property.getComponentProperty().getPropertyClass().equals("java.lang.Boolean") || property.getComponentProperty().getPropertyClass().equals("boolean"))
+			{
+				try
+				{
+					boolean value = Boolean.valueOf(property.getComponentProperty().getPropertyValueAsString());
+					DataspaceMonitor.getMonitor().setProperty(property.getComponentProperty(), Boolean.toString(!value));
+				}
+				catch (Exception e)
+				{
+					new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
+				}
+			}
+			else
+			{
+				new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
+			}
+			mode = NORMAL_MODE;
+			selectionModel.set(property.getID());
+		}
+	}
+
+	private GraphComponent getGraphComponent(final int x, final int y)
+	{
+		return (GraphComponent) getItem(x, y, GraphComponent.class);
+	}
+
+	private GraphComponentProperty getGraphComponentProperty(final int x, final int y)
+	{
+		final GraphComponent gc = getGraphComponent(x, y);
+		if (gc != null)
+		{
+			return gc.getGraphComponentProperty(x, y);
+		}
+		return null;
+	}
+
+	private void processActiveNameChange(final RDFStatement rdf)
+	{
+		final GUID beanGUID = RDFStatement.urlToGUID(rdf.getSubject());
+		final List<BeanCanvasItem> comps = getBeanInstances(beanGUID.toString());
+
+		if (comps != null)
+		{
+			synchronized (comps)
+			{
+				final DataspaceMonitor monitor = DataspaceMonitor.getMonitor();
+
+				final String currentName = DataspaceUtils.getCurrentName(monitor
+						.getComponentAdvert(beanGUID.toString()));
+
+				for (BeanCanvasItem item : comps)
+				{
+					GraphComponent gc = (GraphComponent) item;
+					if (!gc.getName().equals(currentName))
+					{
+						gc.setName(currentName);
+						gc.update();
+						gc.repaint();
+					}
+				}
+			}
+		}
+	}
+
+	private void showComponentSettings(final GraphComponent gc, final int x, final int y)
+	{
+		final ComponentAdvert compAdv = gc.getComponentAdvert();
+		JFrame ff = (JFrame) componentDialogs.get(compAdv.getID().toString());
+		if (ff == null)
+		{
+			final JFrame f = new JFrame("Component Settings");
+			final ComponentSettingsPanel p = new ComponentSettingsPanel(gc);
+			f.getContentPane().add(p);
+			componentDialogs.put(compAdv.getID().toString(), f);
+
+			f.addWindowListener(new WindowAdapter()
+			{
+				@Override
+				public void windowClosed(final WindowEvent we)
+				{
+					DataspaceMonitor.getMonitor().removeComponentPropertyListener(p);
+					componentDialogs.remove(compAdv.getID().toString());
+					f.setVisible(false);
+				}
+			});
+			ff = f;
+		}
+		// frame already exists, get the settings panel
+		final Component c = ff.getContentPane().getComponent(0);
+		if (c instanceof ComponentSettingsPanel)
+		{
+			DataspaceMonitor.getMonitor().addComponentPropertyListener((ComponentSettingsPanel) c);
+		}
+
+		ff.setLocationRelativeTo(this);
+		// ff.setResizable(false);
+		ff.pack();
+		ff.setVisible(true);
+	}
 
 	/**
 	 * ************* INNER CLASSES *******************************
@@ -349,786 +1120,6 @@ public class GraphEditorCanvas extends BeanGraphPanel
 				}
 			}
 
-		}
-	}
-
-	public final static int LINK_MODE = 1;
-	public final static int LINK_DRAG_MODE = 2;
-	public final static int DRAWER_MODE = 3;
-	public final static int MENU_MODE = 4;
-
-	private Link currentLink;
-
-	private GraphComponentProperty currentAnchor, currentTarget;
-
-	public static boolean allowComponentSelfConnect = false;
-
-	private Map<String, Component> componentDialogs = new HashMap<>();
-
-	GraphEditorCanvas(final String title, SelectionModel selectionModel)
-	{
-		super(title, selectionModel);
-		// need to call this to enable tooltips
-		this.setToolTipText("");
-	}
-
-	@Override
-	public void componentMetadataChanged(final Object metadata)
-	{
-		if (metadata instanceof RDFStatement)
-		{
-			final RDFStatement rdf = (RDFStatement) metadata;
-			if (rdf.getPredicate().equals(RDFStatement.ECT_ACTIVE_TITLE))
-			{
-				processActiveNameChange(rdf);
-			}
-		}
-	}
-
-	@Override
-	public void componentPropertyAdded(final ComponentProperty compProp)
-	{
-		final String beanid = compProp.getComponentID().toString();
-		final List<BeanCanvasItem> comps = getBeanInstances(beanid);
-
-		if (comps != null)
-		{
-			synchronized (comps)
-			{
-
-				for (BeanCanvasItem item : comps)
-				{
-					final GraphComponent gc = (GraphComponent) item;
-					gc.addGraphComponentProperty(compProp);
-
-					gc.update();
-					gc.repaint();
-				}
-			}
-		}
-	}
-
-	@Override
-	public void componentPropertyDeleted(final ComponentProperty compProp)
-	{
-		final String beanid = compProp.getComponentID().toString();
-		final List<BeanCanvasItem> comps = getBeanInstances(beanid);
-		if (comps != null)
-		{
-			for (BeanCanvasItem item : comps)
-			{
-				final GraphComponent gc = (GraphComponent) item;
-				gc.removeGraphComponentProperty(compProp);
-				gc.update();
-				gc.repaint();
-			}
-		}
-	}
-
-	@Override
-	public void componentPropertyUpdated(final ComponentProperty compProp)
-	{
-		if (animatePropertyUpdate)
-		{
-			final List<GraphComponentProperty> graphProps = getGraphComponentProperties(compProp);
-			if (graphProps != null)
-			{
-				synchronized (graphProps)
-				{
-					for (GraphComponentProperty gcp : graphProps)
-					{
-						gcp.componentPropertyUpdated(compProp);
-						gcp.repaint();
-					}
-				}
-				animateActiveItems(graphProps);
-			}
-		}
-	}
-
-	@Override
-	protected BeanCanvasItem createFromGUID(String guid)
-	{
-		final ComponentAdvert component = DataspaceMonitor.getMonitor().getComponentAdvert(guid);
-		final String currentName = DataspaceUtils.getCurrentName(component);
-
-		final String beanID = component.getID().toString();
-		final String hostName = DataspaceUtils.getHostID(component, DataspaceMonitor.getMonitor().getDataspace());
-
-		GraphComponent gc = new GraphComponent(this, beanID, currentName, hostName);
-		gc.watchLinks(true);
-
-		if(selectionModel.getSelected().contains(guid))
-		{
-			gc.setSelected(true);
-		}
-
-		return gc;
-	}
-
-	public List<GraphComponentProperty> getGraphComponentProperties(final ComponentProperty compProp)
-	{
-		if (compProp == null || compProp.getID() == null)
-		{
-			return null;
-		}
-		return getGraphComponentProperties(compProp.getID().toString());
-	}
-
-	public List<GraphComponentProperty> getGraphComponentProperties(final String compPropID)
-	{
-		List<GraphComponentProperty> results = null;
-		for (InteractiveCanvasItem item : items)
-		{
-			if (item instanceof GraphComponent)
-			{
-				final GraphComponentProperty gcp = ((GraphComponent) item)
-						.getGraphComponentProperties().get(compPropID);
-				if (gcp != null)
-				{
-					if (results == null)
-					{
-						results = new ArrayList<>();
-					}
-					results.add(gcp);
-				}
-			}
-		}
-		return results;
-	}
-
-	/**
-	 * custom tooltip
-	 */
-	@Override
-	public String getToolTipText(final MouseEvent event)
-	{
-		final int xPos = event.getX();
-		final int yPos = event.getY();
-		final InteractiveCanvasItem item = getItem(xPos, yPos);
-		// System.out.println("Get tooltip for "+event+" at
-		// "+event.getX()+","+event.getY()+" ("+selectedItem+")...");
-		if (item instanceof GraphComponent)
-		{
-			final GraphComponent gc = (GraphComponent) item;
-			final GraphComponentProperty gcp = gc.getGraphComponentProperty(xPos, yPos);
-			if (gcp == null)
-			{
-				// component
-				final ComponentAdvert ad = gc.getComponentAdvert();
-				final java.lang.Object val = ad.getAttributeValue(BeanDescriptorHelper.SHORT_DESCRIPTION);
-				String text = null;
-				if (val instanceof StringBox)
-				{
-					text = ((StringBox) val).value;
-				}
-				return text;
-			}
-			else
-			{
-				/*
-				 * ComponentProperty p = gcp.getComponentProperty(); java.lang.Object val = p
-				 * .getAttributeValue(ect.BeanDescriptorHelper.SHORT_DESCRIPTION); String text
-				 * = null; if (val instanceof StringBox) text = ((StringBox) val).value;
-				 * 
-				 * return text;
-				 */
-				return gcp.getDisplayValue();
-			}
-		}
-		return getToolTipText();
-	}
-
-	@Override
-	public void mouseDragged(final MouseEvent me)
-	{
-		super.mouseDragged(me);
-		final Point end = new Point(xPos, yPos);
-		switch (me.getModifiers())
-		{
-			case MouseEvent.BUTTON1_MASK: // left
-				switch (mode)
-				{
-
-					case LINK_MODE:
-						mode = LINK_DRAG_MODE;
-						final Point start = currentAnchor.getOutAnchorPoint();
-						currentLink = new GraphEditorLink(this, start, end, currentAnchor, null);
-						addItem(currentLink);
-						currentLink.repaint();
-						break;
-
-					case LINK_DRAG_MODE:
-						currentLink.setEndPoint(end);
-						final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
-						if (gcp != null && gcp != currentAnchor && checkIfCanConnect(currentAnchor, gcp))
-						{
-							currentTarget = gcp;
-							selectionModel.set(currentAnchor.getBeanID(), currentTarget.getBeanID());
-						}
-						else
-						{
-							currentTarget = null;
-							selectionModel.set(currentAnchor.getBeanID());
-						}
-
-						currentLink.repaint(); // optimize
-						break;
-				}
-				break;
-
-			case MouseEvent.BUTTON2_MASK:
-				break;
-
-			case MouseEvent.BUTTON3_MASK:
-
-				break;
-		}
-	}
-
-	@Override
-	public void mousePressed(final MouseEvent me)
-	{
-		xPos = me.getX();
-		yPos = me.getY();
-		switch (me.getButton())
-		{
-			case MouseEvent.BUTTON1: // left
-				switch (mode)
-				{
-					case NORMAL_MODE:
-						final GraphComponent gc = getGraphComponent(xPos, yPos);
-						if (gc != null)
-						{
-							final GraphComponentProperty gcp = gc.getGraphComponentProperty(xPos, yPos);
-							if (gcp != null)
-							{
-								if (me.getClickCount() == 2)
-								{
-									doubleClickProperty(gcp);
-								}
-								else
-								{
-									currentAnchor = gcp;
-									if (me.isShiftDown())
-									{
-										selectionModel.add(gcp.getBeanID());
-									}
-									else
-									{
-										selectionModel.set(gcp.getBeanID());
-									}
-									mode = LINK_MODE;
-								}
-							}
-							else
-							{
-								final Drawer.Type drawerAction = gc.getDrawer().getAction(xPos, yPos);
-								if (drawerAction != Drawer.Type.NONE)
-								{
-									gc.handleDrawerAction(drawerAction);
-									mode = DRAWER_MODE;
-								}
-								else
-								{
-									super.mousePressed(me);
-								}
-							}
-						}
-						else
-						{ // no property selected
-							super.mousePressed(me);
-						}
-						break;
-
-					case LINK_MODE:
-						final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
-						if (gcp != null)
-						{
-							if (me.getClickCount() == 2)
-							{
-								doubleClickProperty(gcp);
-							}
-							else
-							{
-								selectionModel.set(gcp.getBeanID());
-								currentTarget = gcp;
-							}
-						}
-						else if (currentTarget != null)
-						{
-							selectionModel.set(currentTarget.getBeanID());
-							//currentTarget.setSelected(false);
-							currentTarget = null;
-						}
-						break;
-				}
-
-				break;
-			case MouseEvent.BUTTON2: // middle
-				break;
-
-			case MouseEvent.BUTTON3: // right
-				if (mode == LINK_MODE)
-				{
-					if (currentAnchor != null)
-					{
-						selectionModel.set(currentAnchor.getBeanID());
-						//currentAnchor.setSelected(false);
-						currentAnchor = null;
-					}
-				}
-				mode = MENU_MODE;
-				break;
-		}
-	}
-
-	private void doubleClickProperty(GraphComponentProperty property)
-	{
-		System.out.println(property.getComponentProperty().getPropertyClass());
-		if(!property.getComponentProperty().isReadonly())
-		{
-			if (property.getComponentProperty().getPropertyClass().equals("java.lang.Boolean") || property.getComponentProperty().getPropertyClass().equals("boolean"))
-			{
-				try
-				{
-					boolean value = Boolean.valueOf(property.getComponentProperty().getPropertyValueAsString());
-					DataspaceMonitor.getMonitor().setProperty(property.getComponentProperty(), Boolean.toString(!value));
-				}
-				catch (Exception e)
-				{
-					new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
-				}
-			}
-			else
-			{
-				new SetValuePopup(null, DataspaceMonitor.getMonitor().getDataspace(), property.getComponentProperty());
-			}
-			mode = NORMAL_MODE;
-			selectionModel.set(property.getID().toString());
-		}
-	}
-
-	@Override
-	public void mouseReleased(final MouseEvent me)
-	{
-		xPos = me.getX();
-		yPos = me.getY();
-		switch (me.getButton())
-		{
-			case MouseEvent.BUTTON1:
-				switch (mode)
-				{
-					case LINK_MODE:
-						if (currentAnchor != null)
-						{
-							// Check if within another component
-							final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
-							if (gcp != null)
-							{ // some property selected
-								if (currentTarget != null)
-								{ // target already
-									// selected on mouse
-									// pressed
-									if (currentTarget == gcp)
-									{ // same as when clicked
-										if (checkIfCanConnect(currentAnchor, gcp))
-										{
-											final Point start = currentAnchor.getOutAnchorPoint();
-											final Point end = gcp.getInAnchorPoint();
-											final Link link = new GraphEditorLink(this, start, end, currentAnchor, gcp);
-											addItem(link);
-											link.repaint();
-											connect(currentAnchor, gcp, link);
-										}
-									}
-
-									selectionModel.clear();
-									currentTarget = null;
-									currentAnchor = null;
-									mode = NORMAL_MODE;
-								}
-							}
-							else
-							{
-								selectionModel.clear();
-								currentAnchor = null;
-								mode = NORMAL_MODE;
-							}
-						}
-						break;
-					case LINK_DRAG_MODE:
-						if (currentAnchor != null)
-						{
-							if (currentLink != null)
-							{
-								// Check if within another component
-								final GraphComponentProperty gcp = getGraphComponentProperty(xPos, yPos);
-								if (gcp != null)
-								{
-									if (checkIfCanConnect(currentAnchor, gcp))
-									{
-										currentLink.setEndPoint(gcp.getInAnchorPoint());
-										currentTarget = gcp;
-										if (connect(currentAnchor, currentTarget, currentLink))
-										{
-											// TODO selectItem(currentTarget, me.isShiftDown());
-											currentLink = null;
-										}
-										currentTarget = null;
-									}
-									else
-									{
-										removeItem(currentLink);
-										currentLink = null;
-									}
-								}
-								else
-								{ // nothing to attach to, so remove
-									removeItem(currentLink);
-									currentLink = null;
-								}
-							}
-							selectionModel.clear();
-							currentAnchor = null;
-						}
-
-						mode = NORMAL_MODE;
-						repaint();
-						break;
-
-					case DRAWER_MODE:
-						mode = NORMAL_MODE;
-						repaint();
-						break;
-					default:
-						super.mouseReleased(me);
-				}
-				break;
-
-			case MouseEvent.BUTTON2:
-				mode = NORMAL_MODE;
-				super.mouseReleased(me);
-				break;
-
-			case MouseEvent.BUTTON3:
-
-				if (mode == MENU_MODE)
-				{
-					final BeanCanvasItem item = (BeanCanvasItem) getItem(xPos, yPos, BeanCanvasItem.class);
-					if (item instanceof Link)
-					{
-						final Link link = (Link) item;
-						selectionModel.set(link.getBeanID());
-						final LinkPopupMenu popup = new LinkPopupMenu(link);
-						popup.show(this, xPos, yPos);
-					}
-					else if (item instanceof GraphComponent)
-					{
-						final GraphComponent gc = (GraphComponent) item;
-						final GraphComponentProperty gcp = gc.getGraphComponentProperty(xPos, yPos);
-						// check first if the selection is a property
-						if (gcp != null)
-						{
-							selectionModel.set(gcp.getBeanID());
-							final PropertyPopupMenu popup = new PropertyPopupMenu(gcp);
-							popup.show(this, xPos, yPos);
-
-						}
-						else
-						{
-							// if not then just show the common settings for
-							// component
-							final ComponentPopupMenu popup = new ComponentPopupMenu(gc);
-							selectionModel.set(item.getBeanID());
-							popup.show(this, xPos, yPos);
-						}
-					}
-					else
-					{
-						final CanvasPopupMenu popup = new CanvasPopupMenu();
-						selectionModel.clear();
-						popup.show(this, xPos, yPos);
-					}
-				}
-				else
-				{
-					super.mouseReleased(me);
-				}
-				mode = NORMAL_MODE;
-
-				break;
-		}
-	}
-
-	@Override
-	public void propertyLinkRequestDeleted(final PropertyLinkRequest linkReq)
-	{
-		System.out.println("Proerty link request deleted");
-		final String beanid = linkReq.getID().toString();
-
-		final List<LinkGroup> allLinkGroups = getItems(LinkGroup.class);
-		if (allLinkGroups != null)
-		{
-			for (LinkGroup linkGroup : allLinkGroups)
-			{
-				final Link link = linkGroup.getLink(beanid);
-				if (link != null)
-				{
-					// link request now non existent,
-					// so remove to avoid double cleanup
-					link.setLinkRequest(null);
-					link.cleanUp();
-					linkGroup.removeLink(link);
-					if (linkGroup.nrLinks() < 1)
-					{ // just one item, remove
-						// System.out.println("Removing the link group");
-						removeItem(linkGroup, false); // this should call the
-						// links cleanUp as well
-					}
-				}
-			}
-		}
-		removeBeans(beanid, true);
-	}
-
-	@Override
-	public void selectionChanged(Collection<String> selection)
-	{
-		super.selectionChanged(selection);
-		for (InteractiveCanvasItem item : items)
-		{
-			if (item instanceof GraphComponent)
-			{
-				GraphComponent component = (GraphComponent) item;
-				for (GraphComponentProperty property : component.getGraphComponentProperties().values())
-				{
-					String id = property.getBeanID();
-					if (selection.contains(id))
-					{
-						property.setSelected(true);
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public void removeItem(final InteractiveCanvasItem item, final boolean cleanUp)
-	{
-		if (item instanceof GraphComponent)
-		{
-			final GraphComponent gc = (GraphComponent) item;
-			// Links are canvas items, so we need to remove these first
-
-			final Map<String, GraphComponentProperty> props = gc.getGraphComponentProperties();
-			final Map<GraphComponent, LinkGroup> outLinkGroups = gc.getOutLinkGroups();
-
-			if (outLinkGroups != null)
-			{
-				removeItems(new ArrayList<>(outLinkGroups.values()), false);
-			}
-
-			final Map<GraphComponent, LinkGroup> inLinkGroups = gc.getInLinkGroups();
-			if (inLinkGroups != null)
-			{
-				removeItems(new ArrayList<>(inLinkGroups.values()), false);
-			}
-
-			if (props != null)
-			{
-				synchronized (props)
-				{
-					for (GraphComponentProperty gcp : props.values())
-					{
-						List<Link> links = gcp.getInputLinks();
-						if (links != null)
-						{
-							removeItems(new ArrayList<>(links), cleanUp);
-						}
-						links = gcp.getOutputLinks();
-						if (links != null)
-						{
-							removeItems(new ArrayList<>(links), cleanUp);
-						}
-					}
-				}
-			}
-
-			gc.watchLinks(false);
-
-			final JFrame f = (JFrame) componentDialogs.remove(gc.getBeanID());
-			if (f != null)
-			{
-				f.setVisible(false);
-			}
-		}
-		super.removeItem(item, cleanUp);
-	}
-
-	public void showComponentSettings(final GraphComponent gc, final int x, final int y)
-	{
-		final ComponentAdvert compAdv = gc.getComponentAdvert();
-		JFrame ff = (JFrame) componentDialogs.get(compAdv.getID().toString());
-		if (ff == null)
-		{
-			final JFrame f = new JFrame("Component Settings");
-			final ComponentSettingsPanel p = new ComponentSettingsPanel(gc);
-			f.getContentPane().add(p);
-			componentDialogs.put(compAdv.getID().toString(), f);
-
-			f.addWindowListener(new WindowAdapter()
-			{
-				@Override
-				public void windowClosed(final WindowEvent we)
-				{
-					DataspaceMonitor.getMonitor().removeComponentPropertyListener(p);
-					componentDialogs.remove(compAdv.getID().toString());
-					f.setVisible(false);
-				}
-			});
-			ff = f;
-		}
-		// frame already exists, get the settings panel
-		final Component c = ff.getContentPane().getComponent(0);
-		if (c instanceof ComponentSettingsPanel)
-		{
-			DataspaceMonitor.getMonitor().addComponentPropertyListener((ComponentSettingsPanel) c);
-		}
-
-		ff.setLocationRelativeTo(this);
-		// ff.setResizable(false);
-		ff.pack();
-		ff.setVisible(true);
-	}
-
-	/**
-	 * Rules for allowing connections
-	 */
-	boolean checkIfCanConnect(final GraphComponentProperty source, final GraphComponentProperty target)
-	{
-		if (source == target)
-		{ // no self connect
-			return false;
-		}
-
-		// check if connect within same component allowed
-		if (!allowComponentSelfConnect && source.getParent().getBeanID().equals(target.getParent().getBeanID()))
-		{
-			return false;
-		}
-
-		// check whether target is read-only
-		return !target.getComponentProperty().isReadonly();
-	}
-
-	boolean connect(final GraphComponentProperty source, final GraphComponentProperty target, final Link link)
-	{
-		return connect(source, target, link, true);
-	}
-
-	boolean connect(final GraphComponentProperty source, final GraphComponentProperty target, final Link link,
-	                final boolean publish)
-	{
-		synchronized (link)
-		{
-			if (publish)
-			{
-				final PropertyLinkRequest plr = DataspaceMonitor.getMonitor()
-						.createLink(source.getComponentProperty(), target.getComponentProperty());
-				if (plr != null)
-				{
-					link.setLinkRequest(plr);
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			final GraphComponent parentSource = source.getParent();
-			final GraphComponent parentTarget = target.getParent();
-			parentSource.setAttached(true);
-			parentTarget.setAttached(true);
-
-			link.setSource(source);
-			link.setTarget(target);
-
-			source.addOutputLink(link);
-			target.addInputLink(link);
-
-			parentTarget.addInputLink(link);
-			parentSource.addOutputLink(link);
-
-			return true;
-		}
-	}
-
-	boolean connect(final GraphComponentProperty source, final GraphComponentProperty target,
-	                final PropertyLinkRequest req)
-	{
-
-		final Point start = source.getOutAnchorPoint();
-		final Point end = target.getInAnchorPoint();
-		final Link link = new GraphEditorLink(this, start, end, source, target);
-		link.setLinkRequest(req);
-		// addItem(link);
-		return connect(source, target, link, false);
-
-	}
-
-	GraphComponent getGraphComponent(final int x, final int y)
-	{
-		return (GraphComponent) getItem(x, y, GraphComponent.class);
-	}
-
-	GraphComponentProperty getGraphComponentProperty(final int x, final int y)
-	{
-		final GraphComponent gc = getGraphComponent(x, y);
-		if (gc != null)
-		{
-			return gc.getGraphComponentProperty(x, y);
-		}
-		return null;
-	}
-
-	// override to show all links
-	@Override
-	protected BeanCanvasItem createFromTemplate(final BeanCanvasItem template)
-	{
-		final BeanCanvasItem newBean = super.createFromTemplate(template);
-		if (newBean instanceof GraphComponent)
-		{
-			((GraphComponent) newBean).watchLinks(true);
-		}
-		return newBean;
-	}
-
-	protected void processActiveNameChange(final RDFStatement rdf)
-	{
-		final GUID beanGUID = RDFStatement.urlToGUID(rdf.getSubject());
-		final List<BeanCanvasItem> comps = getBeanInstances(beanGUID.toString());
-
-		if (comps != null)
-		{
-			synchronized (comps)
-			{
-				final DataspaceMonitor monitor = DataspaceMonitor.getMonitor();
-
-				final String currentName = DataspaceUtils.getCurrentName(monitor
-						.getComponentAdvert(beanGUID.toString()));
-
-				for (BeanCanvasItem item : comps)
-				{
-					GraphComponent gc = (GraphComponent) item;
-					if (!gc.getName().equals(currentName))
-					{
-						gc.setName(currentName);
-						gc.update();
-						gc.repaint();
-					}
-				}
-			}
 		}
 	}
 }

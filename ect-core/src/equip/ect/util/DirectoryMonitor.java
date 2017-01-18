@@ -55,7 +55,7 @@ public class DirectoryMonitor implements Runnable
 	protected class MapEntry
 	{
 		protected File file = null;
-		protected long lastModified = -1;
+		long lastModified = -1;
 
 		MapEntry(final File file, final long lastModified)
 		{
@@ -69,9 +69,9 @@ public class DirectoryMonitor implements Runnable
 	private final Object mapsLock = new Object();
 	private boolean stop = false;
 	private File directory = null;
-	private Collection<DirectoryEventListener> listeners = new HashSet<DirectoryEventListener>();
-	private Map<String, MapEntry> currentMap = new HashMap<String, MapEntry>();
-	private Map<String, MapEntry> previousMap = new HashMap<String, MapEntry>();
+	private Collection<DirectoryEventListener> listeners = new HashSet<>();
+	private Map<String, MapEntry> currentMap = new HashMap<>();
+	private Map<String, MapEntry> previousMap = new HashMap<>();
 	private boolean isRecursive = false;
 	private boolean includeExisting = false;
 
@@ -100,22 +100,6 @@ public class DirectoryMonitor implements Runnable
 			{
 				listeners.add(listener);
 			}
-		}
-	}
-
-	public boolean isStopped()
-	{
-		synchronized (stopLock)
-		{
-			return stop;
-		}
-	}
-
-	public void removeDirectoryEventListener(final DirectoryEventListener listener)
-	{
-		synchronized (listenersLock)
-		{
-			listeners.remove(listener);
 		}
 	}
 
@@ -151,7 +135,7 @@ public class DirectoryMonitor implements Runnable
 			{
 				synchronized (mapsLock)
 				{
-					currentMap = new HashMap<String, MapEntry>();
+					currentMap = new HashMap<>();
 					createDirectoryMapRecursive(directory);
 				}
 			}
@@ -171,7 +155,7 @@ public class DirectoryMonitor implements Runnable
 		}
 	}
 
-	protected void fireFileAdd(final File file)
+	private void fireFileAdd(final File file)
 	{
 		synchronized (listenersLock)
 		{
@@ -182,7 +166,7 @@ public class DirectoryMonitor implements Runnable
 		}
 	}
 
-	protected void fireFileAddComplete(final List<File> files)
+	private void fireFileAddComplete(final List<File> files)
 	{
 		synchronized (listenersLock)
 		{
@@ -193,7 +177,7 @@ public class DirectoryMonitor implements Runnable
 		}
 	}
 
-	protected void fireFileDeleted(final File file)
+	private void fireFileDeleted(final File file)
 	{
 		synchronized (listenersLock)
 		{
@@ -204,7 +188,7 @@ public class DirectoryMonitor implements Runnable
 		}
 	}
 
-	protected void fireFileModified(final File file)
+	private void fireFileModified(final File file)
 	{
 		synchronized (listenersLock)
 		{
@@ -220,8 +204,8 @@ public class DirectoryMonitor implements Runnable
 		synchronized (mapsLock)
 		{
 			// returns non-null
-			final Set<String> currentKeys = new HashSet<String>(currentMap.keySet());
-			final List<File> added = new ArrayList<File>();
+			final Set<String> currentKeys = new HashSet<>(currentMap.keySet());
+			final List<File> added = new ArrayList<>();
 
 			for (final String currentFilename : currentKeys)
 			{
@@ -246,7 +230,7 @@ public class DirectoryMonitor implements Runnable
 			}
 
 			// returns non-null
-			final Set<MapEntry> deleted = new HashSet<MapEntry>(previousMap.values());
+			final Set<MapEntry> deleted = new HashSet<>(previousMap.values());
 			for (final MapEntry deletedEntry : deleted)
 			{
 				fireFileDeleted(deletedEntry.file);
@@ -263,7 +247,7 @@ public class DirectoryMonitor implements Runnable
 	{
 		synchronized (mapsLock)
 		{
-			currentMap = new HashMap<String, MapEntry>();
+			currentMap = new HashMap<>();
 			final File files[] = directory.listFiles();
 			if (files != null)
 			{

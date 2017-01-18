@@ -5,69 +5,13 @@ import equip.ect.ECTComponent;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @ECTComponent
 @Category("Data/Waves")
 public class FrequencyAnalyser implements Serializable
 {
-	public static void main(final String[] args)
-	{
-		try
-		{
-			final FrequencyAnalyser analysis = new FrequencyAnalyser();
-			final SimpleDateFormat timeFormat = new SimpleDateFormat("MM/dd/yy HH:mm:ss");
-
-			final BufferedReader reader = new BufferedReader(
-					new InputStreamReader(new FileInputStream("test-time.csv")));
-
-			final File file = new File("out-anal.csv");
-			file.delete();
-			file.createNewFile();
-			final BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-
-			double oldValue = 0;
-
-			long timestamp = new Date().getTime() - 86400000;
-
-			while (true)
-			{
-				timestamp += 32;
-				final String line = reader.readLine();
-				if (line == null)
-				{
-					break;
-				}
-				final String[] parts = line.split(",");
-				final double value = Double.parseDouble(parts[1]);
-				if (value != oldValue)
-				{
-
-					analysis.setValue(value, timestamp);
-					oldValue = value;
-
-					writer.write(timeFormat.format(new Date(timestamp)) + ", " + value + "," + analysis.getCurrentMid()
-							+ "," + analysis.getFrequency());
-					writer.newLine();
-				}
-			}
-
-			writer.flush();
-		}
-		catch (final Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
 	private int offset = 0;
 
 	private double currentMid = 0;

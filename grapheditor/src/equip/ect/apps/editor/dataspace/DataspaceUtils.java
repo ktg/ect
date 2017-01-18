@@ -40,7 +40,6 @@
 
 package equip.ect.apps.editor.dataspace;
 
-import equip.data.ByteArrayBox;
 import equip.data.GUID;
 import equip.data.ItemData;
 import equip.data.StringBoxImpl;
@@ -57,10 +56,6 @@ import equip.ect.Container;
 import equip.ect.RDFStatement;
 import equip.ect.apps.editor.Info;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Toolkit;
 import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -152,7 +147,7 @@ public abstract class DataspaceUtils
 	/**
 	 * get default name for GUID url
 	 */
-	public static String getDefaultName(final DataspaceBean dataspace, final String url)
+	private static String getDefaultName(final DataspaceBean dataspace, final String url)
 	{
 		final GUID guid = RDFStatement.urlToGUID(url);
 		if (guid == null)
@@ -237,28 +232,6 @@ public abstract class DataspaceUtils
 		return url;
 	}
 
-	/**
-	 * get first name GUID url
-	 */
-	public static String getFirstName(final DataspaceBean dataspace, final String url)
-	{
-		try
-		{
-			final RDFStatement template = new RDFStatement(null, url, RDFStatement.DC_TITLE, null);
-			final RDFStatement names[] = template.copyCollectAsRDFStatement(dataspace);
-			if (names.length > 0)
-			{
-				return names[0].getObject();
-			}
-		}
-		catch (final Exception e)
-		{
-			System.err.println("ERROR doing getDisplayString for " + url + ": " + e);
-			e.printStackTrace(System.err);
-		}
-		return getDefaultName(dataspace, url);
-	}
-
 	public static String getHostID(final ComponentAdvert comp, final DataspaceBean dataspace)
 	{
 
@@ -286,50 +259,6 @@ public abstract class DataspaceUtils
 		{
 			return null;
 		}
-	}
-
-	public static Image getIcon(final ComponentAdvert comp, final DataspaceBean dataspace, final int width,
-	                            final int height, final Component component)
-	{
-		try
-		{
-
-			final ItemData item = dataspace.getItem(comp.getCapabilityID());
-			if (item != null)
-			{
-
-				final Capability cap = new Capability((TupleImpl) item);
-				final ByteArrayBox bab = (ByteArrayBox) cap.getAttributeValue("icon");
-				if (bab != null)
-				{
-
-					final Image image = Toolkit.getDefaultToolkit().createImage(bab.value);
-					if (image != null)
-					{
-
-						try
-						{
-							final MediaTracker tracker = new MediaTracker(component);
-
-							tracker.addImage(image, 0);
-							tracker.waitForID(0);
-
-						}
-						catch (final Exception e)
-						{
-							Info.message(e.getMessage());
-						}
-
-						return image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-					}
-				}
-			}
-		}
-		catch (final DataspaceInactiveException e)
-		{
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	public static String getPropValueAsString(final ComponentProperty prop)
@@ -363,30 +292,6 @@ public abstract class DataspaceUtils
 			cnfe.printStackTrace();
 			return "";
 		}
-	}
-
-	public static String[] getRDFDefinedNames(final DataspaceBean dataspace, final GUID id)
-	{
-		final RDFStatement template = new RDFStatement(null, RDFStatement.GUIDToUrl(id), RDFStatement.DC_TITLE, null);
-		RDFStatement rdfNames[];
-		try
-		{
-			rdfNames = template.copyCollectAsRDFStatement(dataspace);
-		}
-		catch (final DataspaceInactiveException e)
-		{
-			return null;
-		}
-		if (rdfNames == null)
-		{
-			return null;
-		}
-		final String[] names = new String[rdfNames.length];
-		for (int i = 0; i < rdfNames.length; i++)
-		{
-			names[i] = rdfNames[i].getObject();
-		}
-		return names;
 	}
 
 	public static GUID stringToGUID(final String guids)

@@ -61,23 +61,23 @@ import java.awt.geom.GeneralPath;
 
 public abstract class RenderableLink extends InteractiveCanvasItemView
 {
-	protected final Point startPoint, endPoint;
+	final Point startPoint, endPoint;
 
 	protected Color color;
 
-	protected GeneralPath path;
+	GeneralPath path;
 
-	protected Stroke stroke;
+	Stroke stroke;
 
-	protected boolean connected;
+	private boolean connected;
 
-	public RenderableLink(final Point startPoint, final Point endPoint)
+	RenderableLink(final Point startPoint, final Point endPoint)
 	{
 		this(startPoint, endPoint, new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
 
 	}
 
-	public RenderableLink(final Point startPoint, final Point endPoint, final Stroke stroke)
+	private RenderableLink(final Point startPoint, final Point endPoint, final Stroke stroke)
 	{
 		this.startPoint = startPoint;
 		this.endPoint = endPoint;
@@ -92,16 +92,6 @@ public abstract class RenderableLink extends InteractiveCanvasItemView
 	{
 		if (path != null) { return path.getBounds(); }
 		return null;
-	}
-
-	public final Point getEndPoint()
-	{
-		return this.endPoint;
-	}
-
-	public final Point getStartPoint()
-	{
-		return this.startPoint;
 	}
 
 	@Override
@@ -125,18 +115,7 @@ public abstract class RenderableLink extends InteractiveCanvasItemView
 	}
 
 	@Override
-	public void paintShadowed(final Graphics2D g)
-	{
-		paintNormal(g);
-	}
-
-	@Override
 	public void paintUnavailable(final Graphics2D g)
-	{
-		paintNormal(g);
-	}
-
-	public void paintUnselected(final Graphics2D g)
 	{
 		paintNormal(g);
 	}
@@ -146,31 +125,16 @@ public abstract class RenderableLink extends InteractiveCanvasItemView
 		this.color = color;
 	}
 
-	public void setConnected(final boolean conn)
-	{
-		this.connected = conn;
-	}
-
 	public void setEndPoint(final int x, final int y)
 	{
 		endPoint.setLocation(x, y);
 		calculate();
 	}
 
-	public void setEndPoint(final Point endP)
-	{
-		setEndPoint((int) endP.getX(), (int) endP.getY());
-	}
-
 	public void setStartPoint(final int x, final int y)
 	{
 		startPoint.setLocation(x, y);
 		calculate();
-	}
-
-	public void setStartPoint(final Point startP)
-	{
-		setStartPoint((int) startP.getX(), (int) startP.getY());
 	}
 
 	public void setStroke(final Stroke stroke)
@@ -185,5 +149,15 @@ public abstract class RenderableLink extends InteractiveCanvasItemView
 	}
 
 	protected abstract void calculate();
+
+	final Point getStartPoint()
+	{
+		return this.startPoint;
+	}
+
+	void setConnected(final boolean conn)
+	{
+		this.connected = conn;
+	}
 
 }

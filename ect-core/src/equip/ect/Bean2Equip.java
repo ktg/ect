@@ -39,10 +39,6 @@
  */
 package equip.ect;
 
-/**
- * @author imt
- */
-
 import java.beans.EventSetDescriptor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -101,7 +97,6 @@ class Bean2Equip implements PropertyChangeListener
 	private equip.data.beans.DataspaceBean dataspace = null;
 	private Serializable bean = null;
 	private MappingObject parent = null;
-	private equip.data.GUID beanid = null;
 
 	//private HashMap links = new HashMap();
 
@@ -111,7 +106,6 @@ class Bean2Equip implements PropertyChangeListener
 		this.bean = parent.getBean();
 		this.parent = parent;
 		// this.propVals = this.parent.getPropVals();
-		this.beanid = this.parent.getBeanID();
 		addPropertyChangeListener(bean, this);
 
 	}
@@ -121,19 +115,9 @@ class Bean2Equip implements PropertyChangeListener
 		return this.bean;
 	}
 
-	public equip.data.GUID getBeanId()
-	{
-		return this.beanid;
-	}
-
 	public equip.data.beans.DataspaceBean getDataspace()
 	{
 		return this.dataspace;
-	}
-
-	public java.beans.PropertyDescriptor getPropDesc(final equip.data.GUID id)
-	{
-		return this.parent.getPropDesc(id);
 	}
 
 	/**
@@ -142,7 +126,6 @@ class Bean2Equip implements PropertyChangeListener
 	@Override
 	public void propertyChange(final PropertyChangeEvent evt)
 	{
-
 		synchronized (parent)
 		{
 			// equip.data.GUID propID =

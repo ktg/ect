@@ -55,13 +55,13 @@ import java.awt.datatransfer.Transferable;
 
 public class ComponentGUIDTransferableSupport implements Transferable
 {
-	public final static DataFlavor componentGUIDDataFlavor = new DataFlavor(GUID.class, "ComponentGUID");
+	final static DataFlavor componentGUIDDataFlavor = new DataFlavor(GUID.class, "ComponentGUID");
 
 	private Object transferObj;
 
 	private DataFlavor flavor;
 
-	public ComponentGUIDTransferableSupport(final Object transferObj, final DataFlavor flavor)
+	ComponentGUIDTransferableSupport(final Object transferObj, final DataFlavor flavor)
 	{
 		this.transferObj = transferObj;
 		this.flavor = flavor;

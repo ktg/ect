@@ -19,14 +19,6 @@ import java.io.Serializable;
 @Category("Data/Waves")
 public class SkewedWave implements Runnable, Serializable, PropertyChangeListener
 {
-	public static void main(final String args[])
-	{
-		final SkewedWave sineWave = new SkewedWave();
-		sineWave.setFreq(0.1);
-		sineWave.setOutFreq(5);
-		sineWave.setRunning(true);
-	}
-
 	// Property Change
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 

@@ -40,27 +40,14 @@
  */
 package equip.ect;
 
-import java.beans.BeanDescriptor;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import equip.data.GUID;
+import equip.data.GUIDImpl;
+import equip.data.TupleImpl;
+import equip.data.beans.DataspaceBean;
+import equip.data.beans.DataspaceInactiveException;
+import equip.ect.util.URLUtils;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -69,76 +56,29 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import equip.data.GUID;
-import equip.data.GUIDImpl;
-import equip.data.TupleImpl;
-import equip.data.beans.DataspaceBean;
-import equip.data.beans.DataspaceInactiveException;
-import equip.ect.util.URLUtils;
+import java.beans.BeanDescriptor;
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class PersistenceManager implements XMLConstants
 {
-
-	class ObjectInputStreamLoader extends ObjectInputStream
-	{
-
-		ClassLoader loader = null;
-
-		ObjectInputStreamLoader(final InputStream is, ClassLoader loader) throws IOException
-		{
-			super(is);
-			if (loader == null)
-			{
-				loader = Thread.currentThread().getContextClassLoader();
-			}
-			else
-			{
-				this.loader = loader;
-			}
-		}
-
-		@Override
-		protected Class<?> resolveClass(final ObjectStreamClass osc) throws IOException, ClassNotFoundException
-		{
-			if (osc != null)
-			{
-				final String className = osc.getName();
-				if (loader != null && className != null)
-				{
-					try
-					{
-						final Class<?> cls = loader.loadClass(className);
-						if (cls != null) { return cls; }
-					}
-					catch (final ClassNotFoundException e)
-					{
-						throw new ClassNotFoundException("urlclassloader could not find " + className);
-					}
-				}
-			}
-			return super.resolveClass(osc);
-		}
-	}
-
 	// currently only one persistence file per host
-	public static final File PERSISTENCE_FILE = new File("persist.xml");
+	static final File PERSISTENCE_FILE = new File("persist.xml");
 
-	public static final String TEMP_SUFFIX = ".temp";
+	private static final String TEMP_SUFFIX = ".temp";
 
-	public static final String BACKUP_SUFFIX = ".backup";
+	private static final String BACKUP_SUFFIX = ".backup";
 
-	protected static final String NULL_VALUE_MONIKER = "[Lnull";
+	private static final String NULL_VALUE_MONIKER = "[Lnull";
 
-	public static PersistenceManager getPersistenceManager()
+	static PersistenceManager getPersistenceManager()
 	{
 		synchronized (instantiateLock)
 		{
@@ -154,12 +94,7 @@ public class PersistenceManager implements XMLConstants
 
 	private static PersistenceManager instance = null;
 
-	private static Object instantiateLock = new Object();
-
-	/**
-	 * hash map of all known components GUID -> DOM Node
-	 */
-	//private Map<GUID, Node> allKnownComponents = new HashMap<GUID, Node>();
+	private static final Object instantiateLock = new Object();
 
 	// ///////////////////////////
 	// persistence
@@ -169,7 +104,7 @@ public class PersistenceManager implements XMLConstants
 	{
 	}
 
-	public void appendComponentProperties(final Document doc, final Element parent, final GUID compId,
+	private void appendComponentProperties(final Document doc, final Element parent, final GUID compId,
 			final DataspaceBean dataSpaceBean)
 	{
 		if (parent == null || doc == null || dataSpaceBean == null) { return; }
@@ -178,7 +113,6 @@ public class PersistenceManager implements XMLConstants
 		final CompInfo[] compProps = retrieveComponentProperties(dataSpaceBean, compId);
 		if (compProps != null)
 		{
-			Element propElement = null;
 			for (final CompInfo compProp : compProps)
 			{
 				try
@@ -186,7 +120,7 @@ public class PersistenceManager implements XMLConstants
 					if (compProp.getType().equals(ComponentProperty.TYPE))
 					{
 						final ComponentProperty prop = new ComponentProperty((TupleImpl) compProp.tuple);
-						propElement = createXMLElement(COMPONENT_PROPERTY_TAG, null, null, null, doc, prop.getID());
+						Element propElement = createXMLElement(COMPONENT_PROPERTY_TAG, null, null, null, doc, prop.getID());
 						if (propElement != null)
 						{
 							propElement.setAttribute(PROPERTY_NAME_ATTRIBUTE, prop.getPropertyName());
@@ -220,13 +154,12 @@ public class PersistenceManager implements XMLConstants
 	// ///////////////////////////
 	// dataspace copy collect helpers
 
-	public void appendExportedCapabilities(final Document doc, final Element parent, final CompInfo[] caps,
+	private void appendExportedCapabilities(final Document doc, final Element parent, final CompInfo[] caps,
 			final Map<GUID, Class<?>> mappings)
 	{
 
 		if (mappings == null || caps == null || parent == null || doc == null) { return; }
 
-		Element capElement = null;
 		for (final CompInfo cap2 : caps)
 		{
 			try
@@ -234,7 +167,7 @@ public class PersistenceManager implements XMLConstants
 				if (cap2.getType().equals(Capability.TYPE))
 				{
 					final Capability cap = new Capability((TupleImpl) cap2.tuple);
-					capElement = createXMLElement(	CAPABILITY_TAG, cap.getCapabilityName(),
+					Element capElement = createXMLElement(	CAPABILITY_TAG, cap.getCapabilityName(),
 													classLoadedFrom(mappings.get(cap.getID())), null, doc, cap.getID());
 					if (capElement != null)
 					{
@@ -249,7 +182,7 @@ public class PersistenceManager implements XMLConstants
 		}
 	}
 
-	public void appendRunningComponents(final Document doc, final Element parent, final CompInfo[] adverts,
+	private void appendRunningComponents(final Document doc, final Element parent, final CompInfo[] adverts,
 			final Map<GUID, Class<?>> capMappings, final Map<GUID, Serializable> compMappings, final DataspaceBean dataSpaceBean,
 			final ContainerManager containerManager)
 	{
@@ -257,11 +190,8 @@ public class PersistenceManager implements XMLConstants
 		if (capMappings == null || compMappings == null || adverts == null || parent == null || doc == null
 				|| dataSpaceBean == null) { return; }
 
-		Element componentElement = null;
-		Element requestElement = null;
-		Object obj = null;
 		File compPersistFile = null;
-		final Map<GUID,Node> allKnownComponents = new HashMap<GUID, Node>();
+		final Map<GUID,Node> allKnownComponents = new HashMap<>();
 		for (final CompInfo advert2 : adverts)
 		{
 			try
@@ -269,7 +199,7 @@ public class PersistenceManager implements XMLConstants
 				if (advert2.getType().equals(ComponentAdvert.TYPE))
 				{
 					final ComponentAdvert advert = new ComponentAdvert((TupleImpl) advert2.tuple);
-					obj = compMappings.get(advert.getComponentRequestID());
+					Object obj = compMappings.get(advert.getComponentRequestID());
 					if (obj != null && obj instanceof Persistable)
 					{
 						try
@@ -285,13 +215,13 @@ public class PersistenceManager implements XMLConstants
 									+ advert.getComponentName());
 						}
 					}
-					componentElement = createXMLElement(COMPONENT_TAG, advert.getComponentName(),
+					Element componentElement = createXMLElement(COMPONENT_TAG, advert.getComponentName(),
 														classLoadedFrom(capMappings.get(advert.getCapabilityID())),
 														compPersistFile, doc, advert.getComponentID());
 					if (componentElement != null)
 					{
 						// parent.appendChild(componentElement);
-						requestElement = createXMLElement(	COMPONENT_REQUEST_TAG, null, null, null, doc,
+						Element requestElement = createXMLElement(	COMPONENT_REQUEST_TAG, null, null, null, doc,
 															advert.getComponentRequestID());
 						if (requestElement != null)
 						{
@@ -317,7 +247,7 @@ public class PersistenceManager implements XMLConstants
 	}
 
 	// retrieve the url (of jar or dir) where class is loaded from
-	public URL classLoadedFrom(final Object obj)
+	private URL classLoadedFrom(final Object obj)
 	{
 		URL url = null;
 		if (obj != null)
@@ -358,7 +288,7 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public Element createGUIDElement(final Document doc, final GUID guid)
+	private Element createGUIDElement(final Document doc, final GUID guid)
 	{
 		Element element = null;
 		if (doc != null && guid != null && !guid.isNull())
@@ -373,7 +303,7 @@ public class PersistenceManager implements XMLConstants
 		return element;
 	}
 
-	public Element createXMLElement(final String tag, final String name, final URL url, final File compPersistFile,
+	private Element createXMLElement(final String tag, final String name, final URL url, final File compPersistFile,
 			final Document doc, final GUID guid)
 	{
 		Element element = null;
@@ -410,7 +340,7 @@ public class PersistenceManager implements XMLConstants
 	}
 
 	// xml helpers
-	public String extractAttribute(final Node node, final String attribute)
+	private String extractAttribute(final Node node, final String attribute)
 	{
 		if (node != null)
 		{
@@ -421,13 +351,13 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public Node extractNode(final Node parent, final String element)
+	private Node extractNode(final Node parent, final String element)
 	{
 		if (parent != null) { return extractNode(parent.getChildNodes(), element); }
 		return null;
 	}
 
-	public Node extractNode(final NodeList children, final String element)
+	private Node extractNode(final NodeList children, final String element)
 	{
 		if (children != null)
 		{
@@ -440,7 +370,7 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public File getValidPersistFile(final File file)
+	File getValidPersistFile(final File file)
 	{
 		if (file != null)
 		{
@@ -455,7 +385,7 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public boolean isValidPersistFile(final File file)
+	private boolean isValidPersistFile(final File file)
 	{
 		try
 		{
@@ -484,24 +414,7 @@ public class PersistenceManager implements XMLConstants
 		}
 	}
 
-	// ///////////////////////////
-	// recovery
-
-	public Object loadObject(final File file, final ClassLoader loader) throws IOException, ClassNotFoundException
-	{
-		if (file != null)
-		{
-			final FileInputStream fis = new FileInputStream(file);
-			final ObjectInputStreamLoader ois = new ObjectInputStreamLoader(fis, loader);
-			final Object obj = ois.readObject();
-			ois.close();
-			fis.close();
-			return obj;
-		}
-		return null;
-	}
-
-	public ComponentStartupData parseComponent(final Node compNode)
+	private ComponentStartupData parseComponent(final Node compNode)
 	{
 
 		if (compNode == null || !compNode.getNodeName().equals(COMPONENT_TAG)) { return null; }
@@ -517,23 +430,22 @@ public class PersistenceManager implements XMLConstants
 			compReqId = parseGUID(compReqNode);
 		}
 		final Node propsNode = extractNode(compNode, COMPONENT_PROPERTIES_TAG);
-		final ComponentProperty[] props = parseComponentProperties(propsNode, compId);
+		final ComponentProperty[] props = parseComponentProperties(propsNode);
 		return new ComponentStartupData(name, url, compId, compReqId, props, persistFile);
 	}
 
-	public ComponentProperty[] parseComponentProperties(final Node node, final GUID componentId)
+	private ComponentProperty[] parseComponentProperties(final Node node)
 	{
 		if (node != null)
 		{
 			final NodeList children = node.getChildNodes();
 			if (children != null)
 			{
-				ComponentProperty property = null;
-				final List<ComponentProperty> properties = new ArrayList<ComponentProperty>();
+				final List<ComponentProperty> properties = new ArrayList<>();
 				for (int i = 0; i < children.getLength(); i++)
 				{
 					final Node childNode = children.item(i);
-					property = parseComponentProperty(childNode, componentId);
+					ComponentProperty property = parseComponentProperty(childNode);
 					if (property != null)
 					{
 						properties.add(property);
@@ -548,7 +460,7 @@ public class PersistenceManager implements XMLConstants
 	// guid parsing
 
 	// todo - currently does not parse value of component property
-	public ComponentProperty parseComponentProperty(final Node node, final GUID componentId)
+	private ComponentProperty parseComponentProperty(final Node node)
 	{
 		if (node != null && node.getNodeName().equals(COMPONENT_PROPERTY_TAG))
 		{
@@ -582,13 +494,13 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public GUID parseGUID(final Node node)
+	private GUID parseGUID(final Node node)
 	{
 		if (node != null) { return parseGUID(node.getChildNodes()); }
 		return null;
 	}
 
-	public GUID parseGUID(final NodeList nodes)
+	private GUID parseGUID(final NodeList nodes)
 	{
 		final Node node = extractNode(nodes, GUID_TAG);
 		if (node != null)
@@ -616,10 +528,10 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public Map<GUID, ComponentStartupData> parseRunningComponents(final Node node)
+	private Map<GUID, ComponentStartupData> parseRunningComponents(final Node node)
 	{
 
-		final Map<GUID, ComponentStartupData> map = new HashMap<GUID, ComponentStartupData>();
+		final Map<GUID, ComponentStartupData> map = new HashMap<>();
 		final NodeList children = node.getChildNodes();
 		if (children != null)
 		{
@@ -637,16 +549,16 @@ public class PersistenceManager implements XMLConstants
 					// its own GUID (aswell)
 					map.put(data.getComponentGUID(), data);
 				}
-				if (data != null && data.getComponentGUID() != null)
-				{
-					//allKnownComponents.put(data.getComponentGUID(), childNode);
-				}
+				//if (data != null && data.getComponentGUID() != null)
+				//{
+				//  allKnownComponents.put(data.getComponentGUID(), childNode);
+				//}
 			}
 		}
 		return map;
 	}
 
-	public synchronized void persistContainer(final DataspaceBean dataSpaceBean,
+	private synchronized void persistContainer(final DataspaceBean dataSpaceBean,
 			final ContainerManager containerManager, final File persistFile) throws IOException
 	{
 		try
@@ -701,21 +613,8 @@ public class PersistenceManager implements XMLConstants
 		}
 	}
 
-	public void persistObject(final File file, final Object object) throws IOException
-	{
-		if (object != null && file != null)
-		{
-			final FileOutputStream fos = new FileOutputStream(file);
-			final ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(object);
-			oos.flush();
-			oos.close();
-			fos.close();
-		}
-	}
-
 	// recover all container state based upon specified xml file
-	public synchronized ContainerManager recoverContainer(final ContainerManagerHelper managerHelper,
+	synchronized ContainerManager recoverContainer(final ContainerManagerHelper managerHelper,
 			final File persistFile, final String hostName, final String dir) throws IOException, SAXException,
 			javax.xml.parsers.ParserConfigurationException
 	{
@@ -737,14 +636,14 @@ public class PersistenceManager implements XMLConstants
 				parsedIDs);
 	}
 
-	public Map<GUID, Class<?>> recoverExportedCapabilities(final Node node, final ContainerManagerHelper helper,
+	private Map<GUID, Class<?>> recoverExportedCapabilities(final Node node, final ContainerManagerHelper helper,
 			final String hostname, final GUID containerGUID)
 	{
 
 		if (helper == null || node == null) { return null; }
 
 		final CapabilityExporter exporter = new CapabilityExporter();
-		final Map<GUID, Class<?>> map = new HashMap<GUID, Class<?>>();
+		final Map<GUID, Class<?>> map = new HashMap<>();
 		final NodeList children = node.getChildNodes();
 		if (children != null)
 		{
@@ -806,7 +705,7 @@ public class PersistenceManager implements XMLConstants
 		return map;
 	}
 
-	public CompInfo[] retrieveComponentProperties(final DataspaceBean dataSpaceBean, final GUID componentId)
+	private CompInfo[] retrieveComponentProperties(final DataspaceBean dataSpaceBean, final GUID componentId)
 	{
 
 		if (componentId != null && !componentId.isNull())
@@ -819,7 +718,7 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public CompInfo[] retrieveExportedCapabilities(final DataspaceBean dataSpaceBean, final GUID containerId)
+	private CompInfo[] retrieveExportedCapabilities(final DataspaceBean dataSpaceBean, final GUID containerId)
 	{
 
 		if (containerId != null && !containerId.isNull())
@@ -833,7 +732,7 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public CompInfo[] retrieveRunningComponents(final DataspaceBean dataSpaceBean, final GUID containerId)
+	private CompInfo[] retrieveRunningComponents(final DataspaceBean dataSpaceBean, final GUID containerId)
 	{
 
 		if (containerId != null && !containerId.isNull())
@@ -847,7 +746,7 @@ public class PersistenceManager implements XMLConstants
 		return null;
 	}
 
-	public void startPersistence(final File persistFile, final DataspaceBean dataSpaceBean,
+	void startPersistence(final File persistFile, final DataspaceBean dataSpaceBean,
 			final ContainerManager containerManager, final int frequency)
 	{
 		while (true)

@@ -111,8 +111,6 @@ public abstract class InteractiveCanvasItemView implements Serializable
 
 	public abstract void paintSelected(Graphics2D g);
 
-	public abstract void paintShadowed(Graphics2D g);
-
 	public abstract void paintUnavailable(Graphics2D g);
 
 	public void setHeight(final int height)

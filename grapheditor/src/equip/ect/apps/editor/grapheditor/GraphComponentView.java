@@ -104,12 +104,6 @@ class GraphComponentView extends InteractiveCanvasItemView
 	}
 
 	@Override
-	public void paintShadowed(final Graphics2D g)
-	{
-		paintNormal(g);
-	}
-
-	@Override
 	public void paintUnavailable(final Graphics2D g)
 	{
 		paintNormal(g);

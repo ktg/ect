@@ -43,7 +43,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Map;
 
 import javax.swing.AbstractAction;
@@ -86,15 +86,13 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 		}
 	}
 
-	private Map<String, JTextField> propFields = new HashMap<>();
-
 	private final ComponentAdvert compAdv;
 
 	private JTextField tf;
 
-	private final String NONE_SET = "<none set>";
+	private static final String NONE_SET = "<none set>";
 
-	public ComponentSettingsPanel(final GraphComponent graphComponent)
+	ComponentSettingsPanel(final GraphComponent graphComponent)
 	{
 		super(new BorderLayout());
 
@@ -112,53 +110,49 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 		p = new JPanel(new GridLayout(4, 1));
 		p.add(new JLabel("Name: " + DataspaceUtils.getCurrentName(compAdv), SwingConstants.CENTER));		
 		p.add(new JLabel("Equip ID: " + compAdv.getID().toString(), SwingConstants.CENTER));
-		p.add(new JLabel("Host ID: " + compAdv.getHostID().toString(), SwingConstants.CENTER));
+		p.add(new JLabel("Host ID: " + compAdv.getHostID(), SwingConstants.CENTER));
 
 		p.add(new JLabel("Capability name: " + DataspaceUtils.getCapabilityDisplayName(compAdv.getCapabilityID()), SwingConstants.CENTER));
 
 		topPanel.add(BorderLayout.SOUTH, p);
 		add(BorderLayout.NORTH, topPanel);
 
-		if (props != null)
+		Arrays.sort(props, Comparator.comparing(ComponentProperty::getPropertyName));
+
+		final JPanel propNamesPanel = new JPanel(new GridLayout(props.length, 1));
+		// JPanel propsPanel = new JPanel(new GridLayout(props.size(), 2));
+		final JPanel propFieldsPanel = new JPanel(new GridLayout(props.length, 1));
+		for (final ComponentProperty cp : props)
 		{
-			Arrays.sort(props, (cp1, cp2) -> cp1.getPropertyName().compareTo(cp2.getPropertyName()));
+			p = new JPanel();
+			propNamesPanel.add(new JLabel(cp.getPropertyName()));
+			final JTextField propField = new JTextField(DataspaceUtils.getPropValueAsString(cp), 20);
+			p.add(propField);
+			final JButton b = new JButton("set");
 
-			final JPanel propNamesPanel = new JPanel(new GridLayout(props.length, 1));
-			// JPanel propsPanel = new JPanel(new GridLayout(props.size(), 2));
-			final JPanel propFieldsPanel = new JPanel(new GridLayout(props.length, 1));
-			for (final ComponentProperty cp : props)
+			b.setFont(b.getFont().deriveFont(10.0f));
+			if (cp.isReadonly())
 			{
-				p = new JPanel();
-				propNamesPanel.add(new JLabel(cp.getPropertyName()));
-				final JTextField propField = new JTextField(DataspaceUtils.getPropValueAsString(cp), 20);
-				p.add(propField);
-				final JButton b = new JButton("set");
-
-				b.setFont(b.getFont().deriveFont(10.0f));
-				if (cp.isReadonly())
-				{
-					b.setEnabled(false);
-					propField.setEditable(false);
-				}
-				else
-				{
-					b.addActionListener(new PropertyValueSetAction(cp, propField));
-				}
-				p.add(b);
-
-				final GraphComponentProperty gcp = graphComponent.getGraphComponentProperty(cp.getID().toString());
-				final JCheckBox cb = new JCheckBox("Keep visible", gcp.keepVisible());
-				cb.addActionListener(ae -> gcp.setKeepVisible(cb.isSelected()));
-				p.add(cb);
-
-				propFieldsPanel.add(p);
-				propFields.put(cp.getID().toString(), propField);
+				b.setEnabled(false);
+				propField.setEditable(false);
 			}
-			final JPanel propsPanel = new JPanel(new BorderLayout());
-			propsPanel.add(BorderLayout.WEST, propNamesPanel);
-			propsPanel.add(BorderLayout.EAST, propFieldsPanel);
-			add(BorderLayout.CENTER, new JScrollPane(propsPanel));
+			else
+			{
+				b.addActionListener(new PropertyValueSetAction(cp, propField));
+			}
+			p.add(b);
+
+			final GraphComponentProperty gcp = graphComponent.getGraphComponentProperty(cp.getID().toString());
+			final JCheckBox cb = new JCheckBox("Keep visible", gcp.keepVisible());
+			cb.addActionListener(ae -> gcp.setKeepVisible(cb.isSelected()));
+			p.add(cb);
+
+			propFieldsPanel.add(p);
 		}
+		final JPanel propsPanel = new JPanel(new BorderLayout());
+		propsPanel.add(BorderLayout.WEST, propNamesPanel);
+		propsPanel.add(BorderLayout.EAST, propFieldsPanel);
+		add(BorderLayout.CENTER, new JScrollPane(propsPanel));
 		if (CompoundComponentEditor.isCompoundComponent(compAdv))
 		{
 			// nasty hack to see if it seems to be a compound component
@@ -206,16 +200,7 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 	{
 	}
 
-	public void componentPropertyUpdated(final ComponentProperty compProp)
-	{
-		final JTextField tf = propFields.get(compProp.getID().toString());
-		if (tf != null)
-		{
-			tf.setText(DataspaceUtils.getPropValueAsString(compProp));
-		}
-	}
-
-	protected void componentMetadataChanged(final Object metadata)
+	private void componentMetadataChanged(final Object metadata)
 	{
 		if (metadata instanceof RDFStatement)
 		{
@@ -227,7 +212,7 @@ public class ComponentSettingsPanel extends JPanel implements ComponentPropertyL
 		}
 	}
 
-	protected void processActiveNameChange(final RDFStatement rdf)
+	private void processActiveNameChange(final RDFStatement rdf)
 	{
 		// System.out.println("process name change");
 

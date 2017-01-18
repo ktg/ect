@@ -63,10 +63,39 @@ public class Coerce
 {
 	private static final NumberFormat numberFormatter = new DecimalFormat("#,##0.###");
 
+	private static void appendEscapedString(final StringBuffer buf, final String s2)
+	{
+		buf.append('"');
+		for (int i = 0; i < s2.length(); i++)
+		{
+			final char nc = s2.charAt(i);
+			if (nc == '{' || nc == '}' || nc == ',' || nc == '"')
+			{
+				// escape
+				buf.append('\\');
+				buf.append(nc);
+			}
+			// primitive escapes
+			else if (nc == '\n')
+			{
+				buf.append("\\n");
+			}
+			else if (nc == '\t')
+			{
+				buf.append("\\t");
+			}
+			else
+			{
+				buf.append(nc);
+			}
+		}
+		buf.append('"');
+	}
+
 	/**
 	 * simple/primitive class
 	 */
-	public static boolean isSimpleClass(final Class<?> c)
+	private static boolean isSimpleClass(final Class<?> c)
 	{
 		return c.isPrimitive() || Number.class.isAssignableFrom(c) || Boolean.class.equals(c)
 				|| Character.class.equals(c);
@@ -75,7 +104,7 @@ public class Coerce
 	/**
 	 * check for stringified array
 	 */
-	public static boolean isStringifiedArray(final String s)
+	private static boolean isStringifiedArray(final String s)
 	{
 		final String st = s.trim();
 		if (!st.startsWith("{") || !st.endsWith("}"))
@@ -99,7 +128,7 @@ public class Coerce
 	/**
 	 * check for stringified dictionary
 	 */
-	public static boolean isStringifiedDictionary(final String s)
+	private static boolean isStringifiedDictionary(final String s)
 	{
 		final String st = s.trim();
 		if (!st.startsWith("{") || !st.endsWith("}"))
@@ -121,59 +150,9 @@ public class Coerce
 	}
 
 	/**
-	 * testing main
-	 */
-	public static void main(final String args[])
-	{
-		try
-		{
-			if (args.length < 2)
-			{
-				System.err.println("Usage: Coerce <stringvalue> <toclass1> ...");
-				System.exit(-1);
-			}
-			Object value = args[0];
-			for (int i = 1; i < args.length; i++)
-			{
-				final String toclassname = args[i];
-				final Class<?> toclass = Class.forName(toclassname);
-				System.out.println("Convert " + value.getClass() + " " + value + " to class " + toclass + "...");
-				value = toClass(value, toclass);
-				if (value instanceof DictionaryImpl)
-				{
-					System.out.println("Dictionary:");
-					final DictionaryImpl d = (DictionaryImpl) value;
-					for (int j = 0; d.entries != null && j < d.entries.length; j++)
-					{
-						System.out.println("  " + d.entries[j].name + " = " + d.entries[j].value);
-					}
-				}
-				if (value instanceof DictionaryImpl[])
-				{
-					final DictionaryImpl ds[] = (DictionaryImpl[]) value;
-					for (int k = 0; k < ds.length; k++)
-					{
-						System.out.println("Dictionary " + k + ":");
-						for (int j = 0; ds[k].entries != null && j < ds[k].entries.length; j++)
-						{
-							System.out.println("  " + ds[k].entries[j].name + " = " + ds[k].entries[j].value);
-						}
-					}
-				}
-			}
-			System.out.println("Ends with " + value.getClass() + " " + value);
-		}
-		catch (final Exception e)
-		{
-			System.err.println("ERROR: " + e);
-			e.printStackTrace(System.err);
-		}
-	}
-
-	/**
 	 * split stringified array
 	 */
-	public static String[] splitStringifiedArray(final String s)
+	private static String[] splitStringifiedArray(final String s)
 	{
 		final String st = s.trim();
 		final String st2 = st.substring(1, st.length() - 1);
@@ -267,7 +246,6 @@ public class Coerce
 			{
 				rv.add(buf.toString());
 				buf = new StringBuffer();
-				handle = false;
 			}
 		}
 		return rv.toArray(new String[rv.size()]);
@@ -360,7 +338,7 @@ public class Coerce
 					c2 = c2.getComponentType();
 				}
 			}
-			String typePrefix = "";
+			String typePrefix;
 			if (Double.class.equals(c2) || Double.TYPE.equals(c2))
 			{
 				typePrefix = "Double";
@@ -470,7 +448,7 @@ public class Coerce
 			}
 		}
 
-		Object r = toClass2(o, cls2, escapeStrings);
+		Object r = toClass2(o, cls2);
 
 		if (mapValuebase)
 		{
@@ -496,7 +474,7 @@ public class Coerce
 		return (T) r;
 	}
 
-	public static Object toClass2(Object o, Class<?> cls, final boolean escapeStrings) throws ClassNotFoundException,
+	private static Object toClass2(Object o, Class<?> cls) throws ClassNotFoundException,
 			IOException
 	{
 		// repeat in case of ValueBase Box
@@ -636,7 +614,7 @@ public class Coerce
 		if (Number.class.isAssignableFrom(cls))
 		{
 			// to a number
-			Number asNumber = null;
+			Number asNumber;
 			if (o instanceof Number)
 			{
 				asNumber = (Number) o;
@@ -647,7 +625,7 @@ public class Coerce
 			}
 			else
 			{
-				String asString = null;
+				String asString;
 				if (o instanceof String)
 				{
 					asString = (String) o;
@@ -702,7 +680,7 @@ public class Coerce
 		}
 		else if (cls.equals(Boolean.class))
 		{
-			String asString = null;
+			String asString;
 			if (o instanceof String)
 			{
 				asString = (String) o;
@@ -715,16 +693,9 @@ public class Coerce
 			{
 				asString = o.toString();
 			}
-			if (asString.length() == 0 || asString.charAt(0) == '-' || asString.charAt(0) == 'n'
+			return !(asString.length() == 0 || asString.charAt(0) == '-' || asString.charAt(0) == 'n'
 					|| asString.charAt(0) == 'f' || asString.charAt(0) == 'N' || asString.charAt(0) == 'F'
-					|| asString.charAt(0) == '0')
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+					|| asString.charAt(0) == '0');
 		}
 		else if (cls.equals(String.class))
 		{
@@ -870,7 +841,7 @@ public class Coerce
 			if (isStringifiedDictionary(s))
 			{
 				final String els[] = splitStringifiedArray(s);
-				int iequals = -1;
+				int iequals;
 				for (final String el : els)
 				{
 					iequals = el.indexOf('=');
@@ -1007,7 +978,7 @@ public class Coerce
 	/**
 	 * hashtable to dictionary boxing values
 	 */
-	public static DictionaryImpl toDictionary(final Map h) throws ClassNotFoundException, IOException
+	private static DictionaryImpl toDictionary(final Map h) throws ClassNotFoundException, IOException
 	{
 		final DictionaryImpl d = new DictionaryImpl();
 		for (Object key : h.keySet())
@@ -1021,7 +992,7 @@ public class Coerce
 	/**
 	 * dictionary to hashtable unboxing values
 	 */
-	public static Map toHashtable(final DictionaryImpl d) throws ClassNotFoundException, IOException
+	private static Map toHashtable(final DictionaryImpl d) throws ClassNotFoundException, IOException
 	{
 		final Map h = new HashMap();
 		for (int i = 0; d.entries != null && i < d.entries.length; i++)
@@ -1029,34 +1000,5 @@ public class Coerce
 			h.put(d.entries[i].name, toClass(d.entries[i].value, Serializable.class));
 		}
 		return h;
-	}
-
-	static protected void appendEscapedString(final StringBuffer buf, final String s2)
-	{
-		buf.append('"');
-		for (int i = 0; i < s2.length(); i++)
-		{
-			final char nc = s2.charAt(i);
-			if (nc == '{' || nc == '}' || nc == ',' || nc == '"')
-			{
-				// escape
-				buf.append('\\');
-				buf.append(nc);
-			}
-			// primitive escapes
-			else if (nc == '\n')
-			{
-				buf.append("\\n");
-			}
-			else if (nc == '\t')
-			{
-				buf.append("\\t");
-			}
-			else
-			{
-				buf.append(nc);
-			}
-		}
-		buf.append('"');
 	}
 }

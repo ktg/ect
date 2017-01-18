@@ -46,7 +46,6 @@ import equip.data.TupleImpl;
 
 public class Capability extends CompInfo
 {
-
 	public static final String TYPE = "Capability2";
 	public static final int NO_OF_FIELDS = 4;
 	public static final int NAME_INDEX = 2;

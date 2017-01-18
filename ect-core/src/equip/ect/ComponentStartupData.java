@@ -81,11 +81,6 @@ public class ComponentStartupData
 		return componentGUID;
 	}
 
-	public String getJarURL()
-	{
-		return jarURL;
-	}
-
 	public String getName()
 	{
 		return name;
@@ -106,16 +101,6 @@ public class ComponentStartupData
 		return requestGUID;
 	}
 
-	public void setComponentGUID(final GUID componentGUID)
-	{
-		this.componentGUID = componentGUID;
-	}
-
-	public void setJarURL(final String jarURL)
-	{
-		this.jarURL = jarURL;
-	}
-
 	public void setName(final String name)
 	{
 		this.name = name;
@@ -130,10 +115,4 @@ public class ComponentStartupData
 	{
 		this.properties = properties;
 	}
-
-	public void setRequestGUID(final GUID requestGUID)
-	{
-		this.requestGUID = requestGUID;
-	}
-
 }

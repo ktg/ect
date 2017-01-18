@@ -53,14 +53,14 @@ class GraphEditorLink extends Link
 	GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
 			final Connectable source, final Connectable target)
 	{
-		super(canvas, startPoint, endPoint, source, target, new CurvedLine(startPoint, endPoint), null);
+		super(canvas, source, target, new CurvedLine(startPoint, endPoint), null);
 	}
 
-	GraphEditorLink(final Component canvas, final Point startPoint, final Point endPoint,
+	private GraphEditorLink(final Component canvas,
 			final Connectable source, final Connectable target, final RenderableLink linkView,
 			final PropertyLinkRequest link)
 	{
-		super(canvas, startPoint, endPoint, source, target, linkView, link);
+		super(canvas, source, target, linkView, link);
 	}
 
 	/*
@@ -89,8 +89,7 @@ class GraphEditorLink extends Link
 	@Override
 	public Object clone(final Component canvas)
 	{
-		return new GraphEditorLink(canvas, ((RenderableLink) view).getStartPoint(),
-				((RenderableLink) view).getEndPoint(), source, target, (RenderableLink) view, linkReq);
+		return new GraphEditorLink(canvas, source, target, (RenderableLink) view, linkReq);
 	}
 
 	@Override

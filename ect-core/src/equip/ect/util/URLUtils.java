@@ -51,7 +51,7 @@ public class URLUtils
 		try
 		{
 			final int len = url.length();
-			final StringBuffer decodeURL = new StringBuffer();
+			final StringBuilder decodeURL = new StringBuilder();
 			char c;
 			for (int i = 0; i < len; i++)
 			{
@@ -77,16 +77,16 @@ public class URLUtils
 		return encode(s, "$-_.!*'()&+,/:;=?@");
 	}
 
-	public static String encode(final String url, String reservedChars)
+	private static String encode(final String url, String reservedChars)
 	{
 		try
 		{
-			if (url == null) { return url; }
+			if (url == null) { return null; }
 			if (reservedChars == null)
 			{
-				reservedChars = new String();
+				reservedChars = "";
 			}
-			final StringBuffer sb = new StringBuffer();
+			final StringBuilder sb = new StringBuilder();
 			char c;
 			for (int i = 0; i < url.length(); i++)
 			{
@@ -99,11 +99,11 @@ public class URLUtils
 				}
 				if (c > 15)
 				{
-					sb.append("%" + Integer.toHexString(c));
+					sb.append("%").append(Integer.toHexString(c));
 				}
 				else
 				{
-					sb.append("%0" + Integer.toHexString(c));
+					sb.append("%0").append(Integer.toHexString(c));
 				}
 			}
 			return sb.toString();

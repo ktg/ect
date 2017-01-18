@@ -45,13 +45,6 @@ import equip.ect.ContainerManager;
 
 public class StartManager implements Runnable
 {
-
-	public static void main(final String[] args)
-	{
-
-		final StartManager startManager1 = new StartManager(args[0]);
-	}
-
 	DataspaceDiscover disc;
 
 	String componentPath = null;

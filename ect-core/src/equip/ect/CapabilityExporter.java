@@ -78,7 +78,7 @@ class CapabilityExporter
 			return null;
 		}
 
-		BeanInfo beaninfo = null;
+		BeanInfo beaninfo;
 
 		java.beans.Introspector.setBeanInfoSearchPath(new String[]{"."});
 		try

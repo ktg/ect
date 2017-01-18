@@ -21,7 +21,7 @@ class DrawerView extends InteractiveCanvasItemView
 	{
 	}
 
-	public void paintDrawer(final Graphics2D g)
+	private void paintDrawer(final Graphics2D g)
 	{
 		g.fillRoundRect(posX, posY - 20, width, height + 20, 10, 10);
 		g.setColor(Color.black);
@@ -55,12 +55,6 @@ class DrawerView extends InteractiveCanvasItemView
 	public void paintSelected(final Graphics2D g)
 	{
 		g.setColor(Color.blue);
-		paintNormal(g);
-	}
-
-	@Override
-	public void paintShadowed(final Graphics2D g)
-	{
 		paintNormal(g);
 	}
 

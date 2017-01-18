@@ -93,27 +93,6 @@ public class DataspaceDiscover
 
 	public static final String DEFAULT_GROUP = "ect.default";
 
-	/** sample main - as a helper for another server */
-	public static void main(final String[] args)
-	{
-
-		if (args.length > 1)
-		{
-			System.err.println("Usage: DataspaceDiscovery.ExampleClient [<group>]");
-			System.exit(-1);
-		}
-
-		if (args.length > 0)
-		{
-			new DataspaceDiscover(args[0]);
-		}
-		else
-		{
-			new DataspaceDiscover("");
-		}
-
-	}
-
 	protected StartManager handler = null;
 	protected MyDiscoveryEventListenerImpl listen = new MyDiscoveryEventListenerImpl();
 	protected DiscoveryClientAgent agent = new DiscoveryClientAgentImpl();

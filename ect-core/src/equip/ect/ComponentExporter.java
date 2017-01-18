@@ -52,7 +52,7 @@ public class ComponentExporter
 {
 
 	private DataspaceBean dataspace = null;
-	protected Map<Object, MappingObject> objectMappers = null;
+	private Map<Object, MappingObject> objectMappers = null;
 	//private GUID hostID = null;
 	//private GUID containerID = null;
 	private ContainerManager cm = null;

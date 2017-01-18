@@ -41,13 +41,8 @@ package equip.ect.apps.editor;
 
 public class HTMLException extends Exception
 {
-	public HTMLException(final Exception e)
+	HTMLException(final Exception e)
 	{
 		super(e);
-	}
-
-	public HTMLException(final String errorMessage)
-	{
-		super(errorMessage);
 	}
 }

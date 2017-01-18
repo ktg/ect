@@ -53,7 +53,7 @@ public class CompInfo
 {
 	public Tuple tuple = new TupleImpl();
 
-	public static final int TYPE_INDEX = 0;
+	private static final int TYPE_INDEX = 0;
 	public static final int ATTRIBUTES_INDEX = 1;
 
 	public CompInfo()
@@ -76,7 +76,7 @@ public class CompInfo
 		this.tuple = tuple;
 	}
 
-	public DataSession addPatterntoDataSpace(final DataspaceBean dataspace, final DataspaceEventListener eventListner)
+	DataSession addPatterntoDataSpace(final DataspaceBean dataspace, final DataspaceEventListener eventListner)
 			throws DataspaceInactiveException
 	{
 		return dataspace.addDataspaceEventListener(tuple, false, eventListner);

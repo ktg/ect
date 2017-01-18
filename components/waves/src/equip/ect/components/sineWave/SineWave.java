@@ -19,14 +19,6 @@ import java.io.Serializable;
 @Category("Data/Waves")
 public class SineWave implements Runnable, Serializable, PropertyChangeListener
 {
-	public static void main(final String args[])
-	{
-		final SineWave sineWave = new SineWave();
-		sineWave.setFreq(1);
-		sineWave.setOutFreq(5);
-		sineWave.setRunning(true);
-	}
-
 	// Property Change
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 

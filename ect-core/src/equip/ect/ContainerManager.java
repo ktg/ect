@@ -70,34 +70,6 @@ import java.util.Map;
 
 public class ContainerManager implements Runnable
 {
-	public static void main(final String[] argsv)
-	{
-		if (argsv.length != 2)
-		{
-			System.err.println("Usage: java ComponentExporter <dataspaceUrl> <componentdir>");
-			System.exit(-1);
-		}
-
-		// Connect to DataSpace
-		final DataspaceBean dataspace = new DataspaceBean();
-
-		try
-		{
-			dataspace.setDataspaceUrl(argsv[0]);
-		}
-		catch (final DataspaceInactiveException ex)
-		{
-			System.err.println("Exporter could not connect to dataspace.");
-			System.exit(-1);
-		}
-
-		/*
-		 * ContainerManager containerManager1 = new ContainerManager(dataspace, argsv[1],
-		 * "test machine");
-		 */
-		// at home dir = "D:/Equator/Infrastructure/classes";
-	}
-
 	// Dataspace
 	public DataspaceBean dataspace;
 
@@ -112,10 +84,10 @@ public class ContainerManager implements Runnable
 	String hostName;
 
 	// Component Capabilities
-	public Map<GUID, Class<?>> capabilityClasses = Collections.synchronizedMap(new HashMap<GUID, Class<?>>());
+	Map<GUID, Class<?>> capabilityClasses = Collections.synchronizedMap(new HashMap<GUID, Class<?>>());
 
 	// Launched Components
-	protected Map<Object, MappingObject> componentMappings = Collections.synchronizedMap(new HashMap<Object, MappingObject>());
+	Map<Object, MappingObject> componentMappings = Collections.synchronizedMap(new HashMap<Object, MappingObject>());
 
 	CapabilityExporter capexport = null;
 
@@ -140,8 +112,8 @@ public class ContainerManager implements Runnable
 		this.id = id;
 		this.hostName = hostname;
 		this.hostID = dspace.allocateId(); // check this
-		this.capabilityClasses = capabilityClasses == null ? new HashMap<GUID, Class<?>>() : capabilityClasses;
-		this.startupDataMap = startupDataMap == null ? new HashMap<GUID, ComponentStartupData>() : startupDataMap;
+		this.capabilityClasses = capabilityClasses == null ? new HashMap<>() : capabilityClasses;
+		this.startupDataMap = startupDataMap == null ? new HashMap<>() : startupDataMap;
 		this.componentdirname = dirname;
 		componentdir = new File(componentdirname);
 
@@ -263,8 +235,7 @@ public class ContainerManager implements Runnable
 					{
 						try
 						{
-							final String propertyvalue = (String) Coerce.toClass(props[j].getPropertyValue(),
-									String.class);
+							final String propertyvalue = Coerce.toClass(props[j].getPropertyValue(), String.class);
 							if (propertyvalue.equals(persistentChild))
 							{
 								foundChild = true;
@@ -276,13 +247,6 @@ public class ContainerManager implements Runnable
 							e.printStackTrace(System.err);
 						}
 					}
-					/*
-					 * try { System.out.println("Property
-					 * "+propertyname+"="+props[j].getPropertyValue()+" (parent? "+foundParent+ ",
-					 * child? "+foundChild+")"); } catch(Exception e) { System.out.println("Property
-					 * "+propertyname+"=?"+e+" (parent? "+foundParent+ ", child? "+foundChild+")");
-					 * }
-					 */
 				}
 				if (foundParent && foundChild)
 				{

@@ -92,19 +92,19 @@ class SetValuePopup extends JDialog
 	/**
 	 * text size
 	 */
-	public static final int TEXT_ROWS = 10;
+	private static final int TEXT_ROWS = 10;
 	/**
 	 * text size
 	 */
-	public static final int TEXT_COLUMNS = 80;
+	private static final int TEXT_COLUMNS = 80;
 	/**
 	 * text area
 	 */
-	protected JTextArea text;
+	private JTextArea text;
 	/**
 	 * guid
 	 */
-	protected ComponentProperty targetProperty;
+	private ComponentProperty targetProperty;
 	/**
 	 * dataspace
 	 */

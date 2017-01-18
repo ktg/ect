@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -78,21 +77,19 @@ import org.xml.sax.SAXException;
 
 public class HTMLDescriptionHelper
 {
-	protected static final String SIMPLE_EDITOR_HEADING1 = "Summary";
-	protected static final String ADVANCED_EDITOR_HEADING1 = "Description";
-	protected static final String ADVANCED_EDITOR_HEADING2 = "Usage";
-	protected static final String ADVANCED_EDITOR_HEADING3 = "Configuration";
-	protected static final String ADVANCED_EDITOR_HEADING4 = "Installation";
-	protected static final String ADVANCED_EDITOR_HEADING5 = "Technical Details";
+	private static final String SIMPLE_EDITOR_HEADING1 = "Summary";
+	private static final String ADVANCED_EDITOR_HEADING1 = "Description";
+	private static final String ADVANCED_EDITOR_HEADING2 = "Usage";
+	private static final String ADVANCED_EDITOR_HEADING3 = "Configuration";
+	private static final String ADVANCED_EDITOR_HEADING4 = "Installation";
+	private static final String ADVANCED_EDITOR_HEADING5 = "Technical Details";
 
-	public static int HEADING_LEVEL = 3;
+	private final Map<String, String> headingToText = new HashMap<>();
+	private boolean headingsExist = false;
 
-	protected Map<String, String> headingToText = new HashMap<String, String>();
-	protected boolean headingsExist = false;
+	private String correctedHTML = null;
 
-	protected String correctedHTML = null;
-
-	public HTMLDescriptionHelper(final String htmlDesc, final boolean removeHead) throws HTMLException
+	public HTMLDescriptionHelper(final String htmlDesc) throws HTMLException
 	{
 		Exception caught = null;
 
@@ -126,9 +123,9 @@ public class HTMLDescriptionHelper
 			final NodeList nl = body.getChildNodes();
 
 			String currentHeading = null;
-			List<Node> currentNodes = new ArrayList<Node>();
+			List<Node> currentNodes = new ArrayList<>();
 
-			final Map<String, List<Node>> hash = new HashMap<String, List<Node>>();
+			final Map<String, List<Node>> hash = new HashMap<>();
 
 			// loop through these nodes, looking for headings, and adding
 			// non-heading nodes to vectors containing html within each heading
@@ -157,7 +154,7 @@ public class HTMLDescriptionHelper
 						}
 
 						currentHeading = ectHeader;
-						currentNodes = new ArrayList<Node>();
+						currentNodes = new ArrayList<>();
 
 					}
 					else
@@ -217,13 +214,6 @@ public class HTMLDescriptionHelper
 		}
 	}
 
-	public String[] getAdvancedEditorHeadings()
-	{
-
-		return new String[]{ ADVANCED_EDITOR_HEADING1, ADVANCED_EDITOR_HEADING2, ADVANCED_EDITOR_HEADING3,
-									ADVANCED_EDITOR_HEADING4, ADVANCED_EDITOR_HEADING5 };
-	}
-
 	public String[] getAllEditorHeadings()
 	{
 
@@ -263,12 +253,12 @@ public class HTMLDescriptionHelper
 		}
 	}
 
-	protected String correctHTMLString(final String htmlDesc) throws SAXException, IOException, TransformerException
+	private String correctHTMLString(final String htmlDesc) throws SAXException, IOException, TransformerException
 	{
 		return getHTMLString(parseHTML(htmlDesc));
 	}
 
-	protected String getECTHeader(final HTMLHeadingElement he)
+	private String getECTHeader(final HTMLHeadingElement he)
 	{
 		// first, check to see if right heading level
 		final String tagName = he.getTagName();
@@ -299,7 +289,7 @@ public class HTMLDescriptionHelper
 		}
 	}
 
-	protected String getHTMLString(final Node node) throws TransformerException
+	private String getHTMLString(final Node node) throws TransformerException
 	{
 		final TransformerFactory factory = TransformerFactory.newInstance();
 		final Transformer transformer = factory.newTransformer();
@@ -314,7 +304,7 @@ public class HTMLDescriptionHelper
 		return (sw.toString());
 	}
 
-	protected HTMLDocumentImpl parseHTML(final String htmlDesc) throws SAXException, IOException
+	private HTMLDocumentImpl parseHTML(final String htmlDesc) throws SAXException, IOException
 	{
 
 		final DOMParser parser = new DOMParser();

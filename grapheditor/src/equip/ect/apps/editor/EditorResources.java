@@ -45,16 +45,16 @@ public abstract class EditorResources
 {
 	public final static java.awt.Color BACKGROUND_COLOR = java.awt.Color.gray.brighter();
 
-	public final static String FOLDER_ICON = "/folder.png";
+	final static String FOLDER_ICON = "/folder.png";
 
-	public final static String COMPONENT_ICON = "/component.png";
+	final static String COMPONENT_ICON = "/component.png";
 
-	public final static String LINK_ICON = "/link.png";
+	final static String LINK_ICON = "/link.png";
 
 
-	public final static String SEARCH_ICON = "/search.png";
+	final static String SEARCH_ICON = "/search.png";
 
-	public final static String COMPONENTREQUEST_ICON = "/componentRequest.png";
+	final static String COMPONENTREQUEST_ICON = "/componentRequest.png";
 
 	public final static String CLEAR_ICON = "/layer_remove.png";
 

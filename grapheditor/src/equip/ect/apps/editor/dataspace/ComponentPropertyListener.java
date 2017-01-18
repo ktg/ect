@@ -45,9 +45,7 @@ import equip.ect.ComponentProperty;
 
 public interface ComponentPropertyListener extends EventListener
 {
+	void componentPropertyAdded(ComponentProperty compProp);
 
-	public abstract void componentPropertyAdded(ComponentProperty compProp);
-
-	public abstract void componentPropertyDeleted(ComponentProperty compProp);
-
+	void componentPropertyDeleted(ComponentProperty compProp);
 }

@@ -40,27 +40,25 @@ package equip.ect;
 
 public interface XMLConstants
 {
+	String CONTAINER_TAG = "Container";
+	String COMPONENT_TAG = "Component";
+	String CAPABILITY_TAG = "Capability";
+	String COMPONENT_REQUEST_TAG = "ComponentRequest";
+	String EXPORTED_CAPABILITIES_TAG = "ExportedCapabilities";
+	String RUNNING_COMPONENTS_TAG = "RunningComponents";
+	String NAME_ATTRIBUTE = "name";
+	String URL_ATTRIBUTE = "url";
+	String PERSIST_FILE_ATTRIBUTE = "persistFile";
 
-	public static String CONTAINER_TAG = "Container";
-	public static String COMPONENT_TAG = "Component";
-	public static String CAPABILITY_TAG = "Capability";
-	public static String COMPONENT_REQUEST_TAG = "ComponentRequest";
-	public static String EXPORTED_CAPABILITIES_TAG = "ExportedCapabilities";
-	public static String RUNNING_COMPONENTS_TAG = "RunningComponents";
-	public static String NAME_ATTRIBUTE = "name";
-	public static String URL_ATTRIBUTE = "url";
-	public static String PERSIST_FILE_ATTRIBUTE = "persistFile";
+	String COMPONENT_PROPERTY_TAG = "ComponentProperty";
+	String COMPONENT_PROPERTIES_TAG = "ComponentProperties";
+	String PROPERTY_NAME_ATTRIBUTE = "propertyName";
+	String PROPERTY_VALUE_ATTRIBUTE = "propertyValue";
+	String PROPERTY_CLASS_ATTRIBUTE = "propertyClass";
 
-	public static String COMPONENT_PROPERTY_TAG = "ComponentProperty";
-	public static String COMPONENT_PROPERTIES_TAG = "ComponentProperties";
-	public static String PROPERTY_NAME_ATTRIBUTE = "propertyName";
-	public static String PROPERTY_VALUE_ATTRIBUTE = "propertyValue";
-	public static String PROPERTY_CLASS_ATTRIBUTE = "propertyClass";
-
-	public static String GUID_TAG = "GUID";
-	public static String HOST_ID_ATTRIBUTE = "host_id";
-	public static String ITEM_ID_ATTRIBUTE = "item_id";
-	public static String PROC_ID_ATTRIBUTE = "proc_id";
-	public static String TIME_S_ATTRIBUTE = "time_s";
-
+	String GUID_TAG = "GUID";
+	String HOST_ID_ATTRIBUTE = "host_id";
+	String ITEM_ID_ATTRIBUTE = "item_id";
+	String PROC_ID_ATTRIBUTE = "proc_id";
+	String TIME_S_ATTRIBUTE = "time_s";
 }

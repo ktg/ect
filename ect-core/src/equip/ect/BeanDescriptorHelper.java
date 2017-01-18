@@ -53,43 +53,20 @@ import equip.data.StringBoxImpl;
  */
 public class BeanDescriptorHelper
 {
-	/**
-	 * Dictionary property name
-	 */
-	static final public String NAME = "name";
-	/**
-	 * Dictionary property name
-	 */
-	static final public String DISPLAY_NAME = "displayName";
-	/**
-	 * Dictionary property name
-	 */
-	static final public String SHORT_DESCRIPTION = "shortDescription";
-	/**
-	 * Dictionary property name
-	 */
-	static final public String EXPERT = "expert";
-	/**
-	 * Dictionary property name
-	 */
-	static final public String PREFERRED = "preferred";
-	/**
-	 * Dictionary property name
-	 */
-	static final public String HIDDEN = "hidden";
-	/**
-	 * Dictionary property name
-	 */
-	static final public String TYPE = "type";
-	/**
-	 * Dictionary property name
-	 */
-	static final public String PROPERTIES = "properties";
+	// Dictionary property names
+	public static final String NAME = "name";
+	public static final String DISPLAY_NAME = "displayName";
+	public static final String SHORT_DESCRIPTION = "shortDescription";
+	public static final String EXPERT = "expert";
+	public static final String PREFERRED = "preferred";
+	public static final String HIDDEN = "hidden";
+	public static final String TYPE = "type";
+	public static final String PROPERTIES = "properties";
 
 	/**
 	 * copy info to CompInfo's attributes
 	 */
-	static public void copyInformation(final BeanInfo bi, final CompInfo ci, final boolean includeProperties)
+	static void copyInformation(final BeanInfo bi, final CompInfo ci, final boolean includeProperties)
 	{
 		final DictionaryImpl d = (DictionaryImpl) (ci.tuple.fields[CompInfo.ATTRIBUTES_INDEX]);
 		final BeanDescriptor bd = bi.getBeanDescriptor();
@@ -103,9 +80,12 @@ public class BeanDescriptorHelper
 	/**
 	 * populate Dictionary with info from a FeatureDescriptor
 	 */
-	static public void copyInformation(final FeatureDescriptor fd, final DictionaryImpl d)
+	private static void copyInformation(final FeatureDescriptor fd, final DictionaryImpl d)
 	{
-		if (fd == null || d == null) { return; }
+		if (fd == null || d == null)
+		{
+			return;
+		}
 		if (fd.getName() != null)
 		{
 			d.put(NAME, new StringBoxImpl(fd.getName()));
@@ -141,7 +121,7 @@ public class BeanDescriptorHelper
 	/**
 	 * copy info to CompInfo's attributes
 	 */
-	static public void copyInformation(final PropertyDescriptor fd, final CompInfo ci)
+	static void copyInformation(final PropertyDescriptor fd, final CompInfo ci)
 	{
 		final DictionaryImpl d = (DictionaryImpl) (ci.tuple.fields[CompInfo.ATTRIBUTES_INDEX]);
 		copyInformation(fd, d);
@@ -150,7 +130,7 @@ public class BeanDescriptorHelper
 	/**
 	 * create Dictionary representing property array
 	 */
-	static public DictionaryImpl describeProperties(final PropertyDescriptor ps[])
+	private static DictionaryImpl describeProperties(final PropertyDescriptor ps[])
 	{
 		final DictionaryImpl d = new DictionaryImpl();
 		for (int pi = 0; ps != null && pi < ps.length; pi++)
@@ -165,7 +145,7 @@ public class BeanDescriptorHelper
 	/**
 	 * add standard information for a parent pseudo-property
 	 */
-	static public void parentProperty(final CompInfo ci)
+	static void parentProperty(final CompInfo ci)
 	{
 		final DictionaryImpl d = (DictionaryImpl) (ci.tuple.fields[CompInfo.ATTRIBUTES_INDEX]);
 		d.put(PREFERRED, new BooleanBoxImpl(false));

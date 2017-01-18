@@ -49,24 +49,24 @@ public interface IActiveComponent
 	/**
 	 * initialise
 	 */
-	public void initialise(ContainerManager cmgr, DataspaceBean dataspace);
+	void initialise(ContainerManager cmgr, DataspaceBean dataspace);
 
 	/**
 	 * property link request added to this component
 	 */
-	public void linkToAdded(String propertyName, GUID requestId);
+	void linkToAdded(String propertyName, GUID requestId);
 
 	/**
 	 * property link request added to this component
 	 */
-	public void linkToDeleted(String propertyName, GUID requestId);
+	void linkToDeleted(String propertyName, GUID requestId);
 
 	/**
 	 * attempt to set a property due to a link add / source update.
 	 * 
 	 * @return true if update completely handled (no need to call setter).
 	 */
-	public boolean linkToUpdated(String propertyName, GUID requestId, Object value);
+	boolean linkToUpdated(String propertyName, GUID requestId, Object value);
 
 	/**
 	 * more to go?
@@ -74,5 +74,5 @@ public interface IActiveComponent
 	/**
 	 * standard stop method for all components (including non-active)
 	 */
-	public void stop();
+	void stop();
 }

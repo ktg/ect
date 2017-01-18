@@ -55,15 +55,6 @@ import javax.swing.JTextArea;
 @Category("UI")
 public class TextOutput extends UIBase
 {
-
-	/**
-	 * testing main - no args. Makes a single instance.
-	 */
-	public static void main(final String[] args)
-	{
-		new TextOutput();
-	}
-
 	/**
 	 * the widget
 	 */

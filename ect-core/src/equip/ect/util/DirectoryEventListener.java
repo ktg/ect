@@ -44,11 +44,11 @@ import java.util.List;
 
 public interface DirectoryEventListener extends EventListener
 {
-	public void fileAdd(File file);
+	void fileAdd(File file);
 
-	public void filesAdded(List<File> files);
+	void filesAdded(List<File> files);
 
-	public void fileDeleted(File file);
+	void fileDeleted(File file);
 
-	public void fileModified(File file);
+	void fileModified(File file);
 }

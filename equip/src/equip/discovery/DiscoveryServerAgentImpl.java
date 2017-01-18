@@ -50,563 +50,737 @@ package equip.discovery;
 import equip.runtime.*;
 import equip.config.ConfigManager;
 import equip.config.ConfigManagerImpl;
+
 import java.net.*;
 import java.util.Random;
 import java.util.Vector;
 import java.io.*;
 
-public class DiscoveryServerAgentImpl extends DiscoveryServerAgent {
-    static boolean debug = false;
+public class DiscoveryServerAgentImpl extends DiscoveryServerAgent
+{
+	static boolean debug = false;
 
-    /** started? */
-    boolean started = false;
-    /** random number generator */
-    Random random = new Random();
-    /** servers to advertise */
-    ServerDiscoveryInfo [] servers;
-    /** discovery URLs to use */
-    String [] discoveryUrls;
-    /** announcement messages */
-    byte [][] announcementDatas;
+	/**
+	 * started?
+	 */
+	boolean started = false;
+	/**
+	 * random number generator
+	 */
+	Random random = new Random();
+	/**
+	 * servers to advertise
+	 */
+	ServerDiscoveryInfo[] servers;
+	/**
+	 * discovery URLs to use
+	 */
+	String[] discoveryUrls;
+	/**
+	 * announcement messages
+	 */
+	byte[][] announcementDatas;
 
-    /** internal announcement client (sender) class */
-    class AnnouncementClient implements Runnable {
-	/** socket to send announcements on - just multicast to set TTL */
-	DatagramSocket sendSocket;
-	/** send interval */
-	long resendInterval;
-	/** next send time */
-	long nextSendTime;
-	/** thread */
-	Thread myThread;
-	/** data to send */
-	byte [] data;
-	/** destination address */
-	InetAddress destAddress;
-	/** dest port */
-	int destPort;
+	/**
+	 * internal announcement client (sender) class
+	 */
+	class AnnouncementClient implements Runnable
+	{
+		/**
+		 * socket to send announcements on - just multicast to set TTL
+		 */
+		DatagramSocket sendSocket;
+		/**
+		 * send interval
+		 */
+		long resendInterval;
+		/**
+		 * next send time
+		 */
+		long nextSendTime;
+		/**
+		 * thread
+		 */
+		Thread myThread;
+		/**
+		 * data to send
+		 */
+		byte[] data;
+		/**
+		 * destination address
+		 */
+		InetAddress destAddress;
+		/**
+		 * dest port
+		 */
+		int destPort;
 
-	/** main constructor */
-	AnnouncementClient(InetAddress destAddress,
-			   int destPort, 
-			   byte [] data) {
-	    this.destAddress = destAddress;
-	    this.destPort = destPort;
-	    this.data = data;
-	    try {
-		if (destAddress.isMulticastAddress()) 
+		/**
+		 * main constructor
+		 */
+		AnnouncementClient(InetAddress destAddress,
+		                   int destPort,
+		                   byte[] data)
 		{
-		    sendSocket = MulticastUtils.newMulticastSocket();
-		    try 
-		    {
-			java.lang.reflect.Method m = sendSocket.getClass().getMethod
-			    ("setTimeToLive",
-			    new Class [] { Integer.TYPE });
-			m.invoke(sendSocket,
-			    new java.lang.Object [] 
-			    { new Integer(DISCOVERY_TTL.value) });
-		    } 
-		    catch (Exception e) 
-		    {
-			System.err.println("sendSocket.setTimeToLive failed: "+e);
-		    }
-		} 
-		else 
-		{
-		    // unicast
-		    sendSocket = new DatagramSocket();
-		    // NB Shared by DiscoveryServer??
-		}
-	    } catch (Exception e) {
-		System.err.println("ERROR: in DiscoveryServerAgent."+
-				   "AnnouncementClient: "+e);
-		e.printStackTrace(System.err);
-		return;
-	    }
-	    resendInterval = ANNOUNCEMENT_INTERVAL_S.value*1000;
-	    long now = System.currentTimeMillis();
-	    nextSendTime = now + 
-		(long)(random.nextDouble()*
-		       ANNOUNCEMENT_STARTUP_DELAY_S.value*1000);
-
-	    myThread = new Thread(this);
-	    myThread.start();
-	}
-	/** stop */
-	synchronized void stop() {
-	    if (myThread!=null) {
-		//myThread.stop();
-		Thread t = myThread;
-		myThread = null;
-		t.interrupt();
-	    }
-	}
-	/** work... */
-	public void run() {
-	    System.err.println("AnnouncementClient running for "+
-			       destAddress+":"+destPort+"...");
-	    while (myThread!=null) {
-		// wait until next send
-		long now = System.currentTimeMillis();
-		if (now < nextSendTime) {
-		    try {
-			Thread.sleep(nextSendTime-now);
-		    } catch (Exception e) {}
-		    continue;
-		}
-		// send!
-		DatagramPacket p = new DatagramPacket(data,
-						      data.length,
-						      destAddress,
-						      destPort);
-		try {
-		    if (debug)
-			System.err.println("Note: AnnouncementClient sends "+
-					   "to "+destAddress+":"+destPort);
-		    sendSocket.send(p);
-		} catch (Exception e) {
-		    System.err.println("Warning: AnnouncementClient: "+e);
-		    e.printStackTrace(System.err);
-		}
-		// fix next send time
-		nextSendTime += resendInterval;
-	    }
-	}
-    }
-    /** current announcement clients, 1 per url */
-    AnnouncementClient [] announcementClients;
-
-    /** internal discovery server (receiver/responder) class.
-     * Note: uses announcementDatas and servers from containing class. 
-     */
-    class DiscoveryServer implements Runnable {
-	/** mc group */
-	InetAddress discAddress;
-	/** mc port */
-	int discPort;
-	/** multicast socket */
-	DatagramSocket discSocket;
-	/** thread */
-	Thread myThread;
-	  
-	/** main constructor */
-	DiscoveryServer(InetAddress discAddress,
-			int discPort) {
-	    this.discAddress = discAddress;
-	    this.discPort = discPort;
-	    
-	    if (discAddress.isMulticastAddress()) 
-	    {
-		try 
-		{
-		    discSocket = MulticastUtils.newMulticastSocket(discPort);
-		    ((MulticastSocket)discSocket).joinGroup(discAddress);
-		} 
-		catch (Exception e) 
-		{
-		    System.err.println("ERROR: in DiscoveryServerAgent."+
-			"DiscoveryServer: "+e);
-		    e.printStackTrace(System.err);
-		    return;
-		}
-	    } 
-	    else 
-	    {
-		// unicast - we may not need to listen for queries if the rendezvous is smart enough...
-		return;
-	    }
-	    myThread = new Thread(this);
-	    myThread.start();
-	}
-	/** stop */
-	synchronized void stop() {
-	    if (myThread!=null) {
-		//myThread.stop();
-		Thread t = myThread;
-		myThread = null;
-		t.interrupt();
-	    }
-	}
-	/** work... */
-	public void run() {
-	    System.err.println("DiscoveryServer running on "+
-			       discAddress+":"+discPort+"...");
-	    while (myThread!=null) {
-		byte requestData [] = new byte[1024];
-		DatagramPacket requestpkt = 
-		    new DatagramPacket(requestData,
-				       requestData.length);
-		try {
-		    // get a packet
-		    discSocket.receive(requestpkt);
-		    if (myThread==null)
-			// abort
-			break;
-		} catch (Exception e) {
-		    System.err.println("ERROR: in DiscoveryServer receive: "+
-				       e);
-		    continue;
-		}
-		// decode
-		DiscoveryRequest request = null;
-		try {
-		    ByteArrayInputStream bins = 
-			new ByteArrayInputStream(requestpkt.getData(), 0, 
-						 requestpkt.getLength());
-		    equip.runtime.ObjectInputStream oins = 
-			new equip.runtime.ObjectInputStream(bins);
-		    long version = oins.readInt();
-		    if (version!=DISCOVERY_VERSION.value) {
-			System.err.println
-			    ("Warning: DiscoveryServer failed to "+
-			     "get a valid DiscoveryRequest object "+
-			     "from "+requestpkt.getAddress()+"/"+
-			     requestpkt.getPort()+" ("+
-			     requestpkt.getLength()+" bytes), "+
-			     "version "+version+" (expecting "+
-			     DISCOVERY_VERSION.value+")");
-			continue;
-		    }
-		    request = (DiscoveryRequest)oins.readObject();
-		} catch (Exception e) {
-		    System.err.println("Warning: DiscoveryServer failed to "+
-				       "get a valid DiscoveryRequest object "+
-				       "from "+requestpkt.getAddress()+"/"+
-				       requestpkt.getPort()+" ("+
-				       requestpkt.getLength()+" bytes)");
-		    continue;
-		}
-		// check against what we know...
-		int si;
-		for (si=0; si<servers.length; si++) {
-		    if (matchServiceTypes(request.serviceTypes,
-					  servers[si].serviceTypes) &&
-			matchServiceTypes(request.groups,
-					  servers[si].groups)) {
-			// so far so good
-			String [] unknownUrls = urlsNotKnown(servers[si].urls,
-							     request.heard);
-			if (unknownUrls==null || unknownUrls.length==0) {
-			    if (debug)
-				System.err.println("Note: DiscoveryServer does "+
-						   "not reply due to all urls "+
-						   "known");
-			    continue;
+			this.destAddress = destAddress;
+			this.destPort = destPort;
+			this.data = data;
+			try
+			{
+				if (destAddress.isMulticastAddress())
+				{
+					sendSocket = MulticastUtils.newMulticastSocket();
+					try
+					{
+						java.lang.reflect.Method m = sendSocket.getClass().getMethod
+								("setTimeToLive",
+										new Class[]{Integer.TYPE});
+						m.invoke(sendSocket,
+								new java.lang.Object[]
+										{new Integer(DISCOVERY_TTL.value)});
+					}
+					catch (Exception e)
+					{
+						System.err.println("sendSocket.setTimeToLive failed: " + e);
+					}
+				}
+				else
+				{
+					// unicast
+					sendSocket = new DatagramSocket();
+					// NB Shared by DiscoveryServer??
+				}
 			}
-			// reply!
-			DatagramPacket p = 
-			    new DatagramPacket(announcementDatas[si],
-					       announcementDatas[si].length,
-					       requestpkt.getAddress(),
-					       ((int)request.port)&0xffff);
-					       // adjust for overflow error - ianm
-			try {
-			    if(debug)
-				System.err.println("- DiscoveryServer replies "+
-						   "to "+requestpkt.getAddress()+"/"+
-						   request.port+" ("+
-						   requestpkt.getPort()+")");
-			    discSocket.send(p);
-			} catch (Exception e) {
-			    System.err.println("Warning: DiscoveryServer: "+e);
-			    e.printStackTrace(System.err);
+			catch (Exception e)
+			{
+				System.err.println("ERROR: in DiscoveryServerAgent." +
+						"AnnouncementClient: " + e);
+				e.printStackTrace(System.err);
+				return;
 			}
-		    } else {
-			if (debug)
-			    System.err.println("Note: DiscoveryServer does "+
-					       "not reply due unmatched "+
-					       "type and/or group");
-		    }
-		}
-	    }
-	}
-    }
+			resendInterval = ANNOUNCEMENT_INTERVAL_S.value * 1000;
+			long now = System.currentTimeMillis();
+			nextSendTime = now +
+					(long) (random.nextDouble() *
+							ANNOUNCEMENT_STARTUP_DELAY_S.value * 1000);
 
-    /** current discovery servers, 1 per url */
-    DiscoveryServer [] discoveryServers;
- 
-    /* lifecycle */
-    public DiscoveryServerAgentImpl() {
-	//....
-    }
+			myThread = new Thread(this);
+			myThread.start();
+		}
+
+		/**
+		 * stop
+		 */
+		synchronized void stop()
+		{
+			if (myThread != null)
+			{
+				//myThread.stop();
+				Thread t = myThread;
+				myThread = null;
+				t.interrupt();
+			}
+		}
+
+		/**
+		 * work...
+		 */
+		public void run()
+		{
+			System.err.println("AnnouncementClient running for " +
+					destAddress + ":" + destPort + "...");
+			while (myThread != null)
+			{
+				// wait until next send
+				long now = System.currentTimeMillis();
+				if (now < nextSendTime)
+				{
+					try
+					{
+						Thread.sleep(nextSendTime - now);
+					}
+					catch (Exception e)
+					{
+					}
+					continue;
+				}
+				// send!
+				DatagramPacket p = new DatagramPacket(data,
+						data.length,
+						destAddress,
+						destPort);
+				try
+				{
+					if (debug)
+					{
+						System.err.println("Note: AnnouncementClient sends " +
+								"to " + destAddress + ":" + destPort);
+					}
+					sendSocket.send(p);
+				}
+				catch (Exception e)
+				{
+					System.err.println("Warning: AnnouncementClient: " + e);
+					e.printStackTrace(System.err);
+				}
+				// fix next send time
+				nextSendTime += resendInterval;
+			}
+		}
+	}
+
+	/**
+	 * current announcement clients, 1 per url
+	 */
+	AnnouncementClient[] announcementClients;
+
+	/**
+	 * internal discovery server (receiver/responder) class.
+	 * Note: uses announcementDatas and servers from containing class.
+	 */
+	class DiscoveryServer implements Runnable
+	{
+		/**
+		 * mc group
+		 */
+		InetAddress discAddress;
+		/**
+		 * mc port
+		 */
+		int discPort;
+		/**
+		 * multicast socket
+		 */
+		DatagramSocket discSocket;
+		/**
+		 * thread
+		 */
+		Thread myThread;
+
+		/**
+		 * main constructor
+		 */
+		DiscoveryServer(InetAddress discAddress,
+		                int discPort)
+		{
+			this.discAddress = discAddress;
+			this.discPort = discPort;
+
+			if (discAddress.isMulticastAddress())
+			{
+				try
+				{
+					discSocket = MulticastUtils.newMulticastSocket(discPort);
+					((MulticastSocket) discSocket).joinGroup(discAddress);
+				}
+				catch (Exception e)
+				{
+					System.err.println("ERROR: in DiscoveryServerAgent." +
+							"DiscoveryServer: " + e);
+					e.printStackTrace(System.err);
+					return;
+				}
+			}
+			else
+			{
+				// unicast - we may not need to listen for queries if the rendezvous is smart enough...
+				return;
+			}
+			myThread = new Thread(this);
+			myThread.start();
+		}
+
+		/**
+		 * stop
+		 */
+		synchronized void stop()
+		{
+			if (myThread != null)
+			{
+				//myThread.stop();
+				Thread t = myThread;
+				myThread = null;
+				t.interrupt();
+			}
+		}
+
+		/**
+		 * work...
+		 */
+		public void run()
+		{
+			System.err.println("DiscoveryServer running on " +
+					discAddress + ":" + discPort + "...");
+			while (myThread != null)
+			{
+				byte requestData[] = new byte[1024];
+				DatagramPacket requestpkt =
+						new DatagramPacket(requestData,
+								requestData.length);
+				try
+				{
+					// get a packet
+					discSocket.receive(requestpkt);
+					if (myThread == null)
+					// abort
+					{
+						break;
+					}
+				}
+				catch (Exception e)
+				{
+					System.err.println("ERROR: in DiscoveryServer receive: " +
+							e);
+					continue;
+				}
+				// decode
+				DiscoveryRequest request = null;
+				try
+				{
+					ByteArrayInputStream bins =
+							new ByteArrayInputStream(requestpkt.getData(), 0,
+									requestpkt.getLength());
+					equip.runtime.ObjectInputStream oins =
+							new equip.runtime.ObjectInputStream(bins);
+					long version = oins.readInt();
+					if (version != DISCOVERY_VERSION.value)
+					{
+						System.err.println
+								("Warning: DiscoveryServer failed to " +
+										"get a valid DiscoveryRequest object " +
+										"from " + requestpkt.getAddress() + "/" +
+										requestpkt.getPort() + " (" +
+										requestpkt.getLength() + " bytes), " +
+										"version " + version + " (expecting " +
+										DISCOVERY_VERSION.value + ")");
+						continue;
+					}
+					request = (DiscoveryRequest) oins.readObject();
+				}
+				catch (Exception e)
+				{
+					System.err.println("Warning: DiscoveryServer failed to " +
+							"get a valid DiscoveryRequest object " +
+							"from " + requestpkt.getAddress() + "/" +
+							requestpkt.getPort() + " (" +
+							requestpkt.getLength() + " bytes)");
+					continue;
+				}
+				// check against what we know...
+				int si;
+				for (si = 0; si < servers.length; si++)
+				{
+					if (matchServiceTypes(request.serviceTypes,
+							servers[si].serviceTypes) &&
+							matchServiceTypes(request.groups,
+									servers[si].groups))
+					{
+						// so far so good
+						String[] unknownUrls = urlsNotKnown(servers[si].urls,
+								request.heard);
+						if (unknownUrls == null || unknownUrls.length == 0)
+						{
+							if (debug)
+							{
+								System.err.println("Note: DiscoveryServer does " +
+										"not reply due to all urls " +
+										"known");
+							}
+							continue;
+						}
+						// reply!
+						DatagramPacket p =
+								new DatagramPacket(announcementDatas[si],
+										announcementDatas[si].length,
+										requestpkt.getAddress(),
+										((int) request.port) & 0xffff);
+						// adjust for overflow error - ianm
+						try
+						{
+							if (debug)
+							{
+								System.err.println("- DiscoveryServer replies " +
+										"to " + requestpkt.getAddress() + "/" +
+										request.port + " (" +
+										requestpkt.getPort() + ")");
+							}
+							discSocket.send(p);
+						}
+						catch (Exception e)
+						{
+							System.err.println("Warning: DiscoveryServer: " + e);
+							e.printStackTrace(System.err);
+						}
+					}
+					else
+					{
+						if (debug)
+						{
+							System.err.println("Note: DiscoveryServer does " +
+									"not reply due unmatched " +
+									"type and/or group");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * current discovery servers, 1 per url
+	 */
+	DiscoveryServer[] discoveryServers;
+
+	/* lifecycle */
+	public DiscoveryServerAgentImpl()
+	{
+		//....
+	}
 
     /* API */
-    /** initialiase.
-     */
-    public synchronized void 
-	start(equip.discovery.ServerDiscoveryInfo []servers, 
-	      String []discoveryUrls) {
-	if (started) {
-	    System.err.println("Warning: DiscoveryServerAgent.start "+
-			       "causes stop/start");
-	    stop();
-	}
-	this.servers = servers;
-	this.discoveryUrls = discoveryUrls;
 
-	int i;
-	int si;
-	// announcements
-	if (servers.length>0) {
-	    announcementDatas = new byte [servers.length][];
-	    for (si=0; si<servers.length; si++) {
-		announcementDatas[si] = makeAnnouncement(servers[si]);
-	    }
-	}
-	if (discoveryUrls.length > 0 && 
-	    servers.length > 0) {
-	    announcementClients = 
-		new AnnouncementClient [discoveryUrls.length*
-				        servers.length];
-	    int j=0;
-	    for (si=0; si<servers.length; si++) {
-		for (i=0; i<discoveryUrls.length; i++, j++) {
-		    try {
-			InetAddress address;
-			int port[] = new int[1];
-			address = parseUrl(discoveryUrls[i], 
-					   DISCOVERY_GROUP.value,
-					   port);
-			// add 1 to port and address for announcement
-			// rather than discovery ONLY IF MULTICAST
-			byte [] addr = address.getAddress();
-			if (address.isMulticastAddress()) 
-			{
-			    port[0]++;
-			    addr[addr.length-1]++;
-			    // address = InetAddress.getByAddress(addr);
-			    // assumes 4-byte address
-			    address = InetAddress.getByName(
-				(addr[0] & 0xff) + "." + 
-				(addr[1] & 0xff) + "." + 
-				(addr[2] & 0xff)  + "." + 
-				(addr[3] & 0xff) 
-				);
-			}
-			// make it
-			announcementClients[j] = 
-			    new AnnouncementClient(address, port[0], 
-						   announcementDatas[si]);
-		    } catch (Exception e) {
-			System.err.println
-			    ("ERROR: creating AnnouncementClient "+
-			     "for "+discoveryUrls[i]+": "+e);
-			e.printStackTrace(System.err);
-		    }
-		}
-	    }
-	}
-	// discoverys
-	if (discoveryUrls.length > 0) {
-	    discoveryServers = 
-		new DiscoveryServer[discoveryUrls.length];
-	    for (i=0; i<discoveryUrls.length; i++)
-		try {
-		    InetAddress address;
-		    int port[] = new int[1];
-		    address = parseUrl(discoveryUrls[i], 
-				       DISCOVERY_GROUP.value,
-				       port);
-		    discoveryServers[i] = 
-			new DiscoveryServer(address, port[0]);
-		} catch (Exception e) {
-		    System.err.println
-			("ERROR: creating discoveryServer "+
-			 "for "+discoveryUrls[i]+": "+e);
-		    e.printStackTrace(System.err);
-		}
-	}
-	started = true;
-	return;
-    }
-    /** initialiase using default discovery and announcement Urls.
-       */
-    public void startDefault(equip.discovery.ServerDiscoveryInfo []servers) {
-	String [] discoveryUrls = getDefaultDiscoveryUrls();
-	start(servers, discoveryUrls);
-	return;
-    }
-    /** terminate activity.
-       */
-    public synchronized void stop() {
-	if (!started) {
-	    System.err.println("ERROR: DiscoveryServerAgent.stop called "+
-			       "when not started");
-	    return;
-	}
-	started = false;
-	int i;
-	if (announcementClients!=null) {
-	    for (i=0; i<announcementClients.length; i++)
-		announcementClients[i].stop();
-	    announcementClients = null;
-	}
-	if (discoveryServers!=null) {
-	    for (i=0; i<discoveryServers.length; i++)
-		discoveryServers[i].stop();
-	    discoveryServers = null;
-	}
-	return;
-    }
-    /* subclasses....*/
-
-    /** get default discovery URL(s) */
-    static String [] getDefaultDiscoveryUrls() {
-	String [] urls;
-	// ensure initialised
-	SingletonManager.get(equip.data.DataManager.class.getName());//throw away - forces equip.eqconf read
-	ConfigManager config = (ConfigManager)SingletonManager.get(ConfigManagerImpl.class.getName());
-	String allUrls = System.getProperty("discoveryUrls", config.getStringValue("discoveryUrls", null));
-	if (allUrls==null)
-	    allUrls = "equipd://"+config.getStringValue("discoveryGroup", DISCOVERY_GROUP.value)+":"+
-		config.getLongValue("discoveryPort", DISCOVERY_PORT.value);
-	java.util.StringTokenizer toks = new java.util.StringTokenizer(allUrls, ",");
-	urls = new String[toks.countTokens()];
-	int i =0;
-	while(toks.hasMoreTokens()) 
+	/**
+	 * initialiase.
+	 */
+	public synchronized void
+	start(equip.discovery.ServerDiscoveryInfo[] servers,
+	      String[] discoveryUrls)
 	{
-	    urls[i++] = toks.nextToken().trim();
-	}
-	return urls;
-    }
+		if (started)
+		{
+			System.err.println("Warning: DiscoveryServerAgent.start " +
+					"causes stop/start");
+			stop();
+		}
+		this.servers = servers;
+		this.discoveryUrls = discoveryUrls;
 
-    /** parse discovery URL to address and port */
-    static InetAddress parseUrl(String urlIn, String defaultAddress,
-				int [] port) 
-	throws SecurityException, UnknownHostException,
-	       DiscoveryUrlException {
-	StringBuffer url = new StringBuffer(urlIn);
-	// expand to canonical "equipd://<default>:<default>/"
-	if (url.toString().indexOf(":")<0)
-	    url.insert(0,"equipd:");
-	// check scheme
-	if (url.length()<7 || !(url.toString().substring(0,7).equals("equipd:"))) 
-	    throw new DiscoveryUrlException("Discovery URL must begin with "+
-					    "equipd: - \""+urlIn+"\"");
-	if (!(url.toString().substring(7,9).equals("//")))
-	    url.insert(7,"//");
-	int iColon, iSlash;
-	iColon = url.toString().indexOf(":", 9);
-	iSlash = url.toString().indexOf("/", 9);
-	if (iSlash<0) {
-	    iSlash = url.length();
-	    url.append("/");
+		int i;
+		int si;
+		// announcements
+		if (servers.length > 0)
+		{
+			announcementDatas = new byte[servers.length][];
+			for (si = 0; si < servers.length; si++)
+			{
+				announcementDatas[si] = makeAnnouncement(servers[si]);
+			}
+		}
+		if (discoveryUrls.length > 0 &&
+				servers.length > 0)
+		{
+			announcementClients =
+					new AnnouncementClient[discoveryUrls.length *
+							servers.length];
+			int j = 0;
+			for (si = 0; si < servers.length; si++)
+			{
+				for (i = 0; i < discoveryUrls.length; i++, j++)
+				{
+					try
+					{
+						InetAddress address;
+						int port[] = new int[1];
+						address = parseUrl(discoveryUrls[i],
+								DISCOVERY_GROUP.value,
+								port);
+						// add 1 to port and address for announcement
+						// rather than discovery ONLY IF MULTICAST
+						byte[] addr = address.getAddress();
+						if (address.isMulticastAddress())
+						{
+							port[0]++;
+							addr[addr.length - 1]++;
+							// address = InetAddress.getByAddress(addr);
+							// assumes 4-byte address
+							address = InetAddress.getByName(
+									(addr[0] & 0xff) + "." +
+											(addr[1] & 0xff) + "." +
+											(addr[2] & 0xff) + "." +
+											(addr[3] & 0xff)
+							);
+						}
+						// make it
+						announcementClients[j] =
+								new AnnouncementClient(address, port[0],
+										announcementDatas[si]);
+					}
+					catch (Exception e)
+					{
+						System.err.println
+								("ERROR: creating AnnouncementClient " +
+										"for " + discoveryUrls[i] + ": " + e);
+						e.printStackTrace(System.err);
+					}
+				}
+			}
+		}
+		// discoverys
+		if (discoveryUrls.length > 0)
+		{
+			discoveryServers =
+					new DiscoveryServer[discoveryUrls.length];
+			for (i = 0; i < discoveryUrls.length; i++)
+			{
+				try
+				{
+					InetAddress address;
+					int port[] = new int[1];
+					address = parseUrl(discoveryUrls[i],
+							DISCOVERY_GROUP.value,
+							port);
+					discoveryServers[i] =
+							new DiscoveryServer(address, port[0]);
+				}
+				catch (Exception e)
+				{
+					System.err.println
+							("ERROR: creating discoveryServer " +
+									"for " + discoveryUrls[i] + ": " + e);
+					e.printStackTrace(System.err);
+				}
+			}
+		}
+		started = true;
+		return;
 	}
-	if (iSlash==9 || iColon==9) {
-	    url.insert(9, defaultAddress);
-	    iColon = url.toString().indexOf(":", 9);
-	    iSlash = url.toString().indexOf("/", 9);
-	}
-	if (iColon<0 || iColon>iSlash) {
-	    iColon = iSlash;
-	    url.insert(iSlash, ":"+DISCOVERY_PORT.value);
-	    iSlash = url.toString().indexOf("/", 9);
-	}
-	// check path null
-	if (iSlash!=url.length()-1) 
-	    throw new DiscoveryUrlException
-		("Discovery URL cannot have a path component - \""+
-		 urlIn+"\" (canocialised to \""+url+"\")");
-	// parse
-	InetAddress address = InetAddress.getByName(url.toString().substring(9,iColon));
-	try {
-	    port[0] = new Integer(url.toString().substring(iColon+1, iSlash)).intValue();
-	} catch (NumberFormatException e) {
-	    throw new DiscoveryUrlException
-		("Problem with port number in Discovery URL - \""+
-		 urlIn+"\" (canocialised to \""+url+"\")");
-	}
-	return address;
-    }
-    /** make announcement */
-    byte [] makeAnnouncement(ServerDiscoveryInfo server) {
-	try {
-	    ByteArrayOutputStream bouts = new ByteArrayOutputStream();
-	    equip.runtime.ObjectOutputStream oouts = 
-		new equip.runtime.ObjectOutputStream(bouts);
-	    oouts.writeInt(DISCOVERY_VERSION.value);
-	    ServerAnnouncement announcement = new ServerAnnouncementImpl();
-	    announcement.infos = new ServerDiscoveryInfo[] { server };
-	    announcement.announcementIntervalMillis = 
-		ANNOUNCEMENT_INTERVAL_S.value*1000;
 
-	    oouts.writeObject(announcement);
-	    oouts.flush();
-	    byte [] data = bouts.toByteArray();
-	    return data;
-	} catch (Exception e) {
-	    System.err.println("ERROR: DiscoveryServerAgent making "+
-			       "announcement: "+e);
-	    e.printStackTrace(System.err);
+	/**
+	 * initialiase using default discovery and announcement Urls.
+	 */
+	public void startDefault(equip.discovery.ServerDiscoveryInfo[] servers)
+	{
+		String[] discoveryUrls = getDefaultDiscoveryUrls();
+		start(servers, discoveryUrls);
+		return;
 	}
-	return null;
-    }
 
-    /** sample main - as a helper for another server */
-    public static void main(String [] args) {
-	if (args.length!=3) {
-	    System.err.println("Usage: equip.discovery.DiscoveryServerAgentImpl <serviceType> <group> <url>");
-	    System.exit(-1);
+	/**
+	 * terminate activity.
+	 */
+	public synchronized void stop()
+	{
+		if (!started)
+		{
+			System.err.println("ERROR: DiscoveryServerAgent.stop called " +
+					"when not started");
+			return;
+		}
+		started = false;
+		int i;
+		if (announcementClients != null)
+		{
+			for (i = 0; i < announcementClients.length; i++)
+			{
+				announcementClients[i].stop();
+			}
+			announcementClients = null;
+		}
+		if (discoveryServers != null)
+		{
+			for (i = 0; i < discoveryServers.length; i++)
+			{
+				discoveryServers[i].stop();
+			}
+			discoveryServers = null;
+		}
+		return;
 	}
-	ServerDiscoveryInfo [] servers = new ServerDiscoveryInfo[1];
-	servers[0] = new ServerDiscoveryInfoImpl();
-	servers[0].serviceTypes = new String [1];
-	servers[0].serviceTypes[0] = args[0];
-	servers[0].groups = new String [1];
-	servers[0].groups[0] = args[1];
-	servers[0].urls = new String [1];
-	servers[0].urls[0] = args[2];
-	
-	// go...
-	DiscoveryServerAgent agent = new DiscoveryServerAgentImpl();
-	agent.startDefault(servers);
-    }
+	/* subclasses....*/
 
-    /** match a request array of serviceTypes or groups against an server
-     */
-    static boolean matchServiceTypes(String [] request,
-				     String [] offer) {
-	if (request==null || offer==null)
-	    return false;
-
-	int i, j;
-	// serviceTypes
-	for (i=0; i<request.length; i++) {
-	    if (request[i].equals(DISCOVERY_GROUP_ANY.value))
-		// any ("") always matches
-		return true;
-	    for (j=0; j<offer.length; j++)
-		if (request[i].equals(offer[j]))
-		    return true;
+	/**
+	 * get default discovery URL(s)
+	 */
+	static String[] getDefaultDiscoveryUrls()
+	{
+		String[] urls;
+		// ensure initialised
+		SingletonManager.get(equip.data.DataManager.class.getName());//throw away - forces equip.eqconf read
+		ConfigManager config = (ConfigManager) SingletonManager.get(ConfigManagerImpl.class.getName());
+		String allUrls = System.getProperty("discoveryUrls", config.getStringValue("discoveryUrls", null));
+		if (allUrls == null)
+		{
+			allUrls = "equipd://" + config.getStringValue("discoveryGroup", DISCOVERY_GROUP.value) + ":" +
+					config.getLongValue("discoveryPort", DISCOVERY_PORT.value);
+		}
+		java.util.StringTokenizer toks = new java.util.StringTokenizer(allUrls, ",");
+		urls = new String[toks.countTokens()];
+		int i = 0;
+		while (toks.hasMoreTokens())
+		{
+			urls[i++] = toks.nextToken().trim();
+		}
+		return urls;
 	}
-	return false;
-    }
-    /** return offer urls not already known
-     */
-    static String [] urlsNotKnown(String [] urls,
-				  String [] heard) {
-	if (heard==null)
-	    return urls;
-	if (urls==null)
-	    return null;
-	Vector ok = new Vector();
 
-	int i, j;
-	for (i=0; i<urls.length; i++) {
-	    for (j=0; j<heard.length; j++)
-		if (urls[i].equals(heard[j]))
-		    break;
-	    if (j<heard.length)
-		// already heard
-		continue;
-	    ok.addElement(urls[i]);
+	/**
+	 * parse discovery URL to address and port
+	 */
+	static InetAddress parseUrl(String urlIn, String defaultAddress,
+	                            int[] port)
+			throws SecurityException, UnknownHostException,
+			DiscoveryUrlException
+	{
+		StringBuffer url = new StringBuffer(urlIn);
+		// expand to canonical "equipd://<default>:<default>/"
+		if (url.toString().indexOf(":") < 0)
+		{
+			url.insert(0, "equipd:");
+		}
+		// check scheme
+		if (url.length() < 7 || !(url.toString().substring(0, 7).equals("equipd:")))
+		{
+			throw new DiscoveryUrlException("Discovery URL must begin with " +
+					"equipd: - \"" + urlIn + "\"");
+		}
+		if (!(url.toString().substring(7, 9).equals("//")))
+		{
+			url.insert(7, "//");
+		}
+		int iColon, iSlash;
+		iColon = url.toString().indexOf(":", 9);
+		iSlash = url.toString().indexOf("/", 9);
+		if (iSlash < 0)
+		{
+			iSlash = url.length();
+			url.append("/");
+		}
+		if (iSlash == 9 || iColon == 9)
+		{
+			url.insert(9, defaultAddress);
+			iColon = url.toString().indexOf(":", 9);
+			iSlash = url.toString().indexOf("/", 9);
+		}
+		if (iColon < 0 || iColon > iSlash)
+		{
+			iColon = iSlash;
+			url.insert(iSlash, ":" + DISCOVERY_PORT.value);
+			iSlash = url.toString().indexOf("/", 9);
+		}
+		// check path null
+		if (iSlash != url.length() - 1)
+		{
+			throw new DiscoveryUrlException
+					("Discovery URL cannot have a path component - \"" +
+							urlIn + "\" (canocialised to \"" + url + "\")");
+		}
+		// parse
+		InetAddress address = InetAddress.getByName(url.toString().substring(9, iColon));
+		try
+		{
+			port[0] = new Integer(url.toString().substring(iColon + 1, iSlash)).intValue();
+		}
+		catch (NumberFormatException e)
+		{
+			throw new DiscoveryUrlException
+					("Problem with port number in Discovery URL - \"" +
+							urlIn + "\" (canocialised to \"" + url + "\")");
+		}
+		return address;
 	}
-	String [] result = new String[ok.size()];
-	for (i=0; i<ok.size(); i++)
-	    result[i] = (String)ok.elementAt(i);
 
-	return result;
-    }
+	/**
+	 * make announcement
+	 */
+	byte[] makeAnnouncement(ServerDiscoveryInfo server)
+	{
+		try
+		{
+			ByteArrayOutputStream bouts = new ByteArrayOutputStream();
+			equip.runtime.ObjectOutputStream oouts =
+					new equip.runtime.ObjectOutputStream(bouts);
+			oouts.writeInt(DISCOVERY_VERSION.value);
+			ServerAnnouncement announcement = new ServerAnnouncementImpl();
+			announcement.infos = new ServerDiscoveryInfo[]{server};
+			announcement.announcementIntervalMillis =
+					ANNOUNCEMENT_INTERVAL_S.value * 1000;
+
+			oouts.writeObject(announcement);
+			oouts.flush();
+			byte[] data = bouts.toByteArray();
+			return data;
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR: DiscoveryServerAgent making " +
+					"announcement: " + e);
+			e.printStackTrace(System.err);
+		}
+		return null;
+	}
+
+	/**
+	 * match a request array of serviceTypes or groups against an server
+	 */
+	static boolean matchServiceTypes(String[] request,
+	                                 String[] offer)
+	{
+		if (request == null || offer == null)
+		{
+			return false;
+		}
+
+		int i, j;
+		// serviceTypes
+		for (i = 0; i < request.length; i++)
+		{
+			if (request[i].equals(DISCOVERY_GROUP_ANY.value))
+			// any ("") always matches
+			{
+				return true;
+			}
+			for (j = 0; j < offer.length; j++)
+			{
+				if (request[i].equals(offer[j]))
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * return offer urls not already known
+	 */
+	static String[] urlsNotKnown(String[] urls,
+	                             String[] heard)
+	{
+		if (heard == null)
+		{
+			return urls;
+		}
+		if (urls == null)
+		{
+			return null;
+		}
+		Vector ok = new Vector();
+
+		int i, j;
+		for (i = 0; i < urls.length; i++)
+		{
+			for (j = 0; j < heard.length; j++)
+			{
+				if (urls[i].equals(heard[j]))
+				{
+					break;
+				}
+			}
+			if (j < heard.length)
+			// already heard
+			{
+				continue;
+			}
+			ok.addElement(urls[i]);
+		}
+		String[] result = new String[ok.size()];
+		for (i = 0; i < ok.size(); i++)
+		{
+			result[i] = (String) ok.elementAt(i);
+		}
+
+		return result;
+	}
 
 } /* class DiscoveryServerAgent */
 

@@ -71,101 +71,6 @@ import equip.ect.apps.editor.interactive.InteractiveCanvasItem;
 
 public class GraphComponent extends BeanCanvasItem implements Connectable
 {
-	private class MyLinkWatcher implements DataspaceEventListener
-	{
-		@Override
-		public void dataspaceEvent(final DataspaceEvent de)
-		{
-			final Runnable task = new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					// System.err.println("Link event: " + de);
-					final equip.data.ItemData newItem = de.getAddItem();
-					if (newItem instanceof equip.data.TupleImpl && canvas instanceof GraphEditorCanvas)
-					{
-						final GraphEditorCanvas gec = (GraphEditorCanvas) canvas;
-						final PropertyLinkRequest req = new PropertyLinkRequest((equip.data.TupleImpl) newItem);
-						Info.message(this, "Link from " + req.getSourcePropID() + " to " + req.getDestinationPropID());
-						final String linkid = req.getID().toString();
-						final List<BeanCanvasItem> links = gec.getBeanInstances(linkid);
-						if (links != null && links.size() > 0)
-						{
-							System.err.println("Link " + linkid + " already exists");
-							return;
-						}
-
-						final String fromid = req.getSourceComponentID().toString();
-						//final String toid = req.getDestComponentID().toString();
-						GraphComponentProperty fromprop = null, toprop = null;
-						if (fromid.equals(beanid))
-						{
-							fromprop = getGraphComponentProperty(req.getSourcePropID().toString());
-						}
-						else
-						{
-							toprop = getGraphComponentProperty(req.getDestinationPropID().toString());
-						}
-
-						final ComponentProperty prop = new ComponentProperty(
-								(fromid.equals(beanid) ? req.getDestinationPropID() : req.getSourcePropID()));
-						final List<GraphComponentProperty> props = gec.getGraphComponentProperties(prop);
-						if (props != null && props.size() > 0)
-						{
-							if (fromid.equals(beanid))
-							{
-								toprop = props.get(0);
-							}
-							else
-							{
-								fromprop = props.get(0);
-							}
-						}
-
-						if (fromid.equals(beanid))
-						{
-							if (fromprop == null)
-							{
-								// probably a dynamic property
-								List<PropertyLinkRequest> lr = pendingFromLinks.get(req.getSourcePropID().toString());
-								if (lr == null)
-								{
-									lr = new ArrayList<>();
-									pendingFromLinks.put(req.getSourcePropID().toString(), lr);
-								}
-								lr.add(req);
-							}
-						}
-						else
-						{
-							if (toprop == null)
-							{
-								List<PropertyLinkRequest> lr = pendingToLinks.get(req.getDestinationPropID().toString());
-								if (lr == null)
-								{
-									lr = new ArrayList<>();
-									pendingToLinks.put(req.getDestinationPropID().toString(), lr);
-								}
-								lr.add(req);
-							}
-						}
-
-						if (toprop != null && fromprop != null)
-						{
-							Info.message(this, "Found both ends of link!");
-							gec.connect(fromprop, toprop, req);
-							fromprop.getParent().revalidate();
-							toprop.getParent().revalidate();
-						}
-					}
-				}
-			};
-			javax.swing.SwingUtilities.invokeLater(task);
-		}
-	}
-	// links from me - template
-	public static boolean showAllLinks = true;
 	private final Drawer drawer;
 	private transient final Map<String, GraphComponentProperty> graphCompProps = new HashMap<>();
 	private transient final List<GraphComponentProperty> renderableProps = new ArrayList<>();
@@ -176,7 +81,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 	private equip.data.DataSession linkFromSession;
 	private equip.data.DataSession linkToSession;
 	private boolean watchingLinks = false;
-
 	GraphComponent(final Component canvas, final String beanid, final String title, final String hostID)
 	{
 		super(canvas, new GraphComponentView(canvas, title, null), beanid, title);
@@ -236,66 +140,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		return new Point(posX + width, (int) (posY + 0.5 * headerHeight));
 	}
 
-	public void removeInputLink(final Link link)
-	{
-		if (inLinkGroups == null)
-		{
-			return;
-		}
-
-		final GraphComponentProperty source = (GraphComponentProperty) link.getSource();
-		if (source != null)
-		{
-			final LinkGroup linkGroup = getInLinkGroup(source.getParent());
-			if (linkGroup == null)
-			{
-				return;
-			}
-
-			linkGroup.removeLink(link);
-			if (linkGroup.nrLinks() < 1)
-			{
-				inLinkGroups.remove(linkGroup.getSource());
-			}
-			if (inLinkGroups.size() < 1)
-			{
-				inLinkGroups = null;
-			}
-		}
-	}
-
-	public void removeOutputLink(final Link link)
-	{
-		synchronized (link)
-		{
-			if (outLinkGroups == null)
-			{
-				return;
-			}
-
-			final GraphComponentProperty target = (GraphComponentProperty) link.getTarget();
-			if (target != null)
-			{
-				final LinkGroup linkGroup = getOutLinkGroup(target.getParent());
-				if (linkGroup == null)
-				{
-					return;
-				}
-				//final Link removedLink =
-				linkGroup.removeLink(link);
-
-				if (linkGroup.nrLinks() < 1)
-				{
-					outLinkGroups.remove(linkGroup.getTarget());
-				}
-				if (outLinkGroups.size() < 1)
-				{
-					outLinkGroups = null;
-				}
-			}
-		}
-	}
-
 	@Override
 	public void repaint()
 	{
@@ -329,55 +173,12 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		super.repaint();
 	}
 
-	public void revalidate()
-	{
-		switch (drawer.getDrawerState())
-		{
-			case OPEN:
-				openDrawer();
-				break;
-			case COMPACT:
-				compactDrawer();
-				break;
-			case CLOSED:
-				closeDrawer();
-				break;
-		}
-	}
-
-	public final void setDrawerState(final Drawer.State drawerState)
-	{
-		drawer.setDrawerState(drawerState);
-		switch (drawerState)
-		{
-			case OPEN:
-				openDrawer();
-				break;
-			case COMPACT:
-				compactDrawer();
-				break;
-			case CLOSED:
-				closeDrawer();
-				break;
-		}
-	}
-
 	@Override
 	public void setName(final String name)
 	{
 		System.out.println("Set Name " + name);
 		super.setName(name);
 		((GraphComponentView) view).setName(name);
-	}
-
-	@Override
-	public void setSelected(boolean selected)
-	{
-		if (!selected)
-		{
-			renderableProps.stream().filter(InteractiveCanvasItem::isSelected).forEach(gcp -> gcp.setSelected(false));
-		}
-		super.setSelected(selected);
 	}
 
 	@Override
@@ -420,65 +221,20 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 	}
 
 	@Override
+	public void setSelected(boolean selected)
+	{
+		if (!selected)
+		{
+			renderableProps.stream().filter(InteractiveCanvasItem::isSelected).forEach(gcp -> gcp.setSelected(false));
+		}
+		super.setSelected(selected);
+	}
+
+	@Override
 	public void setTargetCanvas(final Component canvas)
 	{
 		super.setTargetCanvas(canvas);
 		calculateSize();
-	}
-
-	public void update()
-	{
-		calculateSize();
-	}
-
-	public void watchLinks(final boolean watch)
-	{
-		Info.message(this, "Watch links? " + watch);
-		if (watch && showAllLinks && !watchingLinks)
-		{
-			final ComponentAdvert compAdv = DataspaceMonitor.getMonitor().getComponentAdverts().get(this.beanid);
-			final PropertyLinkRequest fromRequest = new PropertyLinkRequest((equip.data.GUID) null);
-			fromRequest.setSourceComponentID(compAdv.getComponentID());
-			equip.data.ItemData linkFromTemplate = fromRequest.tuple;
-			final PropertyLinkRequest toRequest = new PropertyLinkRequest((equip.data.GUID) null);
-			toRequest.setDestComponentID(compAdv.getComponentID());
-			equip.data.ItemData linkToTemplate = toRequest.tuple;
-			final DataspaceEventListener linkWatcher = new MyLinkWatcher();
-			try
-			{
-				linkFromSession = DataspaceMonitor.getMonitor().getDataspace()
-						.addDataspaceEventListener(linkFromTemplate, /* local */
-								true, linkWatcher);
-				linkToSession = DataspaceMonitor.getMonitor().getDataspace().addDataspaceEventListener(linkToTemplate, /* local */
-						true, linkWatcher);
-			}
-			catch (final DataspaceInactiveException e)
-			{
-				// Do nothing?
-			}
-			watchingLinks = true;
-		}
-		else if (!watch && watchingLinks)
-		{
-			try
-			{
-				if (linkFromSession != null)
-				{
-					DataspaceMonitor.getMonitor().getDataspace().removeDataspaceEventListener(linkFromSession);
-					linkFromSession = null;
-				}
-				if (linkToSession != null)
-				{
-					DataspaceMonitor.getMonitor().getDataspace().removeDataspaceEventListener(linkToSession);
-					linkToSession = null;
-				}
-			}
-			catch (final DataspaceInactiveException e)
-			{
-				// Do nothing?
-			}
-			watchingLinks = false;
-		}
 	}
 
 	void addGraphComponentProperty(final ComponentProperty compProp)
@@ -629,45 +385,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		return outLinkGroups;
 	}
 
-	void removeGraphComponentProperty(final ComponentProperty compProp)
-	{
-		final GraphComponentProperty gcp = graphCompProps.remove(compProp.getID().toString());
-		renderableProps.remove(gcp);
-		if (gcp != null)
-		{
-			height -= gcp.getHeight();
-		}
-		pendingToLinks.remove(compProp.getID().toString());
-		pendingFromLinks.remove(compProp.getID().toString());
-
-		if (canvas instanceof GraphEditorCanvas)
-		{
-			List<Link> links = gcp.getOutputLinks();
-			if (links != null)
-			{
-				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
-			}
-			links = gcp.getInputLinks();
-			if (links != null)
-			{
-				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
-			}
-		}
-	}
-
-	/**
-	 * Calculate the size for component, adjusting to font metrics. Different sizes for different
-	 * fonts and targets canvases.
-	 */
-	void calculateSize()
-	{
-		this.lastWidth = width;
-		this.lastHeight = height;
-		((GraphComponentView) view).calculateSize();
-		this.width = view.getWidth();
-		this.height = view.getHeight();
-	}
-
 	void handleDrawerAction(final Drawer.Type action)
 	{
 		switch (action)
@@ -711,7 +428,161 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 
 	}
 
-	protected boolean canDrawerCompact()
+	void removeGraphComponentProperty(final ComponentProperty compProp)
+	{
+		final GraphComponentProperty gcp = graphCompProps.remove(compProp.getID().toString());
+		renderableProps.remove(gcp);
+		if (gcp != null)
+		{
+			height -= gcp.getHeight();
+		}
+		pendingToLinks.remove(compProp.getID().toString());
+		pendingFromLinks.remove(compProp.getID().toString());
+
+		if (canvas instanceof GraphEditorCanvas)
+		{
+			List<Link> links = gcp.getOutputLinks();
+			if (links != null)
+			{
+				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
+			}
+			links = gcp.getInputLinks();
+			if (links != null)
+			{
+				((GraphEditorCanvas) canvas).removeItems(new ArrayList<>(links));
+			}
+		}
+	}
+
+	void removeInputLink(final Link link)
+	{
+		if (inLinkGroups == null)
+		{
+			return;
+		}
+
+		final GraphComponentProperty source = (GraphComponentProperty) link.getSource();
+		if (source != null)
+		{
+			final LinkGroup linkGroup = getInLinkGroup(source.getParent());
+			if (linkGroup == null)
+			{
+				return;
+			}
+
+			linkGroup.removeLink(link);
+			if (linkGroup.nrLinks() < 1)
+			{
+				inLinkGroups.remove(linkGroup.getSource());
+			}
+			if (inLinkGroups.size() < 1)
+			{
+				inLinkGroups = null;
+			}
+		}
+	}
+
+	void removeOutputLink(final Link link)
+	{
+		synchronized (link)
+		{
+			if (outLinkGroups == null)
+			{
+				return;
+			}
+
+			final GraphComponentProperty target = (GraphComponentProperty) link.getTarget();
+			if (target != null)
+			{
+				final LinkGroup linkGroup = getOutLinkGroup(target.getParent());
+				if (linkGroup == null)
+				{
+					return;
+				}
+				//final Link removedLink =
+				linkGroup.removeLink(link);
+
+				if (linkGroup.nrLinks() < 1)
+				{
+					outLinkGroups.remove(linkGroup.getTarget());
+				}
+				if (outLinkGroups.size() < 1)
+				{
+					outLinkGroups = null;
+				}
+			}
+		}
+	}
+
+	void update()
+	{
+		calculateSize();
+	}
+
+	void watchLinks(final boolean watch)
+	{
+		Info.message(this, "Watch links? " + watch);
+		if (watch && !watchingLinks)
+		{
+			final ComponentAdvert compAdv = DataspaceMonitor.getMonitor().getComponentAdverts().get(this.beanid);
+			final PropertyLinkRequest fromRequest = new PropertyLinkRequest((equip.data.GUID) null);
+			fromRequest.setSourceComponentID(compAdv.getComponentID());
+			equip.data.ItemData linkFromTemplate = fromRequest.tuple;
+			final PropertyLinkRequest toRequest = new PropertyLinkRequest((equip.data.GUID) null);
+			toRequest.setDestComponentID(compAdv.getComponentID());
+			equip.data.ItemData linkToTemplate = toRequest.tuple;
+			final DataspaceEventListener linkWatcher = new MyLinkWatcher();
+			try
+			{
+				linkFromSession = DataspaceMonitor.getMonitor().getDataspace()
+						.addDataspaceEventListener(linkFromTemplate, /* local */
+								true, linkWatcher);
+				linkToSession = DataspaceMonitor.getMonitor().getDataspace().addDataspaceEventListener(linkToTemplate, /* local */
+						true, linkWatcher);
+			}
+			catch (final DataspaceInactiveException e)
+			{
+				// Do nothing?
+			}
+			watchingLinks = true;
+		}
+		else if (!watch && watchingLinks)
+		{
+			try
+			{
+				if (linkFromSession != null)
+				{
+					DataspaceMonitor.getMonitor().getDataspace().removeDataspaceEventListener(linkFromSession);
+					linkFromSession = null;
+				}
+				if (linkToSession != null)
+				{
+					DataspaceMonitor.getMonitor().getDataspace().removeDataspaceEventListener(linkToSession);
+					linkToSession = null;
+				}
+			}
+			catch (final DataspaceInactiveException e)
+			{
+				// Do nothing?
+			}
+			watchingLinks = false;
+		}
+	}
+
+	/**
+	 * Calculate the size for component, adjusting to font metrics. Different sizes for different
+	 * fonts and targets canvases.
+	 */
+	private void calculateSize()
+	{
+		this.lastWidth = width;
+		this.lastHeight = height;
+		((GraphComponentView) view).calculateSize();
+		this.width = view.getWidth();
+		this.height = view.getHeight();
+	}
+
+	private boolean canDrawerCompact()
 	{
 		int visibleCount = 0;
 		for (GraphComponentProperty gcp : graphCompProps.values())
@@ -725,7 +596,28 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		return !(visibleCount == 0 || visibleCount == graphCompProps.size());
 	}
 
-	protected void compactLinkGroups()
+	private void closeDrawer()
+	{
+		compactLinkGroups();
+		calculateSize();
+		repaint();
+	}
+
+	private void compactDrawer()
+	{
+		if (drawer.getPreviousDrawerState() == Drawer.State.CLOSED)
+		{
+			expandLinkGroups();
+		}
+		else
+		{
+			compactLinkGroups();
+		}
+		calculateSize();
+		repaint();
+	}
+
+	private void compactLinkGroups()
 	{
 		if (inLinkGroups != null)
 		{
@@ -755,7 +647,7 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		}
 	}
 
-	protected void expandLinkGroups()
+	private void expandLinkGroups()
 	{
 		if (inLinkGroups != null)
 		{
@@ -781,27 +673,6 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 				}
 			}
 		}
-	}
-
-	private void closeDrawer()
-	{
-		compactLinkGroups();
-		calculateSize();
-		repaint();
-	}
-
-	private void compactDrawer()
-	{
-		if (drawer.getPreviousDrawerState() == Drawer.State.CLOSED)
-		{
-			expandLinkGroups();
-		}
-		else
-		{
-			compactLinkGroups();
-		}
-		calculateSize();
-		repaint();
 	}
 
 	/**
@@ -833,5 +704,122 @@ public class GraphComponent extends BeanCanvasItem implements Connectable
 		expandLinkGroups();
 		calculateSize();
 		repaint();
+	}
+
+	private void revalidate()
+	{
+		switch (drawer.getDrawerState())
+		{
+			case OPEN:
+				openDrawer();
+				break;
+			case COMPACT:
+				compactDrawer();
+				break;
+			case CLOSED:
+				closeDrawer();
+				break;
+		}
+	}
+
+	private void setDrawerState(final Drawer.State drawerState)
+	{
+		drawer.setDrawerState(drawerState);
+		switch (drawerState)
+		{
+			case OPEN:
+				openDrawer();
+				break;
+			case COMPACT:
+				compactDrawer();
+				break;
+			case CLOSED:
+				closeDrawer();
+				break;
+		}
+	}
+
+	private class MyLinkWatcher implements DataspaceEventListener
+	{
+		@Override
+		public void dataspaceEvent(final DataspaceEvent de)
+		{
+			final Runnable task = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					// System.err.println("Link event: " + de);
+					final equip.data.ItemData newItem = de.getAddItem();
+					if (newItem instanceof equip.data.TupleImpl && canvas instanceof GraphEditorCanvas)
+					{
+						final GraphEditorCanvas gec = (GraphEditorCanvas) canvas;
+						final PropertyLinkRequest req = new PropertyLinkRequest((equip.data.TupleImpl) newItem);
+						Info.message(this, "Link from " + req.getSourcePropID() + " to " + req.getDestinationPropID());
+						final String linkid = req.getID().toString();
+						final List<BeanCanvasItem> links = gec.getBeanInstances(linkid);
+						if (links != null && links.size() > 0)
+						{
+							System.err.println("Link " + linkid + " already exists");
+							return;
+						}
+
+						final String fromid = req.getSourceComponentID().toString();
+						//final String toid = req.getDestComponentID().toString();
+						GraphComponentProperty fromprop = null, toprop = null;
+						if (fromid.equals(beanid))
+						{
+							fromprop = getGraphComponentProperty(req.getSourcePropID().toString());
+						}
+						else
+						{
+							toprop = getGraphComponentProperty(req.getDestinationPropID().toString());
+						}
+
+						final ComponentProperty prop = new ComponentProperty(
+								(fromid.equals(beanid) ? req.getDestinationPropID() : req.getSourcePropID()));
+						final List<GraphComponentProperty> props = gec.getGraphComponentProperties(prop);
+						if (props != null && props.size() > 0)
+						{
+							if (fromid.equals(beanid))
+							{
+								toprop = props.get(0);
+							}
+							else
+							{
+								fromprop = props.get(0);
+							}
+						}
+
+						if (fromid.equals(beanid))
+						{
+							if (fromprop == null)
+							{
+								// probably a dynamic property
+								List<PropertyLinkRequest> lr = pendingFromLinks.computeIfAbsent(req.getSourcePropID().toString(), k -> new ArrayList<>());
+								lr.add(req);
+							}
+						}
+						else
+						{
+							if (toprop == null)
+							{
+								List<PropertyLinkRequest> lr = pendingToLinks.computeIfAbsent(req.getDestinationPropID().toString(), k -> new ArrayList<>());
+								lr.add(req);
+							}
+						}
+
+						if (toprop != null && fromprop != null)
+						{
+							Info.message(this, "Found both ends of link!");
+							gec.connect(fromprop, toprop, req);
+							fromprop.getParent().revalidate();
+							toprop.getParent().revalidate();
+						}
+					}
+				}
+			};
+			javax.swing.SwingUtilities.invokeLater(task);
+		}
 	}
 }

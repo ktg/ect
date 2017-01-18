@@ -43,9 +43,7 @@ import java.io.IOException;
 
 public interface Persistable
 {
+	void load(File persistFile, ContainerManager containerManager) throws IOException;
 
-	public void load(File persistFile, ContainerManager containerManager) throws IOException;
-
-	public File persist(ContainerManager containerManager) throws IOException;
-
+	File persist(ContainerManager containerManager) throws IOException;
 }

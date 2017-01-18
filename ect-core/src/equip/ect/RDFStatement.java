@@ -142,13 +142,13 @@ public class RDFStatement extends CompInfo
 		try
 		{
 			final GUID guid = new equip.data.GUIDImpl();
-			guid.host_id = (new Integer(matcher.group(1)).intValue() << 24)
-					| (new Integer(matcher.group(2)).intValue() << 16)
-					| (new Integer(matcher.group(3)).intValue() << 8) | (new Integer(matcher.group(4)).intValue());
-			guid.proc_id = (new Integer(matcher.group(5)).intValue() << 16)
-					| (new Integer(matcher.group(6)).intValue());
-			guid.item_id = (new Integer(matcher.group(7)).intValue());
-			guid.time_s = (new Integer(matcher.group(8)).intValue());
+			guid.host_id = (new Integer(matcher.group(1)) << 24)
+					| (new Integer(matcher.group(2)) << 16)
+					| (new Integer(matcher.group(3)) << 8) | (new Integer(matcher.group(4)));
+			guid.proc_id = (new Integer(matcher.group(5)) << 16)
+					| (new Integer(matcher.group(6)));
+			guid.item_id = (new Integer(matcher.group(7)));
+			guid.time_s = (new Integer(matcher.group(8)));
 
 			// test/temp check
 			if (!guid.toString().equals(guids))

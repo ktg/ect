@@ -50,10 +50,10 @@ public abstract class LinkGroup extends Link
 
 	private final Map<String, Link> links;
 
-	public LinkGroup(final Component canvas, final Point startPoint, final Point endPoint, final Connectable source,
+	public LinkGroup(final Component canvas, final Connectable source,
 			final Connectable target, final RenderableLink linkView, final List<Link> links)
 	{
-		super(canvas, startPoint, endPoint, source, target, linkView, null);
+		super(canvas, source, target, linkView, null);
 
 		this.links = new HashMap<>();
 		addLinks(links);
@@ -67,7 +67,7 @@ public abstract class LinkGroup extends Link
 		}
 	}
 
-	public final void addLinks(final List<Link> links)
+	private void addLinks(final List<Link> links)
 	{
 		if (links != null)
 		{

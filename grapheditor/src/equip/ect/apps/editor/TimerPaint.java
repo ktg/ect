@@ -59,12 +59,11 @@ import java.util.List;
  */
 public class TimerPaint extends Thread
 {
-
-	protected final int delay; // delay in milli-seconds.
+	private final int delay; // delay in milli-seconds.
 
 	protected final List<? extends BeanCanvasItem> items;
 
-	public TimerPaint(final List<? extends BeanCanvasItem> items, final int delay)
+	TimerPaint(final List<? extends BeanCanvasItem> items, final int delay)
 	{
 		this.delay = delay;
 		this.items = items;

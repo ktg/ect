@@ -59,7 +59,7 @@ class GraphComponentPropertyView extends InteractiveCanvasItemView
 		setValue(value);
 	}
 
-	void paint(final Graphics2D g)
+	private void paint(final Graphics2D g)
 	{
 		// g.setClip(posX, posY, width, height);
 		g.setFont(propertyFont);
@@ -114,11 +114,6 @@ class GraphComponentPropertyView extends InteractiveCanvasItemView
 	{
 		g.setColor(selectedColor);
 		paint(g);
-	}
-
-	@Override
-	public void paintShadowed(final Graphics2D g)
-	{
 	}
 
 	@Override

@@ -50,15 +50,15 @@ public abstract class Link extends BeanCanvasItem
 	protected Connectable source, target;
 
 	protected PropertyLinkRequest linkReq;
-	protected boolean connected = false;
+	private boolean connected = false;
 
-	public Link(final Component canvas, final Point startPoint, final Point endPoint, final Connectable source,
+	public Link(final Component canvas, final Connectable source,
 	            final Connectable target, final RenderableLink linkView)
 	{
-		this(canvas, startPoint, endPoint, source, target, linkView, null);
+		this(canvas, source, target, linkView, null);
 	}
 
-	public Link(final Component canvas, final Point startPoint, final Point endPoint, final Connectable source,
+	public Link(final Component canvas, final Connectable source,
 	            final Connectable target, final RenderableLink linkView, final PropertyLinkRequest link)
 	{
 		super(canvas, linkView, link != null ? link.getID().toString() : null, "Link");
@@ -77,11 +77,6 @@ public abstract class Link extends BeanCanvasItem
 		 * view).getEndPoint(), source, target, (RenderableLink) view, linkReq);
 		 */
 		return null;
-	}
-
-	public final Point getEndPoint()
-	{
-		return ((RenderableLink) view).getEndPoint();
 	}
 
 	public void setEndPoint(final Point endP)

@@ -65,7 +65,7 @@ import equip.ect.apps.editor.dataspace.DataspaceMonitor;
 /**
  * compound component editor - test/demo
  */
-public class CompoundComponentEditor extends JFrame
+class CompoundComponentEditor extends JFrame
 {
 	static void createCompoundComponent(final String name)
 	{
@@ -86,7 +86,7 @@ public class CompoundComponentEditor extends JFrame
 		}
 	}
 
-	static void createCompoundComponentProperty(final GUID compId, final String name, final ComponentProperty refProp)
+	private static void createCompoundComponentProperty(final GUID compId, final String name, final ComponentProperty refProp)
 	{
 		System.out.println("Create compound component property \"" + name + "\" -> " + refProp.getID());
 		final DataspaceBean dataspace = DataspaceMonitor.getMonitor().getDataspace();
@@ -153,45 +153,6 @@ public class CompoundComponentEditor extends JFrame
 			System.err.println("ERROR deleting compound component property " + id + ": " + e);
 			e.printStackTrace(System.err);
 		}
-	}
-
-	/*
-	 * public CompoundComponentEditor() { super("Compound Component Editor");
-	 * //DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(browser);
-	 * //getContentPane().add(browser); makeGui(); pack(); }
-	 */
-	static void handleAddNewCompoundComponent(final JFrame parent)
-	{
-		final JDialog d = new JDialog(parent, "Add new compount component", true);
-		final JPanel p = new JPanel();
-		p.setLayout(new GridLayout(3, 1));
-		p.add(new JLabel("Name:"));
-		final JTextField name = new JTextField(20);
-		p.add(name);
-		final JPanel bp = new JPanel();
-		bp.setLayout(new FlowLayout());
-		bp.add(new JButton(new AbstractAction("OK")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				final String n = name.getText();
-				createCompoundComponent(n);
-				d.setVisible(false);
-			}
-		}));
-		bp.add(new JButton(new AbstractAction("Cancel")
-		{
-			@Override
-			public void actionPerformed(final ActionEvent ae)
-			{
-				d.setVisible(false);
-			}
-		}));
-		p.add(bp);
-		d.setContentPane(p);
-		d.pack();
-		d.setVisible(true);
 	}
 
 	static void handleAddProperty(final ComponentProperty prop)

@@ -56,7 +56,6 @@ import equip.ect.apps.editor.state.StateManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -73,204 +72,10 @@ import java.util.Properties;
 
 public class GraphEditor extends JFrame
 {
-	private class GraphEditorTab extends JScrollPane
-	{
-		private GraphEditorCanvas canvas;
-
-		GraphEditorTab(GraphEditorCanvas canvas)
-		{
-			super(canvas);
-			this.canvas = canvas;
-		}
-	}
-
-	private class SettingsDialog extends JDialog implements ActionListener
-	{
-		private final JFormattedTextField tf;
-
-		SettingsDialog(final GraphEditor parent)
-		{
-			super(parent, "Editor Settings", true);
-			final JPanel mainPanel = new JPanel();
-			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-
-			final JPanel panel = new JPanel(new GridLayout(3, 2));
-			JCheckBox cb = new JCheckBox("Show property values", GraphComponentPropertyView.renderPropValue);
-			cb.addActionListener(this);
-			panel.add(cb);
-			cb = new JCheckBox("Animate property updates", BeanGraphPanel.animatePropertyUpdate);
-			cb.addActionListener(this);
-			panel.add(cb);
-			cb = new JCheckBox("Allow self-connect", GraphEditorCanvas.allowComponentSelfConnect);
-			cb.addActionListener(this);
-			panel.add(cb);
-			final JPanel ttkP = new JPanel();
-			cb = new JCheckBox();
-			ttkP.add(cb);
-			ttkP.add(new JLabel("Remove idle items after "));
-			tf = new JFormattedTextField((int) (CleanerTask.timeUntilKill / 1000.0));
-			tf.setColumns(3);
-			tf.addActionListener(this);
-			tf.setActionCommand("TIME_TO_KILL");
-			cb.addActionListener(this);
-
-			ttkP.add(tf);
-			ttkP.add(new JLabel("secs"));
-			ttkP.setAlignmentX(Component.LEFT_ALIGNMENT);
-			panel.add(ttkP);
-
-			mainPanel.add(panel);
-			final JPanel dataspacePanel = new JPanel();
-			final JButton b = new JButton("Reconnect");
-			dataspacePanel.add(b);
-			final JTextField dataspaceTF = new JTextField("equip://<insert address>", 25);
-			dataspacePanel.add(dataspaceTF);
-			mainPanel.add(dataspacePanel);
-			getContentPane().add(mainPanel);
-			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-			pack();
-		}
-
-		@Override
-		public void actionPerformed(final ActionEvent ae)
-		{
-			final String command = ae.getActionCommand();
-			if (command.equals("Show property values"))
-			{
-				GraphComponentPropertyView.renderPropValue = ((AbstractButton) ae.getSource()).isSelected();
-				getActiveCanvas().repaint();
-				settings.setProperty("RENDER_PROP_VALUE", String.valueOf(GraphComponentPropertyView.renderPropValue));
-			}
-			else if (command.equals("Animate property updates"))
-			{
-				BeanGraphPanel.animatePropertyUpdate = ((AbstractButton) ae.getSource()).isSelected();
-				settings.setProperty("ANIMATE_PROP_UPDATE", String.valueOf(BeanGraphPanel.animatePropertyUpdate));
-			}
-			else if (command.equals("Allow self-connect"))
-			{
-				GraphEditorCanvas.allowComponentSelfConnect = ((AbstractButton) ae.getSource()).isSelected();
-				settings.setProperty("ALLOW_COMP_SELF_CONNECT",
-						String.valueOf(GraphEditorCanvas.allowComponentSelfConnect));
-			}
-			else if (command.equals("TIME_TO_KILL"))
-			{
-				final Long value = (Long) tf.getValue();
-				CleanerTask.timeUntilKill = value * 1000;
-				settings.setProperty("TIME_UNTIL_ITEM_CLEAN", String.valueOf(CleanerTask.timeUntilKill));
-			}
-			else if (command.equals("AUTO_CLEAN_UP"))
-			{
-				final boolean autoClean = ((JCheckBox) ae.getSource()).isSelected();
-				tf.setEnabled(autoClean);
-				GraphEditorResources.autoCleanComponents = autoClean;
-				if (autoClean)
-				{
-					final Long value = (Long) tf.getValue();
-					CleanerTask.timeUntilKill = value * 1000;
-				}
-				settings.setProperty("AUTO_CLEAN_COMPONENTS", String.valueOf(autoClean));
-			}
-		}
-	}
-
 	static GraphEditor instance;
-	static boolean fullscreen;
-
-	/**
-	 * You coould have several instances for controlling different spaces simultaneously.
-	 */
-	public static GraphEditor getInstance()
-	{
-		if (instance == null)
-		{
-			instance = new GraphEditor();
-		}
-		return instance;
-	}
-
-	public static void main(final String[] args)
-	{
-		try
-		{
-			String url = "equip://:9123";
-			if (args.length > 0)
-			{
-				for (final String arg : args)
-				{
-					if (arg.equals("-fullscreen"))
-					{
-						fullscreen = true;
-					}
-					else if (arg.equals("-debug"))
-					{
-						Info.setDebug(true);
-					}
-					else
-					{
-						url = arg;
-					}
-				}
-			}
-
-			final GraphEditor editor = GraphEditor.getInstance();
-			editor.setSize(500, 500);
-			editor.setLocationRelativeTo(null); // should center on screen
-			editor.connect(url);
-
-			// create configuration manager
-			editor.configurationManager = new ConfigurationManager(DataspaceMonitor.getMonitor().getDataspace());
-
-			editor.addWindowListener(new WindowAdapter()
-			{
-				@Override
-				public void windowClosing(final WindowEvent we)
-				{
-					System.exit(0);
-				}
-			});
-
-			Runtime.getRuntime().addShutdownHook(new Thread()
-			{
-				@Override
-				public void run()
-				{
-					editor.exit();
-				}
-			});
-			editor.setVisible(true);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	static boolean getBooleanProperty(final String key, final boolean defaultValue, final Properties settings)
-	{
-		final String boolString = settings.getProperty(key);
-		if (boolString == null)
-		{
-			return defaultValue;
-		}
-		return Boolean.parseBoolean(boolString);
-	}
-
-	static long getLongProperty(final String key, final long defaultValue, final Properties settings)
-	{
-		final String intString = settings.getProperty(key);
-		if (intString == null)
-		{
-			return defaultValue;
-		}
-		return Long.parseLong(intString);
-	}
-
-	private Properties settings = new Properties();
-
-	private ConfigurationManager configurationManager;
-
 	private final SelectionModel selectionModel = new SelectionModel();
-
+	private Properties settings = new Properties();
+	private ConfigurationManager configurationManager;
 	private JTabbedPane pane;
 
 	private GraphEditor()
@@ -297,12 +102,6 @@ public class GraphEditor extends JFrame
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				/*
-				 * int option = clearConfiguration(); if (option == JOptionPane.CANCEL_OPTION)
-				 * return; if (option == JOptionPane.YES_OPTION)
-				 * configurationManager.clearConfiguration();
-				 */
-
 				final File file = configurationManager.chooseOpenFile(getActiveCanvas());
 				if (file != null)
 				{
@@ -311,7 +110,7 @@ public class GraphEditor extends JFrame
 						configurationManager.clearConfiguration();
 
 						BufferedReader reader = new BufferedReader(new FileReader(file));
-						if(reader.readLine().startsWith("<?xml"))
+						if (reader.readLine().startsWith("<?xml"))
 						{
 							reader.close();
 							configurationManager.restoreConfiguration(file);
@@ -323,12 +122,11 @@ public class GraphEditor extends JFrame
 							Gson gson = new GsonBuilder().create();
 							final State state = gson.fromJson(new FileReader(file), State.class);
 
-							new Thread(() -> {
-								StateManager.restoreState(state, GraphEditor.this, new ProgressDialog());
-							}).start();
+							new Thread(() ->
+									StateManager.restoreState(state, GraphEditor.this, new ProgressDialog())).start();
 						}
 					}
-					catch(Exception e)
+					catch (Exception e)
 					{
 						e.printStackTrace();
 					}
@@ -383,8 +181,8 @@ public class GraphEditor extends JFrame
 			@Override
 			public void actionPerformed(final ActionEvent ae)
 			{
-				int dialogResult = JOptionPane.showConfirmDialog (null, "Are you sure you want to delete" + getActiveCanvas().getName() +  "?","Warning",JOptionPane.YES_NO_OPTION);
-				if(dialogResult == JOptionPane.YES_OPTION)
+				int dialogResult = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete" + getActiveCanvas().getName() + "?", "Warning", JOptionPane.YES_NO_OPTION);
+				if (dialogResult == JOptionPane.YES_OPTION)
 				{
 					removeCanvas();
 				}
@@ -413,7 +211,6 @@ public class GraphEditor extends JFrame
 		getContentPane().add(toolbar, BorderLayout.PAGE_START);
 
 
-
 		pane = new JTabbedPane();
 
 		addCanvas("Editor");
@@ -424,6 +221,81 @@ public class GraphEditor extends JFrame
 		loadSettings();
 	}
 
+	private static boolean getBooleanProperty(final String key, final boolean defaultValue, final Properties settings)
+	{
+		final String boolString = settings.getProperty(key);
+		if (boolString == null)
+		{
+			return defaultValue;
+		}
+		return Boolean.parseBoolean(boolString);
+	}
+
+	private static GraphEditor getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new GraphEditor();
+		}
+		return instance;
+	}
+
+	private static long getLongProperty(final String key, final long defaultValue, final Properties settings)
+	{
+		final String intString = settings.getProperty(key);
+		if (intString == null)
+		{
+			return defaultValue;
+		}
+		return Long.parseLong(intString);
+	}
+
+	public static void main(final String[] args)
+	{
+		try
+		{
+			String url = "equip://:9123";
+			if (args.length > 0)
+			{
+				for (final String arg : args)
+				{
+					if (arg.equals("-debug"))
+					{
+						Info.setDebug(true);
+					}
+					else
+					{
+						url = arg;
+					}
+				}
+			}
+
+			final GraphEditor editor = GraphEditor.getInstance();
+			editor.setSize(500, 500);
+			editor.setLocationRelativeTo(null); // should center on screen
+			editor.connect(url);
+
+			// create configuration manager
+			editor.configurationManager = new ConfigurationManager(DataspaceMonitor.getMonitor().getDataspace());
+
+			editor.addWindowListener(new WindowAdapter()
+			{
+				@Override
+				public void windowClosing(final WindowEvent we)
+				{
+					System.exit(0);
+				}
+			});
+
+			Runtime.getRuntime().addShutdownHook(new Thread(editor::exit));
+			editor.setVisible(true);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	public GraphEditorCanvas addCanvas(final String name)
 	{
 		final GraphEditorTab tab = new GraphEditorTab(new GraphEditorCanvas(name, selectionModel));
@@ -431,41 +303,54 @@ public class GraphEditor extends JFrame
 		return tab.canvas;
 	}
 
-	public void connect(final String url)
-	{
-		getActiveCanvas().startDaemon();
-		DataspaceMonitor.getMonitor().startListening(url);
-	}
-
-	public void renameCanvas(final String newName)
-	{
-		pane.setTitleAt(pane.getSelectedIndex(), newName);
-		getActiveCanvas().setName(newName);
-	}
-
-	public void removeCanvas()
-	{
-		pane.remove(pane.getSelectedIndex());
-	}
-
-	public void exit()
-	{
-		System.out.println("Graph Editor shutting down ...");
-		storeSettings();
-		System.out.println("Goodbye.");
-	}
-
 	public GraphEditorCanvas getActiveCanvas()
 	{
-		GraphEditorTab tab = (GraphEditorTab)pane.getSelectedComponent();
-		if(tab != null)
+		GraphEditorTab tab = (GraphEditorTab) pane.getSelectedComponent();
+		if (tab != null)
 		{
 			return tab.canvas;
 		}
 		return null;
 	}
 
-	public void loadSettings()
+	public List<GraphEditorCanvas> getCanvases()
+	{
+		List<GraphEditorCanvas> canvases = new ArrayList<>();
+		for (int i = 0; i < pane.getTabCount(); i++)
+		{
+			GraphEditorTab tab = (GraphEditorTab) pane.getComponentAt(i);
+			if (tab != null)
+			{
+				canvases.add(tab.canvas);
+			}
+		}
+		return canvases;
+	}
+
+	public void removeAllCanvases()
+	{
+		pane.removeAll();
+	}
+
+	private int clearConfiguration()
+	{
+		return JOptionPane.showConfirmDialog(getActiveCanvas(), "Delete all components?");
+	}
+
+	private void connect(final String url)
+	{
+		getActiveCanvas().startDaemon();
+		DataspaceMonitor.getMonitor().startListening(url);
+	}
+
+	private void exit()
+	{
+		System.out.println("Graph Editor shutting down ...");
+		storeSettings();
+		System.out.println("Goodbye.");
+	}
+
+	private void loadSettings()
 	{
 		try
 		{
@@ -492,28 +377,25 @@ public class GraphEditor extends JFrame
 		}
 	}
 
-	public void showSettingsDialog()
+	private void removeCanvas()
+	{
+		pane.remove(pane.getSelectedIndex());
+	}
+
+	private void renameCanvas(final String newName)
+	{
+		pane.setTitleAt(pane.getSelectedIndex(), newName);
+		getActiveCanvas().setName(newName);
+	}
+
+	private void showSettingsDialog()
 	{
 		final SettingsDialog sd = new SettingsDialog(this);
 		sd.setLocationRelativeTo(this);
 		sd.setVisible(true);
 	}
 
-	public List<GraphEditorCanvas> getCanvases()
-	{
-		List<GraphEditorCanvas> canvases = new ArrayList<>();
-		for (int i = 0; i < pane.getTabCount(); i++)
-		{
-			GraphEditorTab tab = (GraphEditorTab)pane.getComponentAt(i);
-			if(tab != null)
-			{
-				canvases.add(tab.canvas);
-			}
-		}
-		return canvases;
-	}
-
-	public synchronized void storeSettings()
+	private synchronized void storeSettings()
 	{
 		try
 		{
@@ -530,13 +412,91 @@ public class GraphEditor extends JFrame
 		}
 	}
 
-	protected int clearConfiguration()
+	private class GraphEditorTab extends JScrollPane
 	{
-		return JOptionPane.showConfirmDialog(getActiveCanvas(), "Delete all components?");
+		private GraphEditorCanvas canvas;
+
+		GraphEditorTab(GraphEditorCanvas canvas)
+		{
+			super(canvas);
+			this.canvas = canvas;
+		}
 	}
 
-	public void removeAllCanvases()
+	private class SettingsDialog extends JDialog
 	{
-		pane.removeAll();
+		private final JFormattedTextField tf;
+
+		SettingsDialog(final GraphEditor parent)
+		{
+			super(parent, "Editor Settings", true);
+			final JPanel mainPanel = new JPanel();
+			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+			final JPanel panel = new JPanel(new GridLayout(3, 2));
+			JCheckBox cb = new JCheckBox("Show property values", GraphComponentPropertyView.renderPropValue);
+			cb.addActionListener(ae ->
+			{
+				GraphComponentPropertyView.renderPropValue = ((AbstractButton) ae.getSource()).isSelected();
+				getActiveCanvas().repaint();
+				settings.setProperty("RENDER_PROP_VALUE", String.valueOf(GraphComponentPropertyView.renderPropValue));
+			});
+			panel.add(cb);
+			cb = new JCheckBox("Animate property updates", BeanGraphPanel.animatePropertyUpdate);
+			cb.addActionListener(ae ->
+			{
+				BeanGraphPanel.animatePropertyUpdate = ((AbstractButton) ae.getSource()).isSelected();
+				settings.setProperty("ANIMATE_PROP_UPDATE", String.valueOf(BeanGraphPanel.animatePropertyUpdate));
+			});
+			panel.add(cb);
+			cb = new JCheckBox("Allow self-connect", GraphEditorCanvas.allowComponentSelfConnect);
+			cb.addActionListener(ae ->
+			{
+				GraphEditorCanvas.allowComponentSelfConnect = ((AbstractButton) ae.getSource()).isSelected();
+				settings.setProperty("ALLOW_COMP_SELF_CONNECT",
+						String.valueOf(GraphEditorCanvas.allowComponentSelfConnect));
+			});
+			panel.add(cb);
+			final JPanel ttkP = new JPanel();
+			cb = new JCheckBox();
+			ttkP.add(cb);
+			ttkP.add(new JLabel("Remove idle items after "));
+			tf = new JFormattedTextField((int) (CleanerTask.timeUntilKill / 1000.0));
+			tf.setColumns(3);
+			tf.addActionListener(ae ->
+			{
+				final Long value = (Long) tf.getValue();
+				CleanerTask.timeUntilKill = value * 1000;
+				settings.setProperty("TIME_UNTIL_ITEM_CLEAN", String.valueOf(CleanerTask.timeUntilKill));
+			});
+			cb.addActionListener(ae ->
+			{
+				final boolean autoClean = ((JCheckBox) ae.getSource()).isSelected();
+				tf.setEnabled(autoClean);
+				GraphEditorResources.autoCleanComponents = autoClean;
+				if (autoClean)
+				{
+					final Long value = (Long) tf.getValue();
+					CleanerTask.timeUntilKill = value * 1000;
+				}
+				settings.setProperty("AUTO_CLEAN_COMPONENTS", String.valueOf(autoClean));
+			});
+
+			ttkP.add(tf);
+			ttkP.add(new JLabel("secs"));
+			ttkP.setAlignmentX(Component.LEFT_ALIGNMENT);
+			panel.add(ttkP);
+
+			mainPanel.add(panel);
+			final JPanel dataspacePanel = new JPanel();
+			final JButton b = new JButton("Reconnect");
+			dataspacePanel.add(b);
+			final JTextField dataspaceTF = new JTextField("equip://<insert address>", 25);
+			dataspacePanel.add(dataspaceTF);
+			mainPanel.add(dataspacePanel);
+			getContentPane().add(mainPanel);
+			setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			pack();
+		}
 	}
 }

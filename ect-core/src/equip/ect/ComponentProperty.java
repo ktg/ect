@@ -55,33 +55,18 @@ public class ComponentProperty extends CompInfo
 {
 
 	public static final String TYPE = "ComponentProperty3";
-
 	public static final int NO_OF_FIELDS = 5;
-
 	public static final int NAME_INDEX = 2;
-
 	public static final int CLASS_INDEX = 3;
-
 	public static final int VAL_INDEX = 4;
-
 	public static final int ID_INDEX = 5;
-
 	public static final int TYPE_INDEX = 6;
 
 	/**
 	 * standard connection point types
 	 */
 	public static final String CONNECTION_POINT_PROPERTY_VALUE = "propertyvalue";
-
 	public static final String CONNECTION_POINT_PROPERTY_REFERENCE = "propertyreference";
-
-	public static final String CONNECTION_POINT_LOCAL_INTERFACE = "localinterface";
-
-	public static final String CONNECTION_POINT_REMOTE_INTERFACE = "remoteinterface";
-
-	public static final String CONNECTION_POINT_EVENT_PUBLISHER = "eventpublisher";
-
-	public static final String CONNECTION_POINT_EVENT_SUBSCRIBER = "eventsubscriber";
 
 	// dataspace??
 
@@ -103,8 +88,7 @@ public class ComponentProperty extends CompInfo
 		System.arraycopy(tuple.fields, 0, tup.fields, 0, tuple.fields.length);
 		tup.name = tuple.name;
 		tup.id = tuple.id;
-		final ComponentProperty prop = new ComponentProperty(tup);
-		return prop;
+		return new ComponentProperty(tup);
 	}
 
 	/**
@@ -209,40 +193,6 @@ public class ComponentProperty extends CompInfo
 		if (tuple.fields.length >= (VAL_INDEX + 1))
 		{
 			return tuple.fields[VAL_INDEX];
-
-			/*
-			 * if (tuple.fields[VAL_INDEX] == null) return null; if (tuple.fields[VAL_INDEX]
-			 * instanceof StringBox) return ((StringBox) tuple.fields[VAL_INDEX]).value; if
-			 * (tuple.fields[VAL_INDEX] instanceof IntBox) return new Integer(((IntBox)
-			 * tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX] instanceof ByteBox)
-			 * return new Byte(((ByteBox) tuple.fields[VAL_INDEX]).value); if
-			 * (tuple.fields[VAL_INDEX] instanceof CharBox) return new Character(((CharBox)
-			 * tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX] instanceof ShortBox)
-			 * return new Short(((ShortBox) tuple.fields[VAL_INDEX]).value); if
-			 * (tuple.fields[VAL_INDEX] instanceof LongBox) return new Long(((LongBox)
-			 * tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX] instanceof BooleanBox)
-			 * return new Boolean(((BooleanBox) tuple.fields[VAL_INDEX]).value); if
-			 * (tuple.fields[VAL_INDEX] instanceof FloatBox) return new Float(((FloatBox)
-			 * tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX] instanceof DoubleBox)
-			 * return new Double(((DoubleBox) tuple.fields[VAL_INDEX]).value); if
-			 * (tuple.fields[VAL_INDEX] instanceof SerializedObjectImpl) return
-			 * ((SerializedObjectImpl) tuple.fields[VAL_INDEX]) .getValue(); if
-			 * (tuple.fields[VAL_INDEX] instanceof StringArrayBox) return ((StringArrayBox)
-			 * tuple.fields[VAL_INDEX]).value; if (tuple.fields[VAL_INDEX] instanceof IntArrayBox)
-			 * return ((IntArrayBox) tuple.fields[VAL_INDEX]).value; if (tuple.fields[VAL_INDEX]
-			 * instanceof BooleanArrayBox) return (((BooleanArrayBox)
-			 * tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX] instanceof
-			 * FloatArrayBox) return (((FloatArrayBox) tuple.fields[VAL_INDEX]).value); if
-			 * (tuple.fields[VAL_INDEX] instanceof DoubleArrayBox) return (((DoubleArrayBox)
-			 * tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX] instanceof ByteArrayBox)
-			 * return (((ByteArrayBox) tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX]
-			 * instanceof CharArrayBox) return (((CharArrayBox) tuple.fields[VAL_INDEX]).value); if
-			 * (tuple.fields[VAL_INDEX] instanceof ShortArrayBox) return (((ShortArrayBox)
-			 * tuple.fields[VAL_INDEX]).value); if (tuple.fields[VAL_INDEX] instanceof LongArrayBox)
-			 * return (((LongArrayBox) tuple.fields[VAL_INDEX]).value);
-			 * System.err.println("ERROR: do not know how to map type " + tuple.fields[VAL_INDEX]);
-			 * return null;
-			 */
 		}
 		else
 		{
@@ -386,37 +336,7 @@ public class ComponentProperty extends CompInfo
 				"setPropertyValue not allowed on " + type); }
 		if (tuple.fields.length >= (VAL_INDEX + 1))
 		{
-			tuple.fields[VAL_INDEX] = (ValueBase) Coerce.toClass(value, equip.runtime.ValueBase.class);
-
-			/*
-			 * if (value == null) tuple.fields[VAL_INDEX] = null; if (value instanceof String)
-			 * tuple.fields[VAL_INDEX] = new equip.data.StringBoxImpl( (String) value); else if
-			 * (value instanceof Integer) tuple.fields[VAL_INDEX] = new equip.data.IntBoxImpl(
-			 * (Integer) value); else if (value instanceof Float) tuple.fields[VAL_INDEX] = new
-			 * equip.data.FloatBoxImpl( (Float) value); else if (value instanceof Byte)
-			 * tuple.fields[VAL_INDEX] = new equip.data.ByteBoxImpl( (Byte) value); else if (value
-			 * instanceof Character) tuple.fields[VAL_INDEX] = new equip.data.CharBoxImpl(
-			 * (Character) value); else if (value instanceof Short) tuple.fields[VAL_INDEX] = new
-			 * equip.data.ShortBoxImpl( (Short) value); else if (value instanceof Long)
-			 * tuple.fields[VAL_INDEX] = new equip.data.LongBoxImpl( (Long) value); else if (value
-			 * instanceof Boolean) tuple.fields[VAL_INDEX] = new equip.data.BooleanBoxImpl(
-			 * (Boolean) value); else if (value instanceof Double) tuple.fields[VAL_INDEX] = new
-			 * equip.data.DoubleBoxImpl( (Double) value); else if (value instanceof String[])
-			 * tuple.fields[VAL_INDEX] = new equip.data.StringArrayBoxImpl( (String[]) value); else
-			 * if (value instanceof int[]) tuple.fields[VAL_INDEX] = new equip.data.IntArrayBoxImpl(
-			 * (int[]) value); else if (value instanceof byte[]) tuple.fields[VAL_INDEX] = new
-			 * equip.data.ByteArrayBoxImpl( (byte[]) value); else if (value instanceof char[])
-			 * tuple.fields[VAL_INDEX] = new equip.data.CharArrayBoxImpl( (char[]) value); else if
-			 * (value instanceof short[]) tuple.fields[VAL_INDEX] = new
-			 * equip.data.ShortArrayBoxImpl( (short[]) value); else if (value instanceof long[])
-			 * tuple.fields[VAL_INDEX] = new equip.data.LongArrayBoxImpl( (long[]) value); else if
-			 * (value instanceof float[]) tuple.fields[VAL_INDEX] = new
-			 * equip.data.FloatArrayBoxImpl( (float[]) value); else if (value instanceof boolean[])
-			 * tuple.fields[VAL_INDEX] = new equip.data.BooleanArrayBoxImpl( (boolean[]) value);
-			 * else if (value instanceof double[]) tuple.fields[VAL_INDEX] = new
-			 * equip.data.DoubleArrayBoxImpl( (double[]) value); else tuple.fields[VAL_INDEX] = new
-			 * equip.data.SerializedObjectImpl( value);
-			 */
+			tuple.fields[VAL_INDEX] = Coerce.toClass(value, equip.runtime.ValueBase.class);
 		}
 	}
 

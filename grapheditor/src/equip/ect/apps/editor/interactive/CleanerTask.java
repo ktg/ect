@@ -57,27 +57,14 @@ import java.util.TimerTask;
  */
 public class CleanerTask extends TimerTask
 {
-
-	public static final long DEFAULT_TIME_UNTIL_KILL = 1000 * 60 * 2; // 2 min
-
 	public static long timeUntilKill;
 
 	private InteractiveCanvas canvas;
 
-	CleanerTask(final InteractiveCanvas canvas)
-	{
-		this(canvas, DEFAULT_TIME_UNTIL_KILL);
-	}
-
-	CleanerTask(final InteractiveCanvas canvas, final long timeUntilKill)
+	private CleanerTask(final InteractiveCanvas canvas, final long timeUntilKill)
 	{
 		this.canvas = canvas;
 		CleanerTask.timeUntilKill = timeUntilKill;
-	}
-
-	public long getTimeToKill()
-	{
-		return CleanerTask.timeUntilKill;
 	}
 
 	@Override
@@ -96,10 +83,5 @@ public class CleanerTask extends TimerTask
 				// canvas.repaint();
 			}
 		}
-	}
-
-	public void setTimeToKill(final long ms)
-	{
-		CleanerTask.timeUntilKill = ms;
 	}
 }

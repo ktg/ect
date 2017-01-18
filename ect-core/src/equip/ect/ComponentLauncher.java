@@ -69,55 +69,6 @@ import java.util.Map;
 
 public class ComponentLauncher implements DataspaceEventListener
 {
-
-	/**
-	 * . This simple test main program puts in a listener of type capability and for every
-	 * capability that is offered by the container manager it calls the launcher to set the
-	 * component running and publish the elements.
-	 */
-
-	public static void main(final String[] argsv)
-	{
-
-		if (argsv.length != 1)
-		{
-			System.err.println("Usage: java ComponentExporter <dataspaceUrl>");
-			System.exit(-1);
-		}
-
-		final DataspaceBean dataspace = new DataspaceBean();
-		try
-		{
-			dataspace.setDataspaceUrl(argsv[0]);
-		}
-		catch (final Exception e)
-		{
-			System.err.println("COmponent Launcher Main exception: " + e);
-		}
-		if (!dataspace.isActive())
-		{
-			System.err.println("Exporter could not connect to dataspace.");
-			System.exit(-1);
-		}
-
-		// ContainerManager conm = new ContainerManager(dataspace,
-		// "D:/Equator/Infrastructure/classes",
-		// "test Host");
-
-		// componentLancher1.launch("ChatBean", "namer1");
-		// componentLancher1.launch("ChatBean", "namer2");
-
-		// Build the pattern for capability
-		//final Capability capability = new Capability((GUID) null);
-
-		// DataHandler dh = new DataHandler(conm);
-		/*
-		 * try { //capability.addPatterntoDataSpace(conm.dataspace, dh); } catch
-		 * (DataspaceInactiveException ex) { }
-		 */
-
-	}
-
 	// private File componentdirectory = null;
 	ContainerManager conmanager;
 	ComponentExporter exporter;

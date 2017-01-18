@@ -19,14 +19,6 @@ import java.io.Serializable;
 @Category("Data/Waves")
 public class AsymmetricalWave implements Runnable, Serializable, PropertyChangeListener
 {
-	public static void main(final String args[])
-	{
-		final AsymmetricalWave sineWave = new AsymmetricalWave();
-		sineWave.setDownDuration(1);
-		sineWave.setOutFreq(5);
-		sineWave.setRunning(true);
-	}
-
 	// Property Change
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 

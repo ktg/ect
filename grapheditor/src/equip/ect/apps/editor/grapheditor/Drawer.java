@@ -103,12 +103,12 @@ public class Drawer extends InteractiveCanvasItem
 		}
 	}
 
-	public final Type getType()
+	final Type getType()
 	{
 		return type;
 	}
 
-	public void setType(final Type type)
+	private void setType(final Type type)
 	{
 		this.type = type;
 	}

@@ -64,7 +64,7 @@ public class BinaryOutput extends UIBase
 	/**
 	 * the value
 	 */
-	protected boolean value = false;
+	private boolean value = false;
 
 	/**
 	 * main cons, no args.
@@ -114,15 +114,11 @@ public class BinaryOutput extends UIBase
 		// update gui - may not be swing thread
 		if (updateWidget)
 		{
-			runSwing(new Runnable()
+			runSwing(() ->
 			{
-				@Override
-				public void run()
+				if (!stopped)
 				{
-					if (!stopped)
-					{
-						button.getModel().setSelected(value);
-					}
+					button.getModel().setSelected(value);
 				}
 			});
 		}

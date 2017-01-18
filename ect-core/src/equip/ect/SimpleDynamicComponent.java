@@ -116,14 +116,6 @@ public class SimpleDynamicComponent implements Serializable, DynamicProperties
 	}
 
 	/**
-	 * remove property
-	 */
-	public synchronized void removeProperty(final String name) throws NoSuchPropertyException
-	{
-		dynsup.removeProperty(name);
-	}
-
-	/**
 	 * property listener support
 	 */
 	public synchronized void removePropertyChangeListener(final PropertyChangeListener listener)

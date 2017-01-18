@@ -56,7 +56,7 @@ import java.awt.geom.Path2D;
 public class CurvedLine extends RenderableLink
 {
 
-	protected final Point[] controlPoints;
+	private final Point[] controlPoints;
 
 	private static int defaultControlOffsetX = 40;
 	private static int defaultControlOffsetY = 0;
@@ -68,7 +68,7 @@ public class CurvedLine extends RenderableLink
 						endPoint.x - defaultControlOffsetX, endPoint.y - defaultControlOffsetY));
 	}
 
-	public CurvedLine(final Point startPoint, final Point endPoint, final Point controlPoint1, final Point controlPoint2)
+	private CurvedLine(final Point startPoint, final Point endPoint, final Point controlPoint1, final Point controlPoint2)
 	{
 		super(startPoint, endPoint);
 		controlPoints = new Point[2];

@@ -202,12 +202,7 @@ public class DataspaceMonitor
 			{
 				final TupleImpl item = (TupleImpl) dsEvent.getAddItem();
 				final ComponentProperty compProp = new ComponentProperty(item);
-				Map<String, ComponentProperty> props = properties.get(compProp.getComponentID().toString());
-				if (props == null)
-				{
-					props = new HashMap<>();
-					properties.put(compProp.getComponentID().toString(), props);
-				}
+				Map<String, ComponentProperty> props = properties.computeIfAbsent(compProp.getComponentID().toString(), k -> new HashMap<>());
 				props.put(compProp.getID().toString(), compProp);
 				fireEvent(ComponentPropertyListener.class, compPropListeners, "componentPropertyAdded",
 						new Class[]{compProp.getClass()}, new Object[]{compProp});
@@ -220,12 +215,7 @@ public class DataspaceMonitor
 						final GUID ref = compProp.getPropertyReference();
 						if (ref != null)
 						{
-							List<GUID> v = sourcePropertyReferencedBy.get(ref);
-							if (v == null)
-							{
-								v = new ArrayList<>();
-								sourcePropertyReferencedBy.put(ref, v);
-							}
+							List<GUID> v = sourcePropertyReferencedBy.computeIfAbsent(ref, k -> new ArrayList<>());
 							v.add(compProp.getID());
 						}
 					}
@@ -413,18 +403,14 @@ public class DataspaceMonitor
 
 		static final int POLL_TIME_MS = 100;
 		static final int MAX_WORK_TIME_MS = 100;
-		List<DataspaceEvent> events = new ArrayList<>();
+		final List<DataspaceEvent> events = new ArrayList<>();
 
 		MyDSListener()
 		{
-			final javax.swing.Timer t = new javax.swing.Timer(POLL_TIME_MS, new java.awt.event.ActionListener()
+			final javax.swing.Timer t = new javax.swing.Timer(POLL_TIME_MS, ae ->
 			{
-				@Override
-				public void actionPerformed(final java.awt.event.ActionEvent ae)
-				{
-					// System.out.println("Check events...");
-					MyDSListener.this.run();
-				}
+				// System.out.println("Check events...");
+				MyDSListener.this.run();
 			});
 			t.setRepeats(true);
 			t.start();
@@ -645,7 +631,7 @@ public class DataspaceMonitor
 	/**
 	 * map of referenced source property GUID -> Vector of referring source property GUID
 	 */
-	private Map<GUID, List<GUID>> sourcePropertyReferencedBy = new HashMap<GUID, List<GUID>>();
+	private Map<GUID, List<GUID>> sourcePropertyReferencedBy = new HashMap<>();
 
 	private DataspaceMonitor(final String url, final boolean connect)
 	{
@@ -676,7 +662,7 @@ public class DataspaceMonitor
 		configurationListeners.add(configurationListener);
 	}
 
-	public void addDataspaceListener(final String name, final DataspaceEventListener listener)
+	private void addDataspaceListener(final String name, final DataspaceEventListener listener)
 	{
 		final equip.data.TupleImpl item = new TupleImpl(null);
 		item.id = null;
@@ -692,7 +678,7 @@ public class DataspaceMonitor
 		}
 	}
 
-	public final void clearBuffer()
+	private void clearBuffer()
 	{
 		this.components.clear();
 		this.properties.clear();
@@ -779,59 +765,12 @@ public class DataspaceMonitor
 		return dataspace;
 	}
 
-	public Collection<Capability> getMatchingClassCapabilities(final String regex)
-	{
-		final List<Capability> matches = new ArrayList<Capability>();
-		for (final Capability cap : getCapabilities())
-		{
-			if (cap.getClassification().matches(regex))
-			{
-				matches.add(cap);
-			}
-		}
-		return matches;
-	}
-
-	public PropertyLinkRequest getPropertyLink(final String beanid)
-	{
-		return links.get(beanid);
-	}
-
 	public List<PropertyLinkRequest> getPropertyLinks()
 	{
 		return copyCollect(PropertyLinkRequest.TYPE, PropertyLinkRequest.class);
 	}
 
-	/**
-	 * Convenient method for acquiring PropertyLinkRequests from specific source and/or target
-	 */
-	public Collection<PropertyLinkRequest> getPropertyLinks(final String sourceComponentID, final String targetComponentID)
-	{
-		final PropertyLinkRequest template = new PropertyLinkRequest((GUID) null);
-
-		final GUID sourceGUID = getComponentAdvert(sourceComponentID).getComponentID();
-		final GUID targetGUID = getComponentAdvert(targetComponentID).getComponentID();
-
-		template.setSourceComponentID(sourceGUID);
-		template.setDestComponentID(targetGUID);
-		final List<PropertyLinkRequest> links = new ArrayList<PropertyLinkRequest>();
-		try
-		{
-			final CompInfo[] results = template.copyCollect(dataspace);
-			for (CompInfo result : results)
-			{
-				links.add(new PropertyLinkRequest((TupleImpl) result.tuple));
-			}
-		}
-		catch (final DataspaceInactiveException e)
-		{
-			Info.message(this, "Warning: Doing search on an inactive dataspace");
-			return null;
-		}
-		return links;
-	}
-
-	public Capability getCapability(final String className)
+	private Capability getCapability(final String className)
 	{
 		final Collection<Capability> capabilities = getCapabilities();
 		for(Capability capability: capabilities)
@@ -919,24 +858,9 @@ public class DataspaceMonitor
 		return linkreq;
 	}
 
-	public void removeComponentListener(final ComponentListener compListener)
-	{
-		compListeners.remove(compListener);
-	}
-
-	public void removeComponentMetadataListener(final ComponentMetadataListener metadataListener)
-	{
-		metadataListeners.remove(metadataListener);
-	}
-
 	public void removeComponentPropertyListener(final ComponentPropertyListener compPropListener)
 	{
 		compPropListeners.remove(compPropListener);
-	}
-
-	public void removeDataspaceConfigurationListener(final DataspaceConfigurationListener configurationListener)
-	{
-		configurationListeners.remove(configurationListener);
 	}
 
 	public String getPropertyValue(final GUID propertyID)

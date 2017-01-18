@@ -59,18 +59,18 @@ import java.util.Timer;
  * only run while the main application runs and not extend its lifetime.
  */
 
-public class InteractiveCanvasDaemon extends Timer
+class InteractiveCanvasDaemon extends Timer
 {
-	public final static long DEFAULT_DELAY = 60000; // 60 secs
-	public final static long DEFAULT_PERIOD = 60000; // 60 secs
-	InteractiveCanvas canvas;
+	private final static long DEFAULT_DELAY = 60000; // 60 secs
+	private final static long DEFAULT_PERIOD = 60000; // 60 secs
+	private InteractiveCanvas canvas;
 
-	public InteractiveCanvasDaemon(final InteractiveCanvas canvas)
+	InteractiveCanvasDaemon(final InteractiveCanvas canvas)
 	{
 		this(canvas, DEFAULT_DELAY, DEFAULT_PERIOD);
 	}
 
-	public InteractiveCanvasDaemon(final InteractiveCanvas canvas, final long delay, final long period)
+	private InteractiveCanvasDaemon(final InteractiveCanvas canvas, final long delay, final long period)
 	{
 		// Instantiate as daemon
 		super(true);

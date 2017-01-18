@@ -8,9 +8,6 @@ subprojects {
         mavenLocal();
     }
 
-//	sourceCompatibility = 1.7
-//	targetCompatibility = 1.7
-
 	sourceSets {
 		main {
 			java {
@@ -29,5 +26,5 @@ subprojects {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.8'
+	gradleVersion = '3.3'
 }

@@ -85,7 +85,7 @@ class DocsDialog extends JDialog
 			// header section should be removed from
 			// html document. Important as jeditorpane bug
 			// means that some head sections cause rendering errors
-			final HTMLDescriptionHelper hh = new HTMLDescriptionHelper(htmlString, true);
+			final HTMLDescriptionHelper hh = new HTMLDescriptionHelper(htmlString);
 
 			// hh will do html correction (eg insert html etc tags if
 			// developer has missed them

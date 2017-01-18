@@ -41,14 +41,13 @@ package equip.ect.apps.editor.grapheditor;
 
 import equip.ect.apps.editor.EditorResources;
 
-public abstract class GraphEditorResources extends EditorResources
+abstract class GraphEditorResources extends EditorResources
 {
 
-	static final String CONFIG_PATH = "./config/";
-	public static final String STATE_FILE = CONFIG_PATH + "grapheditor.state";
-	public static final String SETTINGS_FILE = CONFIG_PATH + "grapheditor.settings";
+	private static final String CONFIG_PATH = "./config/";
+	static final String SETTINGS_FILE = CONFIG_PATH + "grapheditor.settings";
 
-	public static java.awt.Color PROPERTY_ACTIVE_COLOR = java.awt.Color.pink;
+	static java.awt.Color PROPERTY_ACTIVE_COLOR = java.awt.Color.pink;
 
-	public static boolean autoCleanComponents = false;
+	static boolean autoCleanComponents = false;
 }

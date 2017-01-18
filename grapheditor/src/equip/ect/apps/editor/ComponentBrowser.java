@@ -48,13 +48,7 @@ import equip.data.StringBox;
 import equip.data.TupleImpl;
 import equip.data.beans.DataspaceBean;
 import equip.data.beans.DataspaceInactiveException;
-import equip.ect.BeanDescriptorHelper;
-import equip.ect.Capability;
-import equip.ect.CompInfo;
-import equip.ect.ComponentAdvert;
-import equip.ect.ComponentRequest;
-import equip.ect.PropertyLinkRequest;
-import equip.ect.RDFStatement;
+import equip.ect.*;
 import equip.ect.apps.editor.dataspace.ComponentListener;
 import equip.ect.apps.editor.dataspace.DataspaceConfigurationListener;
 import equip.ect.apps.editor.dataspace.DataspaceMonitor;
@@ -77,17 +71,260 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ComponentBrowser extends JPanel
 {
+	private final List<DataspaceTreeView> dataspaceTreeViews = new ArrayList<>();
+	private final DataspaceBean dataspace = DataspaceMonitor.getMonitor().getDataspace();
+	private final SelectionModel selectionModel;
+
+	public ComponentBrowser(final SelectionModel selectionModel)
+	{
+		super(new BorderLayout());
+
+		this.selectionModel = selectionModel;
+
+		dataspaceTreeViews.add(new CapabilityView());
+		dataspaceTreeViews.add(new ComponentView());
+
+		final JTabbedPane pane = new JTabbedPane();
+		for (DataspaceTreeView tree : dataspaceTreeViews)
+		{
+			selectionModel.add(tree);
+			pane.add(tree.getName(), tree);
+		}
+
+		add(BorderLayout.CENTER, pane);
+
+		ToolTipManager.sharedInstance().setEnabled(true);
+		setPreferredSize(new Dimension(400, 500));
+
+		final JTextField searchField = new JTextField();
+		searchField.setMaximumSize(new Dimension(100, 20));
+
+		final ActionListener searchAction = e ->
+		{
+			final String regexString = ".*" + searchField.getText().toLowerCase() + ".*";
+			for (final DataspaceTreeView capabilityView : dataspaceTreeViews)
+			{
+				final JTree mainCapTree = capabilityView.getMainTree();
+
+				final DataspaceTreeCellRenderer renderer = (DataspaceTreeCellRenderer) mainCapTree.getCellRenderer();
+				renderer.setPattern(regexString);
+
+				final DefaultTreeModel treeModel = (DefaultTreeModel) mainCapTree.getModel();
+				final DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
+				final Enumeration<?> en = rootNode.depthFirstEnumeration();
+				while (en.hasMoreElements())
+				{
+					final DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) en.nextElement();
+					final Object obj = theNode.getUserObject();
+					String nodeString;
+					if (dataspace != null && obj instanceof GUID)
+					{
+						final String rval = RDFStatement.GUIDToUrl((GUID) obj);
+						nodeString = DataspaceUtils.getDisplayString(dataspace, rval);
+					}
+					else
+					{
+						nodeString = theNode.toString();
+					}
+					// System.out.println("Matching " +
+					// obj.getClass().getName());
+					if (nodeString.toLowerCase().matches(regexString))
+					{
+						final TreePath path = new TreePath(treeModel.getPathToRoot(theNode));
+						mainCapTree.scrollPathToVisible(path);
+					}
+				}
+			}
+		};
+		searchField.addActionListener(searchAction);
+		final JButton searchButton = new JButton();
+		searchButton.setIcon(MediaFactory.getImageIcon(EditorResources.SEARCH_ICON, this));
+		searchButton.setEnabled(false);
+		searchButton.setRolloverEnabled(true);
+		searchField.getDocument().addDocumentListener(new DocumentListener()
+		{
+			@Override
+			public void changedUpdate(final DocumentEvent e)
+			{
+				checkStatus();
+			}
+
+			@Override
+			public void insertUpdate(final DocumentEvent e)
+			{
+				checkStatus();
+			}
+
+			@Override
+			public void removeUpdate(final DocumentEvent e)
+			{
+				checkStatus();
+			}
+
+			void cancelHighlight()
+			{
+				for (final DataspaceTreeView dataspaceTreeView : dataspaceTreeViews)
+				{
+					final JTree mainCapTree = dataspaceTreeView.getMainTree();
+					final DataspaceTreeCellRenderer renderer = (DataspaceTreeCellRenderer) mainCapTree.getCellRenderer();
+					if (searchField.getText().equals(""))
+					{
+						renderer.setPattern(null);
+					}
+					else
+					{
+						final String regexString = ".*" + searchField.getText().toLowerCase() + ".*";
+						renderer.setPattern(regexString);
+					}
+					mainCapTree.repaint();
+				}
+			}
+
+			private void checkStatus()
+			{
+				// Always remove highlight information as it is now
+				// no longer in synch with the regex in the text
+				// field
+				cancelHighlight();
+				// Check whether the search button should be enabled
+				if (!searchField.getText().equals(""))
+				{
+					searchButton.setEnabled(true);
+				}
+				else
+				{
+					searchButton.setEnabled(false);
+				}
+			}
+
+		});
+
+		final JLabel searchLabel = new JLabel();
+		searchLabel.setText(" Search ");
+		searchLabel.setLabelFor(searchField);
+
+		searchButton.addActionListener(searchAction);
+
+		final JPanel searchPanel = new JPanel(new BorderLayout());
+		searchPanel.add(searchLabel, BorderLayout.LINE_START);
+		searchPanel.add(searchField, BorderLayout.CENTER);
+		searchPanel.add(searchButton, BorderLayout.LINE_END);
+
+		add(BorderLayout.NORTH, searchPanel);
+	}
+
+	private void deleteComponent(final GUID id)
+	{
+		try
+		{
+			System.err.println("Delete ComponentRequest " + id);
+			ComponentAdvert component = DataspaceMonitor.getMonitor().getComponentAdvert(id.toString());
+			if (component != null)
+			{
+				dataspace.delete(component.getComponentRequestID());
+			}
+		}
+		catch (final DataspaceInactiveException e)
+		{
+			System.err.println("deleteComponentRequest: " + e);
+		}
+	}
+
+	private void deleteComponentRequest(final GUID id)
+	{
+		try
+		{
+			System.err.println("Delete ComponentRequest " + id);
+			dataspace.delete(id);
+		}
+		catch (final DataspaceInactiveException e)
+		{
+			System.err.println("deleteComponentRequest: " + e);
+		}
+	}
+
+	/**
+	 * really do the request
+	 */
+	private void requestComponent(final ItemData item)
+	{
+		final Capability cap = new Capability((TupleImpl) item);
+
+		// Issue request
+		final ComponentRequest compReq = new ComponentRequest(dataspace.allocateId());
+
+		compReq.setCapabilityID(cap.getID());
+		compReq.setHostID(dataspace.allocateId());
+		compReq.setContainerID(cap.getContainerID());
+		compReq.setRequestID(cap.getCapabilityName() + " Request");
+
+		try
+		{
+			compReq.addtoDataSpacePersistent(dataspace, /* lease */null);
+			System.out.println("Issued Component Request....\n" + cap.getCapabilityName() + "\n-");
+
+		}
+		catch (final DataspaceInactiveException ex1)
+		{
+
+			System.out.println("Error: Dataspace Inactive");
+			ex1.printStackTrace();
+		}
+	}
+
+	/**
+	 * tree node to text
+	 */
+
+	private String treeNodeToString(final Object value)
+	{
+		final Object userValue = (value instanceof DefaultMutableTreeNode) ? ((DefaultMutableTreeNode) value)
+				.getUserObject() : null;
+		if (userValue instanceof GUID)
+		{
+			try
+			{
+				final ItemData item = dataspace.getItem((GUID) userValue);
+				if (item instanceof TupleImpl)
+				{
+					final TupleImpl tuple = (TupleImpl) item;
+					switch (tuple.name)
+					{
+						case Capability.TYPE:
+							return DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
+						case ComponentRequest.TYPE:
+							return new ComponentRequest(tuple).getRequestID();
+						case ComponentAdvert.TYPE:
+							return DataspaceUtils.getCurrentName(new ComponentAdvert(tuple));
+						case PropertyLinkRequest.TYPE:
+							PropertyLinkRequest link = new PropertyLinkRequest(tuple);
+							ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
+							return link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
+					}
+
+					if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)
+					{
+						final DictionaryImpl d = (DictionaryImpl) tuple.fields[CompInfo.ATTRIBUTES_INDEX];
+						final Object val = d.get(BeanDescriptorHelper.SHORT_DESCRIPTION);
+						if (val instanceof StringBox)
+						{
+							return ((StringBox) val).value;
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				// Do nothing
+			}
+		}
+		return value.toString();
+	}
+
 	private class DataspaceTreeCellRenderer extends DefaultTreeCellRenderer
 	{
 		private final Icon component;
@@ -234,7 +471,8 @@ public class ComponentBrowser extends JPanel
 					handle(e);
 				}
 			});
-			tree.addTreeSelectionListener(e -> {
+			tree.addTreeSelectionListener(e ->
+			{
 				if (selectionModelChange)
 				{
 					return;
@@ -259,6 +497,29 @@ public class ComponentBrowser extends JPanel
 			ToolTipManager.sharedInstance().registerComponent(tree);
 
 			setViewportView(tree);
+		}
+
+		@Override
+		public void selectionChanged(Collection<String> selection)
+		{
+			List<TreePath> treePaths = new ArrayList<>();
+			for (String item : selection)
+			{
+				DefaultMutableTreeNode node = nodeMap.get(item);
+				if (node != null)
+				{
+					treePaths.add(new TreePath(node.getPath()));
+				}
+			}
+
+			selectionModelChange = true;
+			tree.setSelectionPaths(treePaths.toArray(new TreePath[treePaths.size()]));
+			selectionModelChange = false;
+		}
+
+		JTree getMainTree()
+		{
+			return tree;
 		}
 
 		private void handle(final MouseEvent e)
@@ -334,10 +595,8 @@ public class ComponentBrowser extends JPanel
 			}
 			else if (selPath != null && e.getModifiers() == InputEvent.BUTTON1_MASK && e.getClickCount() == 2)
 			{
-				/**
-				 * on double clicks mouse pressed seems to be triggered twice, even with an click
-				 * count of 2 on the first event. So just wait for the second event.
-				 */
+				// on double clicks mouse pressed seems to be triggered twice, even with an click
+				// count of 2 on the first event. So just wait for the second event.
 				clickCounter++;
 				if (clickCounter == 2)
 				{
@@ -372,29 +631,6 @@ public class ComponentBrowser extends JPanel
 				}
 			}
 		}
-
-		JTree getMainTree()
-		{
-			return tree;
-		}
-
-		@Override
-		public void selectionChanged(Collection<String> selection)
-		{
-			List<TreePath> treePaths = new ArrayList<>();
-			for (String item : selection)
-			{
-				DefaultMutableTreeNode node = nodeMap.get(item);
-				if (node != null)
-				{
-					treePaths.add(new TreePath(node.getPath()));
-				}
-			}
-
-			selectionModelChange = true;
-			tree.setSelectionPaths(treePaths.toArray(new TreePath[treePaths.size()]));
-			selectionModelChange = false;
-		}
 	}
 
 	private class CapabilityView extends DataspaceTreeView implements DataspaceConfigurationListener
@@ -409,101 +645,6 @@ public class ComponentBrowser extends JPanel
 			}
 
 			DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(this);
-		}
-
-		@Override
-		public void componentRequestDeleted(final ComponentRequest compReq)
-		{
-			final GUID id = compReq.getID();
-			final DefaultMutableTreeNode node = nodeMap.get(id.toString());
-			if (node == null)
-			{
-				System.err.println("Unable to delete (unknown component request) item" + id);
-			}
-			else
-			{
-				// writeToConsole("ComponentRequest deleted....\n" + id +
-				// "\n-");
-				treeModel.removeNodeFromParent(node);
-				nodeMap.remove(id.toString());
-			}
-		}
-
-		/**
-		 * check for ComponentRequests against Capability still present and add/remove
-		 */
-		void checkComponentRequests(final GUID capId, final boolean addFlag)
-		{
-			final ComponentRequest template = new ComponentRequest((GUID) null);
-			template.setCapabilityID(capId);
-			try
-			{
-				final CompInfo[] creqs = template.copyCollectAsComponentRequest(dataspace);
-
-				for (final CompInfo creq2 : creqs)
-				{
-					final ComponentRequest creq = (ComponentRequest) creq2;
-					if (creq.getCapabilityID().equals(capId))
-					{
-						if (addFlag)
-						{
-							componentRequestAdded(creq);
-						}
-						else
-						{
-							componentRequestDeleted(creq);
-						}
-					}
-				}
-			}
-			catch (final DataspaceInactiveException e)
-			{
-				System.err.println("checkComponentRequests: " + e);
-			}
-		}
-
-		@Override
-		public void componentRequestAdded(final ComponentRequest creq)
-		{
-
-			// may get called twice due to async events vs check
-			if (nodeMap.get(creq.getID().toString()) != null)
-			{
-				System.out.println("Ignore duplicate componentRequestAdded for " + creq.getID());
-				return;
-			}
-
-			final DefaultMutableTreeNode capNode = nodeMap.get(creq
-					.getCapabilityID().toString());
-			if (capNode == null)
-			{
-				System.err.println("note: capability " + creq.getCapabilityID() + " not (yet) known (ComponentRequest "
-						+ creq.getID() + ")");
-				return;
-			}
-			final DefaultMutableTreeNode addNode = new DefaultMutableTreeNode("ComponentRequest " + creq.getID());
-			addNode.setUserObject(creq.getID());
-
-			nodeMap.put(creq.getID().toString(), addNode);
-			treeModel.insertNodeInto(addNode, capNode, capNode.getChildCount());
-		}
-
-		@Override
-		public void propertyLinkRequestAdded(PropertyLinkRequest linkReq)
-		{
-
-		}
-
-		@Override
-		public void propertyLinkRequestDeleted(PropertyLinkRequest linkReq)
-		{
-
-		}
-
-		@Override
-		public void propertyLinkRequestUpdated(PropertyLinkRequest linkReq)
-		{
-
 		}
 
 		@Override
@@ -617,6 +758,101 @@ public class ComponentBrowser extends JPanel
 		{
 
 		}
+
+		@Override
+		public void componentRequestAdded(final ComponentRequest creq)
+		{
+
+			// may get called twice due to async events vs check
+			if (nodeMap.get(creq.getID().toString()) != null)
+			{
+				System.out.println("Ignore duplicate componentRequestAdded for " + creq.getID());
+				return;
+			}
+
+			final DefaultMutableTreeNode capNode = nodeMap.get(creq
+					.getCapabilityID().toString());
+			if (capNode == null)
+			{
+				System.err.println("note: capability " + creq.getCapabilityID() + " not (yet) known (ComponentRequest "
+						+ creq.getID() + ")");
+				return;
+			}
+			final DefaultMutableTreeNode addNode = new DefaultMutableTreeNode("ComponentRequest " + creq.getID());
+			addNode.setUserObject(creq.getID());
+
+			nodeMap.put(creq.getID().toString(), addNode);
+			treeModel.insertNodeInto(addNode, capNode, capNode.getChildCount());
+		}
+
+		@Override
+		public void componentRequestDeleted(final ComponentRequest compReq)
+		{
+			final GUID id = compReq.getID();
+			final DefaultMutableTreeNode node = nodeMap.get(id.toString());
+			if (node == null)
+			{
+				System.err.println("Unable to delete (unknown component request) item" + id);
+			}
+			else
+			{
+				// writeToConsole("ComponentRequest deleted....\n" + id +
+				// "\n-");
+				treeModel.removeNodeFromParent(node);
+				nodeMap.remove(id.toString());
+			}
+		}
+
+		@Override
+		public void propertyLinkRequestAdded(PropertyLinkRequest linkReq)
+		{
+
+		}
+
+		@Override
+		public void propertyLinkRequestDeleted(PropertyLinkRequest linkReq)
+		{
+
+		}
+
+		@Override
+		public void propertyLinkRequestUpdated(PropertyLinkRequest linkReq)
+		{
+
+		}
+
+		/**
+		 * check for ComponentRequests against Capability still present and add/remove
+		 */
+		void checkComponentRequests(final GUID capId, final boolean addFlag)
+		{
+			final ComponentRequest template = new ComponentRequest((GUID) null);
+			template.setCapabilityID(capId);
+			try
+			{
+				final CompInfo[] creqs = template.copyCollectAsComponentRequest(dataspace);
+
+				for (final CompInfo creq2 : creqs)
+				{
+					final ComponentRequest creq = (ComponentRequest) creq2;
+					if (creq.getCapabilityID().equals(capId))
+					{
+						if (addFlag)
+						{
+							componentRequestAdded(creq);
+						}
+						else
+						{
+							componentRequestDeleted(creq);
+						}
+					}
+				}
+			}
+			catch (final DataspaceInactiveException e)
+			{
+				System.err.println("checkComponentRequests: " + e);
+			}
+		}
 	}
 
 	private class ComponentView extends DataspaceTreeView implements ComponentListener, DataspaceConfigurationListener
@@ -632,6 +868,24 @@ public class ComponentBrowser extends JPanel
 
 			DataspaceMonitor.getMonitor().addComponentListener(this);
 			DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(this);
+		}
+
+		@Override
+		public void capabilityAdded(Capability cap)
+		{
+			// Nothing
+		}
+
+		@Override
+		public void capabilityDeleted(Capability cap)
+		{
+			// Nothing
+		}
+
+		@Override
+		public void capabilityUpdated(Capability cap)
+		{
+			// Nothing
 		}
 
 		@Override
@@ -669,30 +923,6 @@ public class ComponentBrowser extends JPanel
 		}
 
 		@Override
-		public void componentAdvertUpdated(ComponentAdvert comp)
-		{
-			final String id = comp.getID().toString();
-			final DefaultMutableTreeNode node = nodeMap.get(id);
-			sortChildren(root);
-			//treeModel.nodeStructureChanged(root);
-			if (node != null)
-			{
-				treeModel.nodeChanged(node);
-			}
-		}
-
-		@SuppressWarnings("unchecked")
-		private void sortChildren(DefaultMutableTreeNode node)
-		{
-			List<DefaultMutableTreeNode> children = Collections.list(node.children());
-			node.removeAllChildren();
-			Collections.sort(children, (o1, o2) -> treeNodeToString(o1).compareTo(treeNodeToString(o2)));
-			children.forEach(node::add);
-
-			treeModel.nodeStructureChanged(node);
-		}
-
-		@Override
 		public void componentAdvertDeleted(ComponentAdvert comp)
 		{
 			final String id = comp.getID().toString();
@@ -709,21 +939,16 @@ public class ComponentBrowser extends JPanel
 		}
 
 		@Override
-		public void capabilityAdded(Capability cap)
+		public void componentAdvertUpdated(ComponentAdvert comp)
 		{
-			// Nothing
-		}
-
-		@Override
-		public void capabilityDeleted(Capability cap)
-		{
-			// Nothing
-		}
-
-		@Override
-		public void capabilityUpdated(Capability cap)
-		{
-			// Nothing
+			final String id = comp.getID().toString();
+			final DefaultMutableTreeNode node = nodeMap.get(id);
+			sortChildren(root);
+			//treeModel.nodeStructureChanged(root);
+			if (node != null)
+			{
+				treeModel.nodeChanged(node);
+			}
 		}
 
 		@Override
@@ -741,12 +966,12 @@ public class ComponentBrowser extends JPanel
 		@Override
 		public void propertyLinkRequestAdded(PropertyLinkRequest linkReq)
 		{
-			if(nodeMap.containsKey(linkReq.getID().toString()))
+			if (nodeMap.containsKey(linkReq.getID().toString()))
 			{
 				return;
 			}
 			DefaultMutableTreeNode componentNode = nodeMap.get(linkReq.getSourceComponentID().toString());
-			if(componentNode != null)
+			if (componentNode != null)
 			{
 				final DefaultMutableTreeNode linkNode = new DefaultMutableTreeNode(linkReq.getID());
 				nodeMap.put(linkReq.getID().toString(), linkNode);
@@ -796,254 +1021,16 @@ public class ComponentBrowser extends JPanel
 		{
 
 		}
-	}
 
-	private final List<DataspaceTreeView> dataspaceTreeViews = new ArrayList<>();
-	private final DataspaceBean dataspace = DataspaceMonitor.getMonitor().getDataspace();
-	private final SelectionModel selectionModel;
-
-	public ComponentBrowser(final SelectionModel selectionModel)
-	{
-		super(new BorderLayout());
-
-		this.selectionModel = selectionModel;
-
-		dataspaceTreeViews.add(new CapabilityView());
-		dataspaceTreeViews.add(new ComponentView());
-
-		final JTabbedPane pane = new JTabbedPane();
-		for (DataspaceTreeView tree : dataspaceTreeViews)
+		@SuppressWarnings("unchecked")
+		private void sortChildren(DefaultMutableTreeNode node)
 		{
-			selectionModel.add(tree);
-			pane.add(tree.getName(), tree);
-		}
+			List<DefaultMutableTreeNode> children = Collections.list(node.children());
+			node.removeAllChildren();
+			children.sort(Comparator.comparing(ComponentBrowser.this::treeNodeToString));
+			children.forEach(node::add);
 
-		add(BorderLayout.CENTER, pane);
-
-		ToolTipManager.sharedInstance().setEnabled(true);
-		setPreferredSize(new Dimension(400, 500));
-
-		final JTextField searchField = new JTextField();
-		searchField.setMaximumSize(new Dimension(100, 20));
-
-		final ActionListener searchAction = e -> {
-			final String regexString = ".*" + searchField.getText().toLowerCase() + ".*";
-			for (final DataspaceTreeView capabilityView : dataspaceTreeViews)
-			{
-				final JTree mainCapTree = capabilityView.getMainTree();
-
-				final DataspaceTreeCellRenderer renderer = (DataspaceTreeCellRenderer) mainCapTree.getCellRenderer();
-				renderer.setPattern(regexString);
-
-				final DefaultTreeModel treeModel = (DefaultTreeModel) mainCapTree.getModel();
-				final DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) treeModel.getRoot();
-				final Enumeration<?> en = rootNode.depthFirstEnumeration();
-				while (en.hasMoreElements())
-				{
-					final DefaultMutableTreeNode theNode = (DefaultMutableTreeNode) en.nextElement();
-					final Object obj = theNode.getUserObject();
-					String nodeString;
-					if (dataspace != null && obj instanceof GUID)
-					{
-						final String rval = RDFStatement.GUIDToUrl((GUID) obj);
-						nodeString = DataspaceUtils.getDisplayString(dataspace, rval);
-					}
-					else
-					{
-						nodeString = theNode.toString();
-					}
-					// System.out.println("Matching " +
-					// obj.getClass().getName());
-					if (nodeString.toLowerCase().matches(regexString))
-					{
-						final TreePath path = new TreePath(treeModel.getPathToRoot(theNode));
-						mainCapTree.scrollPathToVisible(path);
-					}
-				}
-			}
-		};
-		searchField.addActionListener(searchAction);
-		final JButton searchButton = new JButton();
-		searchButton.setIcon(MediaFactory.getImageIcon(EditorResources.SEARCH_ICON, this));
-		searchButton.setEnabled(false);
-		searchButton.setRolloverEnabled(true);
-		searchField.getDocument().addDocumentListener(new DocumentListener()
-		{
-			@Override
-			public void changedUpdate(final DocumentEvent e)
-			{
-				checkStatus();
-			}
-
-			@Override
-			public void insertUpdate(final DocumentEvent e)
-			{
-				checkStatus();
-			}
-
-			@Override
-			public void removeUpdate(final DocumentEvent e)
-			{
-				checkStatus();
-			}
-
-			void cancelHighlight()
-			{
-				for (final DataspaceTreeView dataspaceTreeView : dataspaceTreeViews)
-				{
-					final JTree mainCapTree = dataspaceTreeView.getMainTree();
-					final DataspaceTreeCellRenderer renderer = (DataspaceTreeCellRenderer) mainCapTree.getCellRenderer();
-					if (searchField.getText().equals(""))
-					{
-						renderer.setPattern(null);
-					}
-					else
-					{
-						final String regexString = ".*" + searchField.getText().toLowerCase() + ".*";
-						renderer.setPattern(regexString);
-					}
-					mainCapTree.repaint();
-				}
-			}
-
-			private void checkStatus()
-			{
-				// Always remove highlight information as it is now
-				// no longer in synch with the regex in the text
-				// field
-				cancelHighlight();
-				// Check whether the search button should be enabled
-				if (!searchField.getText().equals(""))
-				{
-					searchButton.setEnabled(true);
-				}
-				else
-				{
-					searchButton.setEnabled(false);
-				}
-			}
-
-		});
-
-		final JLabel searchLabel = new JLabel();
-		searchLabel.setText(" Search ");
-		searchLabel.setLabelFor(searchField);
-
-		searchButton.addActionListener(searchAction);
-
-		final JPanel searchPanel = new JPanel(new BorderLayout());
-		searchPanel.add(searchLabel, BorderLayout.LINE_START);
-		searchPanel.add(searchField, BorderLayout.CENTER);
-		searchPanel.add(searchButton, BorderLayout.LINE_END);
-
-		add(BorderLayout.NORTH, searchPanel);
-	}
-
-	/**
-	 * tree node to text
-	 */
-
-	private String treeNodeToString(final Object value)
-	{
-		final Object userValue = (value instanceof DefaultMutableTreeNode) ? ((DefaultMutableTreeNode) value)
-				.getUserObject() : null;
-		if (userValue instanceof GUID)
-		{
-			try
-			{
-				final ItemData item = dataspace.getItem((GUID) userValue);
-				if (item instanceof TupleImpl)
-				{
-					final TupleImpl tuple = (TupleImpl) item;
-					switch (tuple.name)
-					{
-						case Capability.TYPE:
-							return DataspaceUtils.getCapabilityDisplayName((GUID) userValue);
-						case ComponentRequest.TYPE:
-							return new ComponentRequest(tuple).getRequestID();
-						case ComponentAdvert.TYPE:
-							return DataspaceUtils.getCurrentName(new ComponentAdvert(tuple));
-						case PropertyLinkRequest.TYPE:
-							PropertyLinkRequest link = new PropertyLinkRequest(tuple);
-							ComponentAdvert target = DataspaceMonitor.getMonitor().getComponentAdvert(link.getDestComponentID().toString());
-							return link.getSourcePropertyName() + " &rarr; " + DataspaceUtils.getCurrentName(target) + "." + link.getDestinationPropertyName();
-					}
-
-					if (tuple.fields[CompInfo.ATTRIBUTES_INDEX] instanceof DictionaryImpl)
-					{
-						final DictionaryImpl d = (DictionaryImpl) tuple.fields[CompInfo.ATTRIBUTES_INDEX];
-						final Object val = d.get(BeanDescriptorHelper.SHORT_DESCRIPTION);
-						if (val instanceof StringBox)
-						{
-							return ((StringBox) val).value;
-						}
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				// Do nothing
-			}
-		}
-		return value.toString();
-	}
-
-	private void deleteComponent(final GUID id)
-	{
-		try
-		{
-			System.err.println("Delete ComponentRequest " + id);
-			ComponentAdvert component = DataspaceMonitor.getMonitor().getComponentAdvert(id.toString());
-			if (component != null)
-			{
-				dataspace.delete(component.getComponentRequestID());
-			}
-		}
-		catch (final DataspaceInactiveException e)
-		{
-			System.err.println("deleteComponentRequest: " + e);
-		}
-	}
-
-	private void deleteComponentRequest(final GUID id)
-	{
-		try
-		{
-			System.err.println("Delete ComponentRequest " + id);
-			dataspace.delete(id);
-		}
-		catch (final DataspaceInactiveException e)
-		{
-			System.err.println("deleteComponentRequest: " + e);
-		}
-	}
-
-	/**
-	 * really do the request
-	 */
-	private void requestComponent(final ItemData item)
-	{
-		final Capability cap = new Capability((TupleImpl) item);
-
-		// Issue request
-		final ComponentRequest compReq = new ComponentRequest(dataspace.allocateId());
-
-		compReq.setCapabilityID(cap.getID());
-		compReq.setHostID(dataspace.allocateId());
-		compReq.setContainerID(cap.getContainerID());
-		compReq.setRequestID(cap.getCapabilityName() + " Request");
-
-		try
-		{
-			compReq.addtoDataSpacePersistent(dataspace, /* lease */null);
-			System.out.println("Issued Component Request....\n" + cap.getCapabilityName() + "\n-");
-
-		}
-		catch (final DataspaceInactiveException ex1)
-		{
-
-			System.out.println("Error: Dataspace Inactive");
-			ex1.printStackTrace();
+			treeModel.nodeStructureChanged(node);
 		}
 	}
 }

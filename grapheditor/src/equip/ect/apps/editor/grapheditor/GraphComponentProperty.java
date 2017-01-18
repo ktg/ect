@@ -54,10 +54,8 @@ import java.util.List;
 
 public class GraphComponentProperty extends BeanCanvasItem implements Connectable, Comparable<GraphComponentProperty>
 {
-	private String value;
-
 	private final GraphComponent parent;
-
+	private String value;
 	private ComponentProperty compProp;
 
 	private List<Link> outputLinks, inputLinks;
@@ -73,30 +71,6 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 						.toString(), compProp.getPropertyName());
 		this.parent = parent;
 		updateValue(compProp);
-	}
-
-	public void addInputLink(final Link link)
-	{
-		if (inputLinks == null)
-		{
-			inputLinks = new ArrayList<>();
-		}
-		if (!inputLinks.contains(link))
-		{
-			inputLinks.add(link);
-		}
-	}
-
-	public void addOutputLink(final Link link)
-	{
-		if (outputLinks == null)
-		{
-			outputLinks = new ArrayList<>();
-		}
-		if (!outputLinks.contains(link))
-		{
-			outputLinks.add(link);
-		}
 	}
 
 	@Override
@@ -121,86 +95,16 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 		return -1;
 	}
 
-	public void componentPropertyUpdated(final ComponentProperty compProp)
-	{
-		updateValue(compProp);
-		repaint();
-	}
-
-	public final ComponentProperty getComponentProperty()
-	{
-		// return DataspaceMonitor.getMonitor().getComponentProperty(beanid);
-		return compProp;
-	}
-
-	public String getDisplayValue()
-	{
-		return value;
-
-	}
-
 	@Override
 	public Point getInAnchorPoint()
 	{
 		return new Point(posX, (int) (posY + 0.5 * height));
 	}
 
-	public final List<Link> getInputLinks()
-	{
-		return inputLinks;
-	}
-
 	@Override
 	public Point getOutAnchorPoint()
 	{
 		return new Point(posX + width, (int) (posY + 0.5 * height));
-	}
-
-	public final List<Link> getOutputLinks()
-	{
-		return outputLinks;
-	}
-
-	public final GraphComponent getParent()
-	{
-		return this.parent;
-	}
-
-	public final boolean isLinked()
-	{
-		return ((inputLinks != null && inputLinks.size() > 0) || (outputLinks != null && outputLinks.size() > 0));
-	}
-
-	public void removeAllInputLinks()
-	{
-		inputLinks = null;
-	}
-
-	public void removeAllLinks()
-	{
-		removeAllInputLinks();
-		removeAllOutputLinks();
-	}
-
-	public void removeAllOutputLinks()
-	{
-		outputLinks = null;
-	}
-
-	public void removeInputLink(final Link link)
-	{
-		if (inputLinks != null && link != null)
-		{
-			inputLinks.remove(link);
-		}
-	}
-
-	public void removeOutputLink(final Link link)
-	{
-		if (outputLinks != null && link != null)
-		{
-			outputLinks.remove(link);
-		}
 	}
 
 	/**
@@ -241,7 +145,101 @@ public class GraphComponentProperty extends BeanCanvasItem implements Connectabl
 		this.parent.setSelected(selected);
 	}
 
-	public void updateValue(final ComponentProperty prop)
+	void addInputLink(final Link link)
+	{
+		if (inputLinks == null)
+		{
+			inputLinks = new ArrayList<>();
+		}
+		if (!inputLinks.contains(link))
+		{
+			inputLinks.add(link);
+		}
+	}
+
+	void addOutputLink(final Link link)
+	{
+		if (outputLinks == null)
+		{
+			outputLinks = new ArrayList<>();
+		}
+		if (!outputLinks.contains(link))
+		{
+			outputLinks.add(link);
+		}
+	}
+
+	void componentPropertyUpdated(final ComponentProperty compProp)
+	{
+		updateValue(compProp);
+		repaint();
+	}
+
+	final ComponentProperty getComponentProperty()
+	{
+		// return DataspaceMonitor.getMonitor().getComponentProperty(beanid);
+		return compProp;
+	}
+
+	String getDisplayValue()
+	{
+		return value;
+
+	}
+
+	final List<Link> getInputLinks()
+	{
+		return inputLinks;
+	}
+
+	final List<Link> getOutputLinks()
+	{
+		return outputLinks;
+	}
+
+	final GraphComponent getParent()
+	{
+		return this.parent;
+	}
+
+	final boolean isLinked()
+	{
+		return ((inputLinks != null && inputLinks.size() > 0) || (outputLinks != null && outputLinks.size() > 0));
+	}
+
+	void removeAllInputLinks()
+	{
+		inputLinks = null;
+	}
+
+	void removeAllLinks()
+	{
+		removeAllInputLinks();
+		removeAllOutputLinks();
+	}
+
+	void removeAllOutputLinks()
+	{
+		outputLinks = null;
+	}
+
+	void removeInputLink(final Link link)
+	{
+		if (inputLinks != null && link != null)
+		{
+			inputLinks.remove(link);
+		}
+	}
+
+	void removeOutputLink(final Link link)
+	{
+		if (outputLinks != null && link != null)
+		{
+			outputLinks.remove(link);
+		}
+	}
+
+	private void updateValue(final ComponentProperty prop)
 	{
 		this.compProp = prop;
 		this.name = prop.getPropertyName();

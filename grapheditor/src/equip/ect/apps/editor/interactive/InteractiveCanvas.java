@@ -55,8 +55,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -66,19 +64,20 @@ import java.util.List;
  */
 public class InteractiveCanvas extends JDesktopPane implements MouseListener, MouseMotionListener, SelectionModel.SelectionListener
 {
-	public static final int NORMAL_MODE = 0;
+	protected static final int NORMAL_MODE = 0;
 	private static final Stroke DASHED_STROKE = new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
 			10.0f, new float[]{2.1f}, 0);
-
 	protected final SelectionModel selectionModel;
-	protected final int SINGLE_MARKER = 0;
-	protected final int BOX_MARKER = 1;
-	protected final int NO_MARKER = 2;
-	protected int markerType;
-	protected boolean inSelection;
-	protected int mode;
-	protected int xPos, yPos, xPosPrev, yPosPrev, xPosAnchor, yPosAnchor;
 	protected final List<InteractiveCanvasItem> items = new ArrayList<>();
+	protected int mode;
+	private MarkerType markerType;
+	private boolean inSelection;
+	protected int xPos;
+	protected int yPos;
+	private int xPosPrev;
+	private int yPosPrev;
+	private int xPosAnchor;
+	private int yPosAnchor;
 	private int[] marker;
 
 	public InteractiveCanvas(final String name, final Color backgroundColor, final SelectionModel selectionModel)
@@ -88,7 +87,7 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		setSize(200, 200);
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		markerType = NO_MARKER;
+		markerType = MarkerType.NO_MARKER;
 		mode = NORMAL_MODE;
 		this.selectionModel = selectionModel;
 		selectionModel.add(this);
@@ -97,20 +96,6 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 	public void addItem(final InteractiveCanvasItem item)
 	{
 		addItem(item, true);
-	}
-
-	public void addItem(final InteractiveCanvasItem item, final boolean sort)
-	{
-		if (!items.contains(item))
-		{
-			items.add(item);
-			item.setTargetCanvas(this);
-			if (sort)
-			{
-				sortItemsByDrawPriority();
-			}
-			item.repaint();
-		}
 	}
 
 	public void addItems(final Iterable<? extends InteractiveCanvasItem> newItems)
@@ -145,45 +130,9 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		return new Rectangle(0, 0, (int) rightmost, (int) downmost);
 	}
 
-	public InteractiveCanvasItem getItem(final int x, final int y)
-	{
-		return getItem(x, y, InteractiveCanvasItem.class);
-	}
-
-	public InteractiveCanvasItem getItem(final int x, final int y, final Class<?> matchClass)
-	{
-		// We need to traverse in the opposite direction since
-		// last elements precede in focus.
-		for (InteractiveCanvasItem ici : items)
-		{
-			if (matchClass.isAssignableFrom(ici.getClass()) && ici.isSelectable(x, y))
-			{
-				return ici;
-			}
-		}
-		return null;
-	}
-
 	public final List<InteractiveCanvasItem> getItems()
 	{
 		return items;
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> List<T> getItems(final Class<T> matchClass)
-	{
-		List<T> results = new ArrayList<T>();
-		// We need to traverse in the opposite direction since
-		// last elements precede in focus.
-		for (final InteractiveCanvasItem ici : items)
-		{
-			if (matchClass.isAssignableFrom(ici.getClass()))
-			{
-				results.add((T) ici);
-			}
-		}
-
-		return results;
 	}
 
 	@Override
@@ -214,7 +163,7 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 					}
 					else
 					{
-						markerType = BOX_MARKER;
+						markerType = MarkerType.BOX_MARKER;
 						final int[] prevMarker = new int[]{marker[0], marker[1], marker[2], marker[3]};
 						calculateMarker();
 						final int clipOrigoX = Math.min(marker[0], prevMarker[0]);
@@ -243,10 +192,6 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 	@Override
 	public void mouseMoved(final MouseEvent me)
 	{
-		/**
-		 * System.out.println("Moving"); xPosPrev = xPos; yPosPrev = yPos; xPos = me.getX(); yPos =
-		 * me.getY();
-		 */
 	}
 
 	@Override
@@ -276,7 +221,7 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 
 						setTopDrawPriority(selectedItem);
 					}
-					markerType = SINGLE_MARKER;
+					markerType = MarkerType.SINGLE_MARKER;
 					inSelection = true;
 				}
 				else
@@ -305,11 +250,6 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 				doOnMouseReleased(xPos, yPos);
 				break;
 		}
-	}
-
-	public void paintBackground(final Graphics2D g)
-	{
-		g.setBackground(EditorResources.BACKGROUND_COLOR);
 	}
 
 	@Override
@@ -367,40 +307,75 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		}
 	}
 
-	/**
-	 * This sets the object to be drawn last, and over the rest.
-	 */
-	public void setTopDrawPriority(final InteractiveCanvasItem item)
+	@Override
+	public void selectionChanged(Collection<String> selection)
 	{
-		if (items.remove(item))
-		{
-			items.add(item);
-		}
-	}
 
-	public void sortItemsByDrawPriority()
-	{
-		Collections.sort(this.items, (item1, item2) -> {
-			final int drawPrior1 = item1.drawPriority;
-			final int drawPrior2 = item2.drawPriority;
-			if (drawPrior1 == drawPrior2)
-			{
-				return 0;
-			}
-			else if (drawPrior1 > drawPrior2)
-			{
-				return 1;
-			}
-			else
-			{
-				return -1;
-			}
-		});
 	}
 
 	public void startDaemon()
 	{
 		new InteractiveCanvasDaemon(this);
+	}
+
+	protected void doOnMouseDragged(final MouseEvent me)
+	{
+	}
+
+	protected void doOnMouseReleased(final int newPosX, final int newPosY)
+	{
+		markerType = MarkerType.NO_MARKER;
+		repaint();
+	}
+
+	protected InteractiveCanvasItem getItem(final int x, final int y)
+	{
+		return getItem(x, y, InteractiveCanvasItem.class);
+	}
+
+	protected InteractiveCanvasItem getItem(final int x, final int y, final Class<?> matchClass)
+	{
+		// We need to traverse in the opposite direction since
+		// last elements precede in focus.
+		for (InteractiveCanvasItem ici : items)
+		{
+			if (matchClass.isAssignableFrom(ici.getClass()) && ici.isSelectable(x, y))
+			{
+				return ici;
+			}
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected <T> List<T> getItems(final Class<T> matchClass)
+	{
+		List<T> results = new ArrayList<>();
+		// We need to traverse in the opposite direction since
+		// last elements precede in focus.
+		for (final InteractiveCanvasItem ici : items)
+		{
+			if (matchClass.isAssignableFrom(ici.getClass()))
+			{
+				results.add((T) ici);
+			}
+		}
+
+		return results;
+	}
+
+	private void addItem(final InteractiveCanvasItem item, final boolean sort)
+	{
+		if (!items.contains(item))
+		{
+			items.add(item);
+			item.setTargetCanvas(this);
+			if (sort)
+			{
+				sortItemsByDrawPriority();
+			}
+			item.repaint();
+		}
 	}
 
 	private void calculateMarker()
@@ -415,29 +390,15 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		marker[3] = Math.abs(yPosAnchor - yPos);
 	}
 
-	protected void doOnDoubleClick(final MouseEvent me)
-	{
-	}
-
-	protected void doOnMouseDragged(final MouseEvent me)
-	{
-	}
-
-	protected void doOnMouseReleased(final int newPosX, final int newPosY)
-	{
-		markerType = NO_MARKER;
-		repaint();
-	}
-
 	/**
 	 * Convenience class for processing upon translation of items.
 	 */
-	protected void doOnTranslate(final int newPosX, final int newPosY)
+	private void doOnTranslate(final int newPosX, final int newPosY)
 	{
 
 	}
 
-	protected void drawItems(final Graphics2D g)
+	private void drawItems(final Graphics2D g)
 	{
 		synchronized (items)
 		{
@@ -448,28 +409,21 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		}
 	}
 
-	protected void drawSelector(final Graphics2D g)
+	private void drawSelector(final Graphics2D g)
 	{
-		if (markerType != NO_MARKER)
+		if (markerType == MarkerType.BOX_MARKER)
 		{
-			switch (markerType)
-			{
-				case SINGLE_MARKER:
-					break;
-				case BOX_MARKER:
-					final Stroke currentStroke = g.getStroke();
-					final Color currentColor = g.getColor();
-					g.setColor(Color.black);
-					g.setStroke(DASHED_STROKE);
-					g.drawRect(marker[0], marker[1], marker[2], marker[3]);
-					g.setColor(currentColor);
-					g.setStroke(currentStroke);
-					break;
-			}
+			final Stroke currentStroke = g.getStroke();
+			final Color currentColor = g.getColor();
+			g.setColor(Color.black);
+			g.setStroke(DASHED_STROKE);
+			g.drawRect(marker[0], marker[1], marker[2], marker[3]);
+			g.setColor(currentColor);
+			g.setStroke(currentStroke);
 		}
 	}
 
-	protected void insideMarker()
+	private void insideMarker()
 	{
 		for (InteractiveCanvasItem item : items)
 		{
@@ -490,7 +444,44 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		}
 	}
 
-	protected void translateItems(final int newPosX, final int newPosY, final int oldPosX, final int oldPosY)
+	private void paintBackground(final Graphics2D g)
+	{
+		g.setBackground(EditorResources.BACKGROUND_COLOR);
+	}
+
+	/**
+	 * This sets the object to be drawn last, and over the rest.
+	 */
+	private void setTopDrawPriority(final InteractiveCanvasItem item)
+	{
+		if (items.remove(item))
+		{
+			items.add(item);
+		}
+	}
+
+	private void sortItemsByDrawPriority()
+	{
+		items.sort((item1, item2) ->
+		{
+			final int drawPrior1 = item1.drawPriority;
+			final int drawPrior2 = item2.drawPriority;
+			if (drawPrior1 == drawPrior2)
+			{
+				return 0;
+			}
+			else if (drawPrior1 > drawPrior2)
+			{
+				return 1;
+			}
+			else
+			{
+				return -1;
+			}
+		});
+	}
+
+	private void translateItems(final int newPosX, final int newPosY, final int oldPosX, final int oldPosY)
 	{
 		final int dx = (newPosX - oldPosX);
 		final int dy = (newPosY - oldPosY);
@@ -505,9 +496,9 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		}
 	}
 
-	@Override
-	public void selectionChanged(Collection<String> selection)
-	{
-
+	private enum MarkerType {
+		SINGLE_MARKER,
+		BOX_MARKER,
+		NO_MARKER
 	}
 }

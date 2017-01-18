@@ -39,11 +39,7 @@
 
 package equip.ect.apps.editor;
 
-import equip.ect.Capability;
-import equip.ect.ComponentAdvert;
-import equip.ect.ComponentProperty;
-import equip.ect.ComponentRequest;
-import equip.ect.PropertyLinkRequest;
+import equip.ect.*;
 import equip.ect.apps.editor.dataspace.ComponentListener;
 import equip.ect.apps.editor.dataspace.ComponentMetadataListener;
 import equip.ect.apps.editor.dataspace.ComponentPropertyUpdateListener;
@@ -76,11 +72,10 @@ import java.util.List;
 public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListener, ComponentListener,
 		ComponentPropertyUpdateListener, ComponentMetadataListener, DataspaceConfigurationListener
 {
-
 	private static final boolean dynamicCanvas = true;
 	public static boolean animatePropertyUpdate = true;
 
-	public static List<BeanCanvasItem> getBeanInstances(final String beanid, final Collection<InteractiveCanvasItem> beans)
+	private static List<BeanCanvasItem> getBeanInstances(final String beanid, final Collection<InteractiveCanvasItem> beans)
 	{
 		List<BeanCanvasItem> results = null;
 		if (beans != null)
@@ -107,8 +102,6 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		return results;
 	}
 
-	protected transient List<BeanCanvasItem> unattachableItems = new ArrayList<>();
-	protected transient List<BeanCanvasItem> attachableItems = new ArrayList<>();
 	private int dragging = 0;
 
 	private static final boolean singleInstance = true;
@@ -183,7 +176,7 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		DataspaceMonitor.getMonitor().addDataspaceConfigurationListener(this);
 	}
 
-	public void animateActiveItems(final List<? extends BeanCanvasItem> items)
+	protected void animateActiveItems(final List<? extends BeanCanvasItem> items)
 	{
 		new TimerPaint(items, 500).start();
 	}
@@ -433,19 +426,19 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 
 	}
 
-	public void removeBeans(final String beanid)
+	private void removeBeans(final String beanid)
 	{
 		removeBeans(beanid, true);
 	}
 
-	public void removeBeans(final String beanid, final boolean cleanUp)
+	protected void removeBeans(final String beanid, final boolean cleanUp)
 	{
 		final List<BeanCanvasItem> removals = getBeanInstances(beanid);
 		System.out.println("Removing " + beanid);
 		removeItems(removals, cleanUp);
 	}
 
-	public void validateViewportSize()
+	private void validateViewportSize()
 	{
 		final Rectangle bounds = getBounds();
 		setPreferredSize(new Dimension((int) bounds.getWidth(), (int) bounds.getHeight()));
@@ -458,43 +451,5 @@ public class BeanGraphPanel extends InteractiveCanvas implements DropTargetListe
 		newBean.setTargetCanvas(this);
 		// newBean.setSize(100, 100);
 		return newBean;
-	}
-
-	@Override
-	protected void doOnDoubleClick(final MouseEvent me)
-	{
-	}
-
-	/**
-	 * Filters out all possible pieces to attach to
-	 */
-	protected void filterValidAttachable(final BeanCanvasItem pp, final List<InteractiveCanvasItem> allBeanCanvasItems)
-	{
-		List<BeanCanvasItem> possible = null;
-		for (final InteractiveCanvasItem obj : allBeanCanvasItems)
-		{
-			if (obj instanceof BeanCanvasItem)
-			{
-				final BeanCanvasItem foreignBit = (BeanCanvasItem) obj;
-				if (foreignBit == pp)
-				{ // ignore self check
-					continue;
-				}
-
-				if (pp.isAttachable(foreignBit) || foreignBit.isAttachable(pp))
-				{
-					if (possible == null)
-					{
-						possible = new ArrayList<>();
-					}
-					attachableItems.add(foreignBit);
-				}
-				else
-				{
-					unattachableItems.add(foreignBit);
-					foreignBit.setAvailable(false);
-				}
-			}
-		}
 	}
 }

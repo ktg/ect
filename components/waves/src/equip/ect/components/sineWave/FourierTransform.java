@@ -6,70 +6,31 @@ import equip.ect.ECTComponent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @ECTComponent
 @Category("Data/Waves")
 public class FourierTransform implements Serializable, PropertyChangeListener
 {
+	private final transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
+	private final double constant = -2 * Math.PI;
+	private int bufferLength = 128;
+	private double frequency;
+	private Entry[] values;
+	private double[] realArray;
+	private double[] imagArray;
+	private double[] freqArray;
+	private int valuesStart;
+	private int nu;
+	private long count;
+	private double value;
+	private double radice;
+	private int calculationFreq = 2;
 
-	private static class Entry
+	public FourierTransform()
 	{
-		private double value;
-		private long time;
-	}
-
-	public static void main(final String[] args)
-	{
-		try
-		{
-
-			final FourierTransform fourier = new FourierTransform();
-			final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
-
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(FourierTransform.class
-					.getClassLoader().getResource("ect/components/sineWave/test-time.csv").openStream()));
-
-			final File file = new File("out.csv");
-			file.delete();
-			file.createNewFile();
-			final BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-
-			double oldValue = 0;
-
-			while (true)
-			{
-				final String line = reader.readLine();
-				if (line == null)
-				{
-					break;
-				}
-				final String[] parts = line.split(",");
-				final long timestamp = timeFormat.parse(parts[0]).getTime();
-				final double value = Double.parseDouble(parts[1]);
-				if (value != oldValue)
-				{
-					fourier.setValue(value, timestamp);
-					oldValue = value;
-
-					writer.write(value + "," + (fourier.getFrequency()));
-					writer.newLine();
-				}
-			}
-
-			writer.flush();
-		}
-		catch (final Exception e)
-		{
-			e.printStackTrace();
-		}
+		setBufferLength(bufferLength);
 	}
 
 	/**
@@ -89,38 +50,6 @@ public class FourierTransform implements Serializable, PropertyChangeListener
 		return k;
 	}
 
-	private final transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
-
-	private int bufferLength = 128;
-
-	private double frequency;
-
-	private Entry[] values;
-	private double[] realArray;
-
-	private double[] imagArray;
-
-	private double[] freqArray;
-
-	private int valuesStart;
-
-	private int nu;
-
-	private long count;
-
-	private final double constant = -2 * Math.PI;
-
-	private double value;
-
-	private double radice;
-
-	private int calculationFreq = 2;
-
-	public FourierTransform()
-	{
-		setBufferLength(bufferLength);
-	}
-
 	public synchronized void addPropertyChangeListener(final PropertyChangeListener l)
 	{
 		propertyChangeListeners.addPropertyChangeListener(l);
@@ -129,31 +58,6 @@ public class FourierTransform implements Serializable, PropertyChangeListener
 	public int getBufferLength()
 	{
 		return bufferLength;
-	}
-
-	public int getCalculationFreq()
-	{
-		return calculationFreq;
-	}
-
-	public double getFrequency()
-	{
-		return frequency;
-	}
-
-	public double getValue()
-	{
-		return value;
-	}
-
-	@Override
-	public void propertyChange(final PropertyChangeEvent evt)
-	{
-	}
-
-	public synchronized void removePropertyChangeListener(final PropertyChangeListener l)
-	{
-		propertyChangeListeners.removePropertyChangeListener(l);
 	}
 
 	public void setBufferLength(final int bufferLength)
@@ -177,12 +81,27 @@ public class FourierTransform implements Serializable, PropertyChangeListener
 		propertyChangeListeners.firePropertyChange("bufferLength", oldLength, bufferLength);
 	}
 
+	public int getCalculationFreq()
+	{
+		return calculationFreq;
+	}
+
 	public void setCalculationFreq(final int value)
 	{
 		final int oldFreq = calculationFreq;
 		calculationFreq = value;
 
 		propertyChangeListeners.firePropertyChange("calculationFreq", oldFreq, calculationFreq);
+	}
+
+	public double getFrequency()
+	{
+		return frequency;
+	}
+
+	public double getValue()
+	{
+		return value;
 	}
 
 	public void setValue(final double value)
@@ -204,6 +123,16 @@ public class FourierTransform implements Serializable, PropertyChangeListener
 		}
 
 		propertyChangeListeners.firePropertyChange("value", oldValue, value);
+	}
+
+	@Override
+	public void propertyChange(final PropertyChangeEvent evt)
+	{
+	}
+
+	public synchronized void removePropertyChangeListener(final PropertyChangeListener l)
+	{
+		propertyChangeListeners.removePropertyChangeListener(l);
 	}
 
 	void setValue(final double value, final long timestamp)
@@ -334,5 +263,11 @@ public class FourierTransform implements Serializable, PropertyChangeListener
 	private int getOffset(final int offset)
 	{
 		return ((bufferLength + offset) % bufferLength);
+	}
+
+	private static class Entry
+	{
+		private double value;
+		private long time;
 	}
 }

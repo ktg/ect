@@ -48,7 +48,6 @@ import equip.data.beans.DataspaceInactiveException;
 
 public class ComponentAdvert extends CompInfo
 {
-
 	public static final String TYPE = "ComponentAdvert2";
 
 	public static final int NO_OF_FIELDS = 6;
@@ -70,27 +69,6 @@ public class ComponentAdvert extends CompInfo
 	public ComponentAdvert(final TupleImpl tuple)
 	{
 		super(tuple);
-	}
-
-	public ComponentAdvert[] copyCollectAsComponentAdvert(final DataspaceBean dataspace)
-			throws DataspaceInactiveException
-	{
-
-		final equip.data.ItemData[] ret = dataspace.copyCollect(this.tuple);
-		if (ret != null)
-		{
-			final ComponentAdvert[] returnvals = new ComponentAdvert[ret.length];
-
-			for (int i = 0; i < ret.length; i++)
-			{
-				returnvals[i] = new ComponentAdvert((TupleImpl) ret[i]);
-			}
-			return returnvals;
-		}
-		else
-		{
-			return null;
-		}
 	}
 
 	public GUID getCapabilityID()

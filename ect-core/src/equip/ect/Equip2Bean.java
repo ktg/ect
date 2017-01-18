@@ -41,16 +41,12 @@ Contributors:
  */
 package equip.ect;
 
-/**
- * @author imt
- */
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import equip.data.DataSession;
 import equip.data.GUID;
@@ -61,157 +57,37 @@ import equip.data.beans.DataspaceBean;
 import equip.data.beans.DataspaceEventListener;
 import equip.data.beans.DataspaceInactiveException;
 
+/**
+ * @author imt
+ */
 class Equip2Bean implements DataspaceEventListener
 {
-	class MyDataspaceEventListener implements DataspaceEventListener
-	{
-		int kind;
-		PropertyLinkRequest link;
-		PropertyDescriptor prop;
-
-		MyDataspaceEventListener(final int kind)
-		{
-			this.kind = kind;
-			this.link = null;
-		}
-
-		MyDataspaceEventListener(final int kind, final PropertyLinkRequest link, final PropertyDescriptor prop)
-		{
-			this.kind = kind;
-			this.link = link;
-			this.prop = prop;
-		}
-
-		@Override
-		public void dataspaceEvent(final equip.data.beans.DataspaceEvent event)
-		{
-			Equip2Bean.this.dataspaceEvent(event, kind, link, prop);
-		}
-	}
-
-	class ReferringPropertyInfo
-	{
-		GUID id;
-		DataSession refSession;
-		DataSession linkSession;
-		GUID refid;
-		/**
-		 * vector of GUIDs of properties which refer to this
-		 */
-		List<GUID> referringToThis = new ArrayList<GUID>();
-	}
-
-	/**
-	 * a delayed set
-	 */
-	protected class DelayedSet
-	{
-		java.beans.PropertyDescriptor descriptor;
-		java.lang.reflect.Method method;
-		Object target;
-		Object value;
-		GUID requestId;
-		boolean deleted;
-
-		DelayedSet(final java.beans.PropertyDescriptor descriptor, final java.lang.reflect.Method method,
-				final Object target, final Object value, final GUID requestId, final boolean deleted)
-		{
-			this.descriptor = descriptor;
-			this.method = method;
-			this.target = target;
-			this.value = value;
-			this.requestId = requestId;
-			this.deleted = deleted;
-		}
-
-		void invoke()
-		{
-			try
-			{
-				if (target instanceof IActiveComponent)
-				{
-
-					final boolean done = ((IActiveComponent) target).linkToUpdated(	descriptor.getName(), requestId,
-																					deleted ? null : value);
-					if (done) { return;
-					// drop through to regular set
-					}
-
-				}
-				if (deleted)
-				{
-					// no op?! (backward compatible)
-					return;
-				}
-				if (descriptor instanceof DynamicPropertyDescriptor)
-				{
-					final DynamicPropertyDescriptor dprop = (DynamicPropertyDescriptor) descriptor;
-					// invoke
-					dprop.writeProperty((DynamicProperties) target, value);
-				}
-				else
-				{
-					// mapping object must not be locked during this call
-					method.invoke(target, new Object[] { value });
-				}
-			}
-			catch (final Exception e)
-			{
-
-				System.out.println("Equip2Bean Exception in setting value");
-				e.printStackTrace();
-
-			}
-		}
-	}
-
-	public boolean debug = false;
+	private static final boolean debug = false;
+	private static final int KIND_MY_PROPERTIES = 1;
+	private static final int KIND_REFS_TO_MY_PROPERTIES = 2;
+	private static final int KIND_LINK_SOURCES = 3;
+	private static final int KIND_LINK_SOURCE_REFS = 4;
+	private static final int KIND_UPDATE_OF_REFERENCED = 5;
+	private static final String[] kind_names = new String[]{"0", "my properties", "refs to my properties", "link sources",
+			"link source refs", "update of referenced"};
 	private final MappingObject parent;
-	private equip.data.beans.DataspaceBean dataspace = null;
-	private Serializable bean = null;
-	private GUID beanID = null;
-	private DataSession propsession = null;
+	private final DataspaceBean dataspace;
+	private final Serializable bean;
 	// private DataSession linksession = null;
-	/**
-	 * map of referenced source property GUID -> Vector of referring source property GUID
-	 */
-	private Map<GUID, List<GUID>> sourcePropertyReferencedBy = new HashMap<GUID, List<GUID>>();
-	/**
-	 * map of referenced source property GUID -> DataSession
-	 */
-	private Map<GUID, ReferringPropertyInfo> destPropertySessions = new HashMap<GUID, ReferringPropertyInfo>();
-
-	/**
-	 * map of link GUID -> data session
-	 */
-	private Map<GUID, DataSession> linkSessions = new HashMap<GUID, DataSession>();
-
-	/**
-	 * map of link GUID -> HashMap of referenced GUID -> DataSession
-	 */
-	private Map<GUID, Map<GUID, DataSession>> linkRefSessions = new HashMap<GUID, Map<GUID, DataSession>>();
-
-	/**
-	 * map of known (added) item GUIDs -> int[1] added count
-	 */
-	private HashMap<GUID, int[]> knownItems = new HashMap<GUID, int[]>();
-
-	equip.data.beans.DataspaceEvent lastUpdateEvent;
-
-	static final int KIND_MY_PROPERTIES = 1;
-
-	static final int KIND_REFS_TO_MY_PROPERTIES = 2;
-	static final int KIND_LINK_SOURCES = 3;
-	static final int KIND_LINK_SOURCE_REFS = 4;
-	static final int KIND_UPDATE_OF_REFERENCED = 5;
-	static final String[] kind_names = new String[] { "0", "my properties", "refs to my properties", "link sources",
-														"link source refs", "update of referenced" };
+	private final Map<GUID, List<GUID>> sourcePropertyReferencedBy = new HashMap<>();
+	private final Map<GUID, ReferringPropertyInfo> destPropertySessions = new HashMap<>();
+	private final Map<GUID, DataSession> linkSessions = new HashMap<>();
+	private final Map<GUID, Map<GUID, DataSession>> linkRefSessions = new HashMap<>();
+	private final Map<GUID, int[]> knownItems = new HashMap<>();
 	/**
 	 * list of delayed sets
 	 */
-	protected Vector<DelayedSet> delayedSets = new Vector<DelayedSet>();
+	private final List<DelayedSet> delayedSets = new ArrayList<>();
+	private GUID beanID = null;
+	private DataSession propsession = null;
+	private equip.data.beans.DataspaceEvent lastUpdateEvent;
 
-	public Equip2Bean(final MappingObject parent, final DataspaceBean dspace)
+	Equip2Bean(final MappingObject parent, final DataspaceBean dspace)
 	{
 
 		this.dataspace = dspace;
@@ -231,8 +107,8 @@ class Equip2Bean implements DataspaceEventListener
 		// Put Patterns in the Space
 		try
 		{
-			propsession = proptemplate.addPatterntoDataSpace(	dataspace,
-																new MyDataspaceEventListener(KIND_MY_PROPERTIES));
+			propsession = proptemplate.addPatterntoDataSpace(dataspace,
+					new MyDataspaceEventListener(KIND_MY_PROPERTIES));
 			// linksession = linktemplate.addPatterntoDataSpace(dataspace, this);
 		}
 		catch (final DataspaceInactiveException ex)
@@ -248,9 +124,62 @@ class Equip2Bean implements DataspaceEventListener
 		dataspaceEvent(event, 0, null, null);
 	}
 
+	public void stop()
+	{
+		try
+		{
+			// this.dataspace.removeDataspaceEventListener(linksession);
+			this.dataspace.removeDataspaceEventListener(propsession);
+		}
+		catch (final DataspaceInactiveException ex)
+		{
+			System.out.println("Dataspace inacative ");
+			ex.printStackTrace();
+		}
+	}
+
+	private void addDestPropertySession(final GUID id)
+	{
+		// look also for links to ourselves
+		addDestPropertySession(id, true, null);
+	}
+
+	private void addDestPropertySession(final GUID id, final boolean includeLinks, final GUID ref)
+	{
+		final ReferringPropertyInfo info = new ReferringPropertyInfo();
+		info.id = id;
+		info.refid = ref;
+
+		// Build pattern for the property tuple
+		final ComponentProperty proptemplate = new ComponentProperty((GUID) null);
+		proptemplate.setConnectionPointType(ComponentProperty.CONNECTION_POINT_PROPERTY_REFERENCE);
+		try
+		{
+			proptemplate.setPropertyReference(id);
+		}
+		catch (final ConnectionPointTypeException e)
+		{
+		}
+		final PropertyLinkRequest linktemplate = new PropertyLinkRequest((GUID) null);
+		linktemplate.setDestinationPropID(id);
+		try
+		{
+			destPropertySessions.put(id, info);
+			info.refSession = proptemplate.addPatterntoDataSpace(dataspace, new MyDataspaceEventListener(
+					KIND_REFS_TO_MY_PROPERTIES));
+			if (includeLinks)
+			{
+				info.linkSession = linktemplate.addPatterntoDataSpace(dataspace, this);
+			}
+		}
+		catch (final DataspaceInactiveException e)
+		{
+		}
+	}
+
 	// DataspaceEventListener method
-	public void dataspaceEvent(final equip.data.beans.DataspaceEvent event, final int kind,
-			final PropertyLinkRequest link, final PropertyDescriptor prop)
+	private void dataspaceEvent(final equip.data.beans.DataspaceEvent event, final int kind,
+	                            final PropertyLinkRequest link, final PropertyDescriptor prop)
 	{
 		synchronized (ContainerManager.class)
 		{
@@ -283,7 +212,10 @@ class Equip2Bean implements DataspaceEventListener
 				// UPDATE Events
 				if (event.getEvent() instanceof equip.data.UpdateEvent)
 				{
-					if (event == lastUpdateEvent) { return; }
+					if (event == lastUpdateEvent)
+					{
+						return;
+					}
 					lastUpdateEvent = event;
 
 					final ItemData updateditem = event.getUpdateItem();
@@ -324,36 +256,79 @@ class Equip2Bean implements DataspaceEventListener
 					}
 				}
 			}// sync parent
-				// do delayed sets without mapping object lock
+			// do delayed sets without mapping object lock
 			while (delayedSets.size() > 0)
 			{
-				final DelayedSet set = delayedSets.elementAt(0);
-				delayedSets.removeElementAt(0);
+				final DelayedSet set = delayedSets.get(0);
+				delayedSets.remove(0);
 				set.invoke();
 			}
 		}// sync container
 	}
 
+	private GUID findLocalDestination(GUID id)
+	{
+		ReferringPropertyInfo info;
+		while (true)
+		{
+			info = destPropertySessions.get(id);
+			if (info == null)
+			{
+				System.err.println("WARNING: mapping link destination " + id + " to local property seems to fail");
+			}
+			if (info != null && info.refid != null)
+			{
+				// debug
+				if (debug)
+				{
+					System.out.println("Link to " + id + " -> " + info.refid);
+				}
+				id = info.refid;
+			}
+			else
+			{
+				break;
+			}
+		}
+		return id;
+	}
+
+	private boolean isSetValuePopupLink(final GUID source) throws DataspaceInactiveException
+	{
+		String propertyName = null;
+
+		final TupleImpl sourceItem = (TupleImpl) (dataspace.getItem(source));
+		if (sourceItem == null)
+		{
+			return false;
+		}
+		final ComponentProperty cp = new ComponentProperty(sourceItem);
+
+		propertyName = cp.getPropertyName();
+
+		return propertyName.equals("SetValuePopup");
+	}
+
 	/*
 	 * NOT USED?! public void propImplUpdated(equip.data.GUID propImplID,
 	 * equip.data.SerializedObjectImpl value) {
-	 * 
+	 *
 	 * // Get the value Serializable deserialized = null; try { deserialized = (Serializable)
 	 * value.getValue(); } catch (ClassNotFoundException ex) { ex.printStackTrace(); } catch
 	 * (IOException ex) { ex.printStackTrace(); }
-	 * 
+	 *
 	 * // Set the Property
-	 * 
+	 *
 	 * // or SetPropDesc??? PropertyDescriptor descriptor = this.parent.getPropDesc(propImplID);
-	 * 
+	 *
 	 * // Object bean = this.bean; try { descriptor.getWriteMethod().invoke(bean, new Object[] {
 	 * MappingObject.mapPropertyValueOnSet(deserialized, descriptor.getPropertyType() )}); } catch
 	 * (Exception e) { System.out.println(" Equip2Bean Execption in setting value");
 	 * e.printStackTrace();
-	 * 
+	 *
 	 * } }
 	 */
-	public void linkAdded(final PropertyLinkRequest linkReq)
+	private void linkAdded(final PropertyLinkRequest linkReq)
 	{
 
 		// retain enough info to reverse....!!
@@ -411,8 +386,65 @@ class Equip2Bean implements DataspaceEventListener
 		}
 	}
 
-	public void propUdate(final ComponentProperty prop, boolean added, final boolean deleted, final int kind,
-			final PropertyLinkRequest link, final PropertyDescriptor targetproperty)
+	private void linkDeleted(final PropertyLinkRequest linkReq)
+	{
+
+		final GUID source = linkReq.getSourcePropID();
+		GUID dest = linkReq.getDestinationPropID();
+		// Build pattern for the property tuple
+
+		// does it map to us by reference?!
+		dest = findLocalDestination(dest);
+
+		final PropertyDescriptor targetdescriptor = this.parent.getPropDesc(dest);
+
+		if (bean instanceof IActiveComponent)
+		{
+			try
+			{
+				if (!isSetValuePopupLink(source))
+				{
+					((IActiveComponent) bean).linkToDeleted(targetdescriptor.getName(), linkReq.getID());
+				}
+			}
+
+			catch (final DataspaceInactiveException e)
+			{
+			}
+		}
+
+		// remove source component monitor
+		try
+		{
+			final DataSession session = linkSessions.get(linkReq.getID());
+			if (session == null)
+			{
+				System.err.println("Unknown PropertyLinkRequest deleted: " + linkReq.getID());
+			}
+			else
+			{
+				if (debug)
+				{
+					System.out
+							.println("Remove source property listener for " + source + " via link " + linkReq.getID());
+				}
+				dataspace.removeDataspaceEventListener(session);
+				linkSessions.remove(linkReq.getID());
+			}
+		}
+		catch (final DataspaceInactiveException ex)
+		{
+			System.out.println("Equip2Bean Dataspace inacative ");
+			ex.printStackTrace();
+		}
+
+		// Remove this Impl as being linked to the propertyELement
+
+		this.parent.removeSetPropDesc(source, targetdescriptor);
+	}
+
+	private void propUdate(final ComponentProperty prop, boolean added, final boolean deleted, final int kind,
+	                       final PropertyLinkRequest link, final PropertyDescriptor targetproperty)
 	{
 		// note that persistent compound component properties can report redundant adds (should be
 		// treated
@@ -421,12 +453,7 @@ class Equip2Bean implements DataspaceEventListener
 		// ....
 		if (added)
 		{
-			int[] count = knownItems.get(prop.getID());
-			if (count == null)
-			{
-				count = new int[1];
-				knownItems.put(prop.getID(), count);
-			}
+			int[] count = knownItems.computeIfAbsent(prop.getID(), k -> new int[1]);
 			count[0]++;
 			if (count[0] > 1)
 			{
@@ -556,12 +583,7 @@ class Equip2Bean implements DataspaceEventListener
 						}
 
 						// listen to it
-						Map<GUID, DataSession> h = linkRefSessions.get(link.getID());
-						if (h == null)
-						{
-							h = new HashMap<GUID, DataSession>();
-							linkRefSessions.put(link.getID(), h);
-						}
+						Map<GUID, DataSession> h = linkRefSessions.computeIfAbsent(link.getID(), k -> new HashMap<>());
 						final ComponentProperty proptemplate = new ComponentProperty((GUID) null);
 						proptemplate.setID(ref);
 						try
@@ -622,7 +644,7 @@ class Equip2Bean implements DataspaceEventListener
 				final List<GUID> v = sourcePropertyReferencedBy.get(prop.getID());
 				if (!deleted && v != null)
 				{
-					for(GUID id: v)
+					for (GUID id : v)
 					{
 						try
 						{
@@ -650,7 +672,10 @@ class Equip2Bean implements DataspaceEventListener
 				}
 			}
 
-			if (kind != KIND_UPDATE_OF_REFERENCED && kind != KIND_LINK_SOURCES) { return; }
+			if (kind != KIND_UPDATE_OF_REFERENCED && kind != KIND_LINK_SOURCES)
+			{
+				return;
+			}
 
 			// value
 			if (type.equals(ComponentProperty.CONNECTION_POINT_PROPERTY_VALUE)
@@ -691,7 +716,7 @@ class Equip2Bean implements DataspaceEventListener
 			// - delay
 			try
 			{
-				delayedSets.addElement(new DelayedSet(targetproperty, targetproperty.getWriteMethod(), bean, MappingObject
+				delayedSets.add(new DelayedSet(targetproperty, targetproperty.getWriteMethod(), bean, MappingObject
 						.mapPropertyValueOnSet(value, targetproperty.getPropertyType()), requestId, deleted));
 			}
 			catch (final Exception e)
@@ -704,87 +729,7 @@ class Equip2Bean implements DataspaceEventListener
 
 	}
 
-	public void stop()
-	{
-		try
-		{
-			// this.dataspace.removeDataspaceEventListener(linksession);
-			this.dataspace.removeDataspaceEventListener(propsession);
-		}
-		catch (final DataspaceInactiveException ex)
-		{
-			System.out.println("Dataspace inacative ");
-			ex.printStackTrace();
-		}
-	}
-
-	protected void addDestPropertySession(final GUID id)
-	{
-		// look also for links to ourselves
-		addDestPropertySession(id, true, null);
-	}
-
-	protected void addDestPropertySession(final GUID id, final boolean includeLinks, final GUID ref)
-	{
-		final ReferringPropertyInfo info = new ReferringPropertyInfo();
-		info.id = id;
-		info.refid = ref;
-
-		// Build pattern for the property tuple
-		final ComponentProperty proptemplate = new ComponentProperty((GUID) null);
-		proptemplate.setConnectionPointType(ComponentProperty.CONNECTION_POINT_PROPERTY_REFERENCE);
-		try
-		{
-			proptemplate.setPropertyReference(id);
-		}
-		catch (final ConnectionPointTypeException e)
-		{
-		}
-		final PropertyLinkRequest linktemplate = new PropertyLinkRequest((GUID) null);
-		linktemplate.setDestinationPropID(id);
-		try
-		{
-			destPropertySessions.put(id, info);
-			info.refSession = proptemplate.addPatterntoDataSpace(dataspace, new MyDataspaceEventListener(
-					KIND_REFS_TO_MY_PROPERTIES));
-			if (includeLinks)
-			{
-				info.linkSession = linktemplate.addPatterntoDataSpace(dataspace, this);
-			}
-		}
-		catch (final DataspaceInactiveException e)
-		{
-		}
-	}
-
-	protected GUID findLocalDestination(GUID id)
-	{
-		ReferringPropertyInfo info;
-		while (true)
-		{
-			info = destPropertySessions.get(id);
-			if (info == null)
-			{
-				System.err.println("WARNING: mapping link destination " + id + " to local property seems to fail");
-			}
-			if (info != null && info.refid != null)
-			{
-				// debug
-				if (debug)
-				{
-					System.out.println("Link to " + id + " -> " + info.refid);
-				}
-				id = info.refid;
-			}
-			else
-			{
-				break;
-			}
-		}
-		return id;
-	}
-
-	protected void removeDestPropertySession(final GUID id)
+	private void removeDestPropertySession(final GUID id)
 	{
 		// deleted
 		final ReferringPropertyInfo info = destPropertySessions.get(id);
@@ -811,73 +756,103 @@ class Equip2Bean implements DataspaceEventListener
 		}
 	}
 
-	private boolean isSetValuePopupLink(final GUID source) throws DataspaceInactiveException
+	class MyDataspaceEventListener implements DataspaceEventListener
 	{
-		String propertyName = null;
+		int kind;
+		PropertyLinkRequest link;
+		PropertyDescriptor prop;
 
-		final TupleImpl sourceItem = (TupleImpl) (dataspace.getItem(source));
-		if (sourceItem == null) { return false; }
-		final ComponentProperty cp = new ComponentProperty(sourceItem);
+		MyDataspaceEventListener(final int kind)
+		{
+			this.kind = kind;
+			this.link = null;
+		}
 
-		propertyName = cp.getPropertyName();
+		MyDataspaceEventListener(final int kind, final PropertyLinkRequest link, final PropertyDescriptor prop)
+		{
+			this.kind = kind;
+			this.link = link;
+			this.prop = prop;
+		}
 
-		return propertyName.equals("SetValuePopup");
+		@Override
+		public void dataspaceEvent(final equip.data.beans.DataspaceEvent event)
+		{
+			Equip2Bean.this.dataspaceEvent(event, kind, link, prop);
+		}
 	}
 
-	private void linkDeleted(final PropertyLinkRequest linkReq)
+	class ReferringPropertyInfo
 	{
+		GUID id;
+		DataSession refSession;
+		DataSession linkSession;
+		GUID refid;
+	}
 
-		final GUID source = linkReq.getSourcePropID();
-		GUID dest = linkReq.getDestinationPropID();
-		// Build pattern for the property tuple
+	/**
+	 * a delayed set
+	 */
+	protected class DelayedSet
+	{
+		java.beans.PropertyDescriptor descriptor;
+		java.lang.reflect.Method method;
+		Object target;
+		Object value;
+		GUID requestId;
+		boolean deleted;
 
-		// does it map to us by reference?!
-		dest = findLocalDestination(dest);
+		DelayedSet(final java.beans.PropertyDescriptor descriptor, final java.lang.reflect.Method method,
+		           final Object target, final Object value, final GUID requestId, final boolean deleted)
+		{
+			this.descriptor = descriptor;
+			this.method = method;
+			this.target = target;
+			this.value = value;
+			this.requestId = requestId;
+			this.deleted = deleted;
+		}
 
-		final PropertyDescriptor targetdescriptor = this.parent.getPropDesc(dest);
-
-		if (bean instanceof IActiveComponent)
+		void invoke()
 		{
 			try
 			{
-				if (!isSetValuePopupLink(source))
+				if (target instanceof IActiveComponent)
 				{
-					((IActiveComponent) bean).linkToDeleted(targetdescriptor.getName(), linkReq.getID());
+
+					final boolean done = ((IActiveComponent) target).linkToUpdated(descriptor.getName(), requestId,
+							deleted ? null : value);
+					if (done)
+					{
+						return;
+						// drop through to regular set
+					}
+
+				}
+				if (deleted)
+				{
+					// no op?! (backward compatible)
+					return;
+				}
+				if (descriptor instanceof DynamicPropertyDescriptor)
+				{
+					final DynamicPropertyDescriptor dprop = (DynamicPropertyDescriptor) descriptor;
+					// invoke
+					dprop.writeProperty((DynamicProperties) target, value);
+				}
+				else
+				{
+					// mapping object must not be locked during this call
+					method.invoke(target, value);
 				}
 			}
-
-			catch (final DataspaceInactiveException e)
+			catch (final Exception e)
 			{
+
+				System.out.println("Equip2Bean Exception in setting value");
+				e.printStackTrace();
+
 			}
 		}
-
-		// remove source component monitor
-		try
-		{
-			final DataSession session = linkSessions.get(linkReq.getID());
-			if (session == null)
-			{
-				System.err.println("Unknown PropertyLinkRequest deleted: " + linkReq.getID());
-			}
-			else
-			{
-				if (debug)
-				{
-					System.out
-							.println("Remove source property listener for " + source + " via link " + linkReq.getID());
-				}
-				dataspace.removeDataspaceEventListener(session);
-				linkSessions.remove(linkReq.getID());
-			}
-		}
-		catch (final DataspaceInactiveException ex)
-		{
-			System.out.println("Equip2Bean Dataspace inacative ");
-			ex.printStackTrace();
-		}
-
-		// Remove this Impl as being linked to the propertyELement
-
-		this.parent.removeSetPropDesc(source, targetdescriptor);
 	}
 }

@@ -57,15 +57,6 @@ import javax.swing.event.ChangeListener;
 @Category("UI")
 public class ToggleButtonInput extends UIBase
 {
-
-	/**
-	 * testing main - no args. Makes a single instance.
-	 */
-	public static void main(final String[] args)
-	{
-		new ToggleButtonInput();
-	}
-
 	/**
 	 * the widget
 	 */

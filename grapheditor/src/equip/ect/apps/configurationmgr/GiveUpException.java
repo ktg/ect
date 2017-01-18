@@ -38,9 +38,9 @@ Contributors:
  */
 package equip.ect.apps.configurationmgr;
 
-public class GiveUpException extends Exception
+class GiveUpException extends Exception
 {
-	public GiveUpException()
+	GiveUpException()
 	{
 		super("Give up");
 	}

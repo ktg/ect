@@ -41,7 +41,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,20 +49,6 @@ import java.util.Map;
  */
 public class PublicFieldsProxyComponent extends SimpleDynamicComponent implements PropertyChangeListener
 {
-	/**
-	 * test class
-	 */
-	public static class TestClass
-	{
-		public int anInt = 4;
-		public String aString = "hello";
-		int anotherInt = 3;
-
-		TestClass()
-		{
-		}
-	}
-
 	/**
 	 * property info
 	 */
@@ -94,66 +79,6 @@ public class PublicFieldsProxyComponent extends SimpleDynamicComponent implement
 	}
 
 	public static boolean debug = false;
-
-	/**
-	 * test main
-	 */
-	public static void main(final String args[])
-	{
-		try
-		{
-			String dataspaceUrl = "equip://:9123";
-			String dataspaceSecret = null;
-			if (args.length > 0)
-			{
-				dataspaceUrl = args[0];
-			}
-			if (args.length > 1)
-			{
-				dataspaceSecret = args[1];
-			}
-			final InetAddress localhost = InetAddress.getLocalHost();
-			final SimpleObjectContainer container = new SimpleObjectContainer(dataspaceUrl,
-					"PublicFieldsProxyComponent.main on " + localhost.getHostName(),
-					"PublicFieldsProxyComponent.main.persist.xml", dataspaceSecret);
-
-			// purely scripted object
-			final TestClass test = new TestClass();
-			final PublicFieldsProxyComponent proxy = new PublicFieldsProxyComponent(test);
-
-			container.exportComponent(proxy, "testproxy");
-			// ok
-			proxy.exported();
-
-			new Thread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					while (true)
-					{
-						try
-						{
-							Thread.sleep(1000);
-						}
-						catch (final InterruptedException e)
-						{
-						}
-						test.anInt = test.anInt + 3;
-						test.aString = test.aString + ".";
-						System.out.println("Changed to " + test.anInt + ", " + test.aString);
-						proxy.poll();
-					}
-
-				}
-			}).start();
-		}
-		catch (final Exception e)
-		{
-			System.err.println("ERROR: " + e);
-			e.printStackTrace(System.err);
-		}
-	}
 
 	/**
 	 * target/subject

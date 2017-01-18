@@ -43,273 +43,276 @@ import java.io.*;
 import java.util.Vector;
 import java.util.Iterator;
 
-/** unicast reflector (with some filtering) for non-multicast
+/**
+ * unicast reflector (with some filtering) for non-multicast
  * discovery.
+ *
  * @author Chris Greenhalgh
  */
-public class DiscoveryRendezvous 
+public class DiscoveryRendezvous
 {
-    /** main - [port]
-     */
-    public static void main(String [] args) 
-    {
-	int port = DISCOVERY_PORT.value;
-	if (args.length>0) 
+	/**
+	 * cons - port
+	 */
+	public DiscoveryRendezvous(int port)
 	{
-	    try 
-	    {
-		port = new Integer(args[0]).intValue();
-	    } 
-	    catch (NumberFormatException e) 
-	    {
-		System.err.println("Usage: DiscoveryRendezvous [port]");
-		System.exit(-1);
-	    }
-	}
-	new DiscoveryRendezvous(port);
-    }
-    /** cons - port
-     */
-    public DiscoveryRendezvous(int port) 
-    {
-	System.out.println("DiscoveryRendezvous running on port "+port);
-	try 
-	{
-	    socket = new DatagramSocket(port);
-	    new Thread(new Runnable() 
-	    {
-		public void run() 
+		System.out.println("DiscoveryRendezvous running on port " + port);
+		try
 		{
-		    listenFn();
+			socket = new DatagramSocket(port);
+			new Thread(this::listenFn).start();
+			new Thread(this::expireFn).start();
 		}
-	    }).start();
+		catch (Exception e)
+		{
+			System.err.println("ERROR: " + e);
+			e.printStackTrace(System.err);
+		}
+	}
 
-	    new Thread(new Runnable() 
-	    {
-		public void run() 
-		{
-		    expireFn();
-		}
-	    }).start();
-	}
-	catch (Exception e) 
-	{
-	    System.err.println("ERROR: "+e);
-	    e.printStackTrace(System.err);
-	}
-    }
-    /** socket
-     */
-    protected DatagramSocket socket;
-    /** client info
-     */
-    protected class PeerInfo 
-    {
-	/** address
+	/**
+	 * socket
 	 */
-	InetAddress address;
-	/** port
-	 */
-	int port;
-	/** request
-	 */
-	DiscoveryRequestImpl request;
-	/** annoucement
-	 */
-	ServerAnnouncementImpl announcement;
-	/** last receive time
-	 */
-	long lastReceiveTime;
-	/** cons
-	 */
-	PeerInfo(InetAddress addr, int port, DiscoveryRequestImpl request, ServerAnnouncementImpl announcement) 
-	{
-	    this.address = addr;
-	    this.port = port;
-	    this.request = request;
-	    this.announcement = announcement;
-	    this.lastReceiveTime = System.currentTimeMillis();
-	}
-    }
-    /** peers
-     */
-    protected Vector peers = new Vector();
-  
-    /** listen and respond
-     */
-    protected void listenFn() 
-    {
-	try 
-	{
-	    System.out.println("Listening on equipd://"+InetAddress.getLocalHost().getHostAddress()+":"+socket.getLocalPort());
-	    while(true) 
-	    {
-		byte announceData [] = new byte[1024];
-		DatagramPacket announcepkt = 
-		    new DatagramPacket(announceData,
-		    announceData.length);
-		try 
-		{
-		    // get a packet 
-		    socket.receive(announcepkt);
-		} 
-		catch (Exception e) 
-		{
-		    System.err.println("ERROR: in DiscoveryRendezvoud receive: "+
-			e+" (give up!)");
-		    return;
-		}
-		try 
-		{
-		    ByteArrayInputStream bins = 
-			new ByteArrayInputStream(announcepkt.getData(), 0, 
-			announcepkt.getLength());
-		    equip.runtime.ObjectInputStream oins = 
-			new equip.runtime.ObjectInputStream(bins);
-		    long version = oins.readInt();
-		    if (version!=DISCOVERY_VERSION.value) 
-		    {
-			System.err.println
-			    ("Warning: DiscoveryRendezvous failed to "+
-			    "get a valid discovery object "+
-			    "from "+announcepkt.getAddress()+"/"+
-			    announcepkt.getPort()+" ("+
-			    announcepkt.getLength()+" bytes), "+
-			    "version "+version+" (expecting "+
-			    DISCOVERY_VERSION.value+")");
-			continue;
-		    }
-		    Object msg = oins.readObject();
-		    System.out.println("Received a "+msg.getClass().getName());
-		    ServerAnnouncementImpl announcement = null;
-		    DiscoveryRequestImpl request = null;
-		    if (msg instanceof ServerAnnouncementImpl)
-			announcement = (ServerAnnouncementImpl)msg;
-		    else if (msg instanceof DiscoveryRequestImpl) 
-			request = (DiscoveryRequestImpl)msg;
-		    else
-			// don't know what to do with this!
-			continue;
-		    synchronized(peers) 
-		    {
-			boolean found = false;
-			Iterator ipeer = peers.iterator();
-			PeerInfo peer = null;
-			while(ipeer.hasNext() && !found) 
-			{
-			    peer =(PeerInfo)ipeer.next();
-			    if (peer.address.equals(announcepkt.getAddress()) &&
-				peer.port==announcepkt.getPort()) 
-				found = true;
-			}
-			if (!found) 
-			{
-			    // new
-			    peer = new PeerInfo(announcepkt.getAddress(), 
-				announcepkt.getPort(), request, announcement);
-			    peers.addElement(peer);
-			    System.out.println("New "+(request!=null ? "client": "server"));
-			    // could do immediate response
-			    // ....
-			} 
-			else 
-			{
-			    peer.lastReceiveTime = System.currentTimeMillis();
-			    System.out.println("known");
-			    if (announcement!=null)
-    			       peer.announcement = announcement;
-			    if (request!=null)
-				peer.request = request;
-			}
-			if (announcement!=null) 
-			{
-			    // send announcement to all matching requests
-			    ipeer = peers.iterator();
-			    while(ipeer.hasNext()) 
-			    {
-				peer =(PeerInfo)ipeer.next();
-				if (peer.request==null)
-				    continue;
-				boolean matches = false;
-				int si;
-				for (si=0; !matches && announcement.infos!=null && si<announcement.infos.length; si++) 
-				{
-				    // match?
-				    if (DiscoveryServerAgentImpl.
-					matchServiceTypes(peer.request.serviceTypes,
-					announcement.infos[si].serviceTypes) &&
-					DiscoveryServerAgentImpl.
-					matchServiceTypes(peer.request.groups,
-					announcement.infos[si].groups)) 
-					matches = true;
-				}
-				// send!
-				try 
-				{
-				    // return to specific address and port - hopefully better for NAT
-				    DatagramPacket p = 
-					new DatagramPacket(announcepkt.getData(),
-					announcepkt.getLength(),
-					peer.address, 
-					((int)peer.port)&0xffff);
-				    // adjust for overflow error - ianm
-				    socket.send(p);
-				}
-				catch (Exception e) 
-				{
-				    System.err.println("ERROR forwarding announcement to "+peer.address+"/"+peer.port+": "+e);
-				}
-			    }
-			}
-		    }
-		} 
-		catch (Exception e) 
-		{
-		    System.err.println("Warning: DiscoveryRendezvous failed to "+
-			"get a valid discovery object "+
-			"from "+announcepkt.getAddress()+"/"+
-			announcepkt.getPort()+" ("+
-			announcepkt.getLength()+" bytes)");
-		    continue;
-		}
+	protected DatagramSocket socket;
 
-	    }
-	} 
-	catch (Exception e) 
+	/**
+	 * client info
+	 */
+	protected class PeerInfo
 	{
-	    System.err.println("ERROR in listenFn: "+e);
-	    e.printStackTrace(System.err);
-	}
-    }
-    /** expire peers
-     */
-    protected void expireFn() 
-    {
-	while(true) 
-	{
-	    synchronized(peers) 
-	    {
-		long now = System.currentTimeMillis();
-		long expiredTime = now-ANNOUNCEMENT_EXPIRE_COUNT.value*ANNOUNCEMENT_INTERVAL_S.value*1000;
-		for (int ip=0; ip<peers.size(); ip++) 
+		/**
+		 * address
+		 */
+		InetAddress address;
+		/**
+		 * port
+		 */
+		int port;
+		/**
+		 * request
+		 */
+		DiscoveryRequestImpl request;
+		/**
+		 * annoucement
+		 */
+		ServerAnnouncementImpl announcement;
+		/**
+		 * last receive time
+		 */
+		long lastReceiveTime;
+
+		/**
+		 * cons
+		 */
+		PeerInfo(InetAddress addr, int port, DiscoveryRequestImpl request, ServerAnnouncementImpl announcement)
 		{
-		    PeerInfo peer = (PeerInfo)peers.elementAt(ip);
-		    if (peer.lastReceiveTime < expiredTime) 
-		    {
-			System.out.println("Expire "+peer.address+"/"+peer.port+" "+(peer.request!=null ? "client" : "server"));
-			peers.removeElementAt(ip);
-			ip--;
-		    }
+			this.address = addr;
+			this.port = port;
+			this.request = request;
+			this.announcement = announcement;
+			this.lastReceiveTime = System.currentTimeMillis();
 		}
-	    }
-	    try 
-	    {
-		Thread.sleep(1000);
-	    } 
-	    catch (InterruptedException e) 
-	    {
-		System.err.println("expireFn interrupted");
-	    }
 	}
-    }
+
+	/**
+	 * peers
+	 */
+	protected Vector peers = new Vector();
+
+	/**
+	 * listen and respond
+	 */
+	protected void listenFn()
+	{
+		try
+		{
+			System.out.println("Listening on equipd://" + InetAddress.getLocalHost().getHostAddress() + ":" + socket.getLocalPort());
+			while (true)
+			{
+				byte announceData[] = new byte[1024];
+				DatagramPacket announcepkt =
+						new DatagramPacket(announceData,
+								announceData.length);
+				try
+				{
+					// get a packet
+					socket.receive(announcepkt);
+				}
+				catch (Exception e)
+				{
+					System.err.println("ERROR: in DiscoveryRendezvoud receive: " +
+							e + " (give up!)");
+					return;
+				}
+				try
+				{
+					ByteArrayInputStream bins =
+							new ByteArrayInputStream(announcepkt.getData(), 0,
+									announcepkt.getLength());
+					equip.runtime.ObjectInputStream oins =
+							new equip.runtime.ObjectInputStream(bins);
+					long version = oins.readInt();
+					if (version != DISCOVERY_VERSION.value)
+					{
+						System.err.println
+								("Warning: DiscoveryRendezvous failed to " +
+										"get a valid discovery object " +
+										"from " + announcepkt.getAddress() + "/" +
+										announcepkt.getPort() + " (" +
+										announcepkt.getLength() + " bytes), " +
+										"version " + version + " (expecting " +
+										DISCOVERY_VERSION.value + ")");
+						continue;
+					}
+					Object msg = oins.readObject();
+					System.out.println("Received a " + msg.getClass().getName());
+					ServerAnnouncementImpl announcement = null;
+					DiscoveryRequestImpl request = null;
+					if (msg instanceof ServerAnnouncementImpl)
+					{
+						announcement = (ServerAnnouncementImpl) msg;
+					}
+					else if (msg instanceof DiscoveryRequestImpl)
+					{
+						request = (DiscoveryRequestImpl) msg;
+					}
+					else
+					// don't know what to do with this!
+					{
+						continue;
+					}
+					synchronized (peers)
+					{
+						boolean found = false;
+						Iterator ipeer = peers.iterator();
+						PeerInfo peer = null;
+						while (ipeer.hasNext() && !found)
+						{
+							peer = (PeerInfo) ipeer.next();
+							if (peer.address.equals(announcepkt.getAddress()) &&
+									peer.port == announcepkt.getPort())
+							{
+								found = true;
+							}
+						}
+						if (!found)
+						{
+							// new
+							peer = new PeerInfo(announcepkt.getAddress(),
+									announcepkt.getPort(), request, announcement);
+							peers.addElement(peer);
+							System.out.println("New " + (request != null ? "client" : "server"));
+							// could do immediate response
+							// ....
+						}
+						else
+						{
+							peer.lastReceiveTime = System.currentTimeMillis();
+							System.out.println("known");
+							if (announcement != null)
+							{
+								peer.announcement = announcement;
+							}
+							if (request != null)
+							{
+								peer.request = request;
+							}
+						}
+						if (announcement != null)
+						{
+							// send announcement to all matching requests
+							ipeer = peers.iterator();
+							while (ipeer.hasNext())
+							{
+								peer = (PeerInfo) ipeer.next();
+								if (peer.request == null)
+								{
+									continue;
+								}
+								boolean matches = false;
+								int si;
+								for (si = 0; !matches && announcement.infos != null && si < announcement.infos.length; si++)
+								{
+									// match?
+									if (DiscoveryServerAgentImpl.
+											matchServiceTypes(peer.request.serviceTypes,
+													announcement.infos[si].serviceTypes) &&
+											DiscoveryServerAgentImpl.
+													matchServiceTypes(peer.request.groups,
+															announcement.infos[si].groups))
+									{
+										matches = true;
+									}
+								}
+								// send!
+								try
+								{
+									// return to specific address and port - hopefully better for NAT
+									DatagramPacket p =
+											new DatagramPacket(announcepkt.getData(),
+													announcepkt.getLength(),
+													peer.address,
+													((int) peer.port) & 0xffff);
+									// adjust for overflow error - ianm
+									socket.send(p);
+								}
+								catch (Exception e)
+								{
+									System.err.println("ERROR forwarding announcement to " + peer.address + "/" + peer.port + ": " + e);
+								}
+							}
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					System.err.println("Warning: DiscoveryRendezvous failed to " +
+							"get a valid discovery object " +
+							"from " + announcepkt.getAddress() + "/" +
+							announcepkt.getPort() + " (" +
+							announcepkt.getLength() + " bytes)");
+					continue;
+				}
+
+			}
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR in listenFn: " + e);
+			e.printStackTrace(System.err);
+		}
+	}
+
+	/**
+	 * expire peers
+	 */
+	protected void expireFn()
+	{
+		while (true)
+		{
+			synchronized (peers)
+			{
+				long now = System.currentTimeMillis();
+				long expiredTime = now - ANNOUNCEMENT_EXPIRE_COUNT.value * ANNOUNCEMENT_INTERVAL_S.value * 1000;
+				for (int ip = 0; ip < peers.size(); ip++)
+				{
+					PeerInfo peer = (PeerInfo) peers.elementAt(ip);
+					if (peer.lastReceiveTime < expiredTime)
+					{
+						System.out.println("Expire " + peer.address + "/" + peer.port + " " + (peer.request != null ? "client" : "server"));
+						peers.removeElementAt(ip);
+						ip--;
+					}
+				}
+			}
+			try
+			{
+				Thread.sleep(1000);
+			}
+			catch (InterruptedException e)
+			{
+				System.err.println("expireFn interrupted");
+			}
+		}
+	}
 }
