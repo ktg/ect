@@ -37,13 +37,13 @@ Contributors:
  */
 package equip.ect;
 
+import equip.data.GUID;
+import equip.data.beans.DataspaceBean;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.net.InetAddress;
-
-import equip.data.GUID;
-import equip.data.beans.DataspaceBean;
 
 /**
  * A supporting class to allow an application to explicitly publish one or more objects as
@@ -51,6 +51,49 @@ import equip.data.beans.DataspaceBean;
  */
 public class SimpleObjectContainer
 {
+	/**
+	 * fixed time for fixed (fake) component request
+	 */
+	public static final int FIXED_TIME_S = 5;
+	protected String hostname;
+	/**
+	 * container manager helper
+	 */
+	protected ContainerManagerHelper containerManagerHelper;
+	/**
+	 * container manager
+	 */
+	protected ContainerManager containerManager;
+	/**
+	 * dataspace
+	 */
+	protected DataspaceBean dataspaceBean;
+	/**
+	 * cons
+	 */
+	public SimpleObjectContainer(final String dataspaceUrl, final String hostname, final String persistFile)
+			throws java.io.IOException
+	{
+		this(dataspaceUrl, hostname, persistFile, null);
+	}
+
+	/**
+	 * cons
+	 */
+	public SimpleObjectContainer(final String dataspaceUrl, final String hostname, final String persistFile,
+			final String dataspaceSecret) throws java.io.IOException
+	{
+		if (dataspaceSecret != null)
+		{
+			System.setProperty("DataspaceSecret", dataspaceSecret);
+		}
+		this.hostname = hostname;
+		containerManagerHelper = new ContainerManagerHelper(dataspaceUrl, persistFile + ".components", persistFile,
+				hostname);
+		containerManager = containerManagerHelper.getContainerManager();
+		dataspaceBean = containerManagerHelper.getDataSpaceBean();
+	}
+
 	/**
 	 * test main
 	 */
@@ -106,51 +149,6 @@ public class SimpleObjectContainer
 			System.err.println("ERROR: " + e);
 			e.printStackTrace(System.err);
 		}
-	}
-
-	protected String hostname;
-	/**
-	 * fixed time for fixed (fake) component request
-	 */
-	public static final int FIXED_TIME_S = 5;
-	/**
-	 * container manager helper
-	 */
-	protected ContainerManagerHelper containerManagerHelper;
-
-	/**
-	 * container manager
-	 */
-	protected ContainerManager containerManager;
-	/**
-	 * dataspace
-	 */
-	protected DataspaceBean dataspaceBean;
-
-	/**
-	 * cons
-	 */
-	public SimpleObjectContainer(final String dataspaceUrl, final String hostname, final String persistFile)
-			throws java.io.IOException
-	{
-		this(dataspaceUrl, hostname, persistFile, null);
-	}
-
-	/**
-	 * cons
-	 */
-	public SimpleObjectContainer(final String dataspaceUrl, final String hostname, final String persistFile,
-			final String dataspaceSecret) throws java.io.IOException
-	{
-		if (dataspaceSecret != null)
-		{
-			System.setProperty("DataspaceSecret", dataspaceSecret);
-		}
-		this.hostname = hostname;
-		containerManagerHelper = new ContainerManagerHelper(dataspaceUrl, persistFile + ".components", persistFile,
-				hostname);
-		containerManager = containerManagerHelper.getContainerManager();
-		dataspaceBean = containerManagerHelper.getDataSpaceBean();
 	}
 
 	/**
