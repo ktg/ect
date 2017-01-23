@@ -41,15 +41,8 @@ package equip.ect.components.ui;
 import equip.ect.Category;
 import equip.ect.ECTComponent;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JSlider;
-import javax.swing.Timer;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Test input which is a slider generating values in the range 0.0f - 1.0f. Rate limited to 10Hz.
@@ -58,37 +51,15 @@ import javax.swing.event.ChangeListener;
  */
 @ECTComponent
 @Category("UI")
-public class SliderInput extends UIBase implements ActionListener
+public class SliderInput extends UIBase
 {
-	/**
-	 * the widget
-	 */
-	private JSlider slider = new JSlider(0, MAX_VALUE, 0);
+	private static final int MAX_VALUE = 1000;
+	private static final int MIN_CHANGE_INTERVAL_MS = 100;
 
-	/**
-	 * max value of slider (not output, which has max 1.0f)
-	 */
-	public static int MAX_VALUE = 1000;
-
-	/**
-	 * the value (as per slider)
-	 */
-	protected int value = 0;
-
-	/**
-	 * next value being set (delayed by timer)
-	 */
-	protected int nextValue = 0;
-
-	/**
-	 * fire change Timer
-	 */
-	protected Timer changeTimer = null;
-
-	/**
-	 * min change interval, ms
-	 */
-	protected int MIN_CHANGE_INTERVAL_MS = 100;
+	private final JSlider slider = new JSlider(0, MAX_VALUE, 0);
+	private int value = 0;
+	private int nextValue = 0;
+	private Timer changeTimer = null;
 
 	/**
 	 * main cons, no args.
@@ -100,55 +71,45 @@ public class SliderInput extends UIBase implements ActionListener
 		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(slider, BorderLayout.CENTER);
-		changeTimer = new Timer(MIN_CHANGE_INTERVAL_MS, this);
-		// handlers for GUI input
-		slider.addChangeListener(new ChangeListener()
+		changeTimer = new Timer(MIN_CHANGE_INTERVAL_MS, e ->
 		{
-			@Override
-			public void stateChanged(final ChangeEvent event)
+			if (stopped)
 			{
-				synchronized (SliderInput.this)
+				// stop
+				if (changeTimer.isRunning())
 				{
-					if (stopped) { return; }
-					nextValue = slider.getValue();
-					if (!changeTimer.isRunning())
-					{
-						// set now
-						intSetValue(slider.getValue(), false);
-						// set timer - to delay a subsequent set
-						changeTimer.start();
-					}
+					changeTimer.stop();
+				}
+				return;
+			}
+			if (nextValue != value)
+			{
+				intSetValue(nextValue, false);
+			}
+			else
+			{
+				// fired no change - stop
+				changeTimer.stop();
+			}
+		});
+		// handlers for GUI input
+		slider.addChangeListener(event ->
+		{
+			synchronized (SliderInput.this)
+			{
+				if (stopped) { return; }
+				nextValue = slider.getValue();
+				if (!changeTimer.isRunning())
+				{
+					// set now
+					intSetValue(slider.getValue(), false);
+					// set timer - to delay a subsequent set
+					changeTimer.start();
 				}
 			}
 		});
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	/**
-	 * timer action performed
-	 */
-	@Override
-	public synchronized void actionPerformed(final ActionEvent ae)
-	{
-		if (stopped)
-		{
-			// stop
-			if (changeTimer.isRunning())
-			{
-				changeTimer.stop();
-			}
-			return;
-		}
-		if (nextValue != value)
-		{
-			intSetValue(nextValue, false);
-		}
-		else
-		{
-			// fired no change - stop
-			changeTimer.stop();
-		}
 	}
 
 	/**
@@ -171,7 +132,7 @@ public class SliderInput extends UIBase implements ActionListener
 	/**
 	 * value setter - internal
 	 */
-	protected synchronized void intSetValue(final int value, final boolean updateWidget)
+	private synchronized void intSetValue(final int value, final boolean updateWidget)
 	{
 		if (this.value == value)
 		{
@@ -183,15 +144,11 @@ public class SliderInput extends UIBase implements ActionListener
 		// update gui - may not be swing thread
 		if (updateWidget)
 		{
-			runSwing(new Runnable()
+			runSwing(() ->
 			{
-				@Override
-				public void run()
+				if (!stopped)
 				{
-					if (!stopped)
-					{
-						slider.setValue(value);
-					}
+					slider.setValue(value);
 				}
 			});
 		}

@@ -47,7 +47,7 @@ import java.io.Serializable;
  * Test input/output base class, with name property, property change support, stop.
  * @author Chris Greenhalgh
  */
-public abstract class UIBase implements Serializable
+abstract class UIBase implements Serializable
 {
 	/**
 	 * utility method to run on swing thread (later)

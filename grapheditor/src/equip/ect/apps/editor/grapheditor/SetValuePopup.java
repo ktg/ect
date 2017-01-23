@@ -128,7 +128,7 @@ class SetValuePopup extends JDialog
 		panel.add(new JScrollPane(text), BorderLayout.CENTER);
 		final String val = DataspaceUtils.getPropValueAsString(targetProperty, dataspace);
 		text.setText(val);
-		if (val.length() > 0)
+		if (val != null && val.length() > 0)
 		{
 			text.select(0, val.length());
 		}

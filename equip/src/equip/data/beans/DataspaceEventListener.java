@@ -41,12 +41,16 @@ Contributors:
  */
 
 package equip.data.beans;
- 
-/** standard DataspaceEvent Listener.
- */ 
-public interface DataspaceEventListener extends java.util.EventListener {
-    /** notify of event (cf DataCallbackPost) */
-    public void dataspaceEvent(DataspaceEvent event);
+
+/**
+ * standard DataspaceEvent Listener.
+ */
+public interface DataspaceEventListener extends java.util.EventListener
+{
+	/**
+	 * notify of event (cf DataCallbackPost)
+	 */
+	void dataspaceEvent(DataspaceEvent event);
 }
 /* EOF */
 

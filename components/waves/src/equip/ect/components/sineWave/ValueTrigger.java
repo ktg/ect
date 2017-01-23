@@ -8,6 +8,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 
 @ECTComponent
+@Category("Data/Processing")
 public class ValueTrigger implements Serializable
 {
 	private boolean running = false;

@@ -42,8 +42,7 @@ package equip.ect.components.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -68,8 +67,8 @@ public class MessageOutput extends UIBase
 {
 	private DictionaryImpl[] messages;
 
-	private JTabbedPane tabbedPane;
-	private JTextField textField;
+	private final JTabbedPane tabbedPane;
+	private final JTextField textField;
 
 	private static String NO_MESSAGE = "No messages currently being displayed";
 
@@ -108,91 +107,73 @@ public class MessageOutput extends UIBase
 
 		if (messages == null)
 		{
-			runSwing(new Runnable()
+			runSwing(() ->
 			{
-				@Override
-				public void run()
+				if (!stopped)
 				{
-					if (!stopped)
-					{
-						textField.setText(NO_MESSAGE);
-						tabbedPane.removeAll();
-						return;
-					}
+					textField.setText(NO_MESSAGE);
+					tabbedPane.removeAll();
 				}
 			});
 		}
 		else
 		{
-			runSwing(new Runnable()
+			runSwing(() ->
 			{
-				@Override
-				public void run()
+				if (!stopped)
 				{
-					if (!stopped)
+					tabbedPane.removeAll();
+
+					textField.setText(messages.length + " message have been received");
+
+					for (int i = 0; i < messages.length; i++)
 					{
-						tabbedPane.removeAll();
+						final String title = "Message " + i;
 
-						textField.setText(messages.length + " message have been received");
+						final JPanel messagePanel = new JPanel();
+						messagePanel.setLayout(new BorderLayout());
 
-						for (int i = 0; i < messages.length; i++)
+						final JTabbedPane fieldPane = new JTabbedPane();
+
+						messagePanel.add(fieldPane, BorderLayout.CENTER);
+
+						final DictionaryImpl di = messages[i];
+
+						if (di != null)
 						{
-							final String title = "Message " + i;
+							final Map<String, ValueBase> map = di.getMap();
 
-							final JPanel messagePanel = new JPanel();
-							messagePanel.setLayout(new BorderLayout());
-
-							final JTabbedPane fieldPane = new JTabbedPane();
-
-							messagePanel.add(fieldPane, BorderLayout.CENTER);
-
-							final DictionaryImpl di = messages[i];
-
-							if (di != null)
+							if (map.containsKey("_largeDisplayKeys"))
 							{
-								final Hashtable hash = di.getHashtable();
+								// if this key exists, then dictionary
+								// has defined the ordering in which
+								// it would like its keys displayed
 
-								if (hash.containsKey("_largeDisplayKeys"))
+								final StringBox keysBox = (StringBox) (map.get("_largeDisplayKeys"));
+								final String keys = keysBox.value;
+
+								final String[] bits = keys.split(",");
+
+								if (bits.length != 0)
 								{
-									// if this key exists, then dictionary
-									// has defined the ordering in which
-									// it would like its keys displayed
-
-									final StringBox keysBox = (StringBox) (hash.get("_largeDisplayKeys"));
-									final String keys = keysBox.value;
-
-									final String[] bits = keys.split(",");
-
-									if (bits.length != 0)
+									for (final String bit : bits)
 									{
-										for (final String bit : bits)
-										{
-											addTabToPane(bit, hash, fieldPane);
-										}
+										addTabToPane(bit, map, fieldPane);
 									}
 								}
-								else
-								{
-									// if no ordering defined, then display
-									// in any order
-
-									final Enumeration keys = hash.keys();
-
-									while (keys.hasMoreElements())
-									{
-										// for each dictionary entry, create a tab in a
-										// pane which lists the fields in the dictionary entry
-
-										final String key = (String) (keys.nextElement());
-
-										addTabToPane(key, hash, fieldPane);
-									}
-								}
-
-								tabbedPane.add(title, fieldPane);
-
-								frame.validate();
 							}
+							else
+							{
+								// if no ordering defined, then display in any order
+								for(String key: map.keySet())
+								{
+									addTabToPane(key, map, fieldPane);
+								}
+							}
+
+							tabbedPane.add(title, fieldPane);
+
+							frame.validate();
 						}
 					}
 				}
@@ -200,9 +181,9 @@ public class MessageOutput extends UIBase
 		}
 	}
 
-	void addTabToPane(final String key, final Hashtable hash, final JTabbedPane tbp)
+	private void addTabToPane(final String key, final Map<String, ValueBase> hash, final JTabbedPane tbp)
 	{
-		final ValueBase vb = (ValueBase) (hash.get(key));
+		final ValueBase vb = hash.get(key);
 
 		if (vb != null)
 		{

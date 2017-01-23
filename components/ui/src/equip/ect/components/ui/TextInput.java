@@ -41,12 +41,8 @@ package equip.ect.components.ui;
 import equip.ect.Category;
 import equip.ect.ECTComponent;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JTextField;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Test input which is a text field generating string.
@@ -60,12 +56,12 @@ public class TextInput extends UIBase
 	/**
 	 * the widget
 	 */
-	private JTextField field;
+	private final JTextField field;
 
 	/**
 	 * the value
 	 */
-	protected String value = "";
+	private String value = "";
 
 	/**
 	 * main cons, no args.
@@ -79,14 +75,7 @@ public class TextInput extends UIBase
 		field = new JTextField(40);
 		contentPane.add(field, BorderLayout.CENTER);
 		// handlers for GUI input
-		field.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(final ActionEvent event)
-			{
-				intSetValue(field.getText(), false);
-			}
-		});
+		field.addActionListener(event -> intSetValue(field.getText(), false));
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -110,11 +99,10 @@ public class TextInput extends UIBase
 	/**
 	 * value setter - internal
 	 */
-	protected synchronized void intSetValue(final String value, final boolean updateWidget)
+	private synchronized void intSetValue(final String value, final boolean updateWidget)
 	{
-		if (this.value.equals(value) || (this.value != null && value != null && this.value.equals(value)))
+		if (this.value != null && value != null && this.value.equals(value))
 		{
-			// no change
 			return;
 		}
 		final Object old = this.value;
@@ -122,15 +110,11 @@ public class TextInput extends UIBase
 		// update gui - may not be swing thread
 		if (updateWidget)
 		{
-			runSwing(new Runnable()
+			runSwing(() ->
 			{
-				@Override
-				public void run()
+				if (!stopped)
 				{
-					if (!stopped)
-					{
-						field.setText(value);
-					}
+					field.setText(value);
 				}
 			});
 		}

@@ -65,7 +65,7 @@ public class DataspaceServer
 		}
 		System.err.println("Starting data server " + url + "...");
 		DataProxy dataspace = DataManager.getInstance().getDataspace(url,
-				DataManager.DATASPACE_SERVER,
+				DataManager.Type.SERVER,
 				true);
 		equip.net.ServerURL surl = new equip.net.ServerURL(((Server) dataspace).getMoniker());
 		System.err.println("SURL = " + surl.getURL());

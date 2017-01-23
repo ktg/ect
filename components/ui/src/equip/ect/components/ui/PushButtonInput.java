@@ -41,12 +41,8 @@ package equip.ect.components.ui;
 import equip.ect.Category;
 import equip.ect.ECTComponent;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-
-import javax.swing.JButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Test input which is a push button generating true/false.
@@ -60,12 +56,12 @@ public class PushButtonInput extends UIBase
 	/**
 	 * the widget
 	 */
-	private JButton button;
+	private final JButton button;
 
 	/**
 	 * the value
 	 */
-	protected boolean value = false;
+	private boolean value = false;
 
 	/**
 	 * main cons, no args.
@@ -79,14 +75,7 @@ public class PushButtonInput extends UIBase
 		button = new JButton("value");
 		contentPane.add(button, BorderLayout.CENTER);
 		// handlers for GUI input
-		button.addChangeListener(new ChangeListener()
-		{
-			@Override
-			public void stateChanged(final ChangeEvent event)
-			{
-				intSetValue(button.getModel().isArmed(), false);
-			}
-		});
+		button.addChangeListener(event -> intSetValue(button.getModel().isArmed(), false));
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -110,7 +99,7 @@ public class PushButtonInput extends UIBase
 	/**
 	 * value setter - internal
 	 */
-	protected synchronized void intSetValue(final boolean value, final boolean updateWidget)
+	private synchronized void intSetValue(final boolean value, final boolean updateWidget)
 	{
 		if (this.value == value)
 		{

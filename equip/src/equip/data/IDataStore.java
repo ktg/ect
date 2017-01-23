@@ -52,9 +52,9 @@ public interface IDataStore {
      *
      * @param add The {@link AddEvent} to be handled.
      * @return true iff this store has handled the add event; false if declined.
-     *         (normally as indicated by a call to {@link IDataStore.checkAdd}
+     *         (normally as indicated by a call to {@link IDataStore#checkAdd}
      */
-    public boolean handleAdd(AddEvent add);
+    boolean handleAdd(AddEvent add);
 
     /** check if store would like to/be prepared to handle this
      * {@link AddEvent}.
@@ -62,14 +62,14 @@ public interface IDataStore {
      * @param add The {@link AddEvent} to be handled.
      * @return true iff this store would be happy/able to handle it.
      */
-    public boolean checkAdd(AddEvent add);
+    boolean checkAdd(AddEvent add);
     
     /** check if store is maintaining state for the given {@link GUID}.
      *
      * @param id The GUID of the data item in question.
      * @return true iff the store currently has state for this item.
      */
-    public boolean holdsGUID(GUID id);
+    boolean holdsGUID(GUID id);
 	    
     /** request that store handles the given update, which it must 
      * iff it is currently maintaining state for it.
@@ -81,17 +81,17 @@ public interface IDataStore {
      * @return true iff the update has been handled (and necessarily
      *         the item's state is maintained by this store).
      */
-    public boolean handleUpdate(UpdateEvent upd);
+    boolean handleUpdate(UpdateEvent upd);
 
     /** request that store handles the given delete, which it must 
      * iff it is currently maintaining state for the corresponding 
      * data item.
      *
-     * @param upd the {@link UpdateEvent} to be handled.
+     * @param del the {@link DeleteEvent} to be handled.
      * @return true iff the delete has been handled (and necessarily
      *         the item's state was maintained by this store).
      */
-    public boolean handleDelete(DeleteEvent del);
+    boolean handleDelete(DeleteEvent del);
 
     /** get GUIDs of data items in this store which are process bound
      * to the given responsible ID as per the RemoveResponsible event
@@ -101,8 +101,7 @@ public interface IDataStore {
      * @return an Enumeration of the GUIDs of locally maintained
      *         data items that should now be deleted.
      */
-    public java.util.Enumeration 
-	getRemoveResponsibleGUIDs(RemoveResponsible remove);
+    Iterable<ItemBinding> getRemoveResponsibleGUIDs(RemoveResponsible remove);
 
     /** get the ItemBinding for the given id iff it is maintained by
      * this store, else null.
@@ -111,7 +110,7 @@ public interface IDataStore {
      * @return the {@link ItemBinding} for that item, else null iff
      *         unknown to this store.
      */
-    public ItemBinding getItemBinding(GUID id);
+    ItemBinding getItemBinding(GUID id);
 
     /** get the ItemBinding maintained by this store which should be 
      * considered when pattern matching the associated itemTemplates
@@ -122,14 +121,14 @@ public interface IDataStore {
      * @return Enumeration of ItemBindings that should be considered
      *         (guaranteed to be a superset of possible matches).
      */
-    public java.util.Enumeration getCandidateItemBindings(ItemData [] itemTemplates);
+    Iterable<ItemBinding>  getCandidateItemBindings(ItemData [] itemTemplates);
 
     /** returns lowest (soonest, or furthest in past) expire time of
      * any leased item in this store.
      *
      * @return lowest (soonest, or furthest in past) expire time, else null (no leased items).
      */
-    public equip.runtime.Time getFirstExpireTime();
+    equip.runtime.Time getFirstExpireTime();
 
     /** returns GUIDs of all leased items expiring at or before time 
      * 'now'.
@@ -139,7 +138,7 @@ public interface IDataStore {
      *         which the call might now reasonably issue delete events
      *         for).
      */
-     public java.util.Enumeration getExpiredGUIDs(equip.runtime.Time now);
+     Iterable<GUID> getExpiredGUIDs(equip.runtime.Time now);
 
 	/** reduce lease on all leased items with given responsible id to
 	 * expire at 'expire time'.
@@ -148,15 +147,15 @@ public interface IDataStore {
 	 * @param expire  the new expire time for matched items
 	 * @return none.
 	 */
-	public void truncateExpireTimes(GUID responsible, equip.runtime.Time expire);
+	void truncateExpireTimes(GUID responsible, equip.runtime.Time expire);
 
 	/** terminate - tidy up.
      */
-    public void terminate();
+    void terminate();
 
     /** Flush any pending persistent records
      */
-	public void flush();
+	void flush();
 }
 //EOF
 

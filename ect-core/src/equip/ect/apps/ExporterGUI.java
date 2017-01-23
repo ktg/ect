@@ -83,7 +83,7 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 	private ExporterGUI(final String dataSpaceURL, final String componentsDirectory, final String persistFile,
 	                   final String hostname) throws IOException
 	{
-		DataManager.getInstance().getDataspace(dataSpaceURL, DataManager.DATASPACE_SERVER, true);
+		DataManager.getInstance().getDataspace(dataSpaceURL, DataManager.Type.SERVER, true);
 
 		//this.hostName = hostname;
 		containerHelper = new ContainerManagerHelper(dataSpaceURL, componentsDirectory, persistFile, hostname);
@@ -93,24 +93,6 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 		setLayout(new BorderLayout());
 		add(panel, BorderLayout.CENTER);
 		setPreferredSize(defaultSize);
-	}
-
-	/**
-	 * force javax.comm initialisation
-	 */
-	private static void initialiseJavaxComm()
-	{
-		/*
-		 * - problem with win32com.dll being loaded in multiple class loaders...?! String
-		 * drivernames[] = new String [] {"com.sun.comm.Win32Driver"}; for(int i=0;
-		 * i<drivernames.length; i++) { String drivername = drivernames[i]; try { java.lang.Object
-		 * driver = Class.forName(drivername).newInstance(); java.lang.reflect.Method init =
-		 * driver.getClass().getMethod("initialize", new Class[0]); init.invoke(driver, new
-		 * Object[0]); //((javax.comm.Driver)driver).initialize();
-		 * System.out.println("Initialised javax.comm driver "+drivername+" OK"); break; } catch
-		 * (Exception e) { System.out.println
-		 * ("ERROR initialising javax.comm driver "+drivername+": "+e.getMessage ()); } }
-		 */
 	}
 
 	/**
@@ -141,7 +123,6 @@ public class ExporterGUI extends JPanel implements DirectoryEventListener
 		f.setVisible(true);
 
 		System.out.println("ECT Java Container");
-		initialiseJavaxComm();
 
 		ExporterGUI gui;
 		if (args.length == 1)

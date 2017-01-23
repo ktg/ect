@@ -38,14 +38,19 @@ Contributors:
 */
 package equip.data.beans;
 
-/** dataspace not active */
-public class DataspaceInactiveException extends DataspaceException {
-    public DataspaceInactiveException() {
-	super();
-    }
+/**
+ * dataspace not active
+ */
+public class DataspaceInactiveException extends DataspaceException
+{
+	public DataspaceInactiveException()
+	{
+		super();
+	}
 
-    public DataspaceInactiveException(String arg) {
-	super(arg);
-    }
+	public DataspaceInactiveException(String arg)
+	{
+		super(arg);
+	}
 }
 

@@ -38,14 +38,19 @@ Contributors:
 */
 package equip.data.beans;
 
-/** dataspace exception superclass */
-public class DataspaceException extends Exception {
-    public DataspaceException() {
-	super();
-    }
+/**
+ * dataspace exception superclass
+ */
+class DataspaceException extends Exception
+{
+	DataspaceException()
+	{
+		super();
+	}
 
-    public DataspaceException(String arg) {
-	super(arg);
-    }
+	DataspaceException(String arg)
+	{
+		super(arg);
+	}
 }
 

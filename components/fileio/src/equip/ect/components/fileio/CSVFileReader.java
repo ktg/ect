@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Reads from a CSV (ie comma-seperated) file <h3>Description</h3> The CSVFileReader is capable of
@@ -78,20 +77,20 @@ import java.util.Vector;
 @Category("File")
 public class CSVFileReader implements Serializable
 {
-	String fileName = null;
-	int currentColumn = -1;
-	int currentRow = -1;
-	int rowCount = -1;
-	int columnCount = -1;
-	String[][] data = null;
+	private String fileName = null;
+	private int currentColumn = -1;
+	private int currentRow = -1;
+	private int rowCount = -1;
+	private int columnCount = -1;
+	private String[][] data = null;
 
-	String[][] fullData = null;
-	String[][] partialData = null;
+	private String[][] fullData = null;
+	private String[][] partialData = null;
 
-	String message;
-	boolean configured = false;
+	private String message;
+	private boolean configured = false;
 
-	boolean ignoreFirstLine = false;
+	private boolean ignoreFirstLine = false;
 
 	// Property Change
 	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
@@ -306,7 +305,7 @@ public class CSVFileReader implements Serializable
 
 	}
 
-	void initializeVariables()
+	private void initializeVariables()
 	{
 		fullData = null;
 		partialData = null;
@@ -316,7 +315,7 @@ public class CSVFileReader implements Serializable
 		setConfigured(false);
 	}
 
-	void loadFile()
+	private void loadFile()
 	{
 		try
 		{
@@ -409,7 +408,7 @@ public class CSVFileReader implements Serializable
 		}
 	}
 
-	String[] processLine(String line)
+	private String[] processLine(String line)
 	{
 		// adding starting and finishing , to line - then all the sections
 		// within the line will be in between these, which simplified
@@ -419,7 +418,7 @@ public class CSVFileReader implements Serializable
 		int lastCommaPos = 0;
 		boolean speechMarksOpen = false;
 
-		final List<String> chunks = new ArrayList<String>();
+		final List<String> chunks = new ArrayList<>();
 
 		for (int i = 1; i < line.length(); i++)
 		{
@@ -466,7 +465,7 @@ public class CSVFileReader implements Serializable
 		return chunks.toArray(new String[chunks.size()]);
 	}
 
-	protected void setColumnCount(final int newCount)
+	private void setColumnCount(final int newCount)
 	{
 		final int oldCount = this.columnCount;
 		this.columnCount = newCount;
@@ -475,7 +474,7 @@ public class CSVFileReader implements Serializable
 
 	}
 
-	protected void setConfigured(final boolean newValue)
+	private void setConfigured(final boolean newValue)
 	{
 		final boolean oldValue = this.configured;
 		this.configured = newValue;
@@ -483,7 +482,7 @@ public class CSVFileReader implements Serializable
 		propertyChangeListeners.firePropertyChange("configured", oldValue, newValue);
 	}
 
-	protected void setMessage(final String newMessage)
+	private void setMessage(final String newMessage)
 	{
 		final String oldMessage = this.message;
 		this.message = newMessage;
@@ -491,7 +490,7 @@ public class CSVFileReader implements Serializable
 		propertyChangeListeners.firePropertyChange("message", oldMessage, newMessage);
 	}
 
-	protected void setRowCount(final int newCount)
+	private void setRowCount(final int newCount)
 	{
 		final int oldCount = this.rowCount;
 		this.rowCount = newCount;

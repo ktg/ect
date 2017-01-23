@@ -45,335 +45,414 @@ Contributors:
 
 package equip.data;
 
-import equip.runtime.*;
+/**
+ * Implementation of IDL'd abstract class {@link DataSession};
+ * delegates most operations to the corresponding {@link DataProxy}'s
+ * {@link DataDelegate}.
+ */
+public class DataSessionImpl extends DataSession
+{
+	EventPattern addingPatterns[] = new EventPattern[0];
 
-/** Implementation of IDL'd abstract class {@link DataSession};
- * delegates most operations to the corresponding {@link DataProxy}'s 
- * {@link DataDelegate}. */
-public class DataSessionImpl extends DataSession {
-    public equip.data.EventPattern addingPatterns[] = 
-	new equip.data.EventPattern [0];
-
-    /* lifecycle */
-    public DataSessionImpl() {
-	dataDelegate = null;
-    }
-
-    /* API */
-    public void addPattern(EventPattern pattern) {
-      EventPattern patternsIn [] = new EventPattern[1];
-      patternsIn[0] = pattern;
-
-      addPatterns(patternsIn);
-    }
-    public void addPatterns(EventPattern [] patternsIn) {
-      if (dataDelegate==null) {
-	System.err.println("ERROR: DataSessionImpl::addPattern(s) - no data delegate "
-			   + "- ignored");
-	return;
-      }
-      int i;
-      synchronized(this) 
-      {
-	// atomically add to addingPatterns
-	if (patternsIn==null || patternsIn.length==0) 
-	  return;
-	int oldlen;
-	oldlen = addingPatterns.length;
-	EventPattern [] oldval = addingPatterns;
-	addingPatterns = new EventPattern[oldlen+patternsIn.length];
-	for (i=0; i<oldlen; i++)
-	  addingPatterns[i] = oldval[i];
-	for (i=0; i<patternsIn.length; i++) {
-	  patternsIn[i].matched = false;
-	  addingPatterns[oldlen+i] = patternsIn[i];
-	}
-      }
-      // limit parallel exposure to events
-      dataDelegate.beginBusy();
-
-      // move to patterns, checking
-      // (deleting a pattern in the addingPatterns list just sets the
-      // deleteOnCheck flag)
-      EventPattern pattern;
-      for (i=0; i<patternsIn.length; i++) {
-	pattern = patternsIn[i];
-	// check?
-	if (dataDelegate!=null) {
-	  dataDelegate.checkPattern(this, pattern, true);
-	}
-	// move to patterns list
-	// possible compensation event
-	Event checkEvent = null;
-	synchronized(this)
+	/* lifecycle */
+	DataSessionImpl()
 	{
-	  int j;
-	  for (j=0; j<addingPatterns.length; j++)
-	    if (addingPatterns[j].id.equals(pattern.id))
-	      break;
-	  if (j>=addingPatterns.length) {
-	    System.err.println("INTERNAL ERROR: DataSessionImpl::addPatterns could not "
-			       + "find adding pattern in addingPatterns");
-	    // next pattern
-	    continue;
-	  }
-	  int oldlen;
-	  // add to patterns - atomic with DataDelegate, which may be in
-	  // checkEvent...
-	  synchronized(dataDelegate) {
-
-	    oldlen = patterns.length;
-	    EventPattern oldval [] = patterns;
-	    patterns = new EventPattern[oldlen+1];
-	    int ii;
-	    for (ii=0; ii<oldlen; ii++)
-	      patterns[ii] = oldval[ii];
-	    patterns[oldlen] = pattern;
-
-	    // compensate?
-	    if (dataDelegate.checkEventEvent!=null) {
-	      // where are we in the session list?
-	      int di;
-	      for (di=0; di<dataDelegate.sessions.size(); di++) {
-		DataSession sdi = 
-		  (DataSession)dataDelegate.sessions.elementAt(di);
-		if (sdi==this)
-		  break;
-	      }
-	      if (di>=dataDelegate.sessions.size()) {
-		System.err.println("INTERNAL ERROR: DataSessionImpl::addPatterns could not "
-				   + "find itself in the data delegate's session list");
-	      } else {
-		if (di<dataDelegate.checkEventSession) {
-		  // this session has already been offered this event, so 
-		  // offer it to this pattern now!
-		  checkEvent = dataDelegate.checkEventEvent;
-		} 
-		// other this will go on end of patterns, or later in session
-		// list and so is still to be checked
-	      }
-	    }
-
-	    // remove from addingPatterns
-	    oldval = addingPatterns;
-	    addingPatterns = new EventPattern[oldval.length-1];
-	    for (ii=0; ii<j; ii++)
-	      addingPatterns[ii] = oldval[ii];
-	    for ( ; j<addingPatterns.length; j++)
-	      addingPatterns[j] = oldval[j+1];
-
-	  } // synchronized(dataDelegate)
-	} // synchronized(this) 
-
-	// compensatory application of event in progress (busy, so still
-	// in flight)
-	if (checkEvent!=null) {
-	  // check now
-	  dataDelegate.checkEvent(checkEvent, pattern, this);
+		dataDelegate = null;
 	}
-	// delete ?
-	if (pattern.deleteOnCheck ||
-	    (pattern.deleteOnMatch && pattern.matched)) {
-	  if (dataDelegate==null) {
-	    System.err.println("Warning: DataSessionImpl::addPattern has no delegate set: "
-			       + "discarding delete-on-check pattern");
-	  }
-	  // and delete!
-	  deletePattern(pattern.id);
+
+	/* API */
+	public void addPattern(EventPattern pattern)
+	{
+		EventPattern patternsIn[] = new EventPattern[1];
+		patternsIn[0] = pattern;
+
+		addPatterns(patternsIn);
 	}
-      } // for(i)
-      dataDelegate.endBusy();
-    }  
 
-
-    public void deletePattern(GUID id) {
-      if (dataDelegate==null) {
-	System.err.println("ERROR: DataSessionImpl::deletePattern(s) - no data delegate "
-			   + "- ignored");
-	return;
-      }
-      if (id==null)
-	return;
-      
-      dataDelegate.beginBusy();
-      // check in patterns first (=> fully added)
-      // explicit lock!!
-
-      EventPattern pattern = null;
-      // possible compensation event
-      Event checkEvent = null;
-      ItemData checkItem = null;
-
-      synchronized(this) {
-	int i;
-	for (i=0; i<patterns.length; i++)
-	  if (patterns[i]!=null &&
-	      patterns[i].id!=null &&
-	      id.equals(patterns[i].id)) {
-	    
-	    pattern = patterns[i];
-	    
-	    // also lock dataDelegate and check for event in flight
-	    synchronized(dataDelegate) {
-
-	      EventPattern oldval [];
-	      int j;
-	      oldval = patterns;
-	      patterns = new EventPattern[oldval.length-1];
-	      for (j=0; j<i; j++)
-		patterns[j] = oldval[j];
-	      for (j=i; j<oldval.length-1; j++)
-		patterns[j] = oldval[j+1];
-	      
-	      // compensate for in progress
-	      if (dataDelegate.checkEventEvent!=null) {
-		// where are we in the session list?
-		int di;
-		for (di=0; di<dataDelegate.sessions.size(); di++) {
-		  DataSession sdi = 
-		    (DataSession)dataDelegate.sessions.elementAt(di);
-		  if (sdi==this)
-		    break;
+	public void addPatterns(EventPattern[] patternsIn)
+	{
+		if (dataDelegate == null)
+		{
+			System.err.println("ERROR: DataSessionImpl::addPattern(s) - no data delegate "
+					+ "- ignored");
+			return;
 		}
-		if (di>=dataDelegate.sessions.size()) {
-		  System.err.println("INTERNAL ERROR: DataSessionImpl::deletePatterns could not "
-				     + "find itself in the data delegate's session list");
-		} else {
-		  if (di<dataDelegate.checkEventSession ||
-		      (di==dataDelegate.checkEventSession &&
-		       i<=dataDelegate.checkEventPattern)) {
-		    if (di==dataDelegate.checkEventSession)
-		      // adjust for removal
-		      dataDelegate.checkEventPattern--;
-		    // this session has already been offered this event, so 
-		    // we may need to compensate, since the checkPattern
-		    // against the database will occur before the event is 
-		    // enacted.
-		    if (dataDelegate.checkEventEvent instanceof AddEvent) {
-		      AddEvent add =
-			(AddEvent)(dataDelegate.checkEventEvent);
-		      // fake delete event
-		      DeleteEvent del = new DeleteEventImpl();
-		      del.id = add.binding.item.id;
-		      del.metadata = add.metadata;
-		      checkEvent = del; // take ref
-		      checkItem = add.binding.item;
-		    } 
-		    if (dataDelegate.checkEventEvent instanceof DeleteEvent) {
-		      DeleteEvent del =
-			(DeleteEvent)(dataDelegate.checkEventEvent);
-		      // fake extra add? 
-		      // Just let two deletes go through for now
-		      System.err.println("Note: DataSessionImpl::deletePattern in parallel "
-					 + "with delete event - will cause duplicate delete "
-					 + "notifications (don't worry)");
-		    }
-		  } 
-		  // otherwise this pattern has not yet been checked, and will 
-		  // be gone before it can be
+		int i;
+		synchronized (this)
+		{
+			// atomically add to addingPatterns
+			if (patternsIn == null || patternsIn.length == 0)
+			{
+				return;
+			}
+			int oldlen;
+			oldlen = addingPatterns.length;
+			EventPattern[] oldval = addingPatterns;
+			addingPatterns = new EventPattern[oldlen + patternsIn.length];
+			for (i = 0; i < oldlen; i++)
+			{
+				addingPatterns[i] = oldval[i];
+			}
+			for (i = 0; i < patternsIn.length; i++)
+			{
+				patternsIn[i].matched = false;
+				addingPatterns[oldlen + i] = patternsIn[i];
+			}
 		}
-	      } // checkEventEvent
-	    } // synchronized(dataDelegate);
+		// limit parallel exposure to events
+		dataDelegate.beginBusy();
 
-	    // release lock before check!!
-	    break;
-	  } // if (match)
+		// move to patterns, checking
+		// (deleting a pattern in the addingPatterns list just sets the
+		// deleteOnCheck flag)
+		EventPattern pattern;
+		for (i = 0; i < patternsIn.length; i++)
+		{
+			pattern = patternsIn[i];
+			// check?
+			if (dataDelegate != null)
+			{
+				dataDelegate.checkPattern(this, pattern, true);
+			}
+			// move to patterns list
+			// possible compensation event
+			Event checkEvent = null;
+			synchronized (this)
+			{
+				int j;
+				for (j = 0; j < addingPatterns.length; j++)
+				{
+					if (addingPatterns[j].id.equals(pattern.id))
+					{
+						break;
+					}
+				}
+				if (j >= addingPatterns.length)
+				{
+					System.err.println("INTERNAL ERROR: DataSessionImpl::addPatterns could not "
+							+ "find adding pattern in addingPatterns");
+					// next pattern
+					continue;
+				}
+				int oldlen;
+				// add to patterns - atomic with DataDelegate, which may be in
+				// checkEvent...
+				synchronized (dataDelegate)
+				{
 
-	if (pattern==null) {
-	  // failed so far
-	  // now check the addingPatterns list (=> mark deleteOnCheck)
-	  for (i=0; i<addingPatterns.length; i++)
-	    if (addingPatterns[i]!=null &&
-		addingPatterns[i].id!=null &&
-		id.equals(addingPatterns[i].id)) {
-	      
-	      pattern = addingPatterns[i];
+					oldlen = patterns.length;
+					EventPattern oldval[] = patterns;
+					patterns = new EventPattern[oldlen + 1];
+					int ii;
+					for (ii = 0; ii < oldlen; ii++)
+					{
+						patterns[ii] = oldval[ii];
+					}
+					patterns[oldlen] = pattern;
 
-	      System.err.println("Note: DataSessionImpl::deletePattern for currently adding "
-				 + "pattern - commuted to deleteOnCheck");
-	      
-	      pattern.deleteOnCheck = true;
-	      dataDelegate.endBusy();
-	      return;
-	    }
-	} // if (pattern==null)
-      } // synchronized(this)
+					// compensate?
+					if (dataDelegate.checkEventEvent != null)
+					{
+						// where are we in the session list?
+						int di;
+						for (di = 0; di < dataDelegate.sessions.size(); di++)
+						{
+							DataSession sdi = dataDelegate.sessions.get(di);
+							if (sdi == this)
+							{
+								break;
+							}
+						}
+						if (di >= dataDelegate.sessions.size())
+						{
+							System.err.println("INTERNAL ERROR: DataSessionImpl::addPatterns could not "
+									+ "find itself in the data delegate's session list");
+						}
+						else
+						{
+							if (di < dataDelegate.checkEventSession)
+							{
+								// this session has already been offered this event, so
+								// offer it to this pattern now!
+								checkEvent = dataDelegate.checkEventEvent;
+							}
+							// other this will go on end of patterns, or later in session
+							// list and so is still to be checked
+						}
+					}
 
-      // did we match the first time? do the unlocked continuation...
-      if (pattern!=null) {
-	// compensatory application of event in progress (busy, so still
-	// in flight)
-	if (checkEvent!=null) {
-	  // check now
-	  dataDelegate.checkEvent(checkEvent, checkItem,
-				   pattern, this);
+					// remove from addingPatterns
+					oldval = addingPatterns;
+					addingPatterns = new EventPattern[oldval.length - 1];
+					for (ii = 0; ii < j; ii++)
+					{
+						addingPatterns[ii] = oldval[ii];
+					}
+					for (; j < addingPatterns.length; j++)
+					{
+						addingPatterns[j] = oldval[j + 1];
+					}
+
+				} // synchronized(dataDelegate)
+			} // synchronized(this)
+
+			// compensatory application of event in progress (busy, so still
+			// in flight)
+			if (checkEvent != null)
+			{
+				// check now
+				dataDelegate.checkEvent(checkEvent, pattern, this);
+			}
+			// delete ?
+			if (pattern.deleteOnCheck ||
+					(pattern.deleteOnMatch && pattern.matched))
+			{
+				if (dataDelegate == null)
+				{
+					System.err.println("Warning: DataSessionImpl::addPattern has no delegate set: "
+							+ "discarding delete-on-check pattern");
+				}
+				// and delete!
+				deletePattern(pattern.id);
+			}
+		} // for(i)
+		dataDelegate.endBusy();
 	}
-	
-	// if it included a DeleteEvent/PRESENT then check current database
-	// content...
-	if (dataDelegate!=null) {
-	  dataDelegate.checkPattern(this, pattern, false);
-	}
-	dataDelegate.endBusy();
-	return;
-      } // if (pattern!=null) 
-      
-      // no joy
-      System.err.println("Warning: DataSessionImpl::deletePattern could not find "
-			 + "pattern " + id + " - ignored");
-      // explicit lock!!
-      
-      dataDelegate.endBusy();
-    } // deletePattern
 
 
-    public void deletePatterns(GUID [] ids) {
-	int i;
-	for (i=0; i<ids.length; i++)
-	    deletePattern(ids[i]);
-    }
-    public EventPattern getPattern(GUID id) {
-      synchronized(this) {
-	int i;
-	for (i=0; i<patterns.length; i++)
-	    if (patterns[i]!=null &&
-		patterns[i].id!=null &&
-		id.equals(patterns[i].id)) {
-		return patterns[i];
-	    }
-	return null;
-      }
-    }
-    /* subclasses....*/
+	public void deletePattern(GUID id)
+	{
+		if (dataDelegate == null)
+		{
+			System.err.println("ERROR: DataSessionImpl::deletePattern(s) - no data delegate "
+					+ "- ignored");
+			return;
+		}
+		if (id == null)
+		{
+			return;
+		}
 
-    /* IMPLEMENTATION - cmg */
-    // ok = true
-    public boolean delegateAdd(DataDelegate dataDelegate) {
-	if (this.dataDelegate!=null) {
-	    System.err.println("ERROR: DataSessionImpl::delegateAdd while "+
-			       "still added");
-	    return false;
-	}
-	this.dataDelegate = dataDelegate;
-	return true;
-    }
-    public boolean delegateRemove(DataDelegate dataDelegate) {
-	if (this.dataDelegate==null) {
-	    System.err.println("ERROR: DataSessionImpl::delegateRemove while "+
-			       "not added");
-	    return false;
-	}
-	if (this.dataDelegate!=dataDelegate) {
-	    System.err.println("ERROR: DataSessionImpl::delegateRemove for "+
-			       "wrong delegate");
-	    return false;
-	}
-	this.dataDelegate = null;
-	return true;
-    }  
+		dataDelegate.beginBusy();
+		// check in patterns first (=> fully added)
+		// explicit lock!!
 
-    // the DataDelegate for which this is active (if any)
-    private DataDelegate dataDelegate;
+		EventPattern pattern = null;
+		// possible compensation event
+		Event checkEvent = null;
+		ItemData checkItem = null;
+
+		synchronized (this)
+		{
+			int i;
+			for (i = 0; i < patterns.length; i++)
+			{
+				if (patterns[i] != null &&
+						patterns[i].id != null &&
+						id.equals(patterns[i].id))
+				{
+
+					pattern = patterns[i];
+
+					// also lock dataDelegate and check for event in flight
+					synchronized (dataDelegate)
+					{
+
+						EventPattern oldval[];
+						int j;
+						oldval = patterns;
+						patterns = new EventPattern[oldval.length - 1];
+						for (j = 0; j < i; j++)
+						{
+							patterns[j] = oldval[j];
+						}
+						for (j = i; j < oldval.length - 1; j++)
+						{
+							patterns[j] = oldval[j + 1];
+						}
+
+						// compensate for in progress
+						if (dataDelegate.checkEventEvent != null)
+						{
+							// where are we in the session list?
+							int di;
+							for (di = 0; di < dataDelegate.sessions.size(); di++)
+							{
+								DataSession sdi = dataDelegate.sessions.get(di);
+								if (sdi == this)
+								{
+									break;
+								}
+							}
+							if (di >= dataDelegate.sessions.size())
+							{
+								System.err.println("INTERNAL ERROR: DataSessionImpl::deletePatterns could not "
+										+ "find itself in the data delegate's session list");
+							}
+							else
+							{
+								if (di < dataDelegate.checkEventSession ||
+										(di == dataDelegate.checkEventSession &&
+												i <= dataDelegate.checkEventPattern))
+								{
+									if (di == dataDelegate.checkEventSession)
+									// adjust for removal
+									{
+										dataDelegate.checkEventPattern--;
+									}
+									// this session has already been offered this event, so
+									// we may need to compensate, since the checkPattern
+									// against the database will occur before the event is
+									// enacted.
+									if (dataDelegate.checkEventEvent instanceof AddEvent)
+									{
+										AddEvent add =
+												(AddEvent) (dataDelegate.checkEventEvent);
+										// fake delete event
+										DeleteEvent del = new DeleteEventImpl();
+										del.id = add.binding.item.id;
+										del.metadata = add.metadata;
+										checkEvent = del; // take ref
+										checkItem = add.binding.item;
+									}
+									if (dataDelegate.checkEventEvent instanceof DeleteEvent)
+									{
+										//DeleteEvent del = (DeleteEvent) (dataDelegate.checkEventEvent);
+										// fake extra add?
+										// Just let two deletes go through for now
+										System.err.println("Note: DataSessionImpl::deletePattern in parallel "
+												+ "with delete event - will cause duplicate delete "
+												+ "notifications (don't worry)");
+									}
+								}
+								// otherwise this pattern has not yet been checked, and will
+								// be gone before it can be
+							}
+						} // checkEventEvent
+					} // synchronized(dataDelegate);
+
+					// release lock before check!!
+					break;
+				} // if (match)
+			}
+
+			if (pattern == null)
+			{
+				// failed so far
+				// now check the addingPatterns list (=> mark deleteOnCheck)
+				for (i = 0; i < addingPatterns.length; i++)
+				{
+					if (addingPatterns[i] != null &&
+							addingPatterns[i].id != null &&
+							id.equals(addingPatterns[i].id))
+					{
+
+						pattern = addingPatterns[i];
+
+						System.err.println("Note: DataSessionImpl::deletePattern for currently adding "
+								+ "pattern - commuted to deleteOnCheck");
+
+						pattern.deleteOnCheck = true;
+						dataDelegate.endBusy();
+						return;
+					}
+				}
+			} // if (pattern==null)
+		} // synchronized(this)
+
+		// did we match the first time? do the unlocked continuation...
+		if (pattern != null)
+		{
+			// compensatory application of event in progress (busy, so still
+			// in flight)
+			if (checkEvent != null)
+			{
+				// check now
+				dataDelegate.checkEvent(checkEvent, checkItem,
+						pattern, this);
+			}
+
+			// if it included a DeleteEvent/PRESENT then check current database
+			// content...
+			if (dataDelegate != null)
+			{
+				dataDelegate.checkPattern(this, pattern, false);
+			}
+			dataDelegate.endBusy();
+			return;
+		} // if (pattern!=null)
+
+		// no joy
+		System.err.println("Warning: DataSessionImpl::deletePattern could not find "
+				+ "pattern " + id + " - ignored");
+		// explicit lock!!
+
+		dataDelegate.endBusy();
+	} // deletePattern
+
+
+	public void deletePatterns(GUID[] ids)
+	{
+		int i;
+		for (i = 0; i < ids.length; i++)
+		{
+			deletePattern(ids[i]);
+		}
+	}
+
+	public EventPattern getPattern(GUID id)
+	{
+		synchronized (this)
+		{
+			int i;
+			for (i = 0; i < patterns.length; i++)
+			{
+				if (patterns[i] != null &&
+						patterns[i].id != null &&
+						id.equals(patterns[i].id))
+				{
+					return patterns[i];
+				}
+			}
+			return null;
+		}
+	}
+	/* subclasses....*/
+
+	/* IMPLEMENTATION - cmg */
+	// ok = true
+	boolean delegateAdd(DataDelegate dataDelegate)
+	{
+		if (this.dataDelegate != null)
+		{
+			System.err.println("ERROR: DataSessionImpl::delegateAdd while " +
+					"still added");
+			return false;
+		}
+		this.dataDelegate = dataDelegate;
+		return true;
+	}
+
+	boolean delegateRemove(DataDelegate dataDelegate)
+	{
+		if (this.dataDelegate == null)
+		{
+			System.err.println("ERROR: DataSessionImpl::delegateRemove while " +
+					"not added");
+			return false;
+		}
+		if (this.dataDelegate != dataDelegate)
+		{
+			System.err.println("ERROR: DataSessionImpl::delegateRemove for " +
+					"wrong delegate");
+			return false;
+		}
+		this.dataDelegate = null;
+		return true;
+	}
+
+	// the DataDelegate for which this is active (if any)
+	private DataDelegate dataDelegate;
 
 } /* class DataSession */
 

@@ -107,7 +107,7 @@ public class Server extends DataProxy implements Runnable
     }
     System.err.println("Starting data server " + args[0] + "...");
     DataManager.getInstance().getDataspace(args[0], 
-					   DataManager.DATASPACE_SERVER,
+					   DataManager.Type.SERVER,
 					   true);
   }
 

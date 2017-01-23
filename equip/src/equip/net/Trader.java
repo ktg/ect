@@ -38,169 +38,216 @@ Contributors:
 */
 package equip.net;
 
-import equip.runtime.*;
-import java.io.*;
-import java.util.Hashtable;
-import java.net.*;
+import equip.runtime.StatusValues;
+import equip.runtime.ValueBase;
 
-/** Java Implementation of {@link TraderProxy}, to provide a simple
- * service trader */
-public class Trader extends TraderProxy 
-  implements SimpleServerHandler, Runnable
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Java Implementation of {@link TraderProxy}, to provide a simple
+ * service trader
+ */
+public class Trader extends TraderProxy implements SimpleServerHandler, Runnable
 {
-    /* Lifecycle */
-  public Trader(short port) {
-    super();
-    mc_socket = null;
-    System.err.println("Starting TraderServer");
-    server.init(port, this);
-    serviceMoniker = server.getMoniker();
-  }
-
-    /* TraderProxy API - real implementations */
-  public ValueBase lookup(String name, String classname) {
-    if (name==null) {
-      System.err.println("ERROR: TraderServer::lookup called with null name");
-      return null;
-    }
-    System.err.println("TraderServer::lookup " + name + " (" 
-		       + (classname!=null ? classname : "NULL") + ")");
-
-    ValueBase value = (ValueBase)bindings.get(name);
-    if (value == null) {
-      System.err.println("- not found");
-      return null;
-    }
-    if (classname!=null) {
-      Class c = value.getClass();
-      do {
-	if (classname.equals(c.getName()))
-	  break;
-	c = c.getSuperclass();
-      } while (c!=null);
-      if (c==null) {
-	System.err.println("- class mismatch (" + value.getClass().getName());
-	return null;
-      }
-    }
-    return value;
-  }
-  public boolean bind(String name, ValueBase proxy) {
-    if (bindings.get(name)!=null)
-      return false;
-    bindings.put(name, proxy);
-    return true;
-  }
-  public boolean rebind(String name, ValueBase proxy) {
-    bindings.put(name, proxy);
-    return true;
-  }
-  
-    /* ServiceProxy API - dummies */
-  public boolean activate(DeactivateCallback callback, ValueBase closure){
-    return true;
-  }
-  public void deactivate() {}
-
-    /* extra API */
-    public short getPort() {
-      SimpleMoniker mon = server.getMoniker();
-      if (mon!=null && mon instanceof SimpleTCPMoniker) {
-	SimpleTCPMoniker tcpMon = (SimpleTCPMoniker)(mon);
-	return tcpMon.port;
-      }
-      return 0;
-    }
-
-    /* add listening on equipm-specified multicast group/port */
-    public int /*StatusValues*/ addMulticast(String equipm_url) {
-      ServerURL url = new ServerURL(equipm_url);
-      Moniker moniker = url.getMoniker();
-      if (!(moniker instanceof MulticastUDPMoniker)) {
-	System.err.println("ERROR: TraderServer::addMulticast called for non-multicast "
-			  + "url " + equipm_url);
-	return StatusValues.STATUS_ERROR;
-      }
-      MulticastUDPMoniker mc = (MulticastUDPMoniker)(moniker);
-      session_id = 1;
-      try {
-	mc_socket = new MulticastSocket(mc.port);
-	InetAddress group = InetAddress.getByName
-	  (""+((mc.addr >> 24) & 0xff)+"."+
-	   ((mc.addr >> 16) & 0xff)+"."+
-	   ((mc.addr >> 8) & 0xff)+"."+
-	   ((mc.addr) & 0xff));
-	mc_socket.joinGroup(group);
-      } catch (Exception e) {
-	System.err.println("ERROR: TraderServer::addMulticast unable to join multicast group "
-			   + equipm_url + ": "+e);
-	mc_socket = null;
-	return StatusValues.STATUS_ERROR;
-      }
-      new Thread(this).start();
-      return StatusValues.STATUS_OK;
-    }
-      
-
-    /* internals */
-    /* ServerMixinHandler */
-    public void handleServerMessage(ConnectionSap connection, 
-				    ValueBase object,
-				    java.lang.Object closure) {
-      System.err.println("TraderServer::handleClientMessage:"+
-			 "- read object (class " + object.getClass().getName()
-			 + ") ok");
-  
-      if (object instanceof TraderLookup) {
-	TraderLookup lookupRequest = (TraderLookup)(object);
-	ValueBase reply = lookup(lookupRequest.name, 
-				 lookupRequest.classname);
-	try {
-	  connection.writeObject(reply);
-	} catch(Exception e) {
-	  System.err.println("Trader.handleServerMessage writeObject failed: "+e);
-	}
-	return;
-      } 
-      if (object instanceof TraderRebind) {
-	TraderRebind rebindRequest = (TraderRebind)(object);
-	boolean reply = false;
-	if (rebindRequest.replaceFlag) {
-	  reply = rebind(rebindRequest.name, rebindRequest.binding);
-	}
-	else {
-	  reply = bind(rebindRequest.name, rebindRequest.binding);
+	/* Lifecycle */
+	public Trader(short port)
+	{
+		super();
+		mc_socket = null;
+		System.err.println("Starting TraderServer");
+		server.init(port, this);
+		serviceMoniker = server.getMoniker();
 	}
 
-	TraderRebindReply repobj = new TraderRebindReplyImpl();
-	repobj.okFlag = reply;
-	try {
-	  connection.writeObject(repobj);
-	} catch(Exception e) {
-	  System.err.println("Trader.handleServerMessage writeObject failed: "+e);
-	}
-	return;
-      } 
-      System.err.println("ERROR: TraderServer: unknown request type " 
-			 +object.getClass().getName());
-      // free ref
-      try {
-	connection.writeObject(null);
-      } catch(Exception e) {
-	System.err.println("Trader.handleServerMessage writeObject failed: "+e);
-      }
-    }
+	/* TraderProxy API - real implementations */
+	public ValueBase lookup(String name, String classname)
+	{
+		if (name == null)
+		{
+			System.err.println("ERROR: TraderServer::lookup called with null name");
+			return null;
+		}
+		System.err.println("TraderServer::lookup " + name + " ("
+				+ (classname != null ? classname : "NULL") + ")");
 
-    private SimpleServer server = new SimpleServer();
-    //typedef std::map<std::string, ValueBase_var> Bindings;
-    private Hashtable bindings = new Hashtable();
-    // multicast...
-    private MulticastSocket mc_socket= null;
-    private int session_id;
-    public void run() {
-	//  void mcThread();
-      // PORT FROM C++!!!
-      System.err.println("Sorry: Trader Multicast not yet ported to Java!\n");
+		ValueBase value = (ValueBase) bindings.get(name);
+		if (value == null)
+		{
+			System.err.println("- not found");
+			return null;
+		}
+		if (classname != null)
+		{
+			Class c = value.getClass();
+			do
+			{
+				if (classname.equals(c.getName()))
+				{
+					break;
+				}
+				c = c.getSuperclass();
+			}
+			while (c != null);
+			if (c == null)
+			{
+				System.err.println("- class mismatch (" + value.getClass().getName());
+				return null;
+			}
+		}
+		return value;
+	}
+
+	public boolean bind(String name, ValueBase proxy)
+	{
+		if (bindings.get(name) != null)
+		{
+			return false;
+		}
+		bindings.put(name, proxy);
+		return true;
+	}
+
+	public boolean rebind(String name, ValueBase proxy)
+	{
+		bindings.put(name, proxy);
+		return true;
+	}
+
+	/* ServiceProxy API - dummies */
+	public boolean activate(DeactivateCallback callback, ValueBase closure)
+	{
+		return true;
+	}
+
+	public void deactivate()
+	{
+	}
+
+	/* extra API */
+	public short getPort()
+	{
+		SimpleMoniker mon = server.getMoniker();
+		if (mon != null && mon instanceof SimpleTCPMoniker)
+		{
+			SimpleTCPMoniker tcpMon = (SimpleTCPMoniker) (mon);
+			return tcpMon.port;
+		}
+		return 0;
+	}
+
+	/* add listening on equipm-specified multicast group/port */
+	public int /*StatusValues*/ addMulticast(String equipm_url)
+	{
+		ServerURL url = new ServerURL(equipm_url);
+		Moniker moniker = url.getMoniker();
+		if (!(moniker instanceof MulticastUDPMoniker))
+		{
+			System.err.println("ERROR: TraderServer::addMulticast called for non-multicast "
+					+ "url " + equipm_url);
+			return StatusValues.STATUS_ERROR;
+		}
+		MulticastUDPMoniker mc = (MulticastUDPMoniker) (moniker);
+		session_id = 1;
+		try
+		{
+			mc_socket = new MulticastSocket(mc.port);
+			InetAddress group = InetAddress.getByName
+					("" + ((mc.addr >> 24) & 0xff) + "." +
+							((mc.addr >> 16) & 0xff) + "." +
+							((mc.addr >> 8) & 0xff) + "." +
+							((mc.addr) & 0xff));
+			mc_socket.joinGroup(group);
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR: TraderServer::addMulticast unable to join multicast group "
+					+ equipm_url + ": " + e);
+			mc_socket = null;
+			return StatusValues.STATUS_ERROR;
+		}
+		new Thread(this).start();
+		return StatusValues.STATUS_OK;
+	}
+
+
+	/* internals */
+	/* ServerMixinHandler */
+	public void handleServerMessage(ConnectionSap connection,
+	                                ValueBase object,
+	                                java.lang.Object closure)
+	{
+		System.err.println("TraderServer::handleClientMessage:" +
+				"- read object (class " + object.getClass().getName()
+				+ ") ok");
+
+		if (object instanceof TraderLookup)
+		{
+			TraderLookup lookupRequest = (TraderLookup) (object);
+			ValueBase reply = lookup(lookupRequest.name,
+					lookupRequest.classname);
+			try
+			{
+				connection.writeObject(reply);
+			}
+			catch (Exception e)
+			{
+				System.err.println("Trader.handleServerMessage writeObject failed: " + e);
+			}
+			return;
+		}
+		if (object instanceof TraderRebind)
+		{
+			TraderRebind rebindRequest = (TraderRebind) (object);
+			boolean reply = false;
+			if (rebindRequest.replaceFlag)
+			{
+				reply = rebind(rebindRequest.name, rebindRequest.binding);
+			}
+			else
+			{
+				reply = bind(rebindRequest.name, rebindRequest.binding);
+			}
+
+			TraderRebindReply repobj = new TraderRebindReplyImpl();
+			repobj.okFlag = reply;
+			try
+			{
+				connection.writeObject(repobj);
+			}
+			catch (Exception e)
+			{
+				System.err.println("Trader.handleServerMessage writeObject failed: " + e);
+			}
+			return;
+		}
+		System.err.println("ERROR: TraderServer: unknown request type "
+				+ object.getClass().getName());
+		// free ref
+		try
+		{
+			connection.writeObject(null);
+		}
+		catch (Exception e)
+		{
+			System.err.println("Trader.handleServerMessage writeObject failed: " + e);
+		}
+	}
+
+	private SimpleServer server = new SimpleServer();
+	//typedef std::map<std::string, ValueBase_var> Bindings;
+	private Map<String, ValueBase> bindings = new HashMap<>();
+	// multicast...
+	private MulticastSocket mc_socket = null;
+	private int session_id;
+
+	public void run()
+	{
+		//  void mcThread();
+		// PORT FROM C++!!!
+		System.err.println("Sorry: Trader Multicast not yet ported to Java!\n");
 /*
   cerr << "Trader ready for multicast requests\n";
   
@@ -368,43 +415,56 @@ public class Trader extends TraderProxy
   }
   while(PR_TRUE);
 */
-    }
-
-    public static void main( String args[] ) {
-      if (args.length>1) {
-	System.err.println("Usage: equip.net.Trader [port]");
-	System.exit(-1);
-      }
-      int port=DEFAULT_TRADER_PORT.value;
-      if (args.length>0) {
-	try {
-	  port = Integer.valueOf(args[0]).intValue();
-	} catch (Exception e) {
-	  System.err.println("ERROR reading port number ("+args[0]+"): "+e);
-	  System.exit(-1);
 	}
-      }
-      new Trader((short)port);
-    }
 
-  public Moniker getMonikerDefault() {
-      SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
-      mon.initFromPort((short)DEFAULT_TRADER_PORT.value);
-      return mon;
-  }
-  public Moniker getMonikerFromPort(short port) {
-      SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
-      mon.initFromPort(port);
-      return mon;
-  }
-  public Moniker getMonikerFromHost(String host, short port) {
-      SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
-      mon.initFromHost(host, port);
-      return mon;
-  }
-  public Moniker getMonikerFromAddr(int addr, short port) {
-      SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
-      mon.initFromAddr(addr, port);
-      return mon;
-  }
+	public static void main(String args[])
+	{
+		if (args.length > 1)
+		{
+			System.err.println("Usage: equip.net.Trader [port]");
+			System.exit(-1);
+		}
+		int port = DEFAULT_TRADER_PORT.value;
+		if (args.length > 0)
+		{
+			try
+			{
+				port = Integer.valueOf(args[0]).intValue();
+			}
+			catch (Exception e)
+			{
+				System.err.println("ERROR reading port number (" + args[0] + "): " + e);
+				System.exit(-1);
+			}
+		}
+		new Trader((short) port);
+	}
+
+	public Moniker getMonikerDefault()
+	{
+		SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
+		mon.initFromPort((short) DEFAULT_TRADER_PORT.value);
+		return mon;
+	}
+
+	public Moniker getMonikerFromPort(short port)
+	{
+		SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
+		mon.initFromPort(port);
+		return mon;
+	}
+
+	public Moniker getMonikerFromHost(String host, short port)
+	{
+		SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
+		mon.initFromHost(host, port);
+		return mon;
+	}
+
+	public Moniker getMonikerFromAddr(int addr, short port)
+	{
+		SimpleTCPMoniker mon = new SimpleTCPMonikerImpl();
+		mon.initFromAddr(addr, port);
+		return mon;
+	}
 }

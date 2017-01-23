@@ -41,115 +41,179 @@ Contributors:
  */
 
 package equip.data.beans;
- 
+
 import equip.data.*;
 
-/** representation of an event in the dataspace as returned to
+/**
+ * representation of an event in the dataspace as returned to
  * client, e.g. using DataCallbackPost.
- *
+ * <p>
  * inherits java.lang.Object source;
- */ 
-public class DataspaceEvent extends java.util.EventObject {
+ */
+public class DataspaceEvent extends java.util.EventObject
+{
+	/**
+	 * native dataspace event
+	 */
+	protected equip.data.Event event;
 
-    /** native dataspace event */
-    protected equip.data.Event event;
+	/**
+	 * native event pattern
+	 */
+	protected equip.data.EventPattern pattern;
 
-    /** native event pattern */
-    protected equip.data.EventPattern pattern;
-    
-    /** was the associated pattern deleted as a result? */
-    protected boolean patternDeleted;
+	/**
+	 * was the associated pattern deleted as a result?
+	 */
+	protected boolean patternDeleted;
 
-    /** native DataSession */
-    protected equip.data.DataSession session;
+	/**
+	 * native DataSession
+	 */
+	protected equip.data.DataSession session;
 
-    /** native dataspace */
-    protected equip.data.DataProxy dataspace;
+	/**
+	 * native dataspace
+	 */
+	protected equip.data.DataProxy dataspace;
 
-    /** old value of item, if any */
-    protected equip.data.ItemData oldValue;
+	/**
+	 * old value of item, if any
+	 */
+	protected equip.data.ItemData oldValue;
 
-    /** old binding of item, if any */
-    protected equip.data.ItemBinding oldBinding;
+	/**
+	 * old binding of item, if any
+	 */
+	private equip.data.ItemBinding oldBinding;
 
-    /** source-only constructor */
-    public DataspaceEvent(java.lang.Object source) {
-	super(source);
-    }
-
-    /** full constructor */
-    public DataspaceEvent(java.lang.Object source,
-			  equip.data.Event event,
-			  equip.data.EventPattern pattern,
-			  boolean patternDeleted,
-			  equip.data.DataSession session,
-			  equip.data.DataProxy dataspace,
-			  equip.data.ItemData oldValue,
-			  equip.data.ItemBinding oldBinding) {
-	super(source);
-	this.event = event;
-	this.pattern = pattern;
-	this.patternDeleted = patternDeleted;
-	this.session = session;
-	this.dataspace = dataspace;
-	this.oldValue = oldValue;
-	this.oldBinding = oldBinding;
-    }
-    
-    /** getter */
-    public equip.data.Event getEvent() {
-	return event;
-    }
-    /** getter */
-    public equip.data.EventPattern getEventPattern() {
-	return pattern;
-    }
-    /** getter */
-    public boolean getPatternDeleted() {
-	return patternDeleted;
-    }
-    /** getter */
-    public equip.data.DataSession getSession() {
-	return session;
-    }
-    /** getter */
-    public equip.data.DataProxy getDataspace() {
-	return dataspace;
-    }
-    /** getter */
-    public equip.data.ItemData getOldValue() {
-	return oldValue;
-    }
-    /** getter */
-    public equip.data.ItemBinding getOldBinding() {
-	return oldBinding;
-    }
-
-    /** convenience getter for item if add event (else null) */
-    public equip.data.ItemData getAddItem() {
-	if (event!=null && (event instanceof AddEvent)) {
-	    AddEvent add = (AddEvent)event;
-	    if (add.binding!=null)
-		return add.binding.item;
+	/**
+	 * source-only constructor
+	 */
+	public DataspaceEvent(java.lang.Object source)
+	{
+		super(source);
 	}
-	return null;
-    }
-    /** convenience getter for item if update event (else null) */
-    public equip.data.ItemData getUpdateItem() {
-	if (event!=null && (event instanceof UpdateEvent)) {
-	    UpdateEvent upd = (UpdateEvent)event;
-	    return upd.item;
+
+	/**
+	 * full constructor
+	 */
+	public DataspaceEvent(java.lang.Object source,
+	                      equip.data.Event event,
+	                      equip.data.EventPattern pattern,
+	                      boolean patternDeleted,
+	                      equip.data.DataSession session,
+	                      equip.data.DataProxy dataspace,
+	                      equip.data.ItemData oldValue,
+	                      equip.data.ItemBinding oldBinding)
+	{
+		super(source);
+		this.event = event;
+		this.pattern = pattern;
+		this.patternDeleted = patternDeleted;
+		this.session = session;
+		this.dataspace = dataspace;
+		this.oldValue = oldValue;
+		this.oldBinding = oldBinding;
 	}
-	return null;
-    }
-    /** convenience getter for id if delete event (else null) */
-    public equip.data.GUID getDeleteId() {
-	if (event!=null && (event instanceof DeleteEvent)) {
-	    DeleteEvent del = (DeleteEvent)event;
-	    return del.id;
+
+	/**
+	 * getter
+	 */
+	public equip.data.Event getEvent()
+	{
+		return event;
 	}
-	return null;
-    }
+
+	/**
+	 * getter
+	 */
+	public equip.data.EventPattern getEventPattern()
+	{
+		return pattern;
+	}
+
+	/**
+	 * getter
+	 */
+	public boolean getPatternDeleted()
+	{
+		return patternDeleted;
+	}
+
+	/**
+	 * getter
+	 */
+	public equip.data.DataSession getSession()
+	{
+		return session;
+	}
+
+	/**
+	 * getter
+	 */
+	public equip.data.DataProxy getDataspace()
+	{
+		return dataspace;
+	}
+
+	/**
+	 * getter
+	 */
+	public equip.data.ItemData getOldValue()
+	{
+		return oldValue;
+	}
+
+	/**
+	 * getter
+	 */
+	public equip.data.ItemBinding getOldBinding()
+	{
+		return oldBinding;
+	}
+
+	/**
+	 * convenience getter for item if add event (else null)
+	 */
+	public equip.data.ItemData getAddItem()
+	{
+		if (event != null && (event instanceof AddEvent))
+		{
+			AddEvent add = (AddEvent) event;
+			if (add.binding != null)
+			{
+				return add.binding.item;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * convenience getter for item if update event (else null)
+	 */
+	public equip.data.ItemData getUpdateItem()
+	{
+		if (event != null && (event instanceof UpdateEvent))
+		{
+			UpdateEvent upd = (UpdateEvent) event;
+			return upd.item;
+		}
+		return null;
+	}
+
+	/**
+	 * convenience getter for id if delete event (else null)
+	 */
+	public equip.data.GUID getDeleteId()
+	{
+		if (event != null && (event instanceof DeleteEvent))
+		{
+			DeleteEvent del = (DeleteEvent) event;
+			return del.id;
+		}
+		return null;
+	}
 }
 /* EOF */
 

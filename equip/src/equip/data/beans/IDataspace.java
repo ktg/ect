@@ -41,130 +41,123 @@ Contributors:
  */
 
 package equip.data.beans;
- 
-import equip.data.*;
-import equip.runtime.ValueBase;
 
-/** main interface of dataspace client JavaBean
- */ 
-public interface IDataspace {
+import equip.data.*;
+
+/**
+ * main interface of dataspace client JavaBean
+ */
+public interface IDataspace
+{
 
     /*------------------------------------------------------------*
      * item and event publishing operations                       * 
      *------------------------------------------------------------*/
 
-    /** allocated a new GUID for a data item to be published 
-     */
-    public GUID allocateId(); 
+	/**
+	 * allocated a new GUID for a data item to be published
+	 */
+	GUID allocateId();
 
-    /** add a globally visible item to the dataspace
-     */
-    public void add(ItemData item) 
-	throws DataspaceInactiveException;
+	/**
+	 * add a globally visible item to the dataspace
+	 */
+	void add(ItemData item) throws DataspaceInactiveException;
 
-	/** add a (potentially) persistent item to the dataspace,
+	/**
+	 * add a (potentially) persistent item to the dataspace,
 	 * i.e. not process bound, and normally with a Lease (although null
 	 * is permitted)
 	 */
-	public void addPersistent(ItemData item, Lease lease) 
-		throws DataspaceInactiveException;
+	void addPersistent(ItemData item, Lease lease) throws DataspaceInactiveException;
 
-	/** add a local-only item to the dataspace
-     */
-    public void addLocal(ItemData item) 
-	throws DataspaceInactiveException;
+	/**
+	 * add a local-only item to the dataspace
+	 */
+	void addLocal(ItemData item) throws DataspaceInactiveException;
 
-    /** update an item, globally visible, reliable
-     */
-    public void update(ItemData item) 
-	throws DataspaceInactiveException;
+	/**
+	 * update an item, globally visible, reliable
+	 */
+	void update(ItemData item) throws DataspaceInactiveException;
 
-    /** update an item, globally visible, optionally reliable
-     */
-    public void update(ItemData item, boolean reliableFlag) 
-	throws DataspaceInactiveException;
+	/**
+	 * update an item, globally visible, optionally reliable
+	 */
+	void update(ItemData item, boolean reliableFlag) throws DataspaceInactiveException;
 
-    /** update an item, local-only, reliable
-     */
-    public void updateLocal(ItemData item) 
-	throws DataspaceInactiveException;
+	/**
+	 * update an item, local-only, reliable
+	 */
+	void updateLocal(ItemData item) throws DataspaceInactiveException;
 
-    /** update an item, local-only, optionally reliable
-     */
-    public void updateLocal(ItemData item, boolean reliableFlag) 
-	throws DataspaceInactiveException;
+	/**
+	 * update an item, local-only, optionally reliable
+	 */
+	void updateLocal(ItemData item, boolean reliableFlag) throws DataspaceInactiveException;
 
-    /** delete a globally visible item from the dataspace
-     */
-    public void delete(GUID id) 
-	throws DataspaceInactiveException;
+	/**
+	 * delete a globally visible item from the dataspace
+	 */
+	void delete(GUID id) throws DataspaceInactiveException;
 
-    /** delete a local-only item from the dataspace
-     */
-    public void deleteLocal(GUID id) 
-	throws DataspaceInactiveException;
+	/**
+	 * delete a local-only item from the dataspace
+	 */
+	void deleteLocal(GUID id) throws DataspaceInactiveException;
 
-    /** emit an event directly
-     */
-    public void addEvent(Event event) 
-	throws DataspaceInactiveException;
+	/**
+	 * emit an event directly
+	 */
+	void addEvent(Event event) throws DataspaceInactiveException;
 
     /*------------------------------------------------------------*
      * query/lookup operations                                    * 
      *------------------------------------------------------------*/
 
-    /** get current value for an item by id - local only.
-     */
-    public ItemData getItem(GUID id) 
-	throws DataspaceInactiveException;
+	/**
+	 * get current value for an item by id - local only.
+	 */
+	ItemData getItem(GUID id) throws DataspaceInactiveException;
 
-    /** copy collect - local only.
-     *
-     * returns all known items (local or replicated) matching the 
-     * template item.
-     */
-    public ItemData[] copyCollect(ItemData template) 
-	throws DataspaceInactiveException;
+	/**
+	 * copy collect - local only.
+	 * <p>
+	 * returns all known items (local or replicated) matching the
+	 * template item.
+	 */
+	ItemData[] copyCollect(ItemData template) throws DataspaceInactiveException;
 
-    /** copy collect - local only - callback form.
-     *
-     * returns all known items (local or replicated) matching the 
-     * template item. Calls listener once for each item
-     */
-    public void copyCollect(ItemData template,
-			    DataspaceEventListener listener) 
-	throws DataspaceInactiveException;
+	/**
+	 * copy collect - local only - callback form.
+	 * <p>
+	 * returns all known items (local or replicated) matching the
+	 * template item. Calls listener once for each item
+	 */
+	void copyCollect(ItemData template, DataspaceEventListener listener) throws DataspaceInactiveException;
 
-    /** add a item monitor.
-     *
-     * listener is called with matching events.
-     *
-     * returned reference is only need to removing the monitor.
-     * Its actually a DataSession.
-     */
-    public DataSession addDataspaceEventListener
-	(ItemData template, boolean localFlag, 
-	 DataspaceEventListener listener) 
-	throws DataspaceInactiveException;
+	/**
+	 * add a item monitor.
+	 * <p>
+	 * listener is called with matching events.
+	 * <p>
+	 * returned reference is only need to removing the monitor.
+	 * Its actually a DataSession.
+	 */
+	DataSession addDataspaceEventListener(ItemData template, boolean localFlag, DataspaceEventListener listener) throws DataspaceInactiveException;
 
-    /** add an event monitor.
-     *
-     * listener is called with matching events.
-     *
-     * returned reference is only need to removing the monitor.
-     * Its actually a DataSession.
-     */
-    public DataSession addDataspaceEventListener
-	(equip.data.Event template, boolean localFlag, 
-	 DataspaceEventListener listener) 
-	throws DataspaceInactiveException;
+	/**
+	 * add an event monitor.
+	 * <p>
+	 * listener is called with matching events.
+	 * <p>
+	 * returned reference is only need to removing the monitor.
+	 * Its actually a DataSession.
+	 */
+	DataSession addDataspaceEventListener(equip.data.Event template, boolean localFlag, DataspaceEventListener listener) throws DataspaceInactiveException;
 
-    /** remove a previously added event monitor 
-     */
-    public void removeDataspaceEventListener
-	(equip.data.DataSession session) 
-	throws DataspaceInactiveException;
-
+	/**
+	 * remove a previously added event monitor
+	 */
+	void removeDataspaceEventListener(equip.data.DataSession session) throws DataspaceInactiveException;
 }
-/* EOF */
-

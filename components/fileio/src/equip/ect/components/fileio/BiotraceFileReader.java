@@ -72,7 +72,7 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 	private String status = "";
 	private String channels = "";
 	private boolean running = false;
-	private Set<Integer> channelIDs = new HashSet<Integer>();
+	private Set<Integer> channelIDs = new HashSet<>();
 	private final Runnable runnable = new Runnable()
 	{
 		@Override

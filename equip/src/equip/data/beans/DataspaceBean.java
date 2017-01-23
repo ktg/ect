@@ -672,7 +672,7 @@ public class DataspaceBean implements IDataspace, BeanContextChild
 			if (useDataManager)
 			{
 				dataspace = DataManager.getInstance().getDataspace
-						(dataspaceUrl, DataManager.DATASPACE_CLIENT, true, retryConnect);
+						(dataspaceUrl, DataManager.Type.CLIENT, true, retryConnect);
 			}
 			else
 			{

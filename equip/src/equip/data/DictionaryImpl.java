@@ -45,227 +45,269 @@ Contributors:
 package equip.data;
 
 import equip.runtime.*;
-import java.util.Hashtable;
-import java.util.Enumeration;
 
-/** Default implementation of IDL-defined abstract class {@link Dictionary} */
-public class DictionaryImpl extends Dictionary {
-  /** Default no-arg constructor */
-  public DictionaryImpl() {
-  }
-    /** create from a Hashtable
-     */
-    public DictionaryImpl(Hashtable h) 
-    {
-	entries = new DictionaryEntry [h.size()];
-	Enumeration ke = h.keys();
-	int ei = 0;
-	for (; ke.hasMoreElements(); ei++) 
-	{
-	    String key = (String)ke.nextElement();
-	    DictionaryEntry e = new DictionaryEntryImpl();
-	    e.name = key;
-	    e.value = (ValueBase)h.get(key);
-	    entries[ei] = e;
-	}
-    }
-    /** subset of java.util.Map API
-     */
-    /** (re)place entry, returning old value or null
-     */
-    public ValueBase put(String name, ValueBase value) 
-    {
-	int ei;
-	for (ei=0; ei<entries.length; ei++) 
-	{
-	    int comp = name.compareTo(entries[ei].name);
-	    if (comp==0) 
-	    {
-		ValueBase oldValue = entries[ei].value;
-		entries[ei].value = value;
-		return oldValue;
-	    }
-	    if (comp<0) 
-	    {
-		// before this one
-		break;
-	    }
-	}
-	// before wherever we got to
-	DictionaryEntry newEntries[] = new DictionaryEntry[entries.length+1];
-	if (ei>0)
-	    System.arraycopy(entries, 0, newEntries, 0, ei);
-	DictionaryEntry e = new DictionaryEntryImpl();
-	e.name = name;
-	e.value = value;
-	newEntries[ei] = e;
-	if (ei<entries.length)
-	    System.arraycopy(entries, ei, newEntries, ei+1, entries.length-ei);
-	entries = newEntries;
-	return null;
-    }
-    /** get value or null
-     */
-    public ValueBase get(String name) 
-    {
-	int ei;
-	for (ei=0; ei<entries.length; ei++) 
-	{
-	    int comp = name.compareTo(entries[ei].name);
-	    if (comp==0) 
-		return entries[ei].value;
-	    if (comp<0)
-		return null;
-	}
-	return null;
-    }
-    /** has  a name? 
-     */
-    public boolean containsKey(String name) 
-    {
-	int ei;
-	for (ei=0; ei<entries.length; ei++) 
-	{
-	    int comp = name.compareTo(entries[ei].name);
-	    if (comp==0) 
-		return true;
-	    if (comp<0)
-		return false;
-	}
-	return false;
-    }
-    /** remote an entry, return old value or null
-     */
-    public ValueBase remove(String name) 
-    {
-	int ei;
-	for (ei=0; ei<entries.length; ei++) 
-	{
-	    int comp = name.compareTo(entries[ei].name);
-	    if (comp==0) 
-	    {
-		DictionaryEntry newEntries[] = new DictionaryEntry[entries.length-1];
-		if (ei>0)
-		    System.arraycopy(entries, 0, newEntries, 0, ei);
-		if (ei<entries.length)
-		    System.arraycopy(entries, ei+1, newEntries, ei, entries.length-ei);
-		ValueBase oldValue = entries[ei].value;
-		entries = newEntries;
-		return oldValue;
-	    }	
-	    if (comp<0)
-		return null;
-	}
-	return null;
-    }
-    /** return a Hashtable of the entries
-     */
-    public Hashtable getHashtable() 
-    {
-	Hashtable h = new Hashtable();
-	for (int ei=0; ei<entries.length; ei++) 
-	{
-	    h.put(entries[ei].name, entries[ei].value);
-	}
-	return h;
-    }
-    /** Custom match test helper - if we have an entry, it must; if ours is non-null it must match theirs */
-    public boolean _matches_helper(Dictionary c) 
-    {
-	if (c==null) return false;
-	//if (!super._matches_helper(c)) return false;
-	if (entries==null || entries.length==0)
-	    // accept anything
-	    return true;
-	if (c.entries==null || c.entries.length<entries.length)
-	    // can't possibly match
-	    return false;
-	int ei, cei;
-	for (ei=0, cei=0; ei<entries.length; ei++) 
-	{
-	    // find corresponding entry
-	    while(true)
-	    {
-		if (cei>=c.entries.length)
-		    // not there (off end)
-		    return false;
+import java.lang.Object;
+import java.util.HashMap;
+import java.util.Map;
 
-		int comp = entries[ei].name.compareTo(c.entries[cei].name);
-		if (comp==0)
-		    // found
-		    break;
-		else if (comp<0)
-		    // we are less less than them, so they musn't have had this name
-		    return false;
-		else if (comp>0) 
+/**
+ * Default implementation of IDL-defined abstract class {@link Dictionary}
+ */
+public class DictionaryImpl extends Dictionary
+{
+	/**
+	 * Default no-arg constructor
+	 */
+	public DictionaryImpl()
+	{
+	}
+
+	/**
+	 * (re)place entry, returning old value or null
+	 */
+	public ValueBase put(String name, ValueBase value)
+	{
+		int ei;
+		for (ei = 0; ei < entries.length; ei++)
 		{
-		    cei++;
+			int comp = name.compareTo(entries[ei].name);
+			if (comp == 0)
+			{
+				ValueBase oldValue = entries[ei].value;
+				entries[ei].value = value;
+				return oldValue;
+			}
+			if (comp < 0)
+			{
+				// before this one
+				break;
+			}
 		}
-	    }
-	    if (entries[ei].value!=null &&
-		(c.entries[cei].value==null ||
-		!entries[ei].value.matches(c.entries[cei].value)))
-		// failed value match
-		return false;
-	    
+		// before wherever we got to
+		DictionaryEntry newEntries[] = new DictionaryEntry[entries.length + 1];
+		if (ei > 0)
+		{
+			System.arraycopy(entries, 0, newEntries, 0, ei);
+		}
+		DictionaryEntry e = new DictionaryEntryImpl();
+		e.name = name;
+		e.value = value;
+		newEntries[ei] = e;
+		if (ei < entries.length)
+		{
+			System.arraycopy(entries, ei, newEntries, ei + 1, entries.length - ei);
+		}
+		entries = newEntries;
+		return null;
 	}
-	// OK!  
-	return true;
-    }
 
-    protected void print(java.io.PrintStream out, String msg) 
-    {
-	out.println(msg + "{");
-	for (int ei=0; ei<entries.length; ei++) 
+	/**
+	 * get value or null
+	 */
+	public ValueBase get(String name)
 	{
-	    java.lang.Object value = entries[ei].value;
-	    if (value instanceof StringBox)
-		value = ((StringBox)value).value;
-	    if (value==null)
-		value = "null";
-
-	    out.println("  \""+entries[ei].name+"\" -> "+value.toString());
+		int ei;
+		for (ei = 0; ei < entries.length; ei++)
+		{
+			int comp = name.compareTo(entries[ei].name);
+			if (comp == 0)
+			{
+				return entries[ei].value;
+			}
+			if (comp < 0)
+			{
+				return null;
+			}
+		}
+		return null;
 	}
-	out.println("}");
-    }
-    /** test
-     */
-    public static void main (String [] args) 
-    {
-	System.out.println("Testing Dictionary class (esp. matching)...");
-	DictionaryImpl d1 = new DictionaryImpl();
-	d1.put("a", new StringBoxImpl("a1"));
-	d1.put("c", new StringBoxImpl("c1"));
-	d1.put("b", new StringBoxImpl("b1"));
-	d1.print(System.out, "d1=");
-	DictionaryImpl d2 = new DictionaryImpl();
-	d2.put("a", new StringBoxImpl("a1"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d2 = new DictionaryImpl();
-	d2.put("a", new StringBoxImpl("a2"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d2 = new DictionaryImpl();
-	d2.put("b", new StringBoxImpl("b1"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d2 = new DictionaryImpl();
-	d2.put("b", new StringBoxImpl("b2"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d2 = new DictionaryImpl();
-	d2.put("c", new StringBoxImpl("c1"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d2 = new DictionaryImpl();
-	d2.put("c", new StringBoxImpl("c2"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d2 = new DictionaryImpl();
-	d2.put("b", new StringBoxImpl("b1"));
-	d2.put("c", new StringBoxImpl("c1"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d2 = new DictionaryImpl();
-	d2.put("b", new StringBoxImpl("b2"));
-	d2.put("c", new StringBoxImpl("c1"));
-	d2.print(System.out, "Matches: "+d2.matches(d1));
-	d1.print(System.out, "Matches: "+d1.matches(d1));
-    }
+
+	/**
+	 * has  a name?
+	 */
+	public boolean containsKey(String name)
+	{
+		int ei;
+		for (ei = 0; ei < entries.length; ei++)
+		{
+			int comp = name.compareTo(entries[ei].name);
+			if (comp == 0)
+			{
+				return true;
+			}
+			if (comp < 0)
+			{
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * remote an entry, return old value or null
+	 */
+	public ValueBase remove(String name)
+	{
+		int ei;
+		for (ei = 0; ei < entries.length; ei++)
+		{
+			int comp = name.compareTo(entries[ei].name);
+			if (comp == 0)
+			{
+				DictionaryEntry newEntries[] = new DictionaryEntry[entries.length - 1];
+				if (ei > 0)
+				{
+					System.arraycopy(entries, 0, newEntries, 0, ei);
+				}
+				if (ei < entries.length)
+				{
+					System.arraycopy(entries, ei + 1, newEntries, ei, entries.length - ei);
+				}
+				ValueBase oldValue = entries[ei].value;
+				entries = newEntries;
+				return oldValue;
+			}
+			if (comp < 0)
+			{
+				return null;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * return a Hashtable of the entries
+	 */
+	public Map<String, ValueBase> getMap()
+	{
+		Map<String, ValueBase> h = new HashMap<>();
+		for (DictionaryEntry entry : entries)
+		{
+			h.put(entry.name, entry.value);
+		}
+		return h;
+	}
+
+	/**
+	 * Custom match test helper - if we have an entry, it must; if ours is non-null it must match theirs
+	 */
+	public boolean _matches_helper(Dictionary c)
+	{
+		if (c == null)
+		{
+			return false;
+		}
+		//if (!super._matches_helper(c)) return false;
+		if (entries == null || entries.length == 0)
+		// accept anything
+		{
+			return true;
+		}
+		if (c.entries == null || c.entries.length < entries.length)
+		// can't possibly match
+		{
+			return false;
+		}
+		int ei, cei;
+		for (ei = 0, cei = 0; ei < entries.length; ei++)
+		{
+			// find corresponding entry
+			while (true)
+			{
+				if (cei >= c.entries.length)
+				// not there (off end)
+				{
+					return false;
+				}
+
+				int comp = entries[ei].name.compareTo(c.entries[cei].name);
+				if (comp == 0)
+				// found
+				{
+					break;
+				}
+				else if (comp < 0)
+				// we are less less than them, so they musn't have had this name
+				{
+					return false;
+				}
+				else if (comp > 0)
+				{
+					cei++;
+				}
+			}
+			if (entries[ei].value != null &&
+					(c.entries[cei].value == null ||
+							!entries[ei].value.matches(c.entries[cei].value)))
+			// failed value match
+			{
+				return false;
+			}
+
+		}
+		// OK!
+		return true;
+	}
+
+	protected void print(java.io.PrintStream out, String msg)
+	{
+		out.println(msg + "{");
+		for (DictionaryEntry entry : entries)
+		{
+			Object value = entry.value;
+			if (value instanceof StringBox)
+			{
+				value = ((StringBox) value).value;
+			}
+			if (value == null)
+			{
+				value = "null";
+			}
+
+			out.println("  \"" + entry.name + "\" -> " + value.toString());
+		}
+		out.println("}");
+	}
+
+	/**
+	 * test
+	 */
+	public static void main(String[] args)
+	{
+		System.out.println("Testing Dictionary class (esp. matching)...");
+		DictionaryImpl d1 = new DictionaryImpl();
+		d1.put("a", new StringBoxImpl("a1"));
+		d1.put("c", new StringBoxImpl("c1"));
+		d1.put("b", new StringBoxImpl("b1"));
+		d1.print(System.out, "d1=");
+		DictionaryImpl d2 = new DictionaryImpl();
+		d2.put("a", new StringBoxImpl("a1"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d2 = new DictionaryImpl();
+		d2.put("a", new StringBoxImpl("a2"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d2 = new DictionaryImpl();
+		d2.put("b", new StringBoxImpl("b1"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d2 = new DictionaryImpl();
+		d2.put("b", new StringBoxImpl("b2"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d2 = new DictionaryImpl();
+		d2.put("c", new StringBoxImpl("c1"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d2 = new DictionaryImpl();
+		d2.put("c", new StringBoxImpl("c2"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d2 = new DictionaryImpl();
+		d2.put("b", new StringBoxImpl("b1"));
+		d2.put("c", new StringBoxImpl("c1"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d2 = new DictionaryImpl();
+		d2.put("b", new StringBoxImpl("b2"));
+		d2.put("c", new StringBoxImpl("c1"));
+		d2.print(System.out, "Matches: " + d2.matches(d1));
+		d1.print(System.out, "Matches: " + d1.matches(d1));
+	}
 
 } /* class Dictionary */
 

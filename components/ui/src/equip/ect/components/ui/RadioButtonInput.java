@@ -68,8 +68,8 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 	private String buttons = "";
 	private String selected = "";
 
-	protected final DynamicPropertiesSupport dynsup;
-	private Map<String, JRadioButton> radioButtons = new HashMap<String, JRadioButton>();
+	private final DynamicPropertiesSupport dynsup;
+	private final Map<String, JRadioButton> radioButtons = new HashMap<>();
 
 	/**
 	 * main cons, no args.
@@ -123,20 +123,16 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		for (String buttonName : buttons.split(" "))
 		{
 			final JRadioButton radioButton = new JRadioButton(buttonName);
-			radioButton.addChangeListener(new ChangeListener()
+			radioButton.addChangeListener(e ->
 			{
-				@Override
-				public void stateChanged(ChangeEvent e)
+				try
 				{
-					try
-					{
-						System.out.println(radioButton.getText() + " = " + radioButton.isSelected());
-						dynSetProperty(radioButton.getText(), radioButton.isSelected());
-					}
-					catch (NoSuchPropertyException e1)
-					{
-						e1.printStackTrace();
-					}
+					System.out.println(radioButton.getText() + " = " + radioButton.isSelected());
+					dynSetProperty(radioButton.getText(), radioButton.isSelected());
+				}
+				catch (NoSuchPropertyException e1)
+				{
+					e1.printStackTrace();
 				}
 			});
 			radioPanel.add(radioButton);

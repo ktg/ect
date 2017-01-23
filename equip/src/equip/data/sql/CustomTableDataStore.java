@@ -43,15 +43,10 @@ import equip.data.*;
 import equip.runtime.SingletonManager;
 import equip.runtime.ValueBase;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Enumeration;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Vector;
 
 /**
  * Implementation of {@link IDataStore} interface which
@@ -145,17 +140,23 @@ import java.util.Vector;
  */
 public class CustomTableDataStore implements IDataStore
 {
+	static final String TYPE_INT = "int";
+	static final String TYPE_STRING = "string";
+	static final String TYPE_FLOAT = "float";
+	static final String TYPE_DOUBLE = "double";
+	static final String TYPE_CHAR = "char";
+	static final String DEFAULT_NAME_COLUMN = "NAME";
+	static final String DEFAULT_ID_COLUMN = "GUID";
+	static final String DEFAULT_DATAKEY_COLUMN = "DATAKEY";
 	private static boolean debug = true;
 	/**
 	 * single shared connection
 	 */
 	Connection conn;
-
 	/**
 	 * readonly?
 	 */
 	boolean readonly;
-
 	/**
 	 * config
 	 */
@@ -164,12 +165,6 @@ public class CustomTableDataStore implements IDataStore
 	 * config
 	 */
 	String dataKeyType;
-	static final String TYPE_INT = "int";
-	static final String TYPE_STRING = "string";
-	static final String TYPE_FLOAT = "float";
-	static final String TYPE_DOUBLE = "double";
-	static final String TYPE_CHAR = "char";
-
 	/**
 	 * config
 	 */
@@ -186,9 +181,6 @@ public class CustomTableDataStore implements IDataStore
 	 * config (null if "NAME" in helper table)
 	 */
 	String dataNameColumn;
-	static final String DEFAULT_NAME_COLUMN = "NAME";
-	static final String DEFAULT_ID_COLUMN = "GUID";
-	static final String DEFAULT_DATAKEY_COLUMN = "DATAKEY";
 	/**
 	 * config
 	 */
@@ -363,7 +355,7 @@ public class CustomTableDataStore implements IDataStore
 		}//for(i)
 
 		// get value(s) query basis
-		StringBuffer getValuesQuery = new StringBuffer();
+		StringBuilder getValuesQuery = new StringBuilder();
 		getValuesQuery.append("SELECT ");
 		getValuesQuery.append(dataKeyColumn);
 		//name in data table?
@@ -375,7 +367,9 @@ public class CustomTableDataStore implements IDataStore
 			getValuesQuery.append(",");
 			getValuesQuery.append(tupleFieldColumns[i]);
 		}
-		getValuesQuery.append(" FROM " + dataTableName + " WHERE ");
+		getValuesQuery.append(" FROM ")
+				.append(dataTableName)
+				.append(" WHERE ");
 		this.getValuesQuery = getValuesQuery.toString();
 
 		// try early test(s) on tables to catch config problems if poss.
@@ -383,98 +377,29 @@ public class CustomTableDataStore implements IDataStore
 	}
 
 	/**
-	 * request that store handle the Add event, adding to itself
-	 * accordingly.
-	 * <p/>
-	 * Note: also has to handle lease updates.
-	 *
-	 * @param add The {@link AddEvent} to be handled.
-	 * @return true iff this store has handled the add event; false if declined.
-	 * (normally as indicated by a call to {@link IDataStore#checkAdd}
+	 * string to guid
 	 */
-	public synchronized boolean handleAdd(AddEvent add)
+	private static GUID parseGUID(String guid)
 	{
-		if (!checkAdd(add))
-		{
-			return false;
-		}
-
+		GUID id = new GUIDImpl();
+		StringTokenizer toks = new StringTokenizer(guid, "[].:");
 		try
 		{
-			Tuple tuple = (Tuple) add.binding.item;
-
-			// get a new PK
-			String dataKey = dataKeyAllocateInstance.allocateKey(dataKeyType,
-					dataTableName,
-					dataKeyColumn,
-					conn);
-			// try adding to data first...
-			StringBuilder addValueUpdate = new StringBuilder();
-			addValueUpdate.append("INSERT INTO " + dataTableName + " (" + dataKeyColumn);
-			if (dataNameColumn != null)
-			{
-				addValueUpdate.append("," + dataNameColumn);
-			}
-
-			int i;
-			for (i = 0; i < tupleSize; i++)
-			{
-				if (tupleFieldColumns[i].equals(dataKeyColumn) ||
-						(dataNameColumn != null &&
-								tupleFieldColumns[i].equals(dataNameColumn)))
-				// already done
-				{
-					continue;
-				}
-				addValueUpdate.append(",");
-				addValueUpdate.append(tupleFieldColumns[i]);
-			}
-
-			addValueUpdate.append(") VALUES (" + quoteType(dataKeyType, dataKey));
-			if (dataNameColumn != null)
-			{
-				addValueUpdate.append("," + quoteType(TYPE_STRING, add.binding.item.name));
-			}
-
-			for (i = 0; i < tupleSize; i++)
-			{
-				if (tupleFieldColumns[i].equals(dataKeyColumn) ||
-						(dataNameColumn != null &&
-								tupleFieldColumns[i].equals(dataNameColumn)))
-				// already done
-				{
-					continue;
-				}
-				addValueUpdate.append(",");
-				addValueUpdate.append(fieldToSQLString(tupleFieldTypes[i],
-						tuple.fields[i + 1]));
-			}
-			addValueUpdate.append(")");
-
-			doSQLUpdate(addValueUpdate.toString());
-
-			// check max value if dataKey null
-			if (dataKey == null)
-			{
-				Vector res = doSQLQuery("SELECT MAX(" + dataKeyColumn + ") FROM " + dataTableName);
-				dataKey = (String) res.elementAt(0);
-			}
-
-			// add to helper table
-			doSQLUpdate("INSERT INTO " + helperTableName +
-					" (GUID,NAME,DATAKEY) VALUES ('" +
-					add.binding.item.id.toString() + "'," +
-					quoteType(TYPE_STRING, add.binding.item.name) + "," +
-					quoteType(dataKeyType, dataKey) + ")");
-
-			return true;
+			id.host_id = new Integer(toks.nextToken()) << 24 |
+					(new Integer(toks.nextToken()) << 16) |
+					(new Integer(toks.nextToken()) << 8) |
+					(new Integer(toks.nextToken()));
+			id.proc_id = (new Integer(toks.nextToken()) << 16) |
+					(new Integer(toks.nextToken()));
+			id.item_id = new Integer(toks.nextToken());
+			id.time_s = new Integer(toks.nextToken());
+			return id;
 		}
 		catch (Exception e)
 		{
-			System.err.println("ERROR: CustomTableDataStore.handleAdd: " + e);
-			e.printStackTrace(System.err);
+			System.err.println("ERROR parsing GUID " + guid + ": " + e);
 		}
-		return false;
+		return null;
 	}
 
 	/**
@@ -524,242 +449,10 @@ public class CustomTableDataStore implements IDataStore
 	}
 
 	/**
-	 * check if store is maintaining state for the given {@link GUID}.
-	 *
-	 * @param id The GUID of the data item in question.
-	 * @return true iff the store currently has state for this item.
+	 * Flush any pending persistent records
 	 */
-	public boolean holdsGUID(GUID id)
+	public void flush()
 	{
-		try
-		{
-			// we must have the GUID
-			Vector res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
-					" WHERE GUID='" + id.toString() + "'");
-			return res.size() >= 2;
-		}
-		catch (Exception e)
-		{
-			System.err.println("ERROR: CustomTableDataStore.holdsGUID: " + e);
-			e.printStackTrace(System.err);
-		}
-		return false;
-	}
-
-	/**
-	 * request that store handles the given update, which it must
-	 * iff it is currently maintaining state for it.
-	 * <p/>
-	 * Note: implies currently no migration of item state between
-	 * store(s).
-	 *
-	 * @param update the {@link UpdateEvent} to be handled.
-	 * @return true iff the update has been handled (and necessarily
-	 * the item's state is maintained by this store).
-	 */
-	public synchronized boolean handleUpdate(UpdateEvent update)
-	{
-		if (readonly)
-		{
-			return false;
-		}
-
-		try
-		{
-			// we must have the GUID
-			Vector res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
-					" WHERE GUID='" + update.item.id.toString() + "'");
-			if (res.size() < 2)
-			{
-				return false;
-			}
-
-			Tuple tuple = (Tuple) update.item;
-
-			// update data
-			StringBuilder updateValueUpdate = new StringBuilder();
-			updateValueUpdate.append("UPDATE " + dataTableName + " SET");
-			if (dataNameColumn != null)
-			{
-				updateValueUpdate.append(" " + dataNameColumn + "=" + quoteType(TYPE_STRING, update.item.name));
-			}
-
-			int i;
-			for (i = 0; i < tupleSize; i++)
-			{
-				if (tupleFieldColumns[i].equals(dataKeyColumn) ||
-						(dataNameColumn != null &&
-								tupleFieldColumns[i].equals(dataNameColumn)))
-				// already done
-				{
-					continue;
-				}
-				updateValueUpdate.append(" " +
-						tupleFieldColumns[i] + "=" +
-						fieldToSQLString(tupleFieldTypes[i],
-								tuple.fields[i + 1]));
-			}
-			updateValueUpdate.append(" WHERE " + dataKeyColumn + "=" +
-					quoteType(dataKeyType,
-							(String) res.elementAt(1)));
-
-			doSQLUpdate(updateValueUpdate.toString());
-
-			// update helper if holding name (and changed)
-			if (dataNameColumn == null &&
-					((res.elementAt(0) == null &&
-							update.item.name != null) ||
-							(res.elementAt(0) != null &&
-									update.item.name == null) ||
-							(res.elementAt(0) != null &&
-									update.item.name != null &&
-									!update.item.name.equals((String) res.elementAt(0)))))
-			{
-				doSQLUpdate("UPDATE " + helperTableName + " SET NAME=" +
-						quoteType(TYPE_STRING, update.item.name) +
-						" WHERE GUID='" + update.item.id.toString() + "'");
-			}
-
-			return true;
-		}
-		catch (Exception e)
-		{
-			System.err.println("ERROR: CustomTableDataStore.handleUpdate: " + e);
-			e.printStackTrace(System.err);
-		}
-		return false;
-	}
-
-	/**
-	 * request that store handles the given delete, which it must
-	 * iff it is currently maintaining state for the corresponding
-	 * data item.
-	 *
-	 * @param del the {@link UpdateEvent} to be handled.
-	 * @return true iff the delete has been handled (and necessarily
-	 * the item's state was maintained by this store).
-	 */
-	public synchronized boolean handleDelete(DeleteEvent del)
-	{
-		if (readonly)
-		{
-			return false;
-		}
-		try
-		{
-			// we must have the GUID
-			Vector res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
-					" WHERE GUID='" + del.id.toString() + "'");
-			if (res.size() < 2)
-			{
-				return false;
-			}
-
-			// delete from data
-			doSQLUpdate("DELETE FROM " + dataTableName + " WHERE " + dataKeyColumn +
-					"=" + quoteType(dataKeyType, (String) res.elementAt(1)));
-
-			// delete from helpers
-			doSQLUpdate("DELETE FROM " + helperTableName + " WHERE GUID='" +
-					del.id.toString() + "'");
-
-			return true;
-		}
-		catch (Exception e)
-		{
-			System.err.println("ERROR: CustomTableDataStore.handleDelete: " + e);
-			e.printStackTrace(System.err);
-		}
-		return false;
-	}
-
-	/**
-	 * get GUIDs of data items in this store which are process bound
-	 * to the given responsible ID as per the RemoveResponsible event
-	 * (or not, according to inverse flag).
-	 *
-	 * @param remove the {@link RemoveResponsible} event.
-	 * @return an Enumeration of the GUIDs of locally maintained
-	 * data items that should now be deleted.
-	 */
-	public synchronized java.util.Enumeration
-	getRemoveResponsibleGUIDs(final RemoveResponsible remove)
-	{
-		if (readonly)
-		{
-			return null;
-		}
-
-		// we don't accept process bound (at the mo - FIXME)
-		return null;
-	}
-
-	/**
-	 * get the ItemBinding for the given id iff it is maintained by
-	 * this store, else null.
-	 *
-	 * @param id the id of the data item being requested.
-	 * @return the {@link ItemBinding} for that item, else null iff
-	 * unknown to this store.
-	 */
-	public synchronized ItemBinding getItemBinding(GUID id)
-	{
-		try
-		{
-			// we must have the GUID
-			Vector res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
-					" WHERE GUID='" + id.toString() + "'");
-			if (res.size() < 2)
-			{
-				return null;
-			}
-			String name = (String) res.elementAt(0);
-			String dataKey = (String) res.elementAt(1);
-
-			// get value(s)
-			res = doSQLQuery(getValuesQuery + " " + dataKeyColumn + "=" +
-					quoteType(dataKeyType, dataKey));
-			if (res.size() != tupleSize + 2)
-			{
-				System.err.println("ERROR: query for dataKey=" + dataKey +
-						" value returned " + res.size() + " items; expected " +
-						(tupleSize + 1) + "; ignoring item!");
-				return null;
-			}
-
-			// make Tuple
-			Tuple tuple = new TupleImpl();
-			tuple.id = id;
-			// name from data table?
-			tuple.name = dataNameColumn != null ? (String) res.elementAt(1) : name;
-			tuple.fields = new ValueBase[tupleSize + 1];
-			tuple.fields[0] = new StringBoxImpl(tupleTypeName);
-			int i;
-			for (i = 0; i < tupleSize; i++)
-			{
-				// res.elementAt(0) = Prim.key.
-				// res.elementAt(1) = name (optional)
-				tuple.fields[i + 1] = newTupleField(tupleFieldTypes[i],
-						(String) res.elementAt(i + 2));
-			}
-
-			// make ItemBinding
-			ItemBinding binding = new ItemBindingImpl();
-			binding.item = tuple;
-			ItemBindingInfo info = new ItemBindingInfoImpl();
-			//GUID agentId, int locked, boolean processBound, boolean local, Lease itemLease
-			info.init(responsible, LockType.LOCK_NONE, false, false, null);
-			info.responsible = responsible;
-			binding.info = info;
-
-			return binding;
-		}
-		catch (Exception e)
-		{
-			System.err.println("ERROR in CustomTableDataStore.getItemBinding: " + e);
-			e.printStackTrace(System.err);
-		}
-		return null;
 	}
 
 	/**
@@ -772,11 +465,11 @@ public class CustomTableDataStore implements IDataStore
 	 * @return Enumeration of ItemBindings that should be considered
 	 * (guaranteed to be a superset of possible matches).
 	 */
-	public synchronized java.util.Enumeration getCandidateItemBindings(ItemData[] itemTemplates)
+	public synchronized Iterable<ItemBinding> getCandidateItemBindings(ItemData[] itemTemplates)
 	{
 		try
 		{
-			Vector dataKeys = null;
+			List<String> dataKeys = null;
 			if (itemTemplates == null ||
 					itemTemplates.length == 0)
 			{
@@ -815,15 +508,13 @@ public class CustomTableDataStore implements IDataStore
 			}
 
 			// make ItemBindings for each...
-			Enumeration idataKeys = dataKeys.elements();
-			Vector bindings = new Vector();
-			while (idataKeys.hasMoreElements())
+			List<ItemBinding> bindings = new ArrayList<>();
+			for (String dataKey : dataKeys)
 			{
-				String dataKey = (String) idataKeys.nextElement();
 				// do we have a GUID already?
-				Vector res = doSQLQuery("SELECT GUID FROM " + helperTableName + " WHERE DATAKEY=" +
+				List<String> res = doSQLQuery("SELECT GUID FROM " + helperTableName + " WHERE DATAKEY=" +
 						quoteType(dataKeyType, dataKey));
-				GUID id = null;
+				GUID id;
 				if (res.size() == 0)
 				{
 					// allocate GUID for item
@@ -836,17 +527,32 @@ public class CustomTableDataStore implements IDataStore
 				else
 				{
 					// parse existing GUID
-					id = parseGUID((String) res.elementAt(0));
+					id = parseGUID(res.get(0));
 				}
-				bindings.addElement(getItemBinding(id));
+				bindings.add(getItemBinding(id));
 			}
-			return bindings.elements();
+			return bindings;
 		}
 		catch (Exception e)
 		{
 			System.err.println("ERROR in CustomTableDataStore.getCandidateItemBindings: " + e);
 			e.printStackTrace(System.err);
 		}
+		return null;
+	}
+
+	/**
+	 * returns GUIDs of all leased items expiring at or before time
+	 * 'now'.
+	 *
+	 * @param now The current time of the expiration clock.
+	 * @return Enumeration of {@link GUID}s of now expiring data items
+	 * which the call might now reasonably issue delete events
+	 * for).
+	 */
+	public synchronized Iterable<GUID> getExpiredGUIDs(equip.runtime.Time now)
+	{
+		// we don't accept leased (at the mo - FIXME)
 		return null;
 	}
 
@@ -863,31 +569,345 @@ public class CustomTableDataStore implements IDataStore
 	}
 
 	/**
-	 * returns GUIDs of all leased items expiring at or before time
-	 * 'now'.
+	 * get the ItemBinding for the given id iff it is maintained by
+	 * this store, else null.
 	 *
-	 * @param now The current time of the expiration clock.
-	 * @return Enumeration of {@link GUID}s of now expiring data items
-	 * which the call might now reasonably issue delete events
-	 * for).
+	 * @param id the id of the data item being requested.
+	 * @return the {@link ItemBinding} for that item, else null iff
+	 * unknown to this store.
 	 */
-	public synchronized java.util.Enumeration getExpiredGUIDs(equip.runtime.Time now)
+	public synchronized ItemBinding getItemBinding(GUID id)
 	{
-		// we don't accept leased (at the mo - FIXME)
+		try
+		{
+			// we must have the GUID
+			List<String> res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
+					" WHERE GUID='" + id.toString() + "'");
+			if (res.size() < 2)
+			{
+				return null;
+			}
+			String name = res.get(0);
+			String dataKey = res.get(1);
+
+			// get value(s)
+			res = doSQLQuery(getValuesQuery + " " + dataKeyColumn + "=" +
+					quoteType(dataKeyType, dataKey));
+			if (res.size() != tupleSize + 2)
+			{
+				System.err.println("ERROR: query for dataKey=" + dataKey +
+						" value returned " + res.size() + " items; expected " +
+						(tupleSize + 1) + "; ignoring item!");
+				return null;
+			}
+
+			// make Tuple
+			Tuple tuple = new TupleImpl();
+			tuple.id = id;
+			// name from data table?
+			tuple.name = dataNameColumn != null ? res.get(1) : name;
+			tuple.fields = new ValueBase[tupleSize + 1];
+			tuple.fields[0] = new StringBoxImpl(tupleTypeName);
+			int i;
+			for (i = 0; i < tupleSize; i++)
+			{
+				// res.elementAt(0) = Prim.key.
+				// res.elementAt(1) = name (optional)
+				tuple.fields[i + 1] = newTupleField(tupleFieldTypes[i], res.get(i + 2));
+			}
+
+			// make ItemBinding
+			ItemBinding binding = new ItemBindingImpl();
+			binding.item = tuple;
+			ItemBindingInfo info = new ItemBindingInfoImpl();
+			//GUID agentId, int locked, boolean processBound, boolean local, Lease itemLease
+			info.init(responsible, LockType.LOCK_NONE, false, false, null);
+			info.responsible = responsible;
+			binding.info = info;
+
+			return binding;
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR in CustomTableDataStore.getItemBinding: " + e);
+			e.printStackTrace(System.err);
+		}
 		return null;
 	}
 
 	/**
-	 * reduce lease on all leased items with given responsible id to
-	 * expire at 'expire time'.
+	 * get GUIDs of data items in this store which are process bound
+	 * to the given responsible ID as per the RemoveResponsible event
+	 * (or not, according to inverse flag).
 	 *
-	 * @param responsible required item responsible id
-	 * @param expire      the new expire time for matched items
-	 * @return none.
+	 * @param remove the {@link RemoveResponsible} event.
+	 * @return an Enumeration of the GUIDs of locally maintained
+	 * data items that should now be deleted.
 	 */
-	public void truncateExpireTimes(GUID responsible, equip.runtime.Time expire)
+	public synchronized Iterable<ItemBinding> getRemoveResponsibleGUIDs(final RemoveResponsible remove)
 	{
-		// we don't accept leased (at the mo - FIXME)
+		if (readonly)
+		{
+			return null;
+		}
+
+		// we don't accept process bound (at the mo - FIXME)
+		return null;
+	}
+
+	/**
+	 * request that store handle the Add event, adding to itself
+	 * accordingly.
+	 * <p/>
+	 * Note: also has to handle lease updates.
+	 *
+	 * @param add The {@link AddEvent} to be handled.
+	 * @return true iff this store has handled the add event; false if declined.
+	 * (normally as indicated by a call to {@link IDataStore#checkAdd}
+	 */
+	public synchronized boolean handleAdd(AddEvent add)
+	{
+		if (!checkAdd(add))
+		{
+			return false;
+		}
+
+		try
+		{
+			Tuple tuple = (Tuple) add.binding.item;
+
+			// get a new PK
+			String dataKey = dataKeyAllocateInstance.allocateKey(dataKeyType,
+					dataTableName,
+					dataKeyColumn,
+					conn);
+			// try adding to data first...
+			StringBuilder addValueUpdate = new StringBuilder();
+			addValueUpdate.append("INSERT INTO ")
+					.append(dataTableName)
+					.append(" (").append(dataKeyColumn);
+			if (dataNameColumn != null)
+			{
+				addValueUpdate.append(",")
+						.append(dataNameColumn);
+			}
+
+			int i;
+			for (i = 0; i < tupleSize; i++)
+			{
+				if (tupleFieldColumns[i].equals(dataKeyColumn) ||
+						(dataNameColumn != null &&
+								tupleFieldColumns[i].equals(dataNameColumn)))
+				// already done
+				{
+					continue;
+				}
+				addValueUpdate.append(",");
+				addValueUpdate.append(tupleFieldColumns[i]);
+			}
+
+			addValueUpdate.append(") VALUES (")
+					.append(quoteType(dataKeyType, dataKey));
+			if (dataNameColumn != null)
+			{
+				addValueUpdate.append(",")
+						.append(quoteType(TYPE_STRING, add.binding.item.name));
+			}
+
+			for (i = 0; i < tupleSize; i++)
+			{
+				if (tupleFieldColumns[i].equals(dataKeyColumn) ||
+						(dataNameColumn != null &&
+								tupleFieldColumns[i].equals(dataNameColumn)))
+				// already done
+				{
+					continue;
+				}
+				addValueUpdate.append(",");
+				addValueUpdate.append(fieldToSQLString(tupleFieldTypes[i],
+						tuple.fields[i + 1]));
+			}
+			addValueUpdate.append(")");
+
+			doSQLUpdate(addValueUpdate.toString());
+
+			// check max value if dataKey null
+			if (dataKey == null)
+			{
+				List<String> res = doSQLQuery("SELECT MAX(" + dataKeyColumn + ") FROM " + dataTableName);
+				dataKey = res.get(0);
+			}
+
+			// add to helper table
+			doSQLUpdate("INSERT INTO " + helperTableName +
+					" (GUID,NAME,DATAKEY) VALUES ('" +
+					add.binding.item.id.toString() + "'," +
+					quoteType(TYPE_STRING, add.binding.item.name) + "," +
+					quoteType(dataKeyType, dataKey) + ")");
+
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR: CustomTableDataStore.handleAdd: " + e);
+			e.printStackTrace(System.err);
+		}
+		return false;
+	}
+
+	/**
+	 * request that store handles the given delete, which it must
+	 * iff it is currently maintaining state for the corresponding
+	 * data item.
+	 *
+	 * @param del the {@link UpdateEvent} to be handled.
+	 * @return true iff the delete has been handled (and necessarily
+	 * the item's state was maintained by this store).
+	 */
+	public synchronized boolean handleDelete(DeleteEvent del)
+	{
+		if (readonly)
+		{
+			return false;
+		}
+		try
+		{
+			// we must have the GUID
+			List<String> res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
+					" WHERE GUID='" + del.id.toString() + "'");
+			if (res.size() < 2)
+			{
+				return false;
+			}
+
+			// delete from data
+			doSQLUpdate("DELETE FROM " + dataTableName + " WHERE " + dataKeyColumn +
+					"=" + quoteType(dataKeyType, res.get(1)));
+
+			// delete from helpers
+			doSQLUpdate("DELETE FROM " + helperTableName + " WHERE GUID='" +
+					del.id.toString() + "'");
+
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR: CustomTableDataStore.handleDelete: " + e);
+			e.printStackTrace(System.err);
+		}
+		return false;
+	}
+
+	/**
+	 * request that store handles the given update, which it must
+	 * iff it is currently maintaining state for it.
+	 * <p/>
+	 * Note: implies currently no migration of item state between
+	 * store(s).
+	 *
+	 * @param update the {@link UpdateEvent} to be handled.
+	 * @return true iff the update has been handled (and necessarily
+	 * the item's state is maintained by this store).
+	 */
+	public synchronized boolean handleUpdate(UpdateEvent update)
+	{
+		if (readonly)
+		{
+			return false;
+		}
+
+		try
+		{
+			// we must have the GUID
+			List<String> res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
+					" WHERE GUID='" + update.item.id.toString() + "'");
+			if (res.size() < 2)
+			{
+				return false;
+			}
+
+			Tuple tuple = (Tuple) update.item;
+
+			// update data
+			StringBuilder updateValueUpdate = new StringBuilder();
+			updateValueUpdate.append("UPDATE ")
+					.append(dataTableName)
+					.append(" SET");
+			if (dataNameColumn != null)
+			{
+				updateValueUpdate.append(" ")
+						.append(dataNameColumn)
+						.append("=")
+						.append(quoteType(TYPE_STRING, update.item.name));
+			}
+
+			int i;
+			for (i = 0; i < tupleSize; i++)
+			{
+				if (tupleFieldColumns[i].equals(dataKeyColumn) ||
+						(dataNameColumn != null &&
+								tupleFieldColumns[i].equals(dataNameColumn)))
+				// already done
+				{
+					continue;
+				}
+				updateValueUpdate.append(" ")
+						.append(tupleFieldColumns[i])
+						.append("=").append(fieldToSQLString(tupleFieldTypes[i], tuple.fields[i + 1]));
+			}
+			updateValueUpdate.append(" WHERE ")
+					.append(dataKeyColumn)
+					.append("=")
+					.append(quoteType(dataKeyType, res.get(1)));
+
+			doSQLUpdate(updateValueUpdate.toString());
+
+			// update helper if holding name (and changed)
+			if (dataNameColumn == null &&
+					((res.get(0) == null &&
+							update.item.name != null) ||
+							(res.get(0) != null &&
+									update.item.name == null) ||
+							(res.get(0) != null &&
+									update.item.name != null &&
+									!update.item.name.equals(res.get(0)))))
+			{
+				doSQLUpdate("UPDATE " + helperTableName + " SET NAME=" +
+						quoteType(TYPE_STRING, update.item.name) +
+						" WHERE GUID='" + update.item.id.toString() + "'");
+			}
+
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR: CustomTableDataStore.handleUpdate: " + e);
+			e.printStackTrace(System.err);
+		}
+		return false;
+	}
+
+	/**
+	 * check if store is maintaining state for the given {@link GUID}.
+	 *
+	 * @param id The GUID of the data item in question.
+	 * @return true iff the store currently has state for this item.
+	 */
+	public boolean holdsGUID(GUID id)
+	{
+		try
+		{
+			// we must have the GUID
+			List<String> res = doSQLQuery("SELECT NAME,DATAKEY FROM " + helperTableName +
+					" WHERE GUID='" + id.toString() + "'");
+			return res.size() >= 2;
+		}
+		catch (Exception e)
+		{
+			System.err.println("ERROR: CustomTableDataStore.holdsGUID: " + e);
+			e.printStackTrace(System.err);
+		}
+		return false;
 	}
 
 	/**
@@ -906,11 +926,23 @@ public class CustomTableDataStore implements IDataStore
 	}
 
 	/**
+	 * reduce lease on all leased items with given responsible id to
+	 * expire at 'expire time'.
+	 *
+	 * @param responsible required item responsible id
+	 * @param expire      the new expire time for matched items
+	 */
+	public void truncateExpireTimes(GUID responsible, equip.runtime.Time expire)
+	{
+		// we don't accept leased (at the mo - FIXME)
+	}
+
+	/**
 	 * sql query.
 	 *
 	 * @return Vector of Strings
 	 */
-	protected Vector doSQLQuery(String query) throws SQLException
+	private List<String> doSQLQuery(String query) throws SQLException
 	{
 		try
 		{
@@ -919,13 +951,13 @@ public class CustomTableDataStore implements IDataStore
 			System.out.println("EXECUTING QUERY: " + query);
 			ResultSet rs = stmt.executeQuery(query);
 			ResultSetMetaData meta = rs.getMetaData();
-			Vector res = new Vector();
+			List<String> res = new ArrayList<>();
 			while (rs.next())
 			{
 				int i;
 				for (i = 1; i <= meta.getColumnCount(); i++)
 				{
-					res.addElement(rs.getString(i));
+					res.add(rs.getString(i));
 				}
 			}
 			rs.close();
@@ -943,7 +975,7 @@ public class CustomTableDataStore implements IDataStore
 	/**
 	 * sql update.
 	 */
-	protected void doSQLUpdate(String update) throws SQLException
+	private void doSQLUpdate(String update) throws SQLException
 	{
 		try
 		{
@@ -961,72 +993,32 @@ public class CustomTableDataStore implements IDataStore
 		}
 	}
 
-	/**
-	 * to type-specific quoting if required
-	 */
-	protected String quoteType(String type, String value)
+	private String fieldToSQLString(String type, ValueBase field)
 	{
-		if (type.equals(TYPE_STRING))
+		if (field == null)
 		{
-			if (value == null)
-			{
-				return "NULL";
-			}
-			return "'" + value + "'";
+			return "NULL";
 		}
-		return value;
-	}
-
-	/**
-	 * to type-specific java type
-	 */
-	protected java.lang.Object toNativeType(String type, String value)
-	{
 		if (type.equals(TYPE_STRING))
 		{
-			return value;
+			return quoteType(TYPE_STRING,
+					((StringBox) field).value);
 		}
 		if (type.equals(TYPE_INT))
 		{
-			return new Integer(value);
+			return Integer.toString(((IntBox) field).value);
 		}
 		if (type.equals(TYPE_FLOAT))
 		{
-			return new Float(value);
+			return Float.toString(((FloatBox) field).value);
 		}
 		if (type.equals(TYPE_DOUBLE))
 		{
-			return new Double(value);
+			return Double.toString(((DoubleBox) field).value);
 		}
 		if (type.equals(TYPE_CHAR))
 		{
-			return new Character(value.charAt(0));
-		}
-		return value;
-	}
-
-	/**
-	 * string to guid
-	 */
-	public static GUID parseGUID(String guid)
-	{
-		GUID id = new GUIDImpl();
-		StringTokenizer toks = new StringTokenizer(guid, "[].:");
-		try
-		{
-			id.host_id = (new Integer(toks.nextToken()).intValue() << 24) |
-					(new Integer(toks.nextToken()).intValue() << 16) |
-					(new Integer(toks.nextToken()).intValue() << 8) |
-					(new Integer(toks.nextToken()).intValue());
-			id.proc_id = (new Integer(toks.nextToken()).intValue() << 16) |
-					(new Integer(toks.nextToken()).intValue());
-			id.item_id = new Integer(toks.nextToken()).intValue();
-			id.time_s = new Integer(toks.nextToken()).intValue();
-			return id;
-		}
-		catch (Exception e)
-		{
-			System.err.println("ERROR parsing GUID " + guid + ": " + e);
+			return "'" + ((CharBox) field).value + "'";
 		}
 		return null;
 	}
@@ -1034,7 +1026,7 @@ public class CustomTableDataStore implements IDataStore
 	/**
 	 * make a correctly typed typle field value
 	 */
-	protected ValueBase newTupleField(String type, String value)
+	private ValueBase newTupleField(String type, String value)
 	{
 		try
 		{
@@ -1044,15 +1036,15 @@ public class CustomTableDataStore implements IDataStore
 			}
 			if (type.equals(TYPE_INT))
 			{
-				return new IntBoxImpl(new Integer(value).intValue());
+				return new IntBoxImpl(new Integer(value));
 			}
 			if (type.equals(TYPE_FLOAT))
 			{
-				return new FloatBoxImpl(new Float(value).floatValue());
+				return new FloatBoxImpl(new Float(value));
 			}
 			if (type.equals(TYPE_DOUBLE))
 			{
-				return new DoubleBoxImpl(new Double(value).doubleValue());
+				return new DoubleBoxImpl(new Double(value));
 			}
 			if (type.equals(TYPE_CHAR))
 			{
@@ -1068,41 +1060,20 @@ public class CustomTableDataStore implements IDataStore
 		return null;
 	}
 
-	protected String fieldToSQLString(String type, ValueBase field)
+	/**
+	 * to type-specific quoting if required
+	 */
+	private String quoteType(String type, String value)
 	{
-		if (field == null)
-		{
-			return "NULL";
-		}
 		if (type.equals(TYPE_STRING))
 		{
-			return quoteType(TYPE_STRING,
-					((StringBox) field).value);
+			if (value == null)
+			{
+				return "NULL";
+			}
+			return "'" + value + "'";
 		}
-		if (type.equals(TYPE_INT))
-		{
-			return new Integer(((IntBox) field).value).toString();
-		}
-		if (type.equals(TYPE_FLOAT))
-		{
-			return new Float(((FloatBox) field).value).toString();
-		}
-		if (type.equals(TYPE_DOUBLE))
-		{
-			return new Double(((DoubleBox) field).value).toString();
-		}
-		if (type.equals(TYPE_CHAR))
-		{
-			return "'" + ((CharBox) field).value + "'";
-		}
-		return null;
-	}
-
-	/**
-	 * Flush any pending persistent records
-	 */
-	public void flush()
-	{
+		return value;
 	}
 }
 //EOF

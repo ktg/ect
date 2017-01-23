@@ -452,7 +452,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 	 */
 	public void setOutputNames(final String[] names)
 	{
-		final Map<String, Integer> indicesByName = new HashMap<String, Integer>();
+		final Map<String, Integer> indicesByName = new HashMap<>();
 		BeanShellParameter[] oldOutputs, newOutputs;
 		boolean namesAreLegal = true;
 		boolean outputsWereChanged;
@@ -607,7 +607,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 
 	void setInputNames(final String[] names)
 	{
-		final Map<String, Integer> indicesByName = new HashMap<String, Integer>();
+		final Map<String, Integer> indicesByName = new HashMap<>();
 		BeanShellParameter[] oldInputs, newInputs;
 		boolean namesAreLegal;
 		boolean inputsWereChanged;

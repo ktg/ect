@@ -37,82 +37,119 @@ Contributors:
 
 */
 package equip.runtime;
-import java.util.Hashtable;
 
-/** Provides a single static method to get singleton instances
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Provides a single static method to get singleton instances
  * of name class(es).
- *
- * Also implemented in C++, but not IDL'd. */
+ * <p>
+ * Also implemented in C++, but not IDL'd.
+ */
 
-public class SingletonManager {
-    //typedef std::map<std::string, Object_var> NameToSingleton;
-    /** internal singletons; <code>String</code> -> 
-     * <code>java.lang.Object</code> */
-    private Hashtable singletons=new Hashtable();
+public class SingletonManager
+{
+	private Map<String, java.lang.Object> singletons = new HashMap<>();
 
-    /** Own singleton. Statically initialised. */
-    private static SingletonManager _instance=new SingletonManager();
-  
-    /** Private constructor - only the singleton should exist. */
-    private SingletonManager() {}
-    
-    /** Return a reference to the SingletonManager's singleton instance
-     * of the named class.
-     *
-     * In the future we may be able to use weak references to 
-     * still allow GC on the singleton, but for now it will probably
-     * never go away (unless you use the - interrim/dangerous? - remove).
-     *
-     * @param name The dot-qualified full name of the class to be 
-     * returned, e.g. 'equip.config.ConfigManagerImpl'.
-     * @return A reference to a singleton instance of the class, or
-     * <code>null</code> if the class could not be loaded.
-     */
-    public static java.lang.Object get(String name) {
-      return _instance._get(name);
-    }
-  /** internal implementation of {@link #get} */
-  private synchronized java.lang.Object _get(String name) {
-    java.lang.Object obj = singletons.get(name);
-    if (obj==null) {
-      System.err.println("SingletonManager creating new singleton: " + name + "...");
-      java.lang.Class c = null;
-      try {
-	  c = ObjectInputStream.loader.loadClass(name);
-      } catch (Exception e) {
-	  c = null;
-      }
-      if (c==null) {
-	  // modules ....
-	  System.err.println("ERROR: could not find class " +name);
-      } else {
-	  try {
-	      obj = c.newInstance();
-	  } catch (Exception e) {
-	      obj = null;
-	  }
-	  if (obj==null) {
-	      System.err.println("ERROR: could not create instance for class " + name);
-	  } else {
-	      System.err.println("ok");
-	  }
-      }
-      singletons.put(name, obj);
-    } 
-    if (obj==null) {
-	System.err.println("WARNING: SingletonManager returning null for " +name);
-    } 
-    return obj;
-  }
-    /** you probably don't want to do this :-) - an experimental operation
-     * to remove the singleton from the internal hashtable (for GC). */
-    public static void remove(String name) {
-	_instance._remove(name);
-    }
-    /** internal implementation of {@link #remove} */
-    private synchronized void _remove(String name) {
-	if (singletons.remove(name)!=null) {
-	    System.err.println("SingletonManager removed singleton: " + name);
+	/**
+	 * Own singleton. Statically initialised.
+	 */
+	private static SingletonManager _instance = new SingletonManager();
+
+	/**
+	 * Private constructor - only the singleton should exist.
+	 */
+	private SingletonManager()
+	{
 	}
-    }
+
+	/**
+	 * Return a reference to the SingletonManager's singleton instance
+	 * of the named class.
+	 * <p>
+	 * In the future we may be able to use weak references to
+	 * still allow GC on the singleton, but for now it will probably
+	 * never go away (unless you use the - interrim/dangerous? - remove).
+	 *
+	 * @param name The dot-qualified full name of the class to be
+	 *             returned, e.g. 'equip.config.ConfigManagerImpl'.
+	 * @return A reference to a singleton instance of the class, or
+	 * <code>null</code> if the class could not be loaded.
+	 */
+	public static java.lang.Object get(String name)
+	{
+		return _instance._get(name);
+	}
+
+	/**
+	 * internal implementation of {@link #get}
+	 */
+	private synchronized java.lang.Object _get(String name)
+	{
+		java.lang.Object obj = singletons.get(name);
+		if (obj == null)
+		{
+			System.err.println("SingletonManager creating new singleton: " + name + "...");
+			java.lang.Class c = null;
+			try
+			{
+				c = ObjectInputStream.loader.loadClass(name);
+			}
+			catch (Exception e)
+			{
+				c = null;
+			}
+			if (c == null)
+			{
+				// modules ....
+				System.err.println("ERROR: could not find class " + name);
+			}
+			else
+			{
+				try
+				{
+					obj = c.newInstance();
+				}
+				catch (Exception e)
+				{
+					obj = null;
+				}
+				if (obj == null)
+				{
+					System.err.println("ERROR: could not create instance for class " + name);
+				}
+				else
+				{
+					System.err.println("ok");
+				}
+			}
+			singletons.put(name, obj);
+		}
+		if (obj == null)
+		{
+			System.err.println("WARNING: SingletonManager returning null for " + name);
+		}
+		return obj;
+	}
+
+	/**
+	 * you probably don't want to do this :-) - an experimental operation
+	 * to remove the singleton from the internal hashtable (for GC).
+	 */
+	public static void remove(String name)
+	{
+		_instance._remove(name);
+	}
+
+	/**
+	 * internal implementation of {@link #remove}
+	 */
+	private synchronized void _remove(String name)
+	{
+		if (singletons.remove(name) != null)
+		{
+			System.err.println("SingletonManager removed singleton: " + name);
+		}
+	}
 }

@@ -46,7 +46,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -81,7 +80,7 @@ public class FileBuffer implements Serializable
 	/**
 	 * Property Change support
 	 */
-	protected transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
+	private transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 
 	public FileBuffer()
 	{
@@ -181,49 +180,41 @@ public class FileBuffer implements Serializable
 		{
 			if (running)
 			{
-				new Thread(new Runnable()
+				new Thread(() ->
 				{
-					@Override
-					public void run()
+					try
 					{
-						try
+						final ObjectInputStream is = new ObjectInputStream(new FileInputStream(file));
+						createFile();
+						while (running)
 						{
-							final ObjectInputStream is = new ObjectInputStream(new FileInputStream(file));
-							createFile();
-							while (running)
+							final double oldOutput = output;
+
+							output = is.readDouble();
+							System.out.println(output);
+
+							propertyChangeListeners.firePropertyChange("output", oldOutput, output);
+
+							try
 							{
-								final double oldOutput = output;
+								Thread.sleep(sleepTime);
+							}
+							catch (final Exception e)
+							{
 
-								output = is.readDouble();
-								System.out.println(output);
-
-								propertyChangeListeners.firePropertyChange("output", oldOutput, output);
-
-								try
-								{
-									Thread.sleep(sleepTime);
-								}
-								catch (final Exception e)
-								{
-
-								}
 							}
 						}
-						catch (final EOFException e)
-						{
-						}
-						catch (final FileNotFoundException e)
-						{
-							e.printStackTrace();
-						}
-						catch (final IOException e)
-						{
-							e.printStackTrace();
-						}
-
-						setRunning(false);
-
 					}
+					catch (final EOFException e)
+					{
+					}
+					catch (final Exception e)
+					{
+						e.printStackTrace();
+					}
+
+					setRunning(false);
+
 				}).start();
 			}
 

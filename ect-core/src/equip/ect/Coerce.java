@@ -292,7 +292,7 @@ public class Coerce
 			{
 				return null;
 			}
-			return (T) toHashtable(d);
+			return (T) toMap(d);
 		}
 		if (o instanceof ValueBase)
 		{
@@ -992,9 +992,9 @@ public class Coerce
 	/**
 	 * dictionary to hashtable unboxing values
 	 */
-	private static Map toHashtable(final DictionaryImpl d) throws ClassNotFoundException, IOException
+	private static Map<String, Serializable> toMap(final DictionaryImpl d) throws ClassNotFoundException, IOException
 	{
-		final Map h = new HashMap();
+		final Map<String, Serializable> h = new HashMap<>();
 		for (int i = 0; d.entries != null && i < d.entries.length; i++)
 		{
 			h.put(d.entries[i].name, toClass(d.entries[i].value, Serializable.class));

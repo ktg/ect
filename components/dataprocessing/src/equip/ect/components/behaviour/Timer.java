@@ -57,7 +57,7 @@ import java.io.Serializable;
  */
 @ECTComponent
 @Category("Timing")
-public class Timer implements Runnable, Serializable
+public class Timer implements Serializable
 {
 	private static final PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
 			.appendHours()
@@ -102,7 +102,6 @@ public class Timer implements Runnable, Serializable
 	{
 	}
 
-	@Override
 	public void run()
 	{
 		DateTime startTime = DateTime.now();
@@ -291,7 +290,7 @@ public class Timer implements Runnable, Serializable
 		{
 			setOutput(false);
 		}
-		Thread thread = new Thread(this);
+		Thread thread = new Thread(this::run);
 		thread.start();
 	}
 }

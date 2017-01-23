@@ -41,12 +41,8 @@ package equip.ect.components.ui;
 import equip.ect.Category;
 import equip.ect.ECTComponent;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-
-import javax.swing.JCheckBox;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Test input which is a toggle button generating true/false.
@@ -60,12 +56,12 @@ public class ToggleButtonInput extends UIBase
 	/**
 	 * the widget
 	 */
-	private JCheckBox button;
+	private final JCheckBox button;
 
 	/**
 	 * the value
 	 */
-	protected boolean value = false;
+	private boolean value = false;
 
 	/**
 	 * main cons, no args.
@@ -79,14 +75,7 @@ public class ToggleButtonInput extends UIBase
 		button = new JCheckBox("value");
 		contentPane.add(button, BorderLayout.CENTER);
 		// handlers for GUI input
-		button.addChangeListener(new ChangeListener()
-		{
-			@Override
-			public void stateChanged(final ChangeEvent event)
-			{
-				intSetValue(button.getModel().isSelected(), false);
-			}
-		});
+		button.addChangeListener(event -> intSetValue(button.getModel().isSelected(), false));
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -110,7 +99,7 @@ public class ToggleButtonInput extends UIBase
 	/**
 	 * value setter - internal
 	 */
-	protected synchronized void intSetValue(final boolean value, final boolean updateWidget)
+	private synchronized void intSetValue(final boolean value, final boolean updateWidget)
 	{
 		if (this.value == value)
 		{
@@ -122,15 +111,11 @@ public class ToggleButtonInput extends UIBase
 		// update gui - may not be swing thread
 		if (updateWidget)
 		{
-			runSwing(new Runnable()
+			runSwing(() ->
 			{
-				@Override
-				public void run()
+				if (!stopped)
 				{
-					if (!stopped)
-					{
-						button.getModel().setSelected(value);
-					}
+					button.getModel().setSelected(value);
 				}
 			});
 		}

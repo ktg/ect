@@ -41,10 +41,8 @@ package equip.ect.components.ui;
 import equip.ect.Category;
 import equip.ect.ECTComponent;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-
-import javax.swing.JTextArea;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Test output which is a uneditable text field.
@@ -55,16 +53,8 @@ import javax.swing.JTextArea;
 @Category("UI")
 public class TextOutput extends UIBase
 {
-	/**
-	 * the widget
-	 */
-	// private JTextField field;
-	private JTextArea field;
-
-	/**
-	 * the value
-	 */
-	protected String value = "";
+	private final JTextArea field;
+	private String value = "";
 
 	/**
 	 * main cons, no args.
@@ -75,7 +65,6 @@ public class TextOutput extends UIBase
 		// make GUI and show
 		final Container contentPane = frame.getContentPane();
 		contentPane.setLayout(new BorderLayout());
-		// field = new JTextField(40);
 		field = new JTextArea(20, 40);
 		// no input
 		field.setEditable(false);
