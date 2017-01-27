@@ -93,7 +93,30 @@ import equip.ect.NoSuchPropertyException;
 @Category("Scripting")
 public class DynamicBeanShell implements Serializable, PropertyChangeListener, DynamicProperties
 {
-	public static synchronized String[] getInputNames(final BeanShellParameter[] inputs)
+	private Interpreter interpreter = new Interpreter();
+	private final Pattern pattern = Pattern.compile("^[A-Za-z_][0-9A-Za-z_]*$");
+	private BeanShellParameter[] inputs = new BeanShellParameter[0];
+	private BeanShellParameter[] outputs = new BeanShellParameter[0];
+	private String script = "// Insert script here\n";
+	private Object result = null;
+	private final transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
+	/**
+	 * dynamic properties support
+	 */
+	private final DynamicPropertiesSupport dynsup = new DynamicPropertiesSupport(propertyChangeListeners);
+	/**
+	 * thread running invoke
+	 */
+	private Thread invokeThread = null;
+	private String errorMessage = "";
+
+	public DynamicBeanShell()
+	{
+		// Compile a regular expression to match valid input and output names
+		addPropertyChangeListener(this);
+	}
+
+	private static synchronized String[] getInputNames(final BeanShellParameter[] inputs)
 	{
 		String[] names;
 
@@ -106,8 +129,34 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 		return names;
 	}
 
+	private static String[] getOutputNames(final BeanShellParameter[] outputs)
+	{
+		final String[] names = new String[outputs.length];
+		for (int i = 0; i < outputs.length; i++)
+		{
+			names[i] = outputs[i].getName();
+		}
+
+		return names;
+	}
+
+	private static String getParameterNamesString(final BeanShellParameter[] outputs)
+	{
+		final StringBuilder buffer = new StringBuilder();
+		for (int i = 0; i < outputs.length; i++)
+		{
+			if (i != 0)
+			{
+				buffer.append(' ');
+			}
+			buffer.append(outputs[i].getName());
+		}
+
+		return buffer.toString();
+	}
+
 	/** Convert basetypes into a string that bsh will interpret properly */
-	public static String stringify(final Object value)
+	private static String stringify(final Object value)
 	{
 		// For strings, we escape the double-quotes and backslashes
 		if (value instanceof String)
@@ -148,61 +197,6 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 		}
 	}
 
-	protected static String[] getOutputNames(final BeanShellParameter[] outputs)
-	{
-		final String[] names = new String[outputs.length];
-		for (int i = 0; i < outputs.length; i++)
-		{
-			names[i] = outputs[i].getName();
-		}
-
-		return names;
-	}
-
-	public static String getParameterNamesString(final BeanShellParameter[] outputs)
-	{
-		final StringBuilder buffer = new StringBuilder();
-		for (int i = 0; i < outputs.length; i++)
-		{
-			if (i != 0)
-			{
-				buffer.append(' ');
-			}
-			buffer.append(outputs[i].getName());
-		}
-
-		return buffer.toString();
-	}
-
-	private Interpreter interpreter = new Interpreter();
-	private Pattern pattern;
-
-	private BeanShellParameter[] inputs = new BeanShellParameter[0];
-	private BeanShellParameter[] outputs = new BeanShellParameter[0];
-	private String script = "// Insert script here\n";
-	private Object result = null;
-	private PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
-
-	/**
-	 * dynamic properties support
-	 */
-	protected DynamicPropertiesSupport dynsup;
-
-	/**
-	 * thread running invoke
-	 */
-	protected Thread invokeThread = null;
-
-	protected String errorMessage = "";
-
-	public DynamicBeanShell()
-	{
-		dynsup = new DynamicPropertiesSupport(propertyChangeListeners);
-		// Compile a regular expression to match valid input and output names
-		pattern = Pattern.compile("^[A-Za-z_][0-9A-Za-z_]*$");
-		addPropertyChangeListener(this);
-	}
-
 	public synchronized void addPropertyChangeListener(final PropertyChangeListener listener)
 	{
 		propertyChangeListeners.addPropertyChangeListener(listener);
@@ -212,32 +206,43 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] dynGetProperties()
+	public DynamicPropertyDescriptor[] getDynamicProperties()
 	{
-		return dynsup.dynGetProperties();
+		return dynsup.getDynamicProperties();
 	}
 
 	/**
 	 * get one property by name
 	 */
 	@Override
-	public Object dynGetProperty(final String name) throws NoSuchPropertyException
+	public Object getDynamicProperty(final String name) throws NoSuchPropertyException
 	{
-		return dynsup.dynGetProperty(name);
+		return dynsup.getDynamicProperty(name);
 	}
 
 	/**
 	 * get one property by name
 	 */
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
-		dynsup.dynSetProperty(name, value);
+		dynsup.setDynamicProperty(name, value);
 	}
 
 	public String getErrorMessage()
 	{
 		return errorMessage;
+	}
+
+	private void setErrorMessage(final String newValue)
+	{
+		final String oldValue = errorMessage;
+		errorMessage = newValue;
+
+		if(oldValue != newValue && (oldValue == null || !oldValue.equals(newValue)))
+		{
+			propertyChangeListeners.firePropertyChange("errorMessage", oldValue, newValue);
+		}
 	}
 
 	public String getInputNamesString()
@@ -250,6 +255,27 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 		}
 
 		return getParameterNamesString(inputs);
+	}
+
+	/**
+	 * A list of inputs for the script, separated by spaces. Each input will be added as a property
+	 * to the component, and can be referenced by name within the script.
+	 */
+	public void setInputNamesString(final String string)
+	{
+		String[] names;
+
+		// Split the string into an array
+		if ("".equals(string))
+		{
+			names = new String[0];
+		}
+		else
+		{
+			names = string.split("[ \t\r\n]+");
+		}
+
+		setInputNames(names);
 	}
 
 	public String getOutputNamesString()
@@ -265,6 +291,27 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 	}
 
 	/**
+	 * A list of outputs for the script, separated by spaces. Each output will be added as a
+	 * property to the component, and can be referenced by name within the script.
+	 */
+	public void setOutputNamesString(final String string)
+	{
+		String[] names;
+
+		// Split the string into an array
+		if ("".equals(string))
+		{
+			names = new String[0];
+		}
+		else
+		{
+			names = string.split("[ \t\r\n]+");
+		}
+
+		setOutputNames(names);
+	}
+
+	/**
 	 * The result of the last expression evaluated by the script.
 	 */
 	public Object getResult()
@@ -272,9 +319,47 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 		return result;
 	}
 
+	private void setResult(final Object newResult)
+	{
+		Object oldResult;
+
+		synchronized (this)
+		{
+			oldResult = result;
+
+			// Bail if the result is unchanged.
+			if (oldResult == newResult) { return; }
+
+			result = newResult;
+		}
+
+		// Update the listeners
+		propertyChangeListeners.firePropertyChange("result", oldResult, newResult);
+	}
+
 	public String getScript()
 	{
 		return script;
+	}
+
+	/**
+	 * Beanshell script
+	 */
+	public void setScript(final String script)
+	{
+		String old;
+
+		// Avoid loops
+		if (this.script == script) { return; }
+
+		// Record the new script
+		old = this.script;
+		this.script = script;
+
+		propertyChangeListeners.firePropertyChange("script", old, script);
+
+		// Try to invoke it
+		invoke();
 	}
 
 	public synchronized void invoke()
@@ -291,7 +376,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 			{
 				try
 				{
-					Object value = dynsup.dynGetProperty(input.getName());
+					Object value = dynsup.getDynamicProperty(input.getName());
 					try
 					{
 						if (value != null && value.getClass().getName().endsWith("BoxImpl"))
@@ -316,7 +401,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 			{
 				try
 				{
-					Object value = dynsup.dynGetProperty(output.getName());
+					Object value = dynsup.getDynamicProperty(output.getName());
 					try
 					{
 						if (value != null && value.getClass().getName().endsWith("BoxImpl"))
@@ -329,7 +414,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 						System.err.println("ERROR coercing " + value + " to Serializable: " + e);
 						e.printStackTrace(System.err);
 					}
-					output.setValue(dynsup.dynGetProperty(output.getName()));
+					output.setValue(dynsup.getDynamicProperty(output.getName()));
 				}
 				catch (final NoSuchPropertyException e)
 				{
@@ -354,7 +439,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 						output.setValue(interpreter.get(output.getName()));
 						try
 						{
-							dynsup.dynSetProperty(output.getName(), output.getValue());
+							dynsup.setDynamicProperty(output.getName(), output.getValue());
 						}
 						catch (final NoSuchPropertyException e)
 						{
@@ -389,7 +474,7 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 					output.setValue(null);
 					try
 					{
-						dynsup.dynSetProperty(output.getName(), output.getValue());
+						dynsup.setDynamicProperty(output.getName(), output.getValue());
 					}
 					catch (final NoSuchPropertyException e)
 					{
@@ -425,26 +510,33 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 		propertyChangeListeners.removePropertyChangeListener(listener);
 	}
 
-	/**
-	 * A list of inputs for the script, separated by spaces. Each input will be added as a property
-	 * to the component, and can be referenced by name within the script.
-	 */
-	public void setInputNamesString(final String string)
+	public void stop()
 	{
-		String[] names;
-
-		// Split the string into an array
-		if ("".equals(string))
+		synchronized (this)
 		{
-			names = new String[0];
+			inputs = null;
+			outputs = null;
 		}
-		else
-		{
-			names = string.split("[ \t\r\n]+");
-		}
-
-		setInputNames(names);
 	}
+
+	protected BeanShellParameter[] getInputs()
+	{
+		return inputs.clone();
+	}
+
+	protected String[] getOutputNames()
+	{
+		BeanShellParameter[] outputs;
+
+		synchronized (this)
+		{
+			outputs = this.outputs;
+		}
+
+		return getOutputNames(outputs);
+	}
+
+	/* PropertyChangeListener interface */
 
 	/*
 	 * This is a dodgy hack to work around a race condition in the re-instantiation code. We should
@@ -543,69 +635,12 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 		                                           	getParameterNamesString(newOutputs));
 	}
 
-	/**
-	 * A list of outputs for the script, separated by spaces. Each output will be added as a
-	 * property to the component, and can be referenced by name within the script.
-	 */
-	public void setOutputNamesString(final String string)
+	protected BeanShellParameter[] getOutputs()
 	{
-		String[] names;
-
-		// Split the string into an array
-		if ("".equals(string))
-		{
-			names = new String[0];
-		}
-		else
-		{
-			names = string.split("[ \t\r\n]+");
-		}
-
-		setOutputNames(names);
+		return outputs.clone();
 	}
 
-	/**
-	 * Beanshell script
-	 */
-	public void setScript(final String script)
-	{
-		String old;
-
-		// Avoid loops
-		if (this.script == script) { return; }
-
-		// Record the new script
-		old = this.script;
-		this.script = script;
-
-		propertyChangeListeners.firePropertyChange("script", old, script);
-
-		// Try to invoke it
-		invoke();
-	}
-
-	public void stop()
-	{
-		synchronized (this)
-		{
-			inputs = null;
-			outputs = null;
-		}
-	}
-
-	synchronized String[] getInputNames()
-	{
-		BeanShellParameter[] inputs;
-
-		synchronized (this)
-		{
-			inputs = this.inputs;
-		}
-
-		return getInputNames(inputs);
-	}
-
-	void setInputNames(final String[] names)
+	private void setInputNames(final String[] names)
 	{
 		final Map<String, Integer> indicesByName = new HashMap<>();
 		BeanShellParameter[] oldInputs, newInputs;
@@ -697,58 +732,5 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 
 		propertyChangeListeners.firePropertyChange(	"inputNamesString", getParameterNamesString(oldInputs),
 		                                           	getParameterNamesString(newInputs));
-	}
-
-	protected BeanShellParameter[] getInputs()
-	{
-		return inputs.clone();
-	}
-
-	/* PropertyChangeListener interface */
-
-	protected String[] getOutputNames()
-	{
-		BeanShellParameter[] outputs;
-
-		synchronized (this)
-		{
-			outputs = this.outputs;
-		}
-
-		return getOutputNames(outputs);
-	}
-
-	protected BeanShellParameter[] getOutputs()
-	{
-		return outputs.clone();
-	}
-
-	protected void setErrorMessage(final String newValue)
-	{
-		final String oldValue = errorMessage;
-		errorMessage = newValue;
-
-		if(oldValue != newValue && (oldValue == null || !oldValue.equals(newValue)))
-		{
-			propertyChangeListeners.firePropertyChange("errorMessage", oldValue, newValue);
-		}
-	}
-
-	private void setResult(final Object newResult)
-	{
-		Object oldResult;
-
-		synchronized (this)
-		{
-			oldResult = result;
-
-			// Bail if the result is unchanged.
-			if (oldResult == newResult) { return; }
-
-			result = newResult;
-		}
-
-		// Update the listeners
-		propertyChangeListeners.firePropertyChange("result", oldResult, newResult);
 	}
 }

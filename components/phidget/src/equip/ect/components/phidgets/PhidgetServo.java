@@ -106,7 +106,7 @@ public class PhidgetServo extends PhidgetBase
 	}
 
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
 		if (name.startsWith(SERVO_OUT_PREFIX))
 		{
@@ -128,7 +128,7 @@ public class PhidgetServo extends PhidgetBase
 				e.printStackTrace(System.err);
 			}
 		}
-		super.dynSetProperty(name, value);
+		super.setDynamicProperty(name, value);
 	}
 
 	@Override

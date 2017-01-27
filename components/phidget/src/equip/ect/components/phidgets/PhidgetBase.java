@@ -137,24 +137,24 @@ public abstract class PhidgetBase implements Serializable, DynamicProperties, At
 	 * get all properties' {@link DynamicPropertyDescriptors}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] dynGetProperties()
+	public DynamicPropertyDescriptor[] getDynamicProperties()
 	{
-		return dynsup.dynGetProperties();
+		return dynsup.getDynamicProperties();
 	}
 
 	/**
 	 * get one property by name
 	 */
 	@Override
-	public Object dynGetProperty(final String name) throws NoSuchPropertyException
+	public Object getDynamicProperty(final String name) throws NoSuchPropertyException
 	{
-		return dynsup.dynGetProperty(name);
+		return dynsup.getDynamicProperty(name);
 	}
 
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
-		dynsup.dynSetProperty(name, value);
+		dynsup.setDynamicProperty(name, value);
 	}
 
 	@Override

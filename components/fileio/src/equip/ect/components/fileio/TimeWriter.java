@@ -149,27 +149,27 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] dynGetProperties()
+	public DynamicPropertyDescriptor[] getDynamicProperties()
 	{
-		return dynamicProperties.dynGetProperties();
+		return dynamicProperties.getDynamicProperties();
 	}
 
 	/**
 	 * get one property by name
 	 */
 	@Override
-	public Object dynGetProperty(final String name) throws NoSuchPropertyException
+	public Object getDynamicProperty(final String name) throws NoSuchPropertyException
 	{
-		return dynamicProperties.dynGetProperty(name);
+		return dynamicProperties.getDynamicProperty(name);
 	}
 
 	/**
 	 * get one property by name
 	 */
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
-		dynamicProperties.dynSetProperty(name, value);
+		dynamicProperties.setDynamicProperty(name, value);
 	}
 
 	public String getDateFormat()
@@ -467,11 +467,11 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 				{
 					try
 					{
-						writer.append(Coerce.toClass(dynamicProperties.dynGetProperty(parameter), String.class));
+						writer.append(Coerce.toClass(dynamicProperties.getDynamicProperty(parameter), String.class));
 					}
 					catch (Exception e)
 					{
-						writer.append(dynamicProperties.dynGetProperty(parameter).toString());
+						writer.append(dynamicProperties.getDynamicProperty(parameter).toString());
 					}
 					writer.append(",");
 				}

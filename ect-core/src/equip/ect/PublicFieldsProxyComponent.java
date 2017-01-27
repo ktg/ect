@@ -166,7 +166,7 @@ public class PublicFieldsProxyComponent extends SimpleDynamicComponent implement
 			fi.value = value;
 			try
 			{
-				dynSetProperty(fi.name, value);
+				setDynamicProperty(fi.name, value);
 			}
 			catch (final NoSuchPropertyException e)
 			{

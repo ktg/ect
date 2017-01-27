@@ -124,7 +124,7 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 	}
 
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
 		if (name.startsWith(DIGITAL_OUT_PREFIX))
 		{
@@ -146,7 +146,7 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 				e.printStackTrace(System.err);
 			}
 		}
-		super.dynSetProperty(name, value);
+		super.setDynamicProperty(name, value);
 	}
 
 	@Override
@@ -154,7 +154,7 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 	{
 		try
 		{
-			dynSetProperty(DIGITAL_IN_PREFIX + oe.getIndex(), oe.getState());
+			setDynamicProperty(DIGITAL_IN_PREFIX + oe.getIndex(), oe.getState());
 		}
 		catch (final NoSuchPropertyException e)
 		{
@@ -166,7 +166,7 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 	{
 		try
 		{
-			dynSetProperty(ANALOG_IN_PREFIX + se.getIndex(), getModifiedSensorValue(se.getValue()));
+			setDynamicProperty(ANALOG_IN_PREFIX + se.getIndex(), getModifiedSensorValue(se.getValue()));
 		}
 		catch (final NoSuchPropertyException e)
 		{
@@ -215,13 +215,13 @@ public class PhidgetInterfaceKit extends PhidgetBase implements InputChangeListe
 			for (int i = 0; i < numDigitalIn; i++)
 			{
 				dynsup.addProperty(DIGITAL_IN_PREFIX + i, Boolean.class, false, true);
-				dynSetProperty(DIGITAL_IN_PREFIX + i, phid.getInputState(i));
+				setDynamicProperty(DIGITAL_IN_PREFIX + i, phid.getInputState(i));
 			}
 
 			for (int i = 0; i < numAnalogIn; i++)
 			{
 				dynsup.addProperty(ANALOG_IN_PREFIX + i, Float.class, 0.0f, true);
-				dynSetProperty(ANALOG_IN_PREFIX + i, getModifiedSensorValue(phid.getSensorValue(i)));
+				setDynamicProperty(ANALOG_IN_PREFIX + i, getModifiedSensorValue(phid.getSensorValue(i)));
 			}
 		}
 		catch (final PhidgetException | NoSuchPropertyException e)

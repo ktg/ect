@@ -38,24 +38,21 @@ Contributors:
  */
 package equip.ect;
 
+import java.beans.PropertyChangeSupport;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * interface for ECT components that have dynamically generated properties
+ * defualt helper implementation of {@link DynamicProperties}.
  */
-public interface DynamicProperties
+public class DynamicPropertyList extends DynamicPropertiesSupport
 {
 	/**
-	 * get all properties' {@link DynamicPropertyDescriptors}
+	 * cons
 	 */
-	public DynamicPropertyDescriptor[] getDynamicProperties();
+	public DynamicPropertyList(final PropertyChangeSupport propertyChangeListeners)
+	{
+		super(propertyChangeListeners);
+	}
 
-	/**
-	 * get one property by name
-	 */
-	public Object getDynamicProperty(String name) throws NoSuchPropertyException;
-
-	/**
-	 * get one property by name
-	 */
-	public void setDynamicProperty(String name, Object value) throws NoSuchPropertyException;
 }

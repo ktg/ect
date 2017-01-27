@@ -52,7 +52,7 @@ abstract class UIBase implements Serializable
 	/**
 	 * utility method to run on swing thread (later)
 	 */
-	public static void runSwing(final Runnable r)
+	static void runSwing(final Runnable r)
 	{
 		if (SwingUtilities.isEventDispatchThread())
 		{
@@ -78,7 +78,7 @@ abstract class UIBase implements Serializable
 	/**
 	 * Property Change support
 	 */
-	protected transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
+	protected final transient PropertyChangeSupport propertyChangeListeners = new PropertyChangeSupport(this);
 
 	/**
 	 * main cons, no args. Sub-class cons should call pack and show.
@@ -128,14 +128,7 @@ abstract class UIBase implements Serializable
 		this.name = name;
 		// update gui title
 		// may not be swing thread
-		runSwing(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				frame.setTitle(name);
-			}
-		});
+		runSwing(() -> frame.setTitle(name));
 		// fire change event
 		propertyChangeListeners.firePropertyChange("name", old, name);
 	}
@@ -145,14 +138,10 @@ abstract class UIBase implements Serializable
 	 */
 	public synchronized void stop()
 	{
-		runSwing(new Runnable()
+		runSwing(() ->
 		{
-			@Override
-			public void run()
-			{
-				frame.setVisible(false);
-				frame.dispose();
-			}
+			frame.setVisible(false);
+			frame.dispose();
 		});
 		// stop subsequent actions on slider
 		stopped = true;

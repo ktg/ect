@@ -55,12 +55,12 @@ public class DynamicPropertiesSupport implements DynamicProperties
 	/**
 	 * properties
 	 */
-	protected Map<String, Object> properties = new HashMap<>();
+	protected final Map<String, Object> properties = new HashMap<>();
 
 	/**
 	 * descriptors
 	 */
-	protected Map<String, DynamicPropertyDescriptor> descriptors = new HashMap<>();
+	private final Map<String, DynamicPropertyDescriptor> descriptors = new HashMap<>();
 
 	/**
 	 * cons
@@ -111,7 +111,7 @@ public class DynamicPropertiesSupport implements DynamicProperties
 	 * get all properties
 	 */
 	@Override
-	public synchronized DynamicPropertyDescriptor[] dynGetProperties()
+	public synchronized DynamicPropertyDescriptor[] getDynamicProperties()
 	{
 		return descriptors.values().toArray(new DynamicPropertyDescriptor[descriptors.size()]);
 	}
@@ -120,7 +120,7 @@ public class DynamicPropertiesSupport implements DynamicProperties
 	 * get one property by name
 	 */
 	@Override
-	public synchronized Object dynGetProperty(final String name) throws NoSuchPropertyException
+	public synchronized Object getDynamicProperty(final String name) throws NoSuchPropertyException
 	{
 		if (!descriptors.containsKey(name)) { throw new NoSuchPropertyException("Property \"" + name + "\""); }
 		return properties.get(name);
@@ -130,24 +130,12 @@ public class DynamicPropertiesSupport implements DynamicProperties
 	 * get one property by name
 	 */
 	@Override
-	public synchronized void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public synchronized void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
 		if (!descriptors.containsKey(name)) { throw new NoSuchPropertyException("Property \"" + name + "\""); }
 		final Object old = properties.put(name, value);
 		// notify
 		notifyChange(name, old, value);
-	}
-
-	/**
-	 * get one property by name
-	 */
-	public synchronized void dynSetProperty(final String name, final Object value, final boolean forceNotify)
-			throws NoSuchPropertyException
-	{
-		if (!descriptors.containsKey(name)) { throw new NoSuchPropertyException("Property \"" + name + "\""); }
-		final Object old = properties.put(name, value);
-		// notify
-		notifyChange(name, forceNotify ? null : old, value);
 	}
 
 	/**

@@ -131,7 +131,7 @@ public class SimpleObjectContainer
 						System.out.println("Property " + name + " changed to " + event.getNewValue());
 						if (name.equals("in"))
 						{
-							dynobj.dynSetProperty("out", event.getNewValue());
+							dynobj.setDynamicProperty("out", event.getNewValue());
 						}
 					}
 					catch (final Exception e)

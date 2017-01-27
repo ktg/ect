@@ -449,7 +449,7 @@ class MappingObject
 		}
 
 		final DynamicProperties dbean = (DynamicProperties) bean;
-		final DynamicPropertyDescriptor dds[] = dbean.dynGetProperties();
+		final DynamicPropertyDescriptor dds[] = dbean.getDynamicProperties();
 		DynamicPropertyDescriptor dprop = null;
 		for (int i = 0; i < dds.length && dprop == null; i++)
 		{
@@ -552,7 +552,7 @@ class MappingObject
 		}
 
 		final DynamicProperties dbean = (DynamicProperties) bean;
-		final DynamicPropertyDescriptor dds[] = dbean.dynGetProperties();
+		final DynamicPropertyDescriptor dds[] = dbean.getDynamicProperties();
 		DynamicPropertyDescriptor dprop = null;
 		for (int i = 0; i < dds.length && dprop == null; i++)
 		{
@@ -912,7 +912,7 @@ class MappingObject
 		final DynamicProperties dbean = (bean instanceof DynamicProperties) ? (DynamicProperties) bean : null;
 		if (dbean != null)
 		{
-			dprops = dbean.dynGetProperties();
+			dprops = dbean.getDynamicProperties();
 			System.out.println("Bean implements DynamicProperties with " + dprops.length + " initial properties");
 		}
 		// set initial values?! - not for Persistable components (do sets first,

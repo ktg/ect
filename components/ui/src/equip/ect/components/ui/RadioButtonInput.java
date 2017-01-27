@@ -48,8 +48,6 @@ import equip.ect.NoSuchPropertyException;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -107,7 +105,7 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		frame.getContentPane().removeAll();
 		radioButtons.clear();
 		final ButtonGroup group = new ButtonGroup();
-		for (DynamicPropertyDescriptor property : dynsup.dynGetProperties())
+		for (DynamicPropertyDescriptor property : dynsup.getDynamicProperties())
 		{
 			try
 			{
@@ -128,7 +126,7 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 				try
 				{
 					System.out.println(radioButton.getText() + " = " + radioButton.isSelected());
-					dynSetProperty(radioButton.getText(), radioButton.isSelected());
+					setDynamicProperty(radioButton.getText(), radioButton.isSelected());
 				}
 				catch (NoSuchPropertyException e1)
 				{
@@ -187,18 +185,18 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] dynGetProperties()
+	public DynamicPropertyDescriptor[] getDynamicProperties()
 	{
-		return dynsup.dynGetProperties();
+		return dynsup.getDynamicProperties();
 	}
 
 	/**
 	 * get one property by name
 	 */
 	@Override
-	public Object dynGetProperty(final String name) throws NoSuchPropertyException
+	public Object getDynamicProperty(final String name) throws NoSuchPropertyException
 	{
-		return dynsup.dynGetProperty(name);
+		return dynsup.getDynamicProperty(name);
 	}
 
 	public String getSelected()
@@ -210,9 +208,9 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 	 * get one property by name
 	 */
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
-		dynsup.dynSetProperty(name, value);
+		dynsup.setDynamicProperty(name, value);
 		if (radioButtons.containsKey(name))
 		{
 			JRadioButton button = radioButtons.get(name);

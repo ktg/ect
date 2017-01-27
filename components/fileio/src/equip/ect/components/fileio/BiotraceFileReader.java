@@ -160,21 +160,21 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 	 * get all properties' {@link equip.ect.DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] dynGetProperties()
+	public DynamicPropertyDescriptor[] getDynamicProperties()
 	{
-		return dynamicProperties.dynGetProperties();
+		return dynamicProperties.getDynamicProperties();
 	}
 
 	@Override
-	public Object dynGetProperty(final String name) throws NoSuchPropertyException
+	public Object getDynamicProperty(final String name) throws NoSuchPropertyException
 	{
-		return dynamicProperties.dynGetProperty(name);
+		return dynamicProperties.getDynamicProperty(name);
 	}
 
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
-		dynamicProperties.dynSetProperty(name, value);
+		dynamicProperties.setDynamicProperty(name, value);
 	}
 
 	public String getChannels()
@@ -196,7 +196,7 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 			String channelName = String.format("channel %03d", channelID);
 			try
 			{
-				dynamicProperties.dynGetProperty(channelName);
+				dynamicProperties.getDynamicProperty(channelName);
 			}
 			catch (NoSuchPropertyException e)
 			{
@@ -204,7 +204,7 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 			}
 		}
 
-		final DynamicPropertyDescriptor[] descriptors = dynamicProperties.dynGetProperties();
+		final DynamicPropertyDescriptor[] descriptors = dynamicProperties.getDynamicProperties();
 		for (final DynamicPropertyDescriptor descriptor : descriptors)
 		{
 			final String channelName = descriptor.getName();

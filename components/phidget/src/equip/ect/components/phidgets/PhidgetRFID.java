@@ -110,7 +110,7 @@ public class PhidgetRFID extends PhidgetBase implements TagGainListener, TagLoss
 	}
 
 	@Override
-	public void dynSetProperty(final String name, final Object value) throws NoSuchPropertyException
+	public void setDynamicProperty(final String name, final Object value) throws NoSuchPropertyException
 	{
 		if (name.startsWith(DIGITAL_OUT_PREFIX))
 		{
@@ -132,7 +132,7 @@ public class PhidgetRFID extends PhidgetBase implements TagGainListener, TagLoss
 				e.printStackTrace(System.err);
 			}
 		}
-		super.dynSetProperty(name, value);
+		super.setDynamicProperty(name, value);
 	}
 
 	public boolean getAntennaOn()

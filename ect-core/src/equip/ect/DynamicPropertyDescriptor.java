@@ -101,8 +101,7 @@ public class DynamicPropertyDescriptor extends PropertyDescriptor
 	{
 		if (!(obj instanceof DynamicPropertyDescriptor)) { return false; }
 		final DynamicPropertyDescriptor o = (DynamicPropertyDescriptor) obj;
-		if (o.name.equals(name) && o.clazz.equals(clazz)) { return true; }
-		return false;
+		return o.name.equals(name) && o.clazz.equals(clazz);
 	}
 
 	@Override
@@ -116,7 +115,7 @@ public class DynamicPropertyDescriptor extends PropertyDescriptor
 	{
 		try
 		{
-			return this.getClass().getMethod("readProperty", new Class[] { DynamicProperties.class });
+			return this.getClass().getMethod("readProperty", DynamicProperties.class);
 		}
 		catch (final Exception e)
 		{
@@ -131,7 +130,7 @@ public class DynamicPropertyDescriptor extends PropertyDescriptor
 		if (readonly) { return null; }
 		try
 		{
-			return this.getClass().getMethod("writeProperty", new Class[] { DynamicProperties.class, Object.class });
+			return this.getClass().getMethod("writeProperty", DynamicProperties.class, Object.class);
 		}
 		catch (final Exception e)
 		{
@@ -142,12 +141,12 @@ public class DynamicPropertyDescriptor extends PropertyDescriptor
 
 	public Object readProperty(final DynamicProperties target) throws NoSuchPropertyException
 	{
-		return target.dynGetProperty(name);
+		return target.getDynamicProperty(name);
 	}
 
 	public void writeProperty(final DynamicProperties target, final Object value) throws NoSuchPropertyException
 	{
-		target.dynSetProperty(name, value);
+		target.setDynamicProperty(name, value);
 
 	}
 }
