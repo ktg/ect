@@ -153,8 +153,12 @@ public class StateManager
 				{
 					ComponentAdvert component = componentMap.get(componentState.getId());
 					// Restore editor
+					System.out.println(component);
 					System.out.println(componentState.getPosition());
-					final BeanCanvasItem item = canvas.createItem(component.getID().toString(), componentState.getPosition().x, componentState.getPosition().y);
+					final BeanCanvasItem item = canvas.createItem(
+							component.getID().toString(),
+							componentState.getPosition().x,
+							componentState.getPosition().y);
 					if (item instanceof GraphComponent)
 					{
 						GraphComponent graphComponent = (GraphComponent) item;

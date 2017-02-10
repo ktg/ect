@@ -1,6 +1,5 @@
 version = '1.0'
 
 dependencies {
-    compile 'org.knowm.xchart:xchart:3.2.2'
 	compile project(":ect-core")
 }
