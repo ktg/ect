@@ -148,10 +148,12 @@ public class StateManager
 			for (final EditorState editor : state.getEditors())
 			{
 				GraphEditorCanvas canvas =  graphEditor.addCanvas(editor.getName());
+				System.out.println(canvas);
 				for (ComponentState componentState : editor.getComponents())
 				{
 					ComponentAdvert component = componentMap.get(componentState.getId());
 					// Restore editor
+					System.out.println(componentState.getPosition());
 					final BeanCanvasItem item = canvas.createItem(component.getID().toString(), componentState.getPosition().x, componentState.getPosition().y);
 					if (item instanceof GraphComponent)
 					{
