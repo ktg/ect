@@ -129,11 +129,11 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 
 	private final DynamicPropertiesSupport dynamicProperties = new DynamicPropertiesSupport(propertyChangeListeners);
 
-	private String dateFormat = "dd/MM/yyyy,HH:mm:ss";
+	private String dateFormat = "yyyy-MM-dd hh:mm:ss.SSS";
 
 	private SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 
-	private SimpleDateFormat fileFormatter = new SimpleDateFormat("yyyyMMddHHmmss");
+	private SimpleDateFormat fileFormatter = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
 
 	public TimeWriter()
 	{
@@ -315,6 +315,27 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			}
 
 			setFile(content + "-" + fileFormatter.format(new Date()) + ext);
+			if(logAll)
+			{
+				try
+				{
+					setState(State.WRITING);
+					writer.append("TIME");
+					for (String parameter : statuses)
+					{
+						writer.append(",");
+						writer.append(parameter);
+					}
+					writer.newLine();
+					writer.flush();
+					setState(State.OPENED);
+				}
+				catch (final Exception e)
+				{
+					e.printStackTrace();
+					setState(State.FAILED);
+				}
+			}
 		}
 	}
 
@@ -454,6 +475,10 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 				getParameterNamesString(newStatuses));
 	}
 
+	private void writeHeader() {
+
+	}
+
 	private void writeTimestamp()
 	{
 		if (writer != null && state == State.OPENED)
@@ -462,9 +487,9 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			{
 				setState(State.WRITING);
 				writer.append(formatter.format(new Date()));
-				writer.append(",");
 				for (String parameter : statuses)
 				{
+					writer.append(",");
 					try
 					{
 						writer.append(Coerce.toClass(dynamicProperties.getDynamicProperty(parameter), String.class));
@@ -473,7 +498,6 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 					{
 						writer.append(dynamicProperties.getDynamicProperty(parameter).toString());
 					}
-					writer.append(",");
 				}
 				writer.newLine();
 				writer.flush();
