@@ -337,11 +337,14 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 	{
 		// We need to traverse in the opposite direction since
 		// last elements precede in focus.
-		for (InteractiveCanvasItem ici : items)
+		synchronized (items)
 		{
-			if (matchClass.isAssignableFrom(ici.getClass()) && ici.isSelectable(x, y))
+			for (InteractiveCanvasItem ici : items)
 			{
-				return ici;
+				if (matchClass.isAssignableFrom(ici.getClass()) && ici.isSelectable(x, y))
+				{
+					return ici;
+				}
 			}
 		}
 		return null;
@@ -353,11 +356,14 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 		List<T> results = new ArrayList<>();
 		// We need to traverse in the opposite direction since
 		// last elements precede in focus.
-		for (final InteractiveCanvasItem ici : items)
+		synchronized (items)
 		{
-			if (matchClass.isAssignableFrom(ici.getClass()))
+			for (final InteractiveCanvasItem ici : items)
 			{
-				results.add((T) ici);
+				if (matchClass.isAssignableFrom(ici.getClass()))
+				{
+					results.add((T) ici);
+				}
 			}
 		}
 
@@ -366,15 +372,18 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 
 	private void addItem(final InteractiveCanvasItem item, final boolean sort)
 	{
-		if (!items.contains(item))
+		synchronized (items)
 		{
-			items.add(item);
-			item.setTargetCanvas(this);
-			if (sort)
+			if (!items.contains(item))
 			{
-				sortItemsByDrawPriority();
+				items.add(item);
+				item.setTargetCanvas(this);
+				if (sort)
+				{
+					sortItemsByDrawPriority();
+				}
+				item.repaint();
 			}
-			item.repaint();
 		}
 	}
 
@@ -425,20 +434,23 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 
 	private void insideMarker()
 	{
-		for (InteractiveCanvasItem item : items)
+		synchronized (items)
 		{
-			if (item.isInside(marker[0], marker[1], marker[0] + marker[2], marker[1] + marker[3]))
+			for (InteractiveCanvasItem item : items)
 			{
-				if (!item.isSelected())
+				if (item.isInside(marker[0], marker[1], marker[0] + marker[2], marker[1] + marker[3]))
 				{
-					// TODO selectItem(item, false);
+					if (!item.isSelected())
+					{
+						// TODO selectItem(item, false);
+					}
 				}
-			}
-			else
-			{
-				if (item.isSelected())
+				else
 				{
-					// TODO unselectItem(item);
+					if (item.isSelected())
+					{
+						// TODO unselectItem(item);
+					}
 				}
 			}
 		}
@@ -454,44 +466,53 @@ public class InteractiveCanvas extends JDesktopPane implements MouseListener, Mo
 	 */
 	private void setTopDrawPriority(final InteractiveCanvasItem item)
 	{
-		if (items.remove(item))
+		synchronized (items)
 		{
-			items.add(item);
+			if (items.remove(item))
+			{
+				items.add(item);
+			}
 		}
 	}
 
 	private void sortItemsByDrawPriority()
 	{
-		items.sort((item1, item2) ->
+		synchronized (items)
 		{
-			final int drawPrior1 = item1.drawPriority;
-			final int drawPrior2 = item2.drawPriority;
-			if (drawPrior1 == drawPrior2)
+			items.sort((item1, item2) ->
 			{
-				return 0;
-			}
-			else if (drawPrior1 > drawPrior2)
-			{
-				return 1;
-			}
-			else
-			{
-				return -1;
-			}
-		});
+				final int drawPrior1 = item1.drawPriority;
+				final int drawPrior2 = item2.drawPriority;
+				if (drawPrior1 == drawPrior2)
+				{
+					return 0;
+				}
+				else if (drawPrior1 > drawPrior2)
+				{
+					return 1;
+				}
+				else
+				{
+					return -1;
+				}
+			});
+		}
 	}
 
 	private void translateItems(final int newPosX, final int newPosY, final int oldPosX, final int oldPosY)
 	{
 		final int dx = (newPosX - oldPosX);
 		final int dy = (newPosY - oldPosY);
-		for (InteractiveCanvasItem item : items)
+		synchronized (items)
 		{
-			if (item.isSelected())
+			for (InteractiveCanvasItem item : items)
 			{
-				item.translatePosition(dx, dy);
+				if (item.isSelected())
+				{
+					item.translatePosition(dx, dy);
 
-				item.doOnTranslate();
+					item.doOnTranslate();
+				}
 			}
 		}
 	}
