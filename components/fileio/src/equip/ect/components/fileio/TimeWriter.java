@@ -301,7 +301,8 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 			final int dateIndex = content.lastIndexOf(" - ");
 			if (dateIndex > -1)
 			{
-				final String date = content.substring(dateIndex);
+				final String date = content.substring(dateIndex + 3);
+				System.out.println(date);
 				try
 				{
 					fileFormatter.parse(date);
