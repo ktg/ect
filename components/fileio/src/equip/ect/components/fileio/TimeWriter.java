@@ -298,7 +298,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 				System.out.println(content);
 			}
 
-			final int dateIndex = content.lastIndexOf('-');
+			final int dateIndex = content.lastIndexOf(" - ");
 			if (dateIndex > -1)
 			{
 				final String date = content.substring(dateIndex);
@@ -314,7 +314,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 				}
 			}
 
-			setFile(content + "-" + fileFormatter.format(new Date()) + ext);
+			setFile(content + " - " + fileFormatter.format(new Date()) + ext);
 			if(logAll)
 			{
 				try
