@@ -206,9 +206,9 @@ public class DynamicBeanShell implements Serializable, PropertyChangeListener, D
 	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] getDynamicProperties()
+	public DynamicPropertyDescriptor[] dynamicProperties()
 	{
-		return dynsup.getDynamicProperties();
+		return dynsup.dynamicProperties();
 	}
 
 	/**

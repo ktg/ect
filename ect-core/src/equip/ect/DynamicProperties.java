@@ -45,9 +45,9 @@ package equip.ect;
 public interface DynamicProperties
 {
 	/**
-	 * get all properties' {@link DynamicPropertyDescriptors}
+	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
-	public DynamicPropertyDescriptor[] getDynamicProperties();
+	public DynamicPropertyDescriptor[] dynamicProperties();
 
 	/**
 	 * get one property by name

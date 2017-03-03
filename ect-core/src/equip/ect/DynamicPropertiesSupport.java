@@ -111,7 +111,7 @@ public class DynamicPropertiesSupport implements DynamicProperties
 	 * get all properties
 	 */
 	@Override
-	public synchronized DynamicPropertyDescriptor[] getDynamicProperties()
+	public synchronized DynamicPropertyDescriptor[] dynamicProperties()
 	{
 		return descriptors.values().toArray(new DynamicPropertyDescriptor[descriptors.size()]);
 	}

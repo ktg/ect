@@ -92,9 +92,9 @@ public class SimpleDynamicComponent implements Serializable, DynamicProperties
 	 * get all properties' {@link DynamicPropertyDescriptors}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] getDynamicProperties()
+	public DynamicPropertyDescriptor[] dynamicProperties()
 	{
-		return dynsup.getDynamicProperties();
+		return dynsup.dynamicProperties();
 	}
 
 	/**

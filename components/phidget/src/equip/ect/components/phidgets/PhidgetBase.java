@@ -137,9 +137,9 @@ public abstract class PhidgetBase implements Serializable, DynamicProperties, At
 	 * get all properties' {@link DynamicPropertyDescriptors}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] getDynamicProperties()
+	public DynamicPropertyDescriptor[] dynamicProperties()
 	{
-		return dynsup.getDynamicProperties();
+		return dynsup.dynamicProperties();
 	}
 
 	/**

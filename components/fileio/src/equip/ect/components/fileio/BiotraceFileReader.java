@@ -160,9 +160,9 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 	 * get all properties' {@link equip.ect.DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] getDynamicProperties()
+	public DynamicPropertyDescriptor[] dynamicProperties()
 	{
-		return dynamicProperties.getDynamicProperties();
+		return dynamicProperties.dynamicProperties();
 	}
 
 	@Override
@@ -204,7 +204,7 @@ public class BiotraceFileReader implements Serializable, DynamicProperties
 			}
 		}
 
-		final DynamicPropertyDescriptor[] descriptors = dynamicProperties.getDynamicProperties();
+		final DynamicPropertyDescriptor[] descriptors = dynamicProperties.dynamicProperties();
 		for (final DynamicPropertyDescriptor descriptor : descriptors)
 		{
 			final String channelName = descriptor.getName();

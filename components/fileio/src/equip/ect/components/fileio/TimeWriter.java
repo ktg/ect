@@ -149,9 +149,9 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] getDynamicProperties()
+	public DynamicPropertyDescriptor[] dynamicProperties()
 	{
-		return dynamicProperties.getDynamicProperties();
+		return dynamicProperties.dynamicProperties();
 	}
 
 	/**
@@ -491,6 +491,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 				for (String parameter : statuses)
 				{
 					writer.append(",");
+					writer.append('"');
 					try
 					{
 						writer.append(Coerce.toClass(dynamicProperties.getDynamicProperty(parameter), String.class));
@@ -499,6 +500,7 @@ public class TimeWriter implements Serializable, PropertyChangeListener, Dynamic
 					{
 						writer.append(dynamicProperties.getDynamicProperty(parameter).toString());
 					}
+					writer.append('"');
 				}
 				writer.newLine();
 				writer.flush();

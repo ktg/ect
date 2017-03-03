@@ -105,7 +105,7 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 		frame.getContentPane().removeAll();
 		radioButtons.clear();
 		final ButtonGroup group = new ButtonGroup();
-		for (DynamicPropertyDescriptor property : dynsup.getDynamicProperties())
+		for (DynamicPropertyDescriptor property : dynsup.dynamicProperties())
 		{
 			try
 			{
@@ -185,9 +185,9 @@ public class RadioButtonInput extends UIBase implements DynamicProperties
 	 * get all properties' {@link DynamicPropertyDescriptor}
 	 */
 	@Override
-	public DynamicPropertyDescriptor[] getDynamicProperties()
+	public DynamicPropertyDescriptor[] dynamicProperties()
 	{
-		return dynsup.getDynamicProperties();
+		return dynsup.dynamicProperties();
 	}
 
 	/**
